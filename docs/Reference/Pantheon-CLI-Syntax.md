@@ -1250,7 +1250,7 @@ pantheon password hash --password=myPassword123
 
 ### operator
 
-Provides password related actions.
+Provides operator actions.
 
 ### generate-blockchain-config
 
@@ -1264,8 +1264,9 @@ pantheon operator generate-blockchain-config --config-file=<FILE> --to=<DIRECTOR
 pantheon operator generate-blockchain-config --config-file=config.json --to=myNetworkFiles
 ```
 
-The configuration file is an IBFT 2.0 genesis file except instead of the extraData property, the number of key pairs to 
-generate or the public node keys are included.
+The configuration file has 2 subnested JSON nodes. The first is `genesis` that includes the  
+the IBFT 2.0 genesis file except for the `extraData` string. The second is the `blockchain` property 
+defining the number of key pairs to generate or existing keys to import. 
 
 ### rlp
 

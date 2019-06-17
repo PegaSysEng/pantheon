@@ -23,8 +23,8 @@ consensus protocol](../Consensus-Protocols/IBFT.md).
 
 ## Steps
 
-The steps to create a private network using IBFT 2.0 with four nodes are on the right. All four nodes are 
-validators.   
+The steps to create a private network using IBFT 2.0 with four nodes are on the right. The four nodes are 
+all validators.   
 
 ### 1. Create Folders 
 
@@ -49,9 +49,9 @@ IBFT-Network/
 The configuration file defines the [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT.md#genesis-file) 
 and the number of node key pairs to generate.    
 
-The configuration file has 2 sub nested JSON nodes. The first is `genesis` that includes the  
-the IBFT 2.0 genesis file except for the `extraData` string. The second is the `blockchain` property defining     
-the number of key pairs to generate. 
+The configuration file has 2 subnested JSON nodes. The first is the `genesis` property defining 
+the IBFT 2.0 genesis file except for the `extraData` string. The second is the `blockchain` property 
+defining the number of key pairs to generate. 
     
 Copy the following configuration file definition to a file called `ibftConfigFile.json` and save it in the `IBFT-Network` directory: 
 
@@ -100,6 +100,11 @@ Copy the following configuration file definition to a file called `ibftConfigFil
 }
 ```
 
+!!! warning 
+    Do not use the accounts in `alloc` in the genesis file on mainnet or any public network except for testing.
+        
+    The private keys are displayed which means the accounts are not secure.  
+
 ### 3. Generate Node Keys and Genesis File 
 
 In the `IBFT-Network` directory, generate the node key and genesis file: 
@@ -109,17 +114,12 @@ pantheon operator generate-blockchain-config --config-file=ibftConfigFile.json -
 ```
 
 In the `networkFiles` directory, the following are created: 
+
 * `genesis.json` - genesis file including the `extraData` property specifying the four nodes are validators
 * Directory for each node named with the node address and containing the public and private key for each node 
 
-!!! example 
-    ADD DIRECTORY STRUCTURE HERE
-    
-### 4. Copy Node Private Keys to Node Directories 
-
-For each node, copy the `key.priv` file to the `data` directory for that node and rename `key`. (DOES IT HAVE TO BE RENAMED?)
-
 ```bash
+networkFiles/
 ├── genesis.json
 └── keys
     ├── 0x438821c42b812fecdcea7fe8235806a412712fc0
@@ -135,13 +135,40 @@ For each node, copy the `key.priv` file to the `data` directory for that node an
         ├── key.priv
         └── key.pub
 ```
+    
+### 4. Copy the Genesis File to the IBFT-Network Directory 
 
-!!! warning 
-    Do not use the accounts in `alloc` in the genesis file on mainnet or any public network except for testing.
-        
-    The private keys are displayed which means the accounts are not secure.  
+Copy the `genesis.json` file to the `IBFT-Network` directory. 
+    
+### 5. Copy Node Private Keys to Node Directories 
 
-### 5. Start First Node as Bootnode
+For each node: 
+
+* Copy the key files to the `data` directory for that node 
+* Rename each `key.priv` file to `key`
+
+```bash
+IBFT-Network/
+├── genesis.json
+├── Node-1
+│   ├── data
+│   │    ├── key
+│   │    ├── key.pub
+├── Node-2
+│   ├── data
+│   │    ├── key
+│   │    ├── key.pub
+├── Node-3
+│   ├── data
+│   │    ├── key
+│   │    ├── key.pub
+├── Node-4
+│   ├── data
+│   │    ├── key
+│   │    ├── key.pub
+```
+
+### 6. Start First Node as Bootnode
 
 In the `Node-1` directory, start Node-1:
 
@@ -171,7 +198,7 @@ Copy the enode URL to specify Node-1 as the bootnode in the following steps.
 
 ![Node 1 Enode URL](../images/EnodeStartup.png)
 
-### 6. Start Node-2 
+### 7. Start Node-2 
 
 Start another terminal, change to the `Node-2` directory and start Node-2 specifying the Node-1 enode URL copied when starting Node-1 as the bootnode:
  
@@ -192,7 +219,7 @@ The command line specifies:
 * Other options as for [Node-1](#5-start-first-node-as-bootnode).
 
 
-### 7. Start Node-3
+### 8. Start Node-3
 
 Start another terminal, change to the `Node-3` directory and start Node-3 specifying the Node-1 enode URL copied when starting Node-1 as the bootnode: 
 
@@ -212,7 +239,7 @@ The command line specifies:
  * Bootnode as for [Node-2](#6-start-node-2).
  * Other options as for [Node-1](#5-start-first-node-as-bootnode). 
  
-### 8. Start Node-4
+### 9. Start Node-4
 
 Start another terminal, change to the `Node-4` directory and start Node-4 specifying the Node-1 enode URL copied when starting Node-1 as the bootnode: 
 
@@ -226,13 +253,13 @@ pantheon --data-path=data --genesis-file=..\genesis.json --bootnodes=<Node-1 Eno
 
 The command line specifies: 
 
- * Data directory for Node-3 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
+ * Data directory for Node-4 using the [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) option.
  * Different port to Node-1, Node-2, and Node-3 for P2P peer discovery using the [`--p2p-port`](../Reference/Pantheon-CLI-Syntax.md#p2p-port) option.
  * Different port to Node-1, Node-2, and Node-3 for HTTP JSON-RPC using the [`--rpc-http-port`](../Reference/Pantheon-CLI-Syntax.md#rpc-http-port) option.
  * Bootnode as for [Node-2](#6-start-node-2).
  * Other options as for [Node-1](#5-start-first-node-as-bootnode). 
 
-### 8. Confirm Private Network is Working 
+### 10. Confirm Private Network is Working 
 
 Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../Reference/Pantheon-API-Methods.md#net_peercount) method and confirm the nodes are functioning as peers: 
 
@@ -240,18 +267,26 @@ Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../R
 curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' localhost:8545
 ```
 
-The result confirms Node-1 has two peers (Node-2, Node-3, and Node-4):
+The result confirms Node-1 has three peers (Node-2, Node-3, and Node-4):
 ```json
 {
   "jsonrpc" : "2.0",
   "id" : 1,
-  "result" : "0x4"
+  "result" : "0x3"
 }
 ```
 
 ## Next Steps 
 
-Look at the logs displayed to blocks are being produced. 
+Look at the logs displayed to confirm blocks are being produced. 
+
+Use the [IBFT API](../Reference/Pantheon-API-Methods.md#ibft-20-methods) to remove or add validators.
+
+!!! note
+    To add or remove nodes as validators you need the node address. The directory [created for each node](#3-generate-node-keys-and-genesis-file) 
+    is named with the node address.
+
+    This tuturial configures a private network using IBFT 2.0 for education purposes only. IBFT 2.0 requires 4 validators to be Byzantine fault tolerant.
 
 Import accounts to MetaMask and send transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask)
 
