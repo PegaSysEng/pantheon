@@ -123,7 +123,7 @@ public class TransactionSmartContractPermissioningController
     if (contractExists.isPresent() && !contractExists.get()) {
       this.checkCounterPermitted.inc();
       LOG.warn(
-          "Account permissioning smart contract not found at address {}. Any transaction will be allowed.",
+          "Account permissioning smart contract not found at address {} in current head block. Any transaction will be allowed.",
           contractAddress);
       return true;
     }
