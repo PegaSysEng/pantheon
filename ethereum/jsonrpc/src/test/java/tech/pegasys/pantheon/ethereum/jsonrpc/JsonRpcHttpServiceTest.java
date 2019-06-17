@@ -350,7 +350,7 @@ public class JsonRpcHttpServiceTest {
 
   @Test
   public void netPeerCountSuccessful() throws Exception {
-    when(peerDiscoveryMock.getPeers()).thenReturn(Arrays.asList(null, null, null));
+    when(peerDiscoveryMock.getPeerCount()).thenReturn(3);
 
     final String id = "123";
     final RequestBody body =
@@ -586,6 +586,7 @@ public class JsonRpcHttpServiceTest {
   @Test
   public void netPeerCountOfZero() throws Exception {
     when(peerDiscoveryMock.getPeers()).thenReturn(Collections.emptyList());
+    when(peerDiscoveryMock.getPeerCount()).thenReturn(0);
 
     final String id = "123";
     final RequestBody body =
