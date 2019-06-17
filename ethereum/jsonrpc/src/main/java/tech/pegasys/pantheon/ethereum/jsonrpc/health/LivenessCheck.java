@@ -12,21 +12,18 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.health;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.HealthService.HealthCheck;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.HealthService.ParamSource;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class LivenessService extends HealthService {
+public class LivenessCheck implements HealthCheck {
   private static final Logger LOG = LogManager.getLogger();
 
-  public LivenessService() {
-    super(buildHeathCheck());
-  }
-
-  private static HealthCheck buildHeathCheck() {
-    return () -> {
-      LOG.debug("Invoking liveness service.");
-
-      return true;
-    };
+  @Override
+  public boolean isHealthy(final ParamSource params) {
+    LOG.debug("Invoking liveness check.");
+    return true;
   }
 }

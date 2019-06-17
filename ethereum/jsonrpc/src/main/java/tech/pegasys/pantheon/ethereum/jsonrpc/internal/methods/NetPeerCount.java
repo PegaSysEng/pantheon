@@ -37,7 +37,7 @@ public class NetPeerCount implements JsonRpcMethod {
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
     try {
-      return new JsonRpcSuccessResponse(req.getId(), Quantity.create(p2pNetwork.getPeers().size()));
+      return new JsonRpcSuccessResponse(req.getId(), Quantity.create(p2pNetwork.getPeerCount()));
     } catch (P2pDisabledException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.P2P_DISABLED);
     }
