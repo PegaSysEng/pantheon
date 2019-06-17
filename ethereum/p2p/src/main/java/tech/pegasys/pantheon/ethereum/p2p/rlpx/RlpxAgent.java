@@ -17,30 +17,27 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.isNull;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.p2p.api.ConnectCallback;
-import tech.pegasys.pantheon.ethereum.p2p.api.DisconnectCallback;
-import tech.pegasys.pantheon.ethereum.p2p.api.MessageCallback;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.p2p.peers.LocalNode;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerProperties;
 import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.ConnectionInitializer;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerRlpxPermissions;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.RlpxConnection;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.netty.NettyConnectionInitializer;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.FutureUtils;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -164,7 +161,9 @@ public class RlpxAgent {
 
   public Optional<CompletableFuture<PeerConnection>> getPeerConnection(final Peer peer) {
     final RlpxConnection connection = connectionsById.get(peer.getId());
-    return isNull(connection) ? Optional.empty() : Optional.of(connection.getFuture());
+    return Optional.ofNullable(connection)
+        .filter(conn -> !conn.isFailedOrDisconnected())
+        .map(RlpxConnection::getFuture);
   }
 
   /**
@@ -278,7 +277,8 @@ public class RlpxAgent {
 
     connectionsToCheck.forEach(
         connection -> {
-          if (!peerPermissions.allowOngoingConnection(connection.getPeer())) {
+          if (!peerPermissions.allowOngoingConnection(
+              connection.getPeer(), connection.initiatedRemotely())) {
             connection.disconnect(DisconnectReason.REQUESTED);
           }
         });
