@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.metrics.prometheus;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,14 +33,13 @@ import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.Comparator;
-import java.util.EnumSet;
 
 import org.junit.Test;
 
 public class PrometheusMetricsSystemTest {
 
   private static final Comparator<Observation> IGNORE_VALUES =
-      Comparator.comparing(Observation::getCategory)
+      Comparator.<Observation, String>comparing(o -> o.getCategory().getName())
           .thenComparing(Observation::getMetricName)
           .thenComparing((o1, o2) -> o1.getLabels().equals(o2.getLabels()) ? 0 : 1);
 
@@ -175,7 +175,7 @@ public class PrometheusMetricsSystemTest {
   public void shouldOnlyObserveEnabledMetrics() {
     final MetricsConfiguration metricsConfiguration =
         MetricsConfiguration.builder()
-            .metricCategories(EnumSet.of(PantheonMetricCategory.RPC))
+            .metricCategories(singleton(PantheonMetricCategory.RPC))
             .enabled(true)
             .build();
     final MetricsSystem localMetricSystem = PrometheusMetricsSystem.init(metricsConfiguration);

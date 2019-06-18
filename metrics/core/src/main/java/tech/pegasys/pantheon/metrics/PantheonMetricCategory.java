@@ -15,7 +15,9 @@ package tech.pegasys.pantheon.metrics;
 import java.util.EnumSet;
 import java.util.Set;
 
-public enum PantheonMetricCategory {
+import com.google.common.collect.ImmutableSet;
+
+public enum PantheonMetricCategory implements MetricCategory {
   BIG_QUEUE("big_queue"),
   BLOCKCHAIN("blockchain"),
   EXECUTORS("executors"),
@@ -31,8 +33,9 @@ public enum PantheonMetricCategory {
   TRANSACTION_POOL("transaction_pool");
 
   // Why not BIG_QUEUE and ROCKSDB?  They hurt performance under load.
-  public static final Set<PantheonMetricCategory> DEFAULT_METRIC_CATEGORIES =
-      EnumSet.complementOf(EnumSet.of(BIG_QUEUE, KVSTORE_ROCKSDB, KVSTORE_ROCKSDB_STATS));
+  public static final Set<MetricCategory> DEFAULT_METRIC_CATEGORIES =
+      ImmutableSet.copyOf(
+          EnumSet.complementOf(EnumSet.of(BIG_QUEUE, KVSTORE_ROCKSDB, KVSTORE_ROCKSDB_STATS)));
 
   private final String name;
   private final boolean pantheonSpecific;
@@ -46,10 +49,12 @@ public enum PantheonMetricCategory {
     this.pantheonSpecific = pantheonSpecific;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public boolean isPantheonSpecific() {
     return pantheonSpecific;
   }
