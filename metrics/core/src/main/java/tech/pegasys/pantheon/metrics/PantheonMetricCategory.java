@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.metrics;
 
 import java.util.EnumSet;
-import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -33,7 +32,7 @@ public enum PantheonMetricCategory implements MetricCategory {
   TRANSACTION_POOL("transaction_pool");
 
   // Why not BIG_QUEUE and ROCKSDB?  They hurt performance under load.
-  public static final Set<MetricCategory> DEFAULT_METRIC_CATEGORIES =
+  public static final ImmutableSet<MetricCategory> DEFAULT_METRIC_CATEGORIES =
       ImmutableSet.copyOf(
           EnumSet.complementOf(EnumSet.of(BIG_QUEUE, KVSTORE_ROCKSDB, KVSTORE_ROCKSDB_STATS)));
 
