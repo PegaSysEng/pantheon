@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -51,6 +52,7 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
   private final Counter pipelineCompleteCounter;
   private final Counter pipelineErrorCounter;
   private Pipeline<?> currentDownloadPipeline;
+  private SyncTarget syncTarget;
 
   public PipelineChainDownloader(
       final SyncState syncState,
@@ -114,13 +116,17 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
 
   private CompletionStage<Void> handleFailedDownload(final Throwable error) {
     pipelineErrorCounter.inc();
-    if (!cancelled.get()
-        && syncTargetManager.shouldContinueDownloading()
-        && !(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
+    final boolean shouldContinue =
+        !cancelled.get() && syncTargetManager.shouldContinueDownloading();
+    if (shouldContinue && !(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
       logDownloadFailure("Chain download failed. Restarting after short delay.", error);
       // Allowing the normal looping logic to retry after a brief delay.
       return scheduler.scheduleFutureTask(() -> completedFuture(null), PAUSE_AFTER_ERROR_DURATION);
     }
+    if (!(ExceptionUtils.rootCause(error) instanceof InvalidBlockException)) {
+      syncTarget.peer().disconnect(DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL);
+    }
+
     logDownloadFailure("Chain download failed.", error);
     // Propagate the error out, terminating this chain download.
     return completedExceptionally(error);
@@ -139,10 +145,11 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
   }
 
   private synchronized CompletionStage<Void> startDownloadForSyncTarget(final SyncTarget target) {
+    this.syncTarget = target;
     if (cancelled.get()) {
       return completedExceptionally(new CancellationException("Chain download was cancelled"));
     }
-    syncState.setSyncTarget(target.peer(), target.commonAncestor());
+    syncState.setSyncTarget(syncTarget.peer(), syncTarget.commonAncestor());
     currentDownloadPipeline = downloadPipelineFactory.createDownloadPipelineForSyncTarget(target);
     return scheduler.startPipeline(currentDownloadPipeline);
   }
