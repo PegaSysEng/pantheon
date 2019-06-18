@@ -43,10 +43,6 @@ public class MetricsConfiguration {
   private final String prometheusJob;
   private final List<String> hostsWhitelist;
 
-  public static MetricsConfiguration createDefault() {
-    return builder().build();
-  }
-
   public static Builder builder() {
     return new Builder();
   }

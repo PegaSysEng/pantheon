@@ -12,11 +12,11 @@
  */
 package tech.pegasys.pantheon.metrics.prometheus;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
 import java.net.InetSocketAddress;
-import java.util.Collections;
 import java.util.Properties;
 
 import io.vertx.core.Vertx;
@@ -64,10 +64,7 @@ public class MetricsHttpServiceTest {
   }
 
   private static MetricsConfiguration.Builder createMetricsConfigBuilder() {
-    return MetricsConfiguration.builder()
-        .enabled(true)
-        .port(0)
-        .hostsWhitelist(Collections.singletonList("*"));
+    return MetricsConfiguration.builder().enabled(true).port(0).hostsWhitelist(singletonList("*"));
   }
 
   /** Tears down the HTTP server. */

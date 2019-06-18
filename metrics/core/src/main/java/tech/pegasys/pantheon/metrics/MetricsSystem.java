@@ -35,7 +35,8 @@ public interface MetricsSystem {
   LabelledMetric<OperationTimer> createLabelledTimer(
       MetricCategory category, String name, String help, String... labelNames);
 
-  void createGauge(MetricCategory category, String name, String help, DoubleSupplier valueSupplier);
+  void createGauge(
+      MetricCategory category, String name, String help, DoubleSupplier valueSupplier);
 
   default void createIntegerGauge(
       final MetricCategory category,
