@@ -134,7 +134,7 @@ public final class RunnerTest {
             .clock(TestClock.fixed())
             .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
             .storageProvider(createKeyValueStorageProvider(dbAhead))
-            .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_HOURS)
+            .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_SECONDS)
             .build()) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
@@ -154,7 +154,7 @@ public final class RunnerTest {
             .clock(TestClock.fixed())
             .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
             .storageProvider(createKeyValueStorageProvider(dbAhead))
-            .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_HOURS)
+            .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_SECONDS)
             .build();
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
@@ -213,7 +213,7 @@ public final class RunnerTest {
               .privacyParameters(PrivacyParameters.DEFAULT)
               .clock(TestClock.fixed())
               .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
-              .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_HOURS)
+              .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_SECONDS)
               .build();
       final EnodeURL enode = runnerAhead.getLocalEnode().get();
       final EthNetworkConfig behindEthNetworkConfiguration =

@@ -98,7 +98,7 @@ public class IbftBlockCreatorTest {
                         initialValidatorList)
                     .encode(),
             new PendingTransactions(
-                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                PendingTransactions.DEFAULT_TX_RETENTION_SECONDS,
                 1,
                 TestClock.fixed(),
                 metricsSystem),

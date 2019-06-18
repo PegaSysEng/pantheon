@@ -720,7 +720,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder)
         .maxPendingTransactions(eq(PendingTransactions.MAX_PENDING_TRANSACTIONS));
     verify(mockControllerBuilder)
-        .pendingTransactionRetentionPeriod(eq(PendingTransactions.DEFAULT_TX_RETENTION_HOURS));
+        .pendingTransactionRetentionPeriod(eq(PendingTransactions.DEFAULT_TX_RETENTION_SECONDS));
     verify(mockControllerBuilder).build();
 
     verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FULL));
@@ -2576,11 +2576,11 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void pendingTransactionRetentionPeriod() {
-    final int pendingTxRetentionHours = 999;
-    parseCommand("--tx-pool-retention-hours", String.valueOf(pendingTxRetentionHours));
+    final int pendingTxRetentionSeconds = 999;
+    parseCommand("--tx-pool-retention-seconds", String.valueOf(pendingTxRetentionSeconds));
 
     verify(mockControllerBuilder).pendingTransactionRetentionPeriod(intArgumentCaptor.capture());
-    verify(mockControllerBuilder).pendingTransactionRetentionPeriod(eq(pendingTxRetentionHours));
+    verify(mockControllerBuilder).pendingTransactionRetentionPeriod(eq(pendingTxRetentionSeconds));
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();

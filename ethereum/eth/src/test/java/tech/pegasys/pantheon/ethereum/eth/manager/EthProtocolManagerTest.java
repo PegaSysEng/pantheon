@@ -1080,7 +1080,7 @@ public final class EthProtocolManagerTest {
           PendingTransactions.MAX_PENDING_TRANSACTIONS,
           metricsSystem,
           mock(SyncState.class),
-          PendingTransactions.DEFAULT_TX_RETENTION_HOURS);
+          PendingTransactions.DEFAULT_TX_RETENTION_SECONDS);
 
       // Send just a transaction message.
       final PeerConnection peer = setupPeer(ethManager, (cap, msg, connection) -> {});

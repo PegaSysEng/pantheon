@@ -66,7 +66,7 @@ public class EthHashBlockCreatorTest {
 
     final PendingTransactions pendingTransactions =
         new PendingTransactions(
-            PendingTransactions.DEFAULT_TX_RETENTION_HOURS, 1, TestClock.fixed(), metricsSystem);
+            PendingTransactions.DEFAULT_TX_RETENTION_SECONDS, 1, TestClock.fixed(), metricsSystem);
 
     final EthHashBlockCreator blockCreator =
         new EthHashBlockCreator(

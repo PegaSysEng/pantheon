@@ -40,8 +40,13 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Holds the current set of pending transactions with the ability to iterate them based on priority
@@ -51,10 +56,11 @@ import java.util.stream.Collectors;
  */
 public class PendingTransactions {
 
-  public static final int MAX_PENDING_TRANSACTIONS = 4096;
-  public static final int DEFAULT_TX_RETENTION_HOURS = 13;
+  private static final Logger LOG = LogManager.getLogger();
+  public static final int MAX_PENDING_TRANSACTIONS = 1024;
+  public static final int DEFAULT_TX_RETENTION_SECONDS = 60;
 
-  private final int maxTransactionRetentionHours;
+  private final int maxTransactionRetentionSeconds;
   private final Clock clock;
 
   private final Map<Hash, TransactionInfo> pendingTransactions = new ConcurrentHashMap<>();
@@ -78,11 +84,11 @@ public class PendingTransactions {
   private final long maxPendingTransactions;
 
   public PendingTransactions(
-      final int maxTransactionRetentionHours,
+      final int maxTransactionRetentionSeconds,
       final int maxPendingTransactions,
       final Clock clock,
       final MetricsSystem metricsSystem) {
-    this.maxTransactionRetentionHours = maxTransactionRetentionHours;
+    this.maxTransactionRetentionSeconds = maxTransactionRetentionSeconds;
     this.maxPendingTransactions = maxPendingTransactions;
     this.clock = clock;
     final LabelledMetric<Counter> transactionAddedCounter =
@@ -105,11 +111,18 @@ public class PendingTransactions {
 
   public void evictOldTransactions() {
     final Instant removeTransactionsBefore =
-        clock.instant().minus(maxTransactionRetentionHours, ChronoUnit.HOURS);
-
-    pendingTransactions.values().stream()
-        .filter(transaction -> transaction.getAddedToPoolAt().isBefore(removeTransactionsBefore))
-        .forEach(transaction -> removeTransaction(transaction.getTransaction()));
+        clock.instant().minus(maxTransactionRetentionSeconds, ChronoUnit.SECONDS);
+    final Stream<TransactionInfo> transactionsToRemove =
+        pendingTransactions.values().stream()
+            .filter(
+                transaction -> transaction.getAddedToPoolAt().isBefore(removeTransactionsBefore));
+    final AtomicInteger txCounter = new AtomicInteger(0);
+    transactionsToRemove.forEach(
+        transaction -> {
+          removeTransaction(transaction.getTransaction());
+          txCounter.incrementAndGet();
+        });
+    LOG.debug("{} transactions evicted from the pool.", txCounter.get());
   }
 
   List<Transaction> getLocalTransactions() {

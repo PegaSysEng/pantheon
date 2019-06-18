@@ -91,7 +91,7 @@ public class TransactionPoolTest {
 
   private final PendingTransactions transactions =
       new PendingTransactions(
-          PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+          PendingTransactions.DEFAULT_TX_RETENTION_SECONDS,
           MAX_TRANSACTIONS,
           TestClock.fixed(),
           metricsSystem);

@@ -51,7 +51,7 @@ public class PendingTransactionsTest {
   private final StubMetricsSystem metricsSystem = new StubMetricsSystem();
   private final PendingTransactions transactions =
       new PendingTransactions(
-          PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+          PendingTransactions.DEFAULT_TX_RETENTION_SECONDS,
           MAX_TRANSACTIONS,
           TestClock.fixed(),
           metricsSystem);
@@ -430,10 +430,10 @@ public class PendingTransactionsTest {
 
   @Test
   public void shouldEvictMultipleOldTransactions() {
-    final int maxTransactionRetentionHours = 1;
+    final int maxTransactionRetentionSeconds = 1;
     final PendingTransactions transactions =
         new PendingTransactions(
-            maxTransactionRetentionHours, MAX_TRANSACTIONS, clock, metricsSystem);
+            maxTransactionRetentionSeconds, MAX_TRANSACTIONS, clock, metricsSystem);
 
     transactions.addRemoteTransaction(transaction1);
     assertThat(transactions.size()).isEqualTo(1);
@@ -448,10 +448,10 @@ public class PendingTransactionsTest {
 
   @Test
   public void shouldEvictSingleOldTransaction() {
-    final int maxTransactionRetentionHours = 1;
+    final int maxTransactionRetentionSeconds = 1;
     final PendingTransactions transactions =
         new PendingTransactions(
-            maxTransactionRetentionHours, MAX_TRANSACTIONS, clock, metricsSystem);
+            maxTransactionRetentionSeconds, MAX_TRANSACTIONS, clock, metricsSystem);
     transactions.addRemoteTransaction(transaction1);
     assertThat(transactions.size()).isEqualTo(1);
     clock.step(2L, ChronoUnit.HOURS);
@@ -462,10 +462,10 @@ public class PendingTransactionsTest {
 
   @Test
   public void shouldEvictExclusivelyOldTransactions() {
-    final int maxTransactionRetentionHours = 2;
+    final int maxTransactionRetentionSeconds = 2;
     final PendingTransactions transactions =
         new PendingTransactions(
-            maxTransactionRetentionHours, MAX_TRANSACTIONS, clock, metricsSystem);
+            maxTransactionRetentionSeconds, MAX_TRANSACTIONS, clock, metricsSystem);
     transactions.addRemoteTransaction(transaction1);
     assertThat(transactions.size()).isEqualTo(1);
     clock.step(3L, ChronoUnit.HOURS);

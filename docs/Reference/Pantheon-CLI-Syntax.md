@@ -1089,23 +1089,23 @@ The default is 8546. Ports must be [exposed appropriately](../Configuring-Panthe
 tx-pool-max-size="2000"
 ```
 
-Maximum number of transactions kept in the transaction pool. Default is 4096. 
+Maximum number of transactions kept in the transaction pool. Default is 1024. 
 
-### tx-pool-retention-hours
+### tx-pool-retention-seconds
 
 ```bash tab="Syntax"
---tx-pool-retention-hours=<INTEGER>
+--tx-pool-retention-seconds=<INTEGER>
 ```
 
 ```bash tab="Example Command Line"
---tx-pool-retention-hours=5
+--tx-pool-retention-seconds=5
 ```
 
 ```bash tab="Example Configuration File"
-tx-pool-retention-hours="5"
+tx-pool-retention-seconds="5"
 ```
 
-Maximum period in hours to retain pending transactions in the transaction pool. Default is 13. 
+Maximum period in seconds to retain pending transactions in the transaction pool. Default is 13. 
 
 ### help
 

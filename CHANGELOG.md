@@ -61,7 +61,7 @@ Documentation updates include:
 ### Additions and Improvements 
 
 - [GraphQL](https://docs.pantheon.pegasys.tech/en/latest/Pantheon-API/GraphQL/) [\#1311](https://github.com/PegaSysEng/pantheon/pull/1311) (thanks to [zyfrank](https://github.com/zyfrank))
-- Added [`--tx-pool-retention-hours`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#tx-pool-retention-hours) [\#1333](https://github.com/PegaSysEng/pantheon/pull/1333)
+- Added [`--tx-pool-retention-seconds`](https://docs.pantheon.pegasys.tech/en/latest/Reference/Pantheon-CLI-Syntax/#tx-pool-retention-seconds) [\#1333](https://github.com/PegaSysEng/pantheon/pull/1333)
 - Added Genesis file support for specifying the maximum stack size. [\#1431](https://github.com/PegaSysEng/pantheon/pull/1431) 
 - Included transaction details when subscribed to Pending transactions [\#1410](https://github.com/PegaSysEng/pantheon/pull/1410) 
 - Documentation updates include:

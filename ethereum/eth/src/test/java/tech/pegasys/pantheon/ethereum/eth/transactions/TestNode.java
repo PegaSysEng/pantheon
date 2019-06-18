@@ -150,7 +150,7 @@ public class TestNode implements Closeable {
             PendingTransactions.MAX_PENDING_TRANSACTIONS,
             metricsSystem,
             syncState,
-            PendingTransactions.DEFAULT_TX_RETENTION_HOURS);
+            PendingTransactions.DEFAULT_TX_RETENTION_SECONDS);
 
     networkRunner.start();
     selfPeer = DefaultPeer.fromEnodeURL(network.getLocalEnode().get());

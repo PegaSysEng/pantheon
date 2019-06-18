@@ -551,12 +551,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer txPoolMaxSize = PendingTransactions.MAX_PENDING_TRANSACTIONS;
 
   @Option(
-      names = {"--tx-pool-retention-hours"},
+      names = {"--tx-pool-retention-seconds"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
-          "Maximum retention period of pending transactions in hours (default: ${DEFAULT-VALUE})",
+          "Maximum retention period of pending transactions in seconds (default: ${DEFAULT-VALUE})",
       arity = "1")
-  private final Integer pendingTxRetentionPeriod = PendingTransactions.DEFAULT_TX_RETENTION_HOURS;
+  private final Integer pendingTxRetentionPeriod = PendingTransactions.DEFAULT_TX_RETENTION_SECONDS;
 
   // Inner class so we can get to loggingLevel.
   public class PantheonExceptionHandler

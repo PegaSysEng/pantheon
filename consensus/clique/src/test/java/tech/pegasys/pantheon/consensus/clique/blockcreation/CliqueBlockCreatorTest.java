@@ -114,7 +114,7 @@ public class CliqueBlockCreatorTest {
             coinbase,
             parent -> extraData,
             new PendingTransactions(
-                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                PendingTransactions.DEFAULT_TX_RETENTION_SECONDS,
                 5,
                 TestClock.fixed(),
                 metricsSystem),
@@ -145,7 +145,7 @@ public class CliqueBlockCreatorTest {
             coinbase,
             parent -> extraData,
             new PendingTransactions(
-                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                PendingTransactions.DEFAULT_TX_RETENTION_SECONDS,
                 5,
                 TestClock.fixed(),
                 metricsSystem),
@@ -175,7 +175,7 @@ public class CliqueBlockCreatorTest {
             coinbase,
             parent -> extraData,
             new PendingTransactions(
-                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                PendingTransactions.DEFAULT_TX_RETENTION_SECONDS,
                 5,
                 TestClock.fixed(),
                 metricsSystem),
@@ -208,7 +208,7 @@ public class CliqueBlockCreatorTest {
             coinbase,
             parent -> extraData,
             new PendingTransactions(
-                PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+                PendingTransactions.DEFAULT_TX_RETENTION_SECONDS,
                 5,
                 TestClock.fixed(),
                 metricsSystem),

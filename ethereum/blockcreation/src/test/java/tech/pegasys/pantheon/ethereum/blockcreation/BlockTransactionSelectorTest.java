@@ -68,7 +68,7 @@ public class BlockTransactionSelectorTest {
 
   private final PendingTransactions pendingTransactions =
       new PendingTransactions(
-          PendingTransactions.DEFAULT_TX_RETENTION_HOURS, 5, TestClock.fixed(), metricsSystem);
+          PendingTransactions.DEFAULT_TX_RETENTION_SECONDS, 5, TestClock.fixed(), metricsSystem);
   private final Blockchain blockchain = new TestBlockchain();
   private final DefaultMutableWorldState worldState = inMemoryWorldState();
   private final Supplier<Boolean> isCancelled = () -> false;
