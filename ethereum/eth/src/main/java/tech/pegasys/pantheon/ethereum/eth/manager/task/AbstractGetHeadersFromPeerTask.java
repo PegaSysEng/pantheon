@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.eth.manager.task;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
@@ -92,18 +91,21 @@ public abstract class AbstractGetHeadersFromPeerTask
     final int expectedDelta = reverse ? -(skip + 1) : (skip + 1);
     for (int i = 1; i < headers.size(); i++) {
       final BlockHeader header = headers.get(i);
+      if (header.getNumber() != prevBlockHeader.getNumber() + expectedDelta) {
+        // Skip doesn't match, this isn't our data
+        return Optional.empty();
+      }
       // if headers are supposed to be sequential check if a chain is formed
       if (Math.abs(expectedDelta) == 1) {
         final BlockHeader parent = reverse ? header : prevBlockHeader;
         final BlockHeader child = reverse ? prevBlockHeader : header;
         if (!parent.getHash().equals(child.getParentHash())) {
+          LOG.debug(
+              "Sequential headers must form a chain through hashes, disconnecting peer: {}",
+              peer.toString());
           peer.disconnect(DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL);
           return Optional.empty();
         }
-      }
-      if (header.getNumber() != prevBlockHeader.getNumber() + expectedDelta) {
-        // Skip doesn't match, this isn't our data
-        return Optional.empty();
       }
       prevBlockHeader = header;
       headersList.add(header);
