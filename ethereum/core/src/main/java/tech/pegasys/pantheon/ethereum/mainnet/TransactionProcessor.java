@@ -107,6 +107,8 @@ public interface TransactionProcessor {
    * @param miningBeneficiary The address which is to receive the transaction fee
    * @param blockHashLookup The {@link BlockHashLookup} to use for BLOCKHASH operations
    * @param isPersistingState Whether the state will be modified by this process
+   * @param checkOnchainPermissions Whether a transaction permissioning check should check onchain
+   *     permissioning rules
    * @return the transaction result
    */
   default Result processTransaction(
