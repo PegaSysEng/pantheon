@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.sync;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
 import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -27,14 +28,17 @@ public class CheckpointHeaderValidationStep<C>
   private final ProtocolSchedule<C> protocolSchedule;
   private final ProtocolContext<C> protocolContext;
   private final ValidationPolicy validationPolicy;
+  private final SyncTarget syncTarget;
 
   public CheckpointHeaderValidationStep(
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
-      final ValidationPolicy validationPolicy) {
+      final ValidationPolicy validationPolicy,
+      final SyncTarget syncTarget) {
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = protocolContext;
     this.validationPolicy = validationPolicy;
+    this.syncTarget = syncTarget;
   }
 
   @Override
@@ -48,7 +52,8 @@ public class CheckpointHeaderValidationStep<C>
       throw new InvalidBlockException(
           "Provided first header does not connect to last header.",
           expectedParent.getNumber(),
-          expectedParent.getHash());
+          expectedParent.getHash(),
+          syncTarget);
     }
   }
 

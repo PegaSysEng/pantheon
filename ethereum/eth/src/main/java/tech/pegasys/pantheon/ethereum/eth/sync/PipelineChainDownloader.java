@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -116,6 +117,16 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
     pipelineErrorCounter.inc();
     if (!cancelled.get()
         && syncTargetManager.shouldContinueDownloading()
+        && ExceptionUtils.rootCause(error) instanceof InvalidBlockException) {
+      final InvalidBlockException invalidBlockException =
+          (InvalidBlockException) ExceptionUtils.rootCause(error);
+      invalidBlockException
+          .getPeer()
+          .ifPresent(peer -> peer.disconnect(DisconnectMessage.DisconnectReason.USELESS_PEER));
+    }
+
+    if (!cancelled.get()
+        && syncTargetManager.shouldContinueDownloading()
         && !(ExceptionUtils.rootCause(error) instanceof CancellationException)) {
       logDownloadFailure("Chain download failed. Restarting after short delay.", error);
       // Allowing the normal looping logic to retry after a brief delay.
@@ -143,6 +154,7 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
       return completedExceptionally(new CancellationException("Chain download was cancelled"));
     }
     syncState.setSyncTarget(target.peer(), target.commonAncestor());
+    target.peer().disconnect(DisconnectMessage.DisconnectReason.USELESS_PEER);
     currentDownloadPipeline = downloadPipelineFactory.createDownloadPipelineForSyncTarget(target);
     return scheduler.startPipeline(currentDownloadPipeline);
   }

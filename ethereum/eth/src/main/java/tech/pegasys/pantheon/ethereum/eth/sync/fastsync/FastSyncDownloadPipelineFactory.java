@@ -116,7 +116,7 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
             metricsSystem);
     final CheckpointHeaderValidationStep<C> validateHeadersJoinUpStep =
         new CheckpointHeaderValidationStep<>(
-            protocolSchedule, protocolContext, detachedValidationPolicy);
+            protocolSchedule, protocolContext, detachedValidationPolicy, target);
     final DownloadBodiesStep<C> downloadBodiesStep =
         new DownloadBodiesStep<>(protocolSchedule, ethContext, metricsSystem);
     final DownloadReceiptsStep downloadReceiptsStep =

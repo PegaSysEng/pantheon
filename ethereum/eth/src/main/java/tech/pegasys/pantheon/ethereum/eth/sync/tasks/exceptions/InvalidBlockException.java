@@ -13,10 +13,34 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
+import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
+
+import java.util.Optional;
 
 public class InvalidBlockException extends RuntimeException {
 
+  private Optional<EthPeer> peer = Optional.empty();
+
   public InvalidBlockException(final String message, final long blockNumber, final Hash blockHash) {
     super(message + ": " + blockNumber + ", " + blockHash);
+  }
+
+  public InvalidBlockException(
+      final String message,
+      final long blockNumber,
+      final Hash blockHash,
+      final SyncTarget syncTarget) {
+    this(message, blockNumber, blockHash, syncTarget.peer());
+  }
+
+  public InvalidBlockException(
+      final String message, final long blockNumber, final Hash blockHash, final EthPeer peer) {
+    this(message, blockNumber, blockHash);
+    this.peer = Optional.of(peer);
+  }
+
+  public Optional<EthPeer> getPeer() {
+    return peer;
   }
 }
