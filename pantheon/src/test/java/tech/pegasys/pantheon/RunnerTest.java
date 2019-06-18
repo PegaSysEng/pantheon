@@ -360,7 +360,7 @@ public final class RunnerTest {
   }
 
   private MetricsConfiguration metricsConfiguration() {
-    return MetricsConfiguration.builder().port(0).enabled(false).build();
+    return MetricsConfiguration.builder().enabled(false).port(0).build();
   }
 
   private static void setupState(
