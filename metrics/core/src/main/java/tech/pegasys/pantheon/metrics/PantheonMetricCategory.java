@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.metrics;
 
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -29,6 +30,7 @@ public enum PantheonMetricCategory implements MetricCategory {
   SYNCHRONIZER("synchronizer"),
   TRANSACTION_POOL("transaction_pool");
 
+  private static final Optional<String> PANTHEON_PREFIX = Optional.of("pantheon_");
   public static final Set<MetricCategory> DEFAULT_METRIC_CATEGORIES;
 
   static {
@@ -61,7 +63,7 @@ public enum PantheonMetricCategory implements MetricCategory {
   }
 
   @Override
-  public boolean isApplicationSpecific() {
-    return pantheonSpecific;
+  public Optional<String> getAppliationPrefix() {
+    return pantheonSpecific ? PANTHEON_PREFIX : Optional.empty();
   }
 }

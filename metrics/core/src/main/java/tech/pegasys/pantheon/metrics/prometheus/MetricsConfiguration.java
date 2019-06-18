@@ -42,7 +42,6 @@ public class MetricsConfiguration {
   private final int pushInterval;
   private final String prometheusJob;
   private final List<String> hostsWhitelist;
-  private final String applicationPrefix;
 
   public static MetricsConfiguration createDefault() {
     return builder().build();
@@ -62,8 +61,7 @@ public class MetricsConfiguration {
       final String pushHost,
       final int pushInterval,
       final String prometheusJob,
-      final List<String> hostsWhitelist,
-      final String applicationPrefix) {
+      final List<String> hostsWhitelist) {
     this.enabled = enabled;
     this.port = port;
     this.host = host;
@@ -74,7 +72,6 @@ public class MetricsConfiguration {
     this.pushInterval = pushInterval;
     this.prometheusJob = prometheusJob;
     this.hostsWhitelist = hostsWhitelist;
-    this.applicationPrefix = applicationPrefix;
   }
 
   public boolean isEnabled() {
@@ -117,10 +114,6 @@ public class MetricsConfiguration {
     return Collections.unmodifiableCollection(this.hostsWhitelist);
   }
 
-  public String getApplicationPrefix() {
-    return applicationPrefix;
-  }
-
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
@@ -134,7 +127,6 @@ public class MetricsConfiguration {
         .add("pushInterval", pushInterval)
         .add("prometheusJob", prometheusJob)
         .add("hostsWhitelist", hostsWhitelist)
-        .add("applicationPrefix", applicationPrefix)
         .toString();
   }
 
@@ -156,8 +148,7 @@ public class MetricsConfiguration {
         && Objects.equals(metricCategories, that.metricCategories)
         && Objects.equals(pushHost, that.pushHost)
         && Objects.equals(prometheusJob, that.prometheusJob)
-        && Objects.equals(hostsWhitelist, that.hostsWhitelist)
-        && Objects.equals(applicationPrefix, that.applicationPrefix);
+        && Objects.equals(hostsWhitelist, that.hostsWhitelist);
   }
 
   @Override
@@ -172,8 +163,7 @@ public class MetricsConfiguration {
         pushHost,
         pushInterval,
         prometheusJob,
-        hostsWhitelist,
-        applicationPrefix);
+        hostsWhitelist);
   }
 
   public static class Builder {
@@ -187,7 +177,6 @@ public class MetricsConfiguration {
     private int pushInterval = 15;
     private String prometheusJob = "pantheon-client";
     private List<String> hostsWhitelist = Arrays.asList("localhost", "127.0.0.1");
-    private String applicationPrefix = "";
 
     private Builder() {}
 
@@ -241,11 +230,6 @@ public class MetricsConfiguration {
       return this;
     }
 
-    public Builder applicationPrefix(final String applicationPrefix) {
-      this.applicationPrefix = applicationPrefix;
-      return this;
-    }
-
     public MetricsConfiguration build() {
       return new MetricsConfiguration(
           enabled,
@@ -257,8 +241,7 @@ public class MetricsConfiguration {
           pushHost,
           pushInterval,
           prometheusJob,
-          hostsWhitelist,
-          applicationPrefix);
+          hostsWhitelist);
     }
   }
 }

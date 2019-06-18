@@ -58,12 +58,9 @@ public class PrometheusMetricsSystem implements MetricsSystem {
       cachedTimers = new ConcurrentHashMap<>();
 
   private final Set<MetricCategory> enabledCategories;
-  private final String applicationPrefix;
 
-  PrometheusMetricsSystem(
-      final Set<MetricCategory> enabledCategories, final String applicationPrefix) {
+  PrometheusMetricsSystem(final Set<MetricCategory> enabledCategories) {
     this.enabledCategories = ImmutableSet.copyOf(enabledCategories);
-    this.applicationPrefix = applicationPrefix;
   }
 
   public static MetricsSystem init(final MetricsConfiguration metricsConfiguration) {
@@ -71,9 +68,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
       return new NoOpMetricsSystem();
     }
     final PrometheusMetricsSystem metricsSystem =
-        new PrometheusMetricsSystem(
-            metricsConfiguration.getMetricCategories(),
-            metricsConfiguration.getApplicationPrefix());
+        new PrometheusMetricsSystem(metricsConfiguration.getMetricCategories());
     if (metricsSystem.isCategoryEnabled(StandardMetricCategory.PROCESS)) {
       metricsSystem.collectors.put(
           StandardMetricCategory.PROCESS,
@@ -246,9 +241,7 @@ public class PrometheusMetricsSystem implements MetricsSystem {
   }
 
   private String prometheusPrefix(final MetricCategory category) {
-    return category.isApplicationSpecific()
-        ? applicationPrefix + category.getName() + "_"
-        : category.getName() + "_";
+    return category.getAppliationPrefix().orElse("") + category.getName() + "_";
   }
 
   CollectorRegistry getRegistry() {

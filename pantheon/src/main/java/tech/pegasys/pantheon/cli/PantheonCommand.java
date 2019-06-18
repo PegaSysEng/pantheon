@@ -957,7 +957,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         .pushInterval(metricsPushInterval)
         .hostsWhitelist(hostsWhitelist)
         .prometheusJob(metricsPrometheusJob)
-        .applicationPrefix("pantheon_")
         .build();
   }
 

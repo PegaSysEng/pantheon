@@ -12,9 +12,11 @@
  */
 package tech.pegasys.pantheon.metrics;
 
+import java.util.Optional;
+
 public interface MetricCategory {
 
   String getName();
 
-  boolean isApplicationSpecific();
+  Optional<String> getAppliationPrefix();
 }

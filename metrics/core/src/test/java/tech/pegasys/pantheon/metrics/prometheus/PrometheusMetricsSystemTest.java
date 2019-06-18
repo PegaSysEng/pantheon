@@ -45,7 +45,7 @@ public class PrometheusMetricsSystemTest {
           .thenComparing((o1, o2) -> o1.getLabels().equals(o2.getLabels()) ? 0 : 1);
 
   private final MetricsSystem metricsSystem =
-      new PrometheusMetricsSystem(DEFAULT_METRIC_CATEGORIES, "pantheon_");
+      new PrometheusMetricsSystem(DEFAULT_METRIC_CATEGORIES);
 
   @Test
   public void shouldCreateObservationFromCounter() {

@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.metrics;
 
+import java.util.Optional;
+
 public enum StandardMetricCategory implements MetricCategory {
   JVM("jvm"),
   PROCESS("process");
@@ -28,7 +30,7 @@ public enum StandardMetricCategory implements MetricCategory {
   }
 
   @Override
-  public boolean isApplicationSpecific() {
-    return false;
+  public Optional<String> getAppliationPrefix() {
+    return Optional.empty();
   }
 }
