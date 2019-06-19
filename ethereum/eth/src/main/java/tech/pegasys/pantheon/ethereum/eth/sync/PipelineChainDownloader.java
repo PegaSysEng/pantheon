@@ -52,7 +52,6 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
   private final Counter pipelineCompleteCounter;
   private final Counter pipelineErrorCounter;
   private Pipeline<?> currentDownloadPipeline;
-  private SyncTarget syncTarget;
 
   public PipelineChainDownloader(
       final SyncState syncState,
@@ -124,7 +123,13 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
       return scheduler.scheduleFutureTask(() -> completedFuture(null), PAUSE_AFTER_ERROR_DURATION);
     }
     if (ExceptionUtils.rootCause(error) instanceof InvalidBlockException) {
-      syncTarget.peer().disconnect(DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL);
+      syncState
+          .syncTarget()
+          .ifPresent(
+              syncTarget ->
+                  syncTarget
+                      .peer()
+                      .disconnect(DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL));
     }
 
     logDownloadFailure("Chain download failed.", error);
@@ -145,11 +150,10 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
   }
 
   private synchronized CompletionStage<Void> startDownloadForSyncTarget(final SyncTarget target) {
-    this.syncTarget = target;
     if (cancelled.get()) {
       return completedExceptionally(new CancellationException("Chain download was cancelled"));
     }
-    syncState.setSyncTarget(syncTarget.peer(), syncTarget.commonAncestor());
+    syncState.setSyncTarget(target.peer(), target.commonAncestor());
     currentDownloadPipeline = downloadPipelineFactory.createDownloadPipelineForSyncTarget(target);
     return scheduler.startPipeline(currentDownloadPipeline);
   }

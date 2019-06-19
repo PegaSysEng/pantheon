@@ -42,7 +42,6 @@ public abstract class AbstractGetHeadersFromPeerTask
   protected final int count;
   protected final int skip;
   protected final boolean reverse;
-  private final BlockHeadersMessage.Reader blockMessageReader;
 
   protected AbstractGetHeadersFromPeerTask(
       final ProtocolSchedule<?> protocolSchedule,
@@ -51,31 +50,12 @@ public abstract class AbstractGetHeadersFromPeerTask
       final int skip,
       final boolean reverse,
       final MetricsSystem metricsSystem) {
-    this(
-        protocolSchedule,
-        ethContext,
-        count,
-        skip,
-        reverse,
-        metricsSystem,
-        BlockHeadersMessage::readFrom);
-  }
-
-  protected AbstractGetHeadersFromPeerTask(
-      final ProtocolSchedule<?> protocolSchedule,
-      final EthContext ethContext,
-      final int count,
-      final int skip,
-      final boolean reverse,
-      final MetricsSystem metricsSystem,
-      final BlockHeadersMessage.Reader blockMessageReader) {
     super(ethContext, EthPV62.GET_BLOCK_HEADERS, metricsSystem);
     checkArgument(count > 0);
     this.protocolSchedule = protocolSchedule;
     this.count = count;
     this.skip = skip;
     this.reverse = reverse;
-    this.blockMessageReader = blockMessageReader;
   }
 
   @Override
@@ -88,7 +68,7 @@ public abstract class AbstractGetHeadersFromPeerTask
       return Optional.of(Collections.emptyList());
     }
 
-    final BlockHeadersMessage headersMessage = blockMessageReader.readFrom(message);
+    final BlockHeadersMessage headersMessage = BlockHeadersMessage.readFrom(message);
     final List<BlockHeader> headers = headersMessage.getHeaders(protocolSchedule);
     if (headers.isEmpty()) {
       // Message contains no data - nothing to do

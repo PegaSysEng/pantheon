@@ -18,7 +18,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static tech.pegasys.pantheon.ethereum.vm.TestBlockchain.generateTestBlockHash;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -30,7 +32,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.PeerMessageTaskTest;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPeerTask.PeerTaskResult;
 import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,9 +51,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class GetHeadersFromPeerByHashTaskTest extends PeerMessageTaskTest<List<BlockHeader>> {
   @Mock private EthPeer peerMock;
-  @Mock private MessageData messageData;
-  @Mock private BlockHeadersMessage blockHeadersMessageMock;
-  @Mock private BlockHeadersMessage.Reader blockHeadersMessageReaderMock;
 
   @Override
   protected void assertPartialResultMatchesExpectation(
@@ -156,8 +155,7 @@ public class GetHeadersFromPeerByHashTaskTest extends PeerMessageTaskTest<List<B
     final BlockHeader block2 =
         new BlockHeaderTestFixture().number(2).parentHash(block1.getHash()).buildHeader();
     final List<BlockHeader> headers = Arrays.asList(block1, block2);
-    when(blockHeadersMessageReaderMock.readFrom(any())).thenReturn(blockHeadersMessageMock);
-    when(blockHeadersMessageMock.getHeaders(any())).thenReturn(headers);
+
     final AbstractGetHeadersFromPeerTask task =
         new GetHeadersFromPeerByHashTask(
             protocolSchedule,
@@ -167,14 +165,15 @@ public class GetHeadersFromPeerByHashTaskTest extends PeerMessageTaskTest<List<B
             2,
             0,
             false,
-            metricsSystem,
-            blockHeadersMessageReaderMock);
+            metricsSystem);
+    spy(peerMock);
     Optional<List<BlockHeader>> optionalBlockHeaders =
-        task.processResponse(false, messageData, peerMock);
+        task.processResponse(false, BlockHeadersMessage.create(headers), peerMock);
     assertNotNull(optionalBlockHeaders);
     assertTrue(optionalBlockHeaders.isPresent());
     List<BlockHeader> blockHeaders = optionalBlockHeaders.get();
     MatcherAssert.assertThat(blockHeaders, hasSize(2));
+    verify(peerMock, times(0)).disconnect(any());
   }
 
   @Test
@@ -186,8 +185,6 @@ public class GetHeadersFromPeerByHashTaskTest extends PeerMessageTaskTest<List<B
     final BlockHeader block2 =
         new BlockHeaderTestFixture().number(2).parentHash(generateTestBlockHash(1)).buildHeader();
     final List<BlockHeader> headers = Arrays.asList(block1, block2);
-    when(blockHeadersMessageReaderMock.readFrom(any())).thenReturn(blockHeadersMessageMock);
-    when(blockHeadersMessageMock.getHeaders(any())).thenReturn(headers);
     final AbstractGetHeadersFromPeerTask task =
         new GetHeadersFromPeerByHashTask(
             protocolSchedule,
@@ -197,11 +194,12 @@ public class GetHeadersFromPeerByHashTaskTest extends PeerMessageTaskTest<List<B
             2,
             0,
             false,
-            metricsSystem,
-            blockHeadersMessageReaderMock);
+            metricsSystem);
+    spy(peerMock);
     Optional<List<BlockHeader>> optionalBlockHeaders =
-        task.processResponse(false, messageData, peerMock);
+        task.processResponse(false, BlockHeadersMessage.create(headers), peerMock);
     assertNotNull(optionalBlockHeaders);
     assertFalse(optionalBlockHeaders.isPresent());
+    verify(peerMock).disconnect(DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL);
   }
 }

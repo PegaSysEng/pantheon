@@ -25,7 +25,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.util.Arrays;
 import java.util.List;
 
-public class BlockHeadersMessage extends AbstractMessageData {
+public final class BlockHeadersMessage extends AbstractMessageData {
 
   public static BlockHeadersMessage readFrom(final MessageData message) {
     if (message instanceof BlockHeadersMessage) {
@@ -67,10 +67,5 @@ public class BlockHeadersMessage extends AbstractMessageData {
         ScheduleBasedBlockHeaderFunctions.create(protocolSchedule);
     return new BytesValueRLPInput(data, false)
         .readList(rlp -> BlockHeader.readFrom(rlp, blockHeaderFunctions));
-  }
-
-  @FunctionalInterface
-  public interface Reader {
-    BlockHeadersMessage readFrom(final MessageData messageData);
   }
 }
