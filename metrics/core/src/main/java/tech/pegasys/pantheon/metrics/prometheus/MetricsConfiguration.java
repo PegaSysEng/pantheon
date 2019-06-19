@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.metrics.prometheus;
 
-import static tech.pegasys.pantheon.metrics.MetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
 
 import tech.pegasys.pantheon.metrics.MetricCategory;
 

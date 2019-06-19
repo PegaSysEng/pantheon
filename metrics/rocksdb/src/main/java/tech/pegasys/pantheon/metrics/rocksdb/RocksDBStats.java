@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.metrics.rocksdb;
 
-import static tech.pegasys.pantheon.metrics.MetricCategory.KVSTORE_ROCKSDB_STATS;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.KVSTORE_ROCKSDB_STATS;
 
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 
@@ -187,8 +187,7 @@ public class RocksDBStats {
       final Statistics stats, final HistogramType histogram) {
     return new Collector() {
       final String metricName =
-          PrometheusMetricsSystem.convertToPrometheusName(
-              KVSTORE_ROCKSDB_STATS, histogram.name().toLowerCase());
+          KVSTORE_ROCKSDB_STATS.getName() + "_" + histogram.name().toLowerCase();
 
       @Override
       public List<MetricFamilySamples> collect() {

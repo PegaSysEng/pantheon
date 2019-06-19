@@ -17,33 +17,35 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static tech.pegasys.pantheon.metrics.MetricCategory.JVM;
-import static tech.pegasys.pantheon.metrics.MetricCategory.NETWORK;
-import static tech.pegasys.pantheon.metrics.MetricCategory.PEERS;
-import static tech.pegasys.pantheon.metrics.MetricCategory.RPC;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.NETWORK;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.PEERS;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.RPC;
+import static tech.pegasys.pantheon.metrics.StandardMetricCategory.JVM;
 
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.Observation;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.OperationTimer.TimingContext;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.Comparator;
-import java.util.EnumSet;
 
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 
 public class PrometheusMetricsSystemTest {
 
   private static final Comparator<Observation> IGNORE_VALUES =
-      Comparator.comparing(Observation::getCategory)
+      Comparator.<Observation, String>comparing(observation -> observation.getCategory().getName())
           .thenComparing(Observation::getMetricName)
           .thenComparing((o1, o2) -> o1.getLabels().equals(o2.getLabels()) ? 0 : 1);
 
-  private final MetricsSystem metricsSystem = new PrometheusMetricsSystem();
+  private final MetricsSystem metricsSystem =
+      new PrometheusMetricsSystem(DEFAULT_METRIC_CATEGORIES);
 
   @Test
   public void shouldCreateObservationFromCounter() {
@@ -175,7 +177,7 @@ public class PrometheusMetricsSystemTest {
   public void shouldOnlyObserveEnabledMetrics() {
     final MetricsConfiguration metricsConfiguration =
         MetricsConfiguration.builder()
-            .metricCategories(EnumSet.of(MetricCategory.RPC))
+            .metricCategories(ImmutableSet.of(PantheonMetricCategory.RPC))
             .enabled(true)
             .build();
     final MetricsSystem localMetricSystem = PrometheusMetricsSystem.init(metricsConfiguration);
