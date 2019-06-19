@@ -16,15 +16,19 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
 public class EeaGetPrivacyPrecompileAddress implements JsonRpcMethod {
 
   private final Integer privacyAddress;
+  private final Boolean privacyEnabled;
 
   public EeaGetPrivacyPrecompileAddress(final PrivacyParameters privacyParameters) {
     privacyAddress = privacyParameters.getPrivacyAddress();
+    privacyEnabled = privacyParameters.isEnabled();
   }
 
   @Override
@@ -35,6 +39,10 @@ public class EeaGetPrivacyPrecompileAddress implements JsonRpcMethod {
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
 
-    return new JsonRpcSuccessResponse(request.getId(), privacyAddress);
+    if (privacyEnabled) {
+      return new JsonRpcSuccessResponse(request.getId(), privacyAddress);
+    } else {
+      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.PRIVACY_NOT_ENABLED);
+    }
   }
 }

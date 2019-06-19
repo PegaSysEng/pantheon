@@ -18,6 +18,10 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponseType;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
 import org.junit.Test;
@@ -30,6 +34,7 @@ public class EeaGetPrivacyPrecompileAddressTest {
   @Test
   public void verifyPrivacyPrecompileAddress() {
     when(privacyParameters.getPrivacyAddress()).thenReturn(privacyAddress);
+    when(privacyParameters.isEnabled()).thenReturn(true);
 
     final EeaGetPrivacyPrecompileAddress eeaGetPrivacyPrecompileAddress =
         new EeaGetPrivacyPrecompileAddress(privacyParameters);
@@ -41,5 +46,22 @@ public class EeaGetPrivacyPrecompileAddressTest {
         (JsonRpcSuccessResponse) eeaGetPrivacyPrecompileAddress.response(request);
 
     assertEquals(privacyAddress, response.getResult());
+  }
+
+  @Test
+  public void verifyErrorPrivacyDisabled() {
+    when(privacyParameters.getPrivacyAddress()).thenReturn(privacyAddress);
+    when(privacyParameters.isEnabled()).thenReturn(false);
+
+    final EeaGetPrivacyPrecompileAddress eeaGetPrivacyPrecompileAddress =
+        new EeaGetPrivacyPrecompileAddress(privacyParameters);
+
+    final JsonRpcRequest request =
+        new JsonRpcRequest("1", "eea_getPrivacyPrecompileAddress", new Object[0]);
+
+    final JsonRpcResponse response = eeaGetPrivacyPrecompileAddress.response(request);
+
+    assertEquals(JsonRpcResponseType.ERROR, response.getType());
+    assertEquals(JsonRpcError.PRIVACY_NOT_ENABLED, ((JsonRpcErrorResponse) response).getError());
   }
 }
