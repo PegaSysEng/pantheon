@@ -68,4 +68,9 @@ public class BlockHeadersMessage extends AbstractMessageData {
     return new BytesValueRLPInput(data, false)
         .readList(rlp -> BlockHeader.readFrom(rlp, blockHeaderFunctions));
   }
+
+  @FunctionalInterface
+  public interface Reader {
+    BlockHeadersMessage readFrom(final MessageData messageData);
+  }
 }

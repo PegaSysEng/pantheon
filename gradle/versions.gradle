@@ -71,8 +71,6 @@ dependencyManagement {
     dependency 'org.java-websocket:Java-WebSocket:1.4.0'
 
     dependency 'org.mockito:mockito-core:2.27.0'
-    dependency 'org.powermock:powermock-module-junit4:2.0.0-beta.5'
-    dependency 'org.powermock:powermock-api-mockito2:2.0.0-beta.5'
 
     dependency 'org.openjdk.jmh:jmh-core:1.21'
     dependency 'org.openjdk.jmh:jmh-generator-annprocess:1.21'

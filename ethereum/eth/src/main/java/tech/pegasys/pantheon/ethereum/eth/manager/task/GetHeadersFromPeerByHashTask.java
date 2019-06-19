@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.PendingPeerRequest;
+import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
@@ -32,7 +33,6 @@ public class GetHeadersFromPeerByHashTask extends AbstractGetHeadersFromPeerTask
   private final Hash referenceHash;
   private final long minimumRequiredBlockNumber;
 
-  @VisibleForTesting
   GetHeadersFromPeerByHashTask(
       final ProtocolSchedule<?> protocolSchedule,
       final EthContext ethContext,
@@ -42,7 +42,37 @@ public class GetHeadersFromPeerByHashTask extends AbstractGetHeadersFromPeerTask
       final int skip,
       final boolean reverse,
       final MetricsSystem metricsSystem) {
-    super(protocolSchedule, ethContext, count, skip, reverse, metricsSystem);
+    this(
+        protocolSchedule,
+        ethContext,
+        referenceHash,
+        minimumRequiredBlockNumber,
+        count,
+        skip,
+        reverse,
+        metricsSystem,
+        BlockHeadersMessage::readFrom);
+  }
+
+  @VisibleForTesting
+  GetHeadersFromPeerByHashTask(
+      final ProtocolSchedule<?> protocolSchedule,
+      final EthContext ethContext,
+      final Hash referenceHash,
+      final long minimumRequiredBlockNumber,
+      final int count,
+      final int skip,
+      final boolean reverse,
+      final MetricsSystem metricsSystem,
+      final BlockHeadersMessage.Reader blockHeadersMessageReader) {
+    super(
+        protocolSchedule,
+        ethContext,
+        count,
+        skip,
+        reverse,
+        metricsSystem,
+        blockHeadersMessageReader);
     this.minimumRequiredBlockNumber = minimumRequiredBlockNumber;
     checkNotNull(referenceHash);
     this.referenceHash = referenceHash;

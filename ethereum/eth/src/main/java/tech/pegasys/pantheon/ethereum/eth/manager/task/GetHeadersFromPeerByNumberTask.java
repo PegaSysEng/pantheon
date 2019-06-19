@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.eth.manager.task;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.PendingPeerRequest;
+import tech.pegasys.pantheon.ethereum.eth.messages.BlockHeadersMessage;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 
@@ -37,7 +38,35 @@ public class GetHeadersFromPeerByNumberTask extends AbstractGetHeadersFromPeerTa
       final int skip,
       final boolean reverse,
       final MetricsSystem metricsSystem) {
-    super(protocolSchedule, ethContext, count, skip, reverse, metricsSystem);
+    this(
+        protocolSchedule,
+        ethContext,
+        blockNumber,
+        count,
+        skip,
+        reverse,
+        metricsSystem,
+        BlockHeadersMessage::readFrom);
+  }
+
+  @VisibleForTesting
+  GetHeadersFromPeerByNumberTask(
+      final ProtocolSchedule<?> protocolSchedule,
+      final EthContext ethContext,
+      final long blockNumber,
+      final int count,
+      final int skip,
+      final boolean reverse,
+      final MetricsSystem metricsSystem,
+      final BlockHeadersMessage.Reader blockHeaderMessageReader) {
+    super(
+        protocolSchedule,
+        ethContext,
+        count,
+        skip,
+        reverse,
+        metricsSystem,
+        blockHeaderMessageReader);
     this.blockNumber = blockNumber;
   }
 
