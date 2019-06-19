@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
 import tech.pegasys.pantheon.enclave.types.CreatePrivacyGroupRequest;
+import tech.pegasys.pantheon.enclave.types.DeletePrivacyGroupRequest;
 import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
@@ -83,7 +84,7 @@ public class EnclaveTest {
   }
 
   @Test
-  public void testCreatePrivacyGroup() throws Exception {
+  public void testCreateAndDeletePrivacyGroup() throws Exception {
     List<String> publicKeys = testHarness.getPublicKeys();
     String name = "testName";
     String description = "testDesc";
@@ -97,6 +98,13 @@ public class EnclaveTest {
     assertEquals(name, privacyGroupResponse.getName());
     assertEquals(description, privacyGroupResponse.getDescription());
     assertEquals(PrivacyGroup.Type.PANTHEON, privacyGroupResponse.getType());
+
+    DeletePrivacyGroupRequest deletePrivacyGroupRequest =
+        new DeletePrivacyGroupRequest(privacyGroupResponse.getPrivacyGroupId(), publicKeys.get(0));
+
+    String response = enclave.deletePrivacyGroup(deletePrivacyGroupRequest);
+
+    assertEquals(response, privacyGroupResponse.getPrivacyGroupId());
   }
 
   @Test(expected = IOException.class)
