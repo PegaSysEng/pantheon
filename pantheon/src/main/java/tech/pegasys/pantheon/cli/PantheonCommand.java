@@ -31,6 +31,7 @@ import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFA
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
+import tech.pegasys.pantheon.cli.converter.MetricCategoryConverter;
 import tech.pegasys.pantheon.cli.converter.RpcApisConverter;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
@@ -92,10 +93,7 @@ import java.nio.file.Paths;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -655,18 +653,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
 
-    final Map<String, MetricCategory> metricCategories = new HashMap<>();
-    addCategories(metricCategories, PantheonMetricCategory.class);
-    addCategories(metricCategories, StandardMetricCategory.class);
-    commandLine.registerConverter(
-        MetricCategory.class,
-        arg -> {
-          final MetricCategory category = metricCategories.get(arg);
-          if (category == null) {
-            throw new IllegalArgumentException("Unknown category: " + arg);
-          }
-          return category;
-        });
+    final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
+    metricCategoryConverter.addCategories(PantheonMetricCategory.class);
+    metricCategoryConverter.addCategories(StandardMetricCategory.class);
+    commandLine.registerConverter(MetricCategory.class, metricCategoryConverter);
 
     // Add performance options
     UnstableOptionsSubCommand.createUnstableOptions(
@@ -689,11 +679,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         new ConfigOptionSearchAndRunHandler(
             resultHandler, exceptionHandler, CONFIG_FILE_OPTION_NAME, isDocker);
     commandLine.parseWithHandlers(configParsingHandler, exceptionHandler, args);
-  }
-
-  private <T extends Enum<T> & MetricCategory> void addCategories(
-      final Map<String, MetricCategory> categories, final Class<T> categoryEnum) {
-    EnumSet.allOf(categoryEnum).forEach(category -> categories.put(category.name(), category));
   }
 
   @Override
