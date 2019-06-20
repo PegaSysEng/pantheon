@@ -24,14 +24,14 @@ import static tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration.DEFAUL
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
-import static tech.pegasys.pantheon.metrics.MetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
-import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.createDefault;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
+import tech.pegasys.pantheon.cli.converter.MetricCategoryConverter;
 import tech.pegasys.pantheon.cli.converter.RpcApisConverter;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
@@ -64,6 +64,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBu
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
@@ -518,13 +520,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--permissions-accounts-contract-address"},
       description = "Address of the account permissioning smart contract",
-      arity = "1")
+      arity = "1",
+      hidden = true)
   private final Address permissionsAccountsContractAddress = null;
 
   @Option(
       names = {"--permissions-accounts-contract-enabled"},
       description =
-          "Enable account level permissions via smart contract (default: ${DEFAULT-VALUE})")
+          "Enable account level permissions via smart contract (default: ${DEFAULT-VALUE})",
+      hidden = true)
   private final Boolean permissionsAccountsContractEnabled = false;
 
   @Option(
@@ -650,6 +654,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
+
+    final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
+    metricCategoryConverter.addCategories(PantheonMetricCategory.class);
+    metricCategoryConverter.addCategories(StandardMetricCategory.class);
+    commandLine.registerConverter(MetricCategory.class, metricCategoryConverter);
 
     // Add performance options
     UnstableOptionsSubCommand.createUnstableOptions(
@@ -924,18 +933,18 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--metrics-push-interval",
             "--metrics-push-prometheus-job"));
 
-    final MetricsConfiguration metricsConfiguration = createDefault();
-    metricsConfiguration.setEnabled(isMetricsEnabled);
-    metricsConfiguration.setHost(metricsHost);
-    metricsConfiguration.setPort(metricsPort);
-    metricsConfiguration.setMetricCategories(metricCategories);
-    metricsConfiguration.setPushEnabled(isMetricsPushEnabled);
-    metricsConfiguration.setPushHost(metricsPushHost);
-    metricsConfiguration.setPushPort(metricsPushPort);
-    metricsConfiguration.setPushInterval(metricsPushInterval);
-    metricsConfiguration.setPrometheusJob(metricsPrometheusJob);
-    metricsConfiguration.setHostsWhitelist(hostsWhitelist);
-    return metricsConfiguration;
+    return MetricsConfiguration.builder()
+        .enabled(isMetricsEnabled)
+        .host(metricsHost)
+        .port(metricsPort)
+        .metricCategories(metricCategories)
+        .pushEnabled(isMetricsPushEnabled)
+        .pushHost(metricsPushHost)
+        .pushPort(metricsPushPort)
+        .pushInterval(metricsPushInterval)
+        .hostsWhitelist(hostsWhitelist)
+        .prometheusJob(metricsPrometheusJob)
+        .build();
   }
 
   private Optional<PermissioningConfiguration> permissioningConfiguration() throws Exception {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,45 +12,11 @@
  */
 package tech.pegasys.pantheon.metrics;
 
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.Optional;
 
-public enum MetricCategory {
-  BIG_QUEUE("big_queue"),
-  BLOCKCHAIN("blockchain"),
-  EXECUTORS("executors"),
-  JVM("jvm", false),
-  NETWORK("network"),
-  PEERS("peers"),
-  PROCESS("process", false),
-  PERMISSIONING("permissioning"),
-  KVSTORE_ROCKSDB("rocksdb"),
-  KVSTORE_ROCKSDB_STATS("rocksdb", false),
-  RPC("rpc"),
-  SYNCHRONIZER("synchronizer"),
-  TRANSACTION_POOL("transaction_pool");
+public interface MetricCategory {
 
-  // Why not BIG_QUEUE and ROCKSDB?  They hurt performance under load.
-  public static final Set<MetricCategory> DEFAULT_METRIC_CATEGORIES =
-      EnumSet.complementOf(EnumSet.of(BIG_QUEUE, KVSTORE_ROCKSDB, KVSTORE_ROCKSDB_STATS));
+  String getName();
 
-  private final String name;
-  private final boolean pantheonSpecific;
-
-  MetricCategory(final String name) {
-    this(name, true);
-  }
-
-  MetricCategory(final String name, final boolean pantheonSpecific) {
-    this.name = name;
-    this.pantheonSpecific = pantheonSpecific;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public boolean isPantheonSpecific() {
-    return pantheonSpecific;
-  }
+  Optional<String> getAppliationPrefix();
 }
