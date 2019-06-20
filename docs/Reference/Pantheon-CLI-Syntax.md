@@ -220,7 +220,7 @@ The default is 8547. Ports must be [exposed appropriately](../Configuring-Panthe
 ### host-whitelist
 
 ```bash tab="Syntax"
---host-whitelist=<hostname>[,<hostname>...]... or *
+--host-whitelist=<hostname>[,<hostname>...]... or "*"
 ```
 
 ```bash tab="Example Command Line"
@@ -235,7 +235,7 @@ Comma-separated list of hostnames to allow [access to the JSON-RPC API](../Panth
 By default, access from `localhost` and `127.0.0.1` is accepted. 
 
 !!!tip
-    To allow all hostnames, use `*`. We don't recommend allowing all hostnames for production code.
+    To allow all hostnames, use `"*"`. We don't recommend allowing all hostnames for production code.
 
 ### max-peers
 
@@ -858,7 +858,7 @@ Set to `true` to require [authentication](../Pantheon-API/Authentication.md) for
 ### rpc-http-cors-origins
 
 ```bash tab="Syntax"
---rpc-http-cors-origins=<url>[,<url>...]... or all or *
+--rpc-http-cors-origins=<url>[,<url>...]... or all or "*"
 ```
 
 ```bash tab="Example Command Line"
@@ -1175,13 +1175,11 @@ fast-sync-min-peers=2
 
 Minimum number of peers required before starting fast sync. Default is 5. 
 
-## Commands
-
-Pantheon subcommands are: 
+## Subcommands
 
 ### blocks
 
-This command provides blocks related actions.
+Provides blocks related actions.
 
 ### import
 
@@ -1235,7 +1233,7 @@ Outputs the node public key address to standard output or writes it to the speci
 
 ### password
 
-This command provides password related actions.
+Provides password related actions.
 
 ### hash
 
@@ -1250,9 +1248,29 @@ pantheon password hash --password=<my-password>
 pantheon password hash --password=myPassword123
 ```
 
+### operator
+
+Provides operator actions.
+
+### generate-blockchain-config
+
+This command generates [IBFT 2.0 configuration files](../Tutorials/Create-IBFT-Network.md). 
+
+```bash tab="Syntax"
+pantheon operator generate-blockchain-config --config-file=<FILE> --to=<DIRECTORY> [--genesis-file-name=<FILE>] [--private-key-file-name=<FILE>] [--public-key-file-name=<FILE>]
+```
+
+```bash tab="Example"
+pantheon operator generate-blockchain-config --config-file=config.json --to=myNetworkFiles
+```
+
+The configuration file has 2 subnested JSON nodes. The first is the `genesis` property defining 
+the [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT.md#genesis-file) except for the `extraData` string. The 
+second is the `blockchain` property defining the number of key pairs to generate.  
+
 ### rlp
 
-This command provides RLP related actions.
+Provides RLP related actions.
 
 ### encode
 
@@ -1315,3 +1333,4 @@ This data is included in the [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT
         ``` tab="RLP Output"
         0xf853a00000000000000000000000000000000000000000000000000000000000000000ea94be068f726a13c8d46c44be6ce9d275600e1735a4945ff6f4b66a46a2b2310a6f3a93aaddc0d9a1c193808400000000c0
         ```
+
