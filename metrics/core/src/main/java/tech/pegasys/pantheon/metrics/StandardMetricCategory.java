@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -10,23 +10,27 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.jsonrpc.health;
+package tech.pegasys.pantheon.metrics;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.Optional;
 
-public class LivenessService extends HealthService {
-  private static final Logger LOG = LogManager.getLogger();
+public enum StandardMetricCategory implements MetricCategory {
+  JVM("jvm"),
+  PROCESS("process");
 
-  public LivenessService() {
-    super(buildHeathCheck());
+  private final String name;
+
+  StandardMetricCategory(final String name) {
+    this.name = name;
   }
 
-  private static HealthCheck buildHeathCheck() {
-    return () -> {
-      LOG.debug("Invoking liveness service.");
+  @Override
+  public String getName() {
+    return name;
+  }
 
-      return true;
-    };
+  @Override
+  public Optional<String> getAppliationPrefix() {
+    return Optional.empty();
   }
 }

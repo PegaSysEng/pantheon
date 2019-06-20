@@ -79,6 +79,11 @@ public class StubMetricsSystem implements MetricsSystem {
     throw new UnsupportedOperationException("Observations aren't actually recorded");
   }
 
+  @Override
+  public Stream<Observation> streamObservations() {
+    throw new UnsupportedOperationException("Observations aren't actually recorded");
+  }
+
   public static class StubLabelledCounter implements LabelledMetric<Counter> {
     private final Map<List<String>, StubCounter> metrics = new HashMap<>();
 
