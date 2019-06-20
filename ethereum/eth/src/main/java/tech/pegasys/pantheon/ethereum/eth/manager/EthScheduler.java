@@ -43,6 +43,7 @@ import org.apache.logging.log4j.Logger;
 
 public class EthScheduler {
   private static final Logger LOG = LogManager.getLogger();
+  private static final int DEFAULT_TX_QUEUE_SIZE = 128;
 
   private final Duration defaultTimeout = Duration.ofSeconds(5);
 
@@ -63,11 +64,28 @@ public class EthScheduler {
       final int computationWorkerCount,
       final MetricsSystem metricsSystem) {
     this(
+        syncWorkerCount,
+        txWorkerCount,
+        DEFAULT_TX_QUEUE_SIZE,
+        computationWorkerCount,
+        metricsSystem);
+  }
+
+  public EthScheduler(
+      final int syncWorkerCount,
+      final int txWorkerCount,
+      final int txWorkerQueueSize,
+      final int computationWorkerCount,
+      final MetricsSystem metricsSystem) {
+    this(
         newFixedThreadPool(
             EthScheduler.class.getSimpleName() + "-Workers", syncWorkerCount, metricsSystem),
         newScheduledThreadPool(EthScheduler.class.getSimpleName() + "-Timer", 1, metricsSystem),
         newFixedThreadPool(
-            EthScheduler.class.getSimpleName() + "-Transactions", txWorkerCount, metricsSystem),
+            EthScheduler.class.getSimpleName() + "-Transactions",
+            txWorkerCount,
+            txWorkerQueueSize,
+            metricsSystem),
         newCachedThreadPool(EthScheduler.class.getSimpleName() + "-Services", metricsSystem),
         newFixedThreadPool(
             EthScheduler.class.getSimpleName() + "-Computation",

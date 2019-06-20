@@ -48,6 +48,10 @@ public class DeterministicEthScheduler extends EthScheduler {
             (MockExecutorService) this.computationExecutor);
   }
 
+  public MockExecutorService txWorkerExecutor() {
+    return (MockExecutorService) this.txWorkerExecutor;
+  }
+
   // Test utility for running pending futures
   public void runPendingFutures() {
     executors.forEach(MockExecutorService::runPendingFutures);

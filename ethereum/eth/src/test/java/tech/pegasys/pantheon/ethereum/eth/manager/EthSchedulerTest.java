@@ -14,19 +14,23 @@ package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.hamcrest.MatcherAssert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class EthSchedulerTest {
 
@@ -203,5 +207,21 @@ public class EthSchedulerTest {
     assertThat(task.isFailed()).isTrue();
     assertThat(task.isSucceeded()).isFalse();
     assertThat(task.isCancelled()).isTrue();
+  }
+
+  @Test
+  public void scheduleTxWorkerTask_completesWhenScheduledTaskCompletes() {
+    final MockRunnable runnable = Mockito.mock(MockRunnable.class);
+    final MockExecutorService mockTxWorker = ethScheduler.txWorkerExecutor();
+    final List<MockExecutorService.ExecutorTask<?>> tasks = mockTxWorker.getTasks();
+    ethScheduler.scheduleTxWorkerTask(runnable);
+    MatcherAssert.assertThat(tasks, hasSize(1));
+    verify(runnable).run();
+  }
+
+  static class MockRunnable implements Runnable {
+
+    @Override
+    public void run() {}
   }
 }

@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class MockExecutorService implements ExecutorService {
 
   private boolean autoRun = true;
+
   private final List<ExecutorTask<?>> tasks = new ArrayList<>();
 
   // Test utility for inspecting executor's futures
@@ -53,6 +54,10 @@ public class MockExecutorService implements ExecutorService {
   public void runPendingFuturesInSeparateThreads(final ExecutorService executorService) {
     final List<ExecutorTask<?>> currentTasks = new ArrayList<>(tasks);
     currentTasks.forEach(task -> executorService.execute(task::run));
+  }
+
+  public List<ExecutorTask<?>> getTasks() {
+    return tasks;
   }
 
   @Override
@@ -139,7 +144,7 @@ public class MockExecutorService implements ExecutorService {
     submit(command);
   }
 
-  private static class ExecutorTask<T> {
+  public static class ExecutorTask<T> {
     private final CompletableFuture<T> future;
     private final Callable<T> taskRunner;
     private boolean isPending = true;
