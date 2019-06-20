@@ -12,7 +12,7 @@ consensus protocol](../Consensus-Protocols/IBFT.md).
     An Ethereum private network created as described here is isolated but not protected or secure. 
     We recommend running the private network behind a properly configured firewall.
     
-    This tuturial configures a private network using IBFT 2.0 for education purposes only. 
+    This tutorial configures a private network using IBFT 2.0 for educational purposes only. 
     IBFT 2.0 requires 4 validators to be Byzantine fault tolerant.
 
 ## Prerequisites 
@@ -110,7 +110,7 @@ Copy the following configuration file definition to a file called `ibftConfigFil
 In the `IBFT-Network` directory, generate the node key and genesis file: 
 
 ```bash tab="MacOS"
-pantheon operator generate-blockchain-config --config-file=ibftConfigFile.json --to=networkFiles
+pantheon operator generate-blockchain-config --config-file=ibftConfigFile.json --to=networkFiles --private-key-file-name=key
 ```
 
 In the `networkFiles` directory, the following are created: 
@@ -123,16 +123,16 @@ networkFiles/
 ├── genesis.json
 └── keys
     ├── 0x438821c42b812fecdcea7fe8235806a412712fc0
-    │   ├── key.priv
+    │   ├── key
     │   └── key.pub
     ├── 0xca9c2dfa62f4589827c0dd7dcf48259aa29f22f5
-    │   ├── key.priv
+    │   ├── key
     │   └── key.pub
     ├── 0xcd5629bd37155608a0c9b28c4fd19310d53b3184
-    │   ├── key.priv
+    │   ├── key
     │   └── key.pub
     └── 0xe96825c5ab8d145b9eeca1aba7ea3695e034911a
-        ├── key.priv
+        ├── key
         └── key.pub
 ```
     
@@ -142,10 +142,8 @@ Copy the `genesis.json` file to the `IBFT-Network` directory.
     
 ### 5. Copy Node Private Keys to Node Directories 
 
-For each node: 
+For each node, copy the key files to the `data` directory for that node 
 
-* Copy the key files to the `data` directory for that node 
-* Rename each `key.priv` file to `key`
 
 ```bash
 IBFT-Network/
@@ -286,7 +284,7 @@ Use the [IBFT API](../Reference/Pantheon-API-Methods.md#ibft-20-methods) to remo
     To add or remove nodes as validators you need the node address. The directory [created for each node](#3-generate-node-keys-and-genesis-file) 
     is named with the node address.
 
-    This tuturial configures a private network using IBFT 2.0 for education purposes only. IBFT 2.0 requires 4 validators to be Byzantine fault tolerant.
+    This tutorial configures a private network using IBFT 2.0 for educational purposes only. IBFT 2.0 requires 4 validators to be Byzantine fault tolerant.
 
 Import accounts to MetaMask and send transactions as described in the [Private Network Quickstart Tutorial](Private-Network-Quickstart.md#creating-a-transaction-using-metamask)
 

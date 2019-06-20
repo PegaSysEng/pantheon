@@ -1257,7 +1257,7 @@ Provides operator actions.
 This command generates [IBFT 2.0 configuration files](../Tutorials/Create-IBFT-Network.md). 
 
 ```bash tab="Syntax"
-pantheon operator generate-blockchain-config --config-file=<FILE> --to=<DIRECTORY> [--genesis-file-name=<PATH>] [--private-key-file-name=<PATH>] [--public-key-file-name=<PATH>]
+pantheon operator generate-blockchain-config --config-file=<FILE> --to=<DIRECTORY> [--genesis-file-name=<FILE>] [--private-key-file-name=<FILE>] [--public-key-file-name=<FILE>]
 ```
 
 ```bash tab="Example"
