@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.eth.transactions;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthMessage;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthMessages.MessageCallback;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
+import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTimedTask;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
 
 class TransactionsMessageHandler implements MessageCallback {
@@ -33,8 +34,9 @@ class TransactionsMessageHandler implements MessageCallback {
   public void exec(final EthMessage message) {
     final TransactionsMessage transactionsMessage = TransactionsMessage.readFrom(message.getData());
     scheduler.scheduleTxWorkerTask(
-        () ->
-            transactionsMessageProcessor.processTransactionsMessage(
-                message.getPeer(), transactionsMessage));
+        BoundedTimedTask.fromRunnable(
+            () ->
+                transactionsMessageProcessor.processTransactionsMessage(
+                    message.getPeer(), transactionsMessage)));
   }
 }

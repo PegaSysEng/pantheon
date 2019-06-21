@@ -12,11 +12,14 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newBoundedThreadPool;
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newCachedThreadPool;
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newFixedThreadPool;
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
 
+import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTimedQueue;
+import tech.pegasys.pantheon.ethereum.eth.manager.bounded.TimedTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
@@ -43,7 +46,6 @@ import org.apache.logging.log4j.Logger;
 
 public class EthScheduler {
   private static final Logger LOG = LogManager.getLogger();
-  private static final int DEFAULT_TX_QUEUE_SIZE = 128;
 
   private final Duration defaultTimeout = Duration.ofSeconds(5);
 
@@ -66,7 +68,7 @@ public class EthScheduler {
     this(
         syncWorkerCount,
         txWorkerCount,
-        DEFAULT_TX_QUEUE_SIZE,
+        BoundedTimedQueue.Default.CAPACITY,
         computationWorkerCount,
         metricsSystem);
   }
@@ -81,10 +83,14 @@ public class EthScheduler {
         newFixedThreadPool(
             EthScheduler.class.getSimpleName() + "-Workers", syncWorkerCount, metricsSystem),
         newScheduledThreadPool(EthScheduler.class.getSimpleName() + "-Timer", 1, metricsSystem),
-        newFixedThreadPool(
+        newBoundedThreadPool(
             EthScheduler.class.getSimpleName() + "-Transactions",
             txWorkerCount,
             txWorkerQueueSize,
+            BoundedTimedQueue.Default.KEEP_ALIVE,
+            BoundedTimedQueue.Default.KEEP_ALIVE_UNIT,
+            BoundedTimedQueue.Default.EVICTION_POLL_TIMEOUT,
+            BoundedTimedQueue.Default.EVICTION_POLL_TIMEOUT_UNIT,
             metricsSystem),
         newCachedThreadPool(EthScheduler.class.getSimpleName() + "-Services", metricsSystem),
         newFixedThreadPool(
@@ -125,8 +131,8 @@ public class EthScheduler {
     syncWorkerExecutor.execute(command);
   }
 
-  public void scheduleTxWorkerTask(final Runnable command) {
-    txWorkerExecutor.execute(command);
+  public void scheduleTxWorkerTask(final TimedTask timedTask) {
+    txWorkerExecutor.execute(timedTask);
   }
 
   public <T> CompletableFuture<T> scheduleServiceTask(final EthTask<T> task) {

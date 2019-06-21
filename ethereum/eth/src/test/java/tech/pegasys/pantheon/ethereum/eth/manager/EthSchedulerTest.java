@@ -20,6 +20,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTimedTask;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -214,7 +216,7 @@ public class EthSchedulerTest {
     final MockRunnable runnable = Mockito.mock(MockRunnable.class);
     final MockExecutorService mockTxWorker = ethScheduler.txWorkerExecutor();
     final List<MockExecutorService.ExecutorTask<?>> tasks = mockTxWorker.getTasks();
-    ethScheduler.scheduleTxWorkerTask(runnable);
+    ethScheduler.scheduleTxWorkerTask(BoundedTimedTask.fromRunnable(runnable));
     MatcherAssert.assertThat(tasks, hasSize(1));
     verify(runnable).run();
   }

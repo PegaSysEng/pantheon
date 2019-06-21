@@ -12,12 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTimedQueue;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
+import java.time.temporal.TemporalUnit;
 import java.util.Locale;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -40,13 +41,26 @@ public class MonitoredExecutors {
     return newFixedThreadPool(name, workerCount, new LinkedBlockingQueue<>(), metricsSystem);
   }
 
-  public static ExecutorService newFixedThreadPool(
+  public static ExecutorService newBoundedThreadPool(
       final String name,
       final int workerCount,
       final int queueSize,
+      final long keepAlive,
+      final TemporalUnit keepAliveUnit,
+      final long evictionPollTimeout,
+      final TimeUnit evictionPollTimeoutUnit,
       final MetricsSystem metricsSystem) {
     return newFixedThreadPool(
-        name, workerCount, new ArrayBlockingQueue<>(queueSize, true), metricsSystem);
+        name,
+        workerCount,
+        new BoundedTimedQueue(
+            queueSize,
+            keepAlive,
+            keepAliveUnit,
+            evictionPollTimeout,
+            evictionPollTimeoutUnit,
+            metricsSystem),
+        metricsSystem);
   }
 
   public static ExecutorService newFixedThreadPool(
