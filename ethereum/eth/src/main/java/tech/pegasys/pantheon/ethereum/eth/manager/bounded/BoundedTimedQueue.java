@@ -64,7 +64,7 @@ public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
     this.metricsSystem = metricsSystem;
     this.metricName = this.getClass().getSimpleName().toLowerCase(Locale.US).replace('-', '_');
     this.totalEvictedTaskCounter =
-        metricsSystem.createCounter(
+        this.metricsSystem.createCounter(
             PantheonMetricCategory.EXECUTORS,
             metricName + "_rejected_tasks_total",
             "Total number of tasks rejected by this working queue.");
