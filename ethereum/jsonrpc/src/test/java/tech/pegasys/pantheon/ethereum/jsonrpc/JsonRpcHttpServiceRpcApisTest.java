@@ -26,18 +26,19 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.HealthService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.network.DefaultP2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.network.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -207,7 +208,13 @@ public class JsonRpcHttpServiceRpcApisTest {
                     mock(MetricsConfiguration.class)));
     final JsonRpcHttpService jsonRpcHttpService =
         new JsonRpcHttpService(
-            vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), rpcMethods);
+            vertx,
+            folder.newFolder().toPath(),
+            config,
+            new NoOpMetricsSystem(),
+            rpcMethods,
+            HealthService.ALWAYS_HEALTHY,
+            HealthService.ALWAYS_HEALTHY);
     jsonRpcHttpService.start().join();
 
     baseUrl = jsonRpcHttpService.url();
@@ -250,9 +257,7 @@ public class JsonRpcHttpServiceRpcApisTest {
   }
 
   private MetricsConfiguration createMetricsConfiguration() {
-    final MetricsConfiguration config = MetricsConfiguration.createDefault();
-    config.setEnabled(true);
-    return config;
+    return MetricsConfiguration.builder().enabled(true).port(0).build();
   }
 
   private JsonRpcHttpService createJsonRpcHttpService(
@@ -296,7 +301,9 @@ public class JsonRpcHttpServiceRpcApisTest {
             folder.newFolder().toPath(),
             jsonRpcConfiguration,
             new NoOpMetricsSystem(),
-            rpcMethods);
+            rpcMethods,
+            HealthService.ALWAYS_HEALTHY,
+            HealthService.ALWAYS_HEALTHY);
     jsonRpcHttpService.start().join();
 
     baseUrl = jsonRpcHttpService.url();
@@ -375,7 +382,7 @@ public class JsonRpcHttpServiceRpcApisTest {
     JsonRpcConfiguration jsonRpcConfiguration = JsonRpcConfiguration.createDefault();
     WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
     P2PNetwork p2pNetwork = mock(P2PNetwork.class);
-    MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    MetricsConfiguration metricsConfiguration = MetricsConfiguration.builder().build();
 
     if (enabledNetServices[netServices.indexOf("jsonrpc")]) {
       jsonRpcConfiguration = createJsonRpcConfiguration();
@@ -403,7 +410,7 @@ public class JsonRpcHttpServiceRpcApisTest {
             JsonRpcConfiguration.createDefault(),
             WebSocketConfiguration.createDefault(),
             mock(P2PNetwork.class),
-            MetricsConfiguration.createDefault());
+            MetricsConfiguration.builder().build());
     final RequestBody body = createNetServicesRequestBody();
 
     try (final Response resp = client.newCall(buildRequest(body)).execute()) {

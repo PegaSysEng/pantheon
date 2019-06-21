@@ -12,9 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.peers;
 
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.Arrays;
 

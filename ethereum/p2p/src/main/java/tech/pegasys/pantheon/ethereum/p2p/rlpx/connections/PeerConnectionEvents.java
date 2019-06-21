@@ -12,18 +12,17 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.rlpx.connections;
 
-import tech.pegasys.pantheon.ethereum.p2p.api.DisconnectCallback;
-import tech.pegasys.pantheon.ethereum.p2p.api.Message;
-import tech.pegasys.pantheon.ethereum.p2p.api.MessageCallback;
-import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
-import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.DisconnectCallback;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.MessageCallback;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.DefaultMessage;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.Subscribers;
 
 import java.util.Map;
@@ -38,7 +37,7 @@ public class PeerConnectionEvents implements PeerConnectionEventDispatcher {
   public PeerConnectionEvents(final MetricsSystem metricsSystem) {
     disconnectCounter =
         metricsSystem.createLabelledCounter(
-            MetricCategory.PEERS,
+            PantheonMetricCategory.PEERS,
             "disconnected_total",
             "Total number of peers disconnected",
             "initiator",

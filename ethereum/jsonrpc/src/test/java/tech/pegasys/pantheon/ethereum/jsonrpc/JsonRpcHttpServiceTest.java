@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.HealthService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockWithMetadata;
@@ -42,8 +43,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.TransactionWithMe
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.network.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -149,7 +150,13 @@ public class JsonRpcHttpServiceTest {
   private static JsonRpcHttpService createJsonRpcHttpService(final JsonRpcConfiguration config)
       throws Exception {
     return new JsonRpcHttpService(
-        vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), rpcMethods);
+        vertx,
+        folder.newFolder().toPath(),
+        config,
+        new NoOpMetricsSystem(),
+        rpcMethods,
+        HealthService.ALWAYS_HEALTHY,
+        HealthService.ALWAYS_HEALTHY);
   }
 
   private static JsonRpcHttpService createJsonRpcHttpService() throws Exception {
@@ -158,7 +165,9 @@ public class JsonRpcHttpServiceTest {
         folder.newFolder().toPath(),
         createJsonRpcConfig(),
         new NoOpMetricsSystem(),
-        rpcMethods);
+        rpcMethods,
+        HealthService.ALWAYS_HEALTHY,
+        HealthService.ALWAYS_HEALTHY);
   }
 
   private static JsonRpcConfiguration createJsonRpcConfig() {
@@ -341,7 +350,7 @@ public class JsonRpcHttpServiceTest {
 
   @Test
   public void netPeerCountSuccessful() throws Exception {
-    when(peerDiscoveryMock.getPeers()).thenReturn(Arrays.asList(null, null, null));
+    when(peerDiscoveryMock.getPeerCount()).thenReturn(3);
 
     final String id = "123";
     final RequestBody body =
@@ -577,6 +586,7 @@ public class JsonRpcHttpServiceTest {
   @Test
   public void netPeerCountOfZero() throws Exception {
     when(peerDiscoveryMock.getPeers()).thenReturn(Collections.emptyList());
+    when(peerDiscoveryMock.getPeerCount()).thenReturn(0);
 
     final String id = "123";
     final RequestBody body =
@@ -2029,6 +2039,20 @@ public class JsonRpcHttpServiceTest {
       final JsonRpcError expectedError = JsonRpcError.INVALID_PARAMS;
       testHelper.assertValidJsonRpcError(
           json, id, expectedError.getCode(), expectedError.getMessage());
+    }
+  }
+
+  @Test
+  public void assertThatLivenessProbeWorks() throws Exception {
+    try (final Response resp = client.newCall(buildGetRequest("/liveness")).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
+    }
+  }
+
+  @Test
+  public void assertThatReadinessProbeWorks() throws Exception {
+    try (final Response resp = client.newCall(buildGetRequest("/readiness")).execute()) {
+      assertThat(resp.code()).isEqualTo(200);
     }
   }
 
