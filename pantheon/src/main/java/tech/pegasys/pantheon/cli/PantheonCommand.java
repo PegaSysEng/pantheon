@@ -28,9 +28,11 @@ import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.DEFAULT_METRI
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
 import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 
+import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
+import tech.pegasys.pantheon.cli.converter.MetricCategoryConverter;
 import tech.pegasys.pantheon.cli.converter.RpcApisConverter;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
@@ -61,8 +63,10 @@ import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfigurat
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
@@ -412,7 +416,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "1..*",
       description =
           "Comma separated list of categories to track metrics for (default: ${DEFAULT-VALUE})")
-  private final Set<PantheonMetricCategory> metricCategories = DEFAULT_METRIC_CATEGORIES;
+  private final Set<MetricCategory> metricCategories = DEFAULT_METRIC_CATEGORIES;
 
   @Option(
       names = {"--metrics-push-enabled"},
@@ -517,13 +521,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--permissions-accounts-contract-address"},
       description = "Address of the account permissioning smart contract",
-      arity = "1")
+      arity = "1",
+      hidden = true)
   private final Address permissionsAccountsContractAddress = null;
 
   @Option(
       names = {"--permissions-accounts-contract-enabled"},
       description =
-          "Enable account level permissions via smart contract (default: ${DEFAULT-VALUE})")
+          "Enable account level permissions via smart contract (default: ${DEFAULT-VALUE})",
+      hidden = true)
   private final Boolean permissionsAccountsContractEnabled = false;
 
   @Option(
@@ -650,6 +656,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
 
+    final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
+    metricCategoryConverter.addCategories(PantheonMetricCategory.class);
+    metricCategoryConverter.addCategories(StandardMetricCategory.class);
+    commandLine.registerConverter(MetricCategory.class, metricCategoryConverter);
+
     // Add performance options
     UnstableOptionsSubCommand.createUnstableOptions(
         commandLine,
@@ -680,6 +691,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       System.out.println("Setting logging level to " + logLevel.name());
       Configurator.setAllLevels("", logLevel);
     }
+
+    logger.info("Starting Pantheon version: {}", PantheonInfo.version());
 
     // Check that P2P options are able to work or send an error
     checkOptionDependencies(
