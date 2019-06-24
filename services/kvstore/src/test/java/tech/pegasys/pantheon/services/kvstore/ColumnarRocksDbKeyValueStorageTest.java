@@ -13,10 +13,10 @@
 package tech.pegasys.pantheon.services.kvstore;
 
 import static org.junit.Assert.assertEquals;
-import static tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider.*;
 
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Transaction;
+import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Segment;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Arrays;
@@ -35,27 +35,48 @@ public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageT
 
     Transaction tx = store.startTransaction();
     tx.put(
-        store.getSegmentIdentifierByName(RocksDbSegment.BLOCKCHAIN),
+        store.getSegmentIdentifierByName(TestSegment.BAR),
         BytesValue.fromHexString("0001"),
         BytesValue.fromHexString("0FFF"));
     tx.commit();
     final Optional<BytesValue> result =
         store.get(
-            store.getSegmentIdentifierByName(RocksDbSegment.WORLD_STATE),
+            store.getSegmentIdentifierByName(TestSegment.FOO),
             BytesValue.fromHexString("0001"));
     assertEquals(Optional.empty(), result);
+  }
+
+  public enum TestSegment implements Segment {
+    FOO(new byte[] {1}),
+    BAR(new byte[] {2});
+
+    private final byte[] id;
+
+    TestSegment(final byte[] id) {
+      this.id = id;
+    }
+
+    @Override
+    public String getName() {
+      return name();
+    }
+
+    @Override
+    public byte[] getId() {
+      return id;
+    }
   }
 
   private SegmentedKeyValueStorage createSegmentedStore() throws Exception {
     return ColumnarRocksDbKeyValueStorage.create(
         new RocksDbConfiguration.Builder().databaseDir(folder.newFolder().toPath()).build(),
-        Arrays.asList(RocksDbSegment.WORLD_STATE, RocksDbSegment.BLOCKCHAIN),
+        Arrays.asList(TestSegment.FOO, TestSegment.BAR),
         new NoOpMetricsSystem());
   }
 
   @Override
   protected KeyValueStorage createStore() throws Exception {
     return new SegmentedKeyValueStorageAdapter<>(
-        RocksDbSegment.WORLD_STATE, createSegmentedStore());
+        TestSegment.FOO, createSegmentedStore());
   }
 }
