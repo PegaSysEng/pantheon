@@ -28,8 +28,8 @@ public class BoundedQueueTest {
     final BoundedQueue queue =
         new BoundedQueue(1, 1, TimeUnit.SECONDS, "test", new NoOpMetricsSystem());
     assertTrue(queue.offer(() -> {}));
-    assertEquals(queue.size(), 1);
+    assertEquals(1, queue.size());
     assertTrue(queue.offer(() -> {}));
-    assertEquals(queue.size(), 1);
+    assertEquals(1, queue.size());
   }
 }
