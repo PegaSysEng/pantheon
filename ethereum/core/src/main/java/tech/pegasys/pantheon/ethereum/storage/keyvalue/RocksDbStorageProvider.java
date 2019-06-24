@@ -51,7 +51,7 @@ public class RocksDbStorageProvider {
     return new KeyValueStorageProvider(kv);
   }
 
-  public static StorageProvider createSegmentedProvider(
+  private static StorageProvider createSegmentedProvider(
       final RocksDbConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem)
       throws IOException {
     LOG.info("Using RocksDB columns");
