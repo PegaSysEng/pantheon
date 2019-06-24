@@ -14,10 +14,9 @@ package tech.pegasys.pantheon.services.kvstore;
 
 import static org.junit.Assert.assertEquals;
 
-import org.rocksdb.ColumnFamilyHandle;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Transaction;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Segment;
+import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Transaction;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Arrays;
@@ -26,6 +25,7 @@ import java.util.Optional;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.rocksdb.ColumnFamilyHandle;
 
 public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
@@ -42,8 +42,7 @@ public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageT
     tx.commit();
     final Optional<BytesValue> result =
         store.get(
-            store.getSegmentIdentifierByName(TestSegment.FOO),
-            BytesValue.fromHexString("0001"));
+            store.getSegmentIdentifierByName(TestSegment.FOO), BytesValue.fromHexString("0001"));
     assertEquals(Optional.empty(), result);
   }
 
