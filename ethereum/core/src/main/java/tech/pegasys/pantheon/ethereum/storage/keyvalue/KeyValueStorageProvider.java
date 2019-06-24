@@ -71,7 +71,6 @@ public class KeyValueStorageProvider implements StorageProvider {
     return new PrivateStateKeyValueStorage(privateStateStorage);
   }
 
-  @Override
   public KeyValueStorage createPruningStorage() {
     return pruningStorage;
   }
