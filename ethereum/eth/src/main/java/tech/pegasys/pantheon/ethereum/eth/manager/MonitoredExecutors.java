@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTimedQueue;
+import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedQueue;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
@@ -53,12 +53,13 @@ public class MonitoredExecutors {
     return newFixedThreadPool(
         name,
         workerCount,
-        new BoundedTimedQueue(
+        new BoundedQueue(
             queueSize,
             keepAlive,
             keepAliveUnit,
             evictionPollTimeout,
             evictionPollTimeoutUnit,
+            toMetricName(name),
             metricsSystem),
         metricsSystem);
   }
@@ -112,7 +113,7 @@ public class MonitoredExecutors {
       final MetricsSystem metricsSystem,
       final BiFunction<RejectedExecutionHandler, ThreadFactory, T> creator) {
 
-    final String metricName = name.toLowerCase(Locale.US).replace('-', '_');
+    final String metricName = toMetricName(name);
 
     final T executor =
         creator.apply(
@@ -150,6 +151,10 @@ public class MonitoredExecutors {
         executor::getTaskCount);
 
     return executor;
+  }
+
+  private static String toMetricName(final String name) {
+    return name.toLowerCase(Locale.US).replace('-', '_');
   }
 
   private static class CountingAbortPolicy extends AbortPolicy {

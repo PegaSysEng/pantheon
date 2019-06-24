@@ -18,8 +18,8 @@ import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newF
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
 
+import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTimedQueue;
-import tech.pegasys.pantheon.ethereum.eth.manager.bounded.TimedTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
@@ -48,9 +48,9 @@ public class EthScheduler {
   private static final Logger LOG = LogManager.getLogger();
 
   private final Duration defaultTimeout = Duration.ofSeconds(5);
-
   private final AtomicBoolean stopped = new AtomicBoolean(false);
   private final CountDownLatch shutdown = new CountDownLatch(1);
+  private static final int txWorkerCapacity = 1000000;
 
   protected final ExecutorService syncWorkerExecutor;
   protected final ScheduledExecutorService scheduler;
@@ -65,12 +65,7 @@ public class EthScheduler {
       final int txWorkerCount,
       final int computationWorkerCount,
       final MetricsSystem metricsSystem) {
-    this(
-        syncWorkerCount,
-        txWorkerCount,
-        BoundedTimedQueue.Default.CAPACITY,
-        computationWorkerCount,
-        metricsSystem);
+    this(syncWorkerCount, txWorkerCount, txWorkerCapacity, computationWorkerCount, metricsSystem);
   }
 
   public EthScheduler(
@@ -87,10 +82,10 @@ public class EthScheduler {
             EthScheduler.class.getSimpleName() + "-Transactions",
             txWorkerCount,
             txWorkerQueueSize,
-            BoundedTimedQueue.Default.KEEP_ALIVE,
-            BoundedTimedQueue.Default.KEEP_ALIVE_UNIT,
-            BoundedTimedQueue.Default.EVICTION_POLL_TIMEOUT,
-            BoundedTimedQueue.Default.EVICTION_POLL_TIMEOUT_UNIT,
+            BoundedTimedQueue.DEFAULT_KEEP_ALIVE,
+            BoundedTimedQueue.DEFAULT_KEEP_ALIVE_UNIT,
+            BoundedTimedQueue.DEFAULT_EVICTION_POLL_TIMEOUT,
+            BoundedTimedQueue.DEFAULT_EVICTION_POLL_TIMEOUT_UNIT,
             metricsSystem),
         newCachedThreadPool(EthScheduler.class.getSimpleName() + "-Services", metricsSystem),
         newFixedThreadPool(
@@ -131,8 +126,8 @@ public class EthScheduler {
     syncWorkerExecutor.execute(command);
   }
 
-  public void scheduleTxWorkerTask(final TimedTask timedTask) {
-    txWorkerExecutor.execute(timedTask);
+  public void scheduleTxWorkerTask(final Runnable command) {
+    txWorkerExecutor.execute(BoundedTask.fromRunnable(command));
   }
 
   public <T> CompletableFuture<T> scheduleServiceTask(final EthTask<T> task) {

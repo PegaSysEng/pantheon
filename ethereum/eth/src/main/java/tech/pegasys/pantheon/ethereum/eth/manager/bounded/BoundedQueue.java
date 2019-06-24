@@ -17,11 +17,9 @@ import static java.util.Objects.requireNonNull;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
-import java.util.Locale;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
@@ -30,24 +28,17 @@ import org.apache.logging.log4j.Logger;
 
 public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
   private static final Logger LOG = LogManager.getLogger();
+  public static final long DEFAULT_KEEP_ALIVE = 60;
+  public static final TemporalUnit DEFAULT_KEEP_ALIVE_UNIT = ChronoUnit.SECONDS;
+  public static final long DEFAULT_EVICTION_POLL_TIMEOUT = 10;
+  public static final TimeUnit DEFAULT_EVICTION_POLL_TIMEOUT_UNIT = TimeUnit.SECONDS;
 
   private final long keepAlive;
   private final TemporalUnit keepAliveUnit;
   private final long evictionPollTimeout;
   private final TimeUnit evictionPollTimeoutUnit;
   private final MetricsSystem metricsSystem;
-  private final String metricName;
   private final Counter totalEvictedTaskCounter;
-
-  public BoundedTimedQueue() {
-    this(
-        Default.CAPACITY,
-        Default.KEEP_ALIVE,
-        Default.KEEP_ALIVE_UNIT,
-        Default.EVICTION_POLL_TIMEOUT,
-        Default.EVICTION_POLL_TIMEOUT_UNIT,
-        Default.METRICS_SYSTEM);
-  }
 
   public BoundedTimedQueue(
       final int capacity,
@@ -55,6 +46,7 @@ public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
       final TemporalUnit keepAliveUnit,
       final long evictionPollTimeout,
       final TimeUnit evictionPollTimeoutUnit,
+      final String metricName,
       final MetricsSystem metricsSystem) {
     super(capacity);
     this.keepAlive = keepAlive;
@@ -62,11 +54,10 @@ public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
     this.evictionPollTimeout = evictionPollTimeout;
     this.evictionPollTimeoutUnit = evictionPollTimeoutUnit;
     this.metricsSystem = metricsSystem;
-    this.metricName = this.getClass().getSimpleName().toLowerCase(Locale.US).replace('-', '_');
     this.totalEvictedTaskCounter =
         this.metricsSystem.createCounter(
             PantheonMetricCategory.EXECUTORS,
-            metricName + "_rejected_tasks_total",
+            metricName + "_dropped_tasks_total",
             "Total number of tasks rejected by this working queue.");
   }
 
@@ -74,12 +65,12 @@ public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
   public boolean offer(final Runnable runnable) {
     try {
       requireNonNull(runnable);
-      if (!(runnable instanceof TimedTask)) {
+      if (!(runnable instanceof BoundedTask)) {
         return false;
       }
-      final TimedTask task = (TimedTask) runnable;
+      final BoundedTask task = (BoundedTask) runnable;
       if (!isEligible(task)) {
-        LOG.debug("Task does not match time policy, rejecting task.");
+        LOG.debug("Task does not match policy, rejecting task.");
         return false;
       }
       final boolean offered = super.offer(task);
@@ -94,7 +85,7 @@ public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
             "Task has been rejected because of maximum capacity of the queue has been reached and no candidate task to remove from the working queue.");
         return false;
       }
-      LOG.warn("{} task(s) evicted from the working queue because too old.", evictedTaskCounter);
+      LOG.warn("{} task(s) evicted from the working queue.", evictedTaskCounter);
       totalEvictedTaskCounter.inc(evictedTaskCounter);
       // Check if task is still eligible after eviction process.
       if (isEligible(task) && super.offer(task)) {
@@ -118,10 +109,10 @@ public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
   private int processEviction() throws InterruptedException {
     int evictedTaskCounter = 0;
     boolean continueEviction = true;
-    TimedTask lastPolledTask = null;
+    BoundedTask lastPolledTask = null;
     // Removing tasks that are too old.
     while (continueEviction) {
-      lastPolledTask = (TimedTask) poll(evictionPollTimeout, evictionPollTimeoutUnit);
+      lastPolledTask = (BoundedTask) poll(evictionPollTimeout, evictionPollTimeoutUnit);
       if (lastPolledTask == null) {
         continueEviction = false;
       } else {
@@ -144,20 +135,11 @@ public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
    * @param task The task to check.
    * @return If the task is eligible.
    */
-  private boolean isEligible(final TimedTask task) {
+  private boolean isEligible(final BoundedTask task) {
     return !isTooOld(task);
   }
 
-  private boolean isTooOld(final TimedTask task) {
+  private boolean isTooOld(final BoundedTask task) {
     return task.age().get(keepAliveUnit) >= keepAlive;
-  }
-
-  public static final class Default {
-    public static final int CAPACITY = 1000000;
-    public static final long KEEP_ALIVE = 60;
-    public static final TemporalUnit KEEP_ALIVE_UNIT = ChronoUnit.SECONDS;
-    public static final long EVICTION_POLL_TIMEOUT = 10;
-    public static final TimeUnit EVICTION_POLL_TIMEOUT_UNIT = TimeUnit.SECONDS;
-    public static final MetricsSystem METRICS_SYSTEM = new NoOpMetricsSystem();
   }
 }

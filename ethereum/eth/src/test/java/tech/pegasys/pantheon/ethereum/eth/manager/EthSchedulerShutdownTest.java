@@ -14,8 +14,6 @@ package tech.pegasys.pantheon.ethereum.eth.manager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTimedTask;
-
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -87,8 +85,8 @@ public class EthSchedulerShutdownTest {
     final MockEthTask task1 = new MockEthTask(1);
     final MockEthTask task2 = new MockEthTask();
 
-    ethScheduler.scheduleTxWorkerTask(BoundedTimedTask.fromRunnable(task1::executeTask));
-    ethScheduler.scheduleTxWorkerTask(BoundedTimedTask.fromRunnable(task2::executeTask));
+    ethScheduler.scheduleTxWorkerTask(task1::executeTask);
+    ethScheduler.scheduleTxWorkerTask(task2::executeTask);
     ethScheduler.stop();
 
     assertThat(txWorkerExecutor.isShutdown()).isTrue();

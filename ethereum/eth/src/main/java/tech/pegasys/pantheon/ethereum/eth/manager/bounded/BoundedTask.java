@@ -18,37 +18,34 @@ import static java.time.Instant.now;
 import java.time.Duration;
 import java.time.Instant;
 
-public class BoundedTimedTask implements TimedTask {
+public class BoundedTask implements Runnable {
 
   private final String name;
   private final Runnable task;
   private final Instant startedAt;
 
-  private BoundedTimedTask(final String name, final Runnable task) {
+  private BoundedTask(final String name, final Runnable task) {
     this.name = name;
     this.task = task;
     this.startedAt = now();
   }
 
-  public static TimedTask fromRunnable(final String name, final Runnable task) {
-    return new BoundedTimedTask(name, task);
+  public static BoundedTask fromRunnable(final String name, final Runnable task) {
+    return new BoundedTask(name, task);
   }
 
-  public static TimedTask fromRunnable(final Runnable task) {
+  public static BoundedTask fromRunnable(final Runnable task) {
     return fromRunnable("", task);
   }
 
-  @Override
   public Instant startedAt() {
     return startedAt;
   }
 
-  @Override
   public Duration age() {
     return between(startedAt(), now());
   }
 
-  @Override
   public String name() {
     return name;
   }
