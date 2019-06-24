@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.services.kvstore;
 
 import static org.junit.Assert.assertEquals;
 
+import org.rocksdb.ColumnFamilyHandle;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Transaction;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Segment;
@@ -31,9 +32,9 @@ public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageT
 
   @Test
   public void twoSegmentsAreIndependent() throws Exception {
-    final SegmentedKeyValueStorage store = createSegmentedStore();
+    final SegmentedKeyValueStorage<ColumnFamilyHandle> store = createSegmentedStore();
 
-    Transaction tx = store.startTransaction();
+    Transaction<ColumnFamilyHandle> tx = store.startTransaction();
     tx.put(
         store.getSegmentIdentifierByName(TestSegment.BAR),
         BytesValue.fromHexString("0001"),
@@ -67,7 +68,7 @@ public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageT
     }
   }
 
-  private SegmentedKeyValueStorage createSegmentedStore() throws Exception {
+  private SegmentedKeyValueStorage<ColumnFamilyHandle> createSegmentedStore() throws Exception {
     return ColumnarRocksDbKeyValueStorage.create(
         new RocksDbConfiguration.Builder().databaseDir(folder.newFolder().toPath()).build(),
         Arrays.asList(TestSegment.FOO, TestSegment.BAR),
@@ -76,7 +77,7 @@ public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageT
 
   @Override
   protected KeyValueStorage createStore() throws Exception {
-    return new SegmentedKeyValueStorageAdapter<>(
+    return new SegmentedKeyValueStorageAdapter<ColumnFamilyHandle>(
         TestSegment.FOO, createSegmentedStore());
   }
 }
