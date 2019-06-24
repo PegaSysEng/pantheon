@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 
 public class WorldStateKeyValueStorage implements WorldStateStorage {
 
-  private final Subscribers<NodesAddedListener> nodeAddedListeners = new Subscribers<>();
+  private final Subscribers<NodesAddedListener> nodeAddedListeners = Subscribers.create();
   private final KeyValueStorage keyValueStorage;
 
   public WorldStateKeyValueStorage(final KeyValueStorage keyValueStorage) {
