@@ -46,6 +46,36 @@ public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageT
     assertEquals(Optional.empty(), result);
   }
 
+  @Test
+  public void canRemoveThroughSegmentIteration() throws Exception {
+    final SegmentedKeyValueStorage<ColumnFamilyHandle> store = createSegmentedStore();
+    final ColumnFamilyHandle fooSegment = store.getSegmentIdentifierByName(TestSegment.FOO);
+    final ColumnFamilyHandle barSegment = store.getSegmentIdentifierByName(TestSegment.BAR);
+
+    Transaction<ColumnFamilyHandle> tx = store.startTransaction();
+    tx.put(fooSegment, BytesValue.of(1), BytesValue.of(1));
+    tx.put(fooSegment, BytesValue.of(2), BytesValue.of(2));
+    tx.put(fooSegment, BytesValue.of(3), BytesValue.of(3));
+    tx.put(barSegment, BytesValue.of(4), BytesValue.of(4));
+    tx.put(barSegment, BytesValue.of(5), BytesValue.of(5));
+    tx.put(barSegment, BytesValue.of(6), BytesValue.of(6));
+    tx.commit();
+
+    final long removedFromFoo = store.removeUnless(fooSegment, x -> x.equals(BytesValue.of(3)));
+    final long removedFromBar = store.removeUnless(barSegment, x -> x.equals(BytesValue.of(4)));
+
+    assertEquals(2, removedFromFoo);
+    assertEquals(2, removedFromBar);
+
+    assertEquals(Optional.empty(), store.get(fooSegment, BytesValue.of(1)));
+    assertEquals(Optional.empty(), store.get(fooSegment, BytesValue.of(2)));
+    assertEquals(Optional.of(BytesValue.of(3)), store.get(fooSegment, BytesValue.of(3)));
+
+    assertEquals(Optional.of(BytesValue.of(4)), store.get(barSegment, BytesValue.of(4)));
+    assertEquals(Optional.empty(), store.get(barSegment, BytesValue.of(5)));
+    assertEquals(Optional.empty(), store.get(barSegment, BytesValue.of(6)));
+  }
+
   public enum TestSegment implements Segment {
     FOO(new byte[] {1}),
     BAR(new byte[] {2});
