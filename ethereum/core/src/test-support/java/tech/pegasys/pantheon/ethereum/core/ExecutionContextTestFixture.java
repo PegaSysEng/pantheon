@@ -53,8 +53,7 @@ public class ExecutionContextTestFixture {
             new KeyValueStoragePrefixedKeyBlockchainStorage(
                 keyValueStorage, new MainnetBlockHeaderFunctions()),
             new NoOpMetricsSystem());
-    this.stateArchive =
-        new WorldStateArchive(new WorldStateKeyValueStorage(keyValueStorage));
+    this.stateArchive = new WorldStateArchive(new WorldStateKeyValueStorage(keyValueStorage));
     this.protocolSchedule = protocolSchedule;
     this.protocolContext = new ProtocolContext<>(blockchain, stateArchive, null);
     genesisState.writeStateTo(stateArchive.getMutable());

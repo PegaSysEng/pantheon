@@ -180,8 +180,7 @@ public class WorldStateDownloaderTest {
   @Test
   public void downloadAlreadyAvailableWorldState() {
     // Setup existing state
-    final WorldStateStorage storage =
-        new WorldStateKeyValueStorage(new InMemoryKeyValueStorage());
+    final WorldStateStorage storage = new WorldStateKeyValueStorage(new InMemoryKeyValueStorage());
     final WorldStateArchive worldStateArchive = new WorldStateArchive(storage);
     final MutableWorldState worldState = worldStateArchive.getMutable();
 

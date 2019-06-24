@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.services.kvstore;
 
 import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
@@ -76,7 +75,7 @@ public class ColumnarRocksDbKeyValueStorage
 
   private ColumnarRocksDbKeyValueStorage(
       final RocksDbConfiguration rocksDbConfiguration,
-  final List<Segment> segments,
+      final List<Segment> segments,
       final MetricsSystem metricsSystem) {
     RocksDbUtil.loadNativeLibrary();
     try {

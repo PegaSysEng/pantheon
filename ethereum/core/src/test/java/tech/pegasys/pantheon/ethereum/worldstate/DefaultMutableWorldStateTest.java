@@ -158,8 +158,7 @@ public class DefaultMutableWorldStateTest {
   @Test
   public void commitAndPersist() {
     final KeyValueStorage storage = new InMemoryKeyValueStorage();
-    final WorldStateKeyValueStorage kvWorldStateStorage =
-        new WorldStateKeyValueStorage(storage);
+    final WorldStateKeyValueStorage kvWorldStateStorage = new WorldStateKeyValueStorage(storage);
     final MutableWorldState worldState = createEmpty(kvWorldStateStorage);
     final WorldUpdater updater = worldState.updater();
     final Wei newBalance = Wei.of(100000);
@@ -190,8 +189,7 @@ public class DefaultMutableWorldStateTest {
 
     // Create new world state and check that it can access modified address
     final MutableWorldState newWorldState =
-        new DefaultMutableWorldState(
-            expectedRootHash, new WorldStateKeyValueStorage(storage));
+        new DefaultMutableWorldState(expectedRootHash, new WorldStateKeyValueStorage(storage));
     assertEquals(expectedRootHash, newWorldState.rootHash());
     assertNotNull(newWorldState.get(ADDRESS));
     assertEquals(newBalance, newWorldState.get(ADDRESS).getBalance());

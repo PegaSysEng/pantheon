@@ -119,8 +119,7 @@ public final class GenesisState {
 
   private static Hash calculateGenesisStateHash(final List<GenesisAccount> genesisAccounts) {
     final MutableWorldState worldState =
-        new DefaultMutableWorldState(
-            new WorldStateKeyValueStorage(new InMemoryKeyValueStorage()));
+        new DefaultMutableWorldState(new WorldStateKeyValueStorage(new InMemoryKeyValueStorage()));
     writeAccountsTo(worldState, genesisAccounts);
     return worldState.rootHash();
   }
