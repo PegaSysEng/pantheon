@@ -76,7 +76,7 @@ public class ColumnarRocksDbKeyValueStorage
 
   private ColumnarRocksDbKeyValueStorage(
       final RocksDbConfiguration rocksDbConfiguration,
-      final List<Segment> segments,
+  final List<Segment> segments,
       final MetricsSystem metricsSystem) {
     RocksDbUtil.loadNativeLibrary();
     try {
