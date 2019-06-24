@@ -17,7 +17,6 @@ import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
-import java.time.temporal.TemporalUnit;
 import java.util.Locale;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -45,8 +44,6 @@ public class MonitoredExecutors {
       final String name,
       final int workerCount,
       final int queueSize,
-      final long keepAlive,
-      final TemporalUnit keepAliveUnit,
       final long evictionPollTimeout,
       final TimeUnit evictionPollTimeoutUnit,
       final MetricsSystem metricsSystem) {
@@ -55,8 +52,6 @@ public class MonitoredExecutors {
         workerCount,
         new BoundedQueue(
             queueSize,
-            keepAlive,
-            keepAliveUnit,
             evictionPollTimeout,
             evictionPollTimeoutUnit,
             toMetricName(name),

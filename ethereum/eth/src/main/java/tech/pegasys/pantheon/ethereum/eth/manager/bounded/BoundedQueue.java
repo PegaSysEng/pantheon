@@ -12,45 +12,29 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager.bounded;
 
-import static java.util.Objects.requireNonNull;
-
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
-  private static final Logger LOG = LogManager.getLogger();
-  public static final long DEFAULT_KEEP_ALIVE = 60;
-  public static final TemporalUnit DEFAULT_KEEP_ALIVE_UNIT = ChronoUnit.SECONDS;
+public class BoundedQueue extends LinkedBlockingDeque<Runnable> {
   public static final long DEFAULT_EVICTION_POLL_TIMEOUT = 10;
   public static final TimeUnit DEFAULT_EVICTION_POLL_TIMEOUT_UNIT = TimeUnit.SECONDS;
 
-  private final long keepAlive;
-  private final TemporalUnit keepAliveUnit;
   private final long evictionPollTimeout;
   private final TimeUnit evictionPollTimeoutUnit;
   private final MetricsSystem metricsSystem;
   private final Counter totalEvictedTaskCounter;
 
-  public BoundedTimedQueue(
+  public BoundedQueue(
       final int capacity,
-      final long keepAlive,
-      final TemporalUnit keepAliveUnit,
       final long evictionPollTimeout,
       final TimeUnit evictionPollTimeoutUnit,
       final String metricName,
       final MetricsSystem metricsSystem) {
     super(capacity);
-    this.keepAlive = keepAlive;
-    this.keepAliveUnit = keepAliveUnit;
     this.evictionPollTimeout = evictionPollTimeout;
     this.evictionPollTimeoutUnit = evictionPollTimeoutUnit;
     this.metricsSystem = metricsSystem;
@@ -62,84 +46,16 @@ public class BoundedTimedQueue extends LinkedBlockingDeque<Runnable> {
   }
 
   @Override
-  public boolean offer(final Runnable runnable) {
+  public boolean offer(final Runnable task) {
     try {
-      requireNonNull(runnable);
-      if (!(runnable instanceof BoundedTask)) {
-        return false;
+      if (!super.offer(task)) {
+        poll(evictionPollTimeout, evictionPollTimeoutUnit);
+        totalEvictedTaskCounter.inc();
+        return super.offer(task);
       }
-      final BoundedTask task = (BoundedTask) runnable;
-      if (!isEligible(task)) {
-        LOG.debug("Task does not match policy, rejecting task.");
-        return false;
-      }
-      final boolean offered = super.offer(task);
-      if (offered) {
-        return true;
-      }
-      // Try to evict tasks based on time policy.
-      int evictedTaskCounter = processEviction();
-      if (evictedTaskCounter == 0) {
-        // No task has been evicted, rejecting new task.
-        LOG.warn(
-            "Task has been rejected because of maximum capacity of the queue has been reached and no candidate task to remove from the working queue.");
-        return false;
-      }
-      LOG.warn("{} task(s) evicted from the working queue.", evictedTaskCounter);
-      totalEvictedTaskCounter.inc(evictedTaskCounter);
-      // Check if task is still eligible after eviction process.
-      if (isEligible(task) && super.offer(task)) {
-        return true;
-      } else {
-        LOG.warn("Task insertion failed after eviction process, rejecting the task.");
-        return false;
-      }
+      return true;
     } catch (InterruptedException e) {
-      LOG.warn("Eviction aborted.", e);
       return false;
     }
-  }
-
-  /**
-   * Process eviction of tasks too old given keepAlive.
-   *
-   * @return The number of tasks evicted.
-   * @throws InterruptedException
-   */
-  private int processEviction() throws InterruptedException {
-    int evictedTaskCounter = 0;
-    boolean continueEviction = true;
-    BoundedTask lastPolledTask = null;
-    // Removing tasks that are too old.
-    while (continueEviction) {
-      lastPolledTask = (BoundedTask) poll(evictionPollTimeout, evictionPollTimeoutUnit);
-      if (lastPolledTask == null) {
-        continueEviction = false;
-      } else {
-        continueEviction = isTooOld(lastPolledTask);
-        if (continueEviction) {
-          evictedTaskCounter++;
-        }
-      }
-    }
-    // Re inject last polled task if not too old.
-    if (lastPolledTask != null && !isTooOld(lastPolledTask)) {
-      super.addFirst(lastPolledTask);
-    }
-    return evictedTaskCounter;
-  }
-
-  /**
-   * Check if the given task is eligible for insertion in the queue.
-   *
-   * @param task The task to check.
-   * @return If the task is eligible.
-   */
-  private boolean isEligible(final BoundedTask task) {
-    return !isTooOld(task);
-  }
-
-  private boolean isTooOld(final BoundedTask task) {
-    return task.age().get(keepAliveUnit) >= keepAlive;
   }
 }

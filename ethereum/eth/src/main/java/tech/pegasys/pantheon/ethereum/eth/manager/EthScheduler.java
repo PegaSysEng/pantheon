@@ -18,8 +18,7 @@ import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newF
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTask;
-import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedTimedQueue;
+import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedQueue;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
@@ -82,10 +81,8 @@ public class EthScheduler {
             EthScheduler.class.getSimpleName() + "-Transactions",
             txWorkerCount,
             txWorkerQueueSize,
-            BoundedTimedQueue.DEFAULT_KEEP_ALIVE,
-            BoundedTimedQueue.DEFAULT_KEEP_ALIVE_UNIT,
-            BoundedTimedQueue.DEFAULT_EVICTION_POLL_TIMEOUT,
-            BoundedTimedQueue.DEFAULT_EVICTION_POLL_TIMEOUT_UNIT,
+            BoundedQueue.DEFAULT_EVICTION_POLL_TIMEOUT,
+            BoundedQueue.DEFAULT_EVICTION_POLL_TIMEOUT_UNIT,
             metricsSystem),
         newCachedThreadPool(EthScheduler.class.getSimpleName() + "-Services", metricsSystem),
         newFixedThreadPool(
@@ -127,7 +124,7 @@ public class EthScheduler {
   }
 
   public void scheduleTxWorkerTask(final Runnable command) {
-    txWorkerExecutor.execute(BoundedTask.fromRunnable(command));
+    txWorkerExecutor.execute(command);
   }
 
   public <T> CompletableFuture<T> scheduleServiceTask(final EthTask<T> task) {
