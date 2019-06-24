@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.ethereum.storage.keyvalue;
 import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.privacy.PrivateKeyValueStorage;
+import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionKeyValueStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateKeyValueStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionStorage;
@@ -58,12 +58,12 @@ public class KeyValueStorageProvider implements StorageProvider {
 
   @Override
   public WorldStateStorage createWorldStateStorage() {
-    return new KeyValueStorageWorldStateStorage(worldStateStorage);
+    return new WorldStateKeyValueStorage(worldStateStorage);
   }
 
   @Override
   public PrivateTransactionStorage createPrivateTransactionStorage() {
-    return new PrivateKeyValueStorage(privateTransactionStorage);
+    return new PrivateTransactionKeyValueStorage(privateTransactionStorage);
   }
 
   @Override

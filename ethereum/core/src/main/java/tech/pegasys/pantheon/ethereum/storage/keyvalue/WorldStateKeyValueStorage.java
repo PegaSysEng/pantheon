@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-public class KeyValueStorageWorldStateStorage implements WorldStateStorage {
+public class WorldStateKeyValueStorage implements WorldStateStorage {
 
   private final Subscribers<NodesAddedListener> nodeAddedListeners = new Subscribers<>();
   private final KeyValueStorage keyValueStorage;
 
-  public KeyValueStorageWorldStateStorage(final KeyValueStorage keyValueStorage) {
+  public WorldStateKeyValueStorage(final KeyValueStorage keyValueStorage) {
     this.keyValueStorage = keyValueStorage;
   }
 
