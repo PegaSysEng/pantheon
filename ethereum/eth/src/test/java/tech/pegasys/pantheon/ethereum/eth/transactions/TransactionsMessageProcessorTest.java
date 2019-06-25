@@ -66,7 +66,7 @@ public class TransactionsMessageProcessorTest {
   }
 
   @Test
-  public void shouldNotMarkAllReceivedTransactionsAsSeenIfExpired() {
+  public void shouldNotMarkReceivedExpiredTransactionsAsSeen() {
     messageHandler.processTransactionsMessage(
         peer1,
         TransactionsMessage.create(asList(transaction1, transaction2, transaction3)),
