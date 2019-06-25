@@ -20,23 +20,12 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 public class BoundedQueue extends LinkedBlockingDeque<Runnable> {
-  public static final long DEFAULT_EVICTION_POLL_TIMEOUT = 10;
-  public static final TimeUnit DEFAULT_EVICTION_POLL_TIMEOUT_UNIT = TimeUnit.SECONDS;
-
-  private final long evictionPollTimeout;
-  private final TimeUnit evictionPollTimeoutUnit;
   private final MetricsSystem metricsSystem;
   private final Counter totalEvictedTaskCounter;
 
   public BoundedQueue(
-      final int capacity,
-      final long evictionPollTimeout,
-      final TimeUnit evictionPollTimeoutUnit,
-      final String metricName,
-      final MetricsSystem metricsSystem) {
+      final int capacity, final String metricName, final MetricsSystem metricsSystem) {
     super(capacity);
-    this.evictionPollTimeout = evictionPollTimeout;
-    this.evictionPollTimeoutUnit = evictionPollTimeoutUnit;
     this.metricsSystem = metricsSystem;
     this.totalEvictedTaskCounter =
         this.metricsSystem.createCounter(
@@ -47,15 +36,10 @@ public class BoundedQueue extends LinkedBlockingDeque<Runnable> {
 
   @Override
   public boolean offer(final Runnable task) {
-    try {
-      if (!super.offer(task)) {
-        poll(evictionPollTimeout, evictionPollTimeoutUnit);
-        totalEvictedTaskCounter.inc();
-        return super.offer(task);
-      }
-      return true;
-    } catch (InterruptedException e) {
-      return false;
+    while (!super.offer(task)) {
+      remove();
+      totalEvictedTaskCounter.inc();
     }
+    return true;
   }
 }

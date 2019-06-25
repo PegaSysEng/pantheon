@@ -140,7 +140,7 @@ public class MockExecutorService implements ExecutorService {
     submit(command);
   }
 
-  public static class ExecutorTask<T> {
+  private static class ExecutorTask<T> {
     private final CompletableFuture<T> future;
     private final Callable<T> taskRunner;
     private boolean isPending = true;

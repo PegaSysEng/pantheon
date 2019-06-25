@@ -24,9 +24,18 @@ import org.junit.Test;
 public class BoundedQueueTest {
 
   @Test
+  public void offerShouldAcceptNewElements() {
+    int size = 10;
+    final BoundedQueue queue = new BoundedQueue(size, "test", new NoOpMetricsSystem());
+    for (int i = 0; i < size; i++) {
+      assertTrue(queue.offer(() -> {}));
+      assertEquals(i + 1, queue.size());
+    }
+  }
+
+  @Test
   public void offerShouldMakeARoomAndAcceptNewElementAtFullCapacity() {
-    final BoundedQueue queue =
-        new BoundedQueue(1, 1, TimeUnit.SECONDS, "test", new NoOpMetricsSystem());
+    final BoundedQueue queue = new BoundedQueue(1, "test", new NoOpMetricsSystem());
     assertTrue(queue.offer(() -> {}));
     assertEquals(1, queue.size());
     assertTrue(queue.offer(() -> {}));

@@ -44,16 +44,12 @@ public class MonitoredExecutors {
       final String name,
       final int workerCount,
       final int queueSize,
-      final long evictionPollTimeout,
-      final TimeUnit evictionPollTimeoutUnit,
       final MetricsSystem metricsSystem) {
     return newFixedThreadPool(
         name,
         workerCount,
         new BoundedQueue(
             queueSize,
-            evictionPollTimeout,
-            evictionPollTimeoutUnit,
             toMetricName(name),
             metricsSystem),
         metricsSystem);

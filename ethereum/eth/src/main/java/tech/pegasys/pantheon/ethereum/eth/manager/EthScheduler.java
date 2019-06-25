@@ -81,8 +81,6 @@ public class EthScheduler {
             EthScheduler.class.getSimpleName() + "-Transactions",
             txWorkerCount,
             txWorkerQueueSize,
-            BoundedQueue.DEFAULT_EVICTION_POLL_TIMEOUT,
-            BoundedQueue.DEFAULT_EVICTION_POLL_TIMEOUT_UNIT,
             metricsSystem),
         newCachedThreadPool(EthScheduler.class.getSimpleName() + "-Services", metricsSystem),
         newFixedThreadPool(
