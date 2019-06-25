@@ -49,7 +49,7 @@ public class EthScheduler {
   private final Duration defaultTimeout = Duration.ofSeconds(5);
   private final AtomicBoolean stopped = new AtomicBoolean(false);
   private final CountDownLatch shutdown = new CountDownLatch(1);
-  private static final int txWorkerCapacity = 1000000;
+  private static final int TX_WORKER_CAPACITY = 1000000;
 
   protected final ExecutorService syncWorkerExecutor;
   protected final ScheduledExecutorService scheduler;
