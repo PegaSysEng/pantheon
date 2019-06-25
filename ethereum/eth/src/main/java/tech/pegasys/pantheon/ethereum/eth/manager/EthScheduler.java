@@ -18,7 +18,6 @@ import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newF
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedQueue;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.pipeline.Pipeline;
@@ -64,7 +63,7 @@ public class EthScheduler {
       final int txWorkerCount,
       final int computationWorkerCount,
       final MetricsSystem metricsSystem) {
-    this(syncWorkerCount, txWorkerCount, txWorkerCapacity, computationWorkerCount, metricsSystem);
+    this(syncWorkerCount, txWorkerCount, TX_WORKER_CAPACITY, computationWorkerCount, metricsSystem);
   }
 
   public EthScheduler(

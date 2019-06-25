@@ -48,10 +48,7 @@ public class MonitoredExecutors {
     return newFixedThreadPool(
         name,
         workerCount,
-        new BoundedQueue(
-            queueSize,
-            toMetricName(name),
-            metricsSystem),
+        new BoundedQueue(queueSize, toMetricName(name), metricsSystem),
         metricsSystem);
   }
 

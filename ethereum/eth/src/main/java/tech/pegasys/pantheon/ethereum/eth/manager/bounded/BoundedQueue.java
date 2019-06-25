@@ -17,7 +17,6 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeUnit;
 
 public class BoundedQueue extends LinkedBlockingDeque<Runnable> {
   private final MetricsSystem metricsSystem;

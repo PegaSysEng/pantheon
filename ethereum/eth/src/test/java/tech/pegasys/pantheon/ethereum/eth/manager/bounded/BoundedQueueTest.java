@@ -17,8 +17,6 @@ import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
-import java.util.concurrent.TimeUnit;
-
 import org.junit.Test;
 
 public class BoundedQueueTest {
