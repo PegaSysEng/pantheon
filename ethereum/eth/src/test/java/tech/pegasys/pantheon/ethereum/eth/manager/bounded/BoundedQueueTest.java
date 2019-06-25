@@ -12,10 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager.bounded;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
 
 public class BoundedQueueTest {
 
