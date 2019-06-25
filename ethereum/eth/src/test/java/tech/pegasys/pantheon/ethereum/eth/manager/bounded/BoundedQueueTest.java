@@ -12,12 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager.bounded;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Test;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class BoundedQueueTest {
 
@@ -26,17 +24,29 @@ public class BoundedQueueTest {
     int size = 10;
     final BoundedQueue queue = new BoundedQueue(size, "test", new NoOpMetricsSystem());
     for (int i = 0; i < size; i++) {
-      assertTrue(queue.offer(() -> {}));
-      assertEquals(i + 1, queue.size());
+      final Runnable task = () -> {};
+      assertThat(queue.offer(task)).isTrue();
+      assertThat(queue).contains(task);
+      assertThat(queue.size()).isEqualTo(i + 1);
     }
   }
 
   @Test
   public void offerShouldMakeARoomAndAcceptNewElementAtFullCapacity() {
-    final BoundedQueue queue = new BoundedQueue(1, "test", new NoOpMetricsSystem());
-    assertTrue(queue.offer(() -> {}));
-    assertEquals(1, queue.size());
-    assertTrue(queue.offer(() -> {}));
-    assertEquals(1, queue.size());
+    final BoundedQueue queue = new BoundedQueue(2, "test", new NoOpMetricsSystem());
+    final Runnable task1 = () -> {};
+    final Runnable task2 = () -> {};
+    final Runnable task3 = () -> {};
+    assertThat(queue.offer(task1)).isTrue();
+    assertThat(queue.size()).isEqualTo(1);
+    assertThat(queue).contains(task1);
+    assertThat(queue.offer(task2)).isTrue();
+    assertThat(queue.size()).isEqualTo(2);
+    assertThat(queue).contains(task2);
+    assertThat(queue.offer(task3)).isTrue();
+    assertThat(queue).doesNotContain(task1);
+    assertThat(queue).contains(task2);
+    assertThat(queue).contains(task3);
+    assertThat(queue.size()).isEqualTo(2);
   }
 }
