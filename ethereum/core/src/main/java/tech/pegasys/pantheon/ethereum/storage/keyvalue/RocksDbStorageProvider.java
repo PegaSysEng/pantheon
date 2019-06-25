@@ -69,15 +69,15 @@ public class RocksDbStorageProvider {
   }
 
   private enum RocksDbSegment implements Segment {
-    BLOCKCHAIN(new byte[] {1}),
-    WORLD_STATE(new byte[] {2}),
-    PRIVATE_TRANSACTIONS(new byte[] {3}),
-    PRIVATE_STATE(new byte[] {4}),
-    PRUNING_STATE(new byte[] {5});
+    BLOCKCHAIN((byte) 1),
+    WORLD_STATE((byte) 2),
+    PRIVATE_TRANSACTIONS((byte) 3),
+    PRIVATE_STATE((byte) 4),
+    PRUNING_STATE((byte) 5);
 
     private final byte[] id;
 
-    RocksDbSegment(final byte[] id) {
+    RocksDbSegment(final byte... id) {
       this.id = id;
     }
 
