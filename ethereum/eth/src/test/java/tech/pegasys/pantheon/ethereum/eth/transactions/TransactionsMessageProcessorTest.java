@@ -16,7 +16,6 @@ import static java.time.Duration.ofMillis;
 import static java.time.Duration.ofMinutes;
 import static java.time.Instant.now;
 import static java.util.Arrays.asList;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -27,20 +26,23 @@ import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TransactionsMessageProcessorTest {
 
-  private final TransactionPool transactionPool = mock(TransactionPool.class);
-  private final PeerTransactionTracker transactionTracker = mock(PeerTransactionTracker.class);
-  private final EthPeer peer1 = mock(EthPeer.class);
+  @Mock private TransactionPool transactionPool;
+  @Mock private PeerTransactionTracker transactionTracker;
+  @Mock private EthPeer peer1;
+  @InjectMocks private TransactionsMessageProcessor messageHandler;
 
   private final BlockDataGenerator generator = new BlockDataGenerator();
   private final Transaction transaction1 = generator.transaction();
   private final Transaction transaction2 = generator.transaction();
   private final Transaction transaction3 = generator.transaction();
-
-  private final TransactionsMessageProcessor messageHandler =
-      new TransactionsMessageProcessor(transactionTracker, transactionPool);
 
   @Test
   public void shouldMarkAllReceivedTransactionsAsSeen() {
