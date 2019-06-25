@@ -118,11 +118,11 @@ public class RocksDbConfiguration {
     @CommandLine.Option(
         names = {"--Xrocksdb-columns-enabled"},
         hidden = true,
-        defaultValue = "true",
+        defaultValue = "false",
         paramLabel = "<BOOLEAN>",
         description =
             "Whether to separate chain and world state into separate RocksDB columns (default: ${DEFAULT-VALUE})")
-    boolean useColumns = true;
+    boolean useColumns = false;
 
     public Builder databaseDir(final Path databaseDir) {
       this.databaseDir = databaseDir;
