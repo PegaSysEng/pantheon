@@ -609,8 +609,8 @@ bintray {
   publish = true
 
   pkg {
-    repo = 'adrian-test'
-    name = 'pantheon'
+    repo = 'pegasys-repo'
+    name = 'adrian-test'
     userOrg = 'consensys'
     licenses = ['Apache-2.0']
     websiteUrl = 'https://github.com/PegaSysEng/pantheon'

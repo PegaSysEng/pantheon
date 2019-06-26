@@ -271,6 +271,9 @@ try {
 
                     docker.image(docker_image_dind).withRun('--privileged') { d ->
                         docker.image(build_image).inside("--link ${d.id}:docker") {
+                            stage(stage_name + 'Prepare') {
+                                sh './gradlew --no-daemon --parallel clean compileJava compileTestJava assemble'
+                            }
                             stage(stage_name + 'Publish') {
                                 withCredentials([
                                     usernamePassword(
