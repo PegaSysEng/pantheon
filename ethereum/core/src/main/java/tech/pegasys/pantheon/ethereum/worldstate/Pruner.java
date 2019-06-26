@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.worldstate;
 
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
+import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
@@ -27,8 +27,9 @@ import org.apache.logging.log4j.Logger;
 
 public class Pruner {
   private static final Logger LOG = LogManager.getLogger();
+
   private final MarkSweepPruner pruningStrategy;
-  private final ProtocolContext<?> protocolContext;
+  private final Blockchain blockchain;
   private final ExecutorService executor;
   private final long retentionPeriodInBlocks;
   private final AtomicReference<State> state = new AtomicReference<>(State.IDLE);
@@ -36,10 +37,10 @@ public class Pruner {
 
   public Pruner(
       final MarkSweepPruner pruningStrategy,
-      final ProtocolContext<?> protocolContext,
+      final Blockchain blockchain,
       final long retentionPeriodInBlocks) {
     this.pruningStrategy = pruningStrategy;
-    this.protocolContext = protocolContext;
+    this.blockchain = blockchain;
     this.executor =
         Executors.newSingleThreadExecutor(
             new ThreadFactoryBuilder()
@@ -52,7 +53,7 @@ public class Pruner {
 
   public void start() {
     // TODO: Don't attempt pruning while a fast sync is in progress.
-    protocolContext.getBlockchain().observeBlockAdded((event, blockchain) -> handleNewBlock(event));
+    blockchain.observeBlockAdded((event, blockchain) -> handleNewBlock(event));
   }
 
   public void stop() {
