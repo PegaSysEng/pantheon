@@ -207,7 +207,7 @@ public abstract class PantheonControllerBuilder<C> {
                 protocolContext.getWorldStateArchive().getStorage(),
                 storageProvider.createPruningStorage(),
                 metricsSystem),
-            protocolContext,
+            protocolContext.getBlockchain(),
             1000);
     addShutdownAction(pruner::stop);
 
