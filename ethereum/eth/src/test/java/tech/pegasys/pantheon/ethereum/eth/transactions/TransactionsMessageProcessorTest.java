@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
+import tech.pegasys.pantheon.metrics.Counter;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
@@ -36,6 +37,7 @@ public class TransactionsMessageProcessorTest {
 
   @Mock private TransactionPool transactionPool;
   @Mock private PeerTransactionTracker transactionTracker;
+  @Mock private Counter totalSkippedTransactionsMessageCounter;
   @Mock private EthPeer peer1;
   @InjectMocks private TransactionsMessageProcessor messageHandler;
 
@@ -75,6 +77,7 @@ public class TransactionsMessageProcessorTest {
         now().minus(ofMinutes(1)),
         ofMillis(1));
     verifyZeroInteractions(transactionTracker);
+    verify(totalSkippedTransactionsMessageCounter).inc(1);
   }
 
   @Test
@@ -85,5 +88,6 @@ public class TransactionsMessageProcessorTest {
         now().minus(ofMinutes(1)),
         ofMillis(1));
     verifyZeroInteractions(transactionPool);
+    verify(totalSkippedTransactionsMessageCounter).inc(1);
   }
 }
