@@ -20,17 +20,17 @@ public class RunnableCounter implements Counter {
   private final Counter backedCounter;
   private final Runnable task;
   private final int step;
-  private final AtomicInteger counter;
+  private AtomicInteger stepCounter;
 
   public RunnableCounter(final Counter backedCounter, final Runnable task, final int step) {
     this.backedCounter = backedCounter;
     this.task = task;
     this.step = step;
-    this.counter = new AtomicInteger(0);
+    this.stepCounter = new AtomicInteger(0);
   }
 
   /**
-   * Increments the counter by 1
+   * Increments the stepCounter by 1
    *
    * <p>{@link #inc(long) inc} method
    */
@@ -40,16 +40,17 @@ public class RunnableCounter implements Counter {
   }
 
   /**
-   * Increments the counter by amount. Triggers the runnable if the step is hit.
+   * Increments the stepCounter by amount. Triggers the runnable if the step is hit.
    *
-   * @param amount the value to add to the counter.
+   * @param amount the value to add to the stepCounter.
    */
   @Override
   public void inc(final long amount) {
-    counter.addAndGet((int) amount);
+    stepCounter.addAndGet((int) amount);
     backedCounter.inc(amount);
-    if (counter.get() % step == 0) {
+    if (stepCounter.get() == step) {
       task.run();
+      stepCounter = new AtomicInteger(0);
     }
   }
 }
