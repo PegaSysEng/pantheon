@@ -2625,7 +2625,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void txMessageKeepAliveSeconds() {
     final int txMessageKeepAliveSeconds = 999;
-    parseCommand("--tx-pool-message-keep-alive-seconds", String.valueOf(txMessageKeepAliveSeconds));
+    parseCommand("--tx-pool-keep-alive-seconds", String.valueOf(txMessageKeepAliveSeconds));
 
     verify(mockControllerBuilder).txMessageKeepAliveSeconds(intArgumentCaptor.capture());
     verify(mockControllerBuilder).txMessageKeepAliveSeconds(eq(txMessageKeepAliveSeconds));
@@ -2636,13 +2636,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void txMessageKeepAliveSecondsWithInvalidInputShouldFail() {
-    parseCommand("--tx-pool-message-keep-alive-seconds", "acbd");
+    parseCommand("--tx-pool-keep-alive-seconds", "acbd");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains(
-            "Invalid value for option '--tx-pool-message-keep-alive-seconds': 'acbd' is not an int");
+            "Invalid value for option '--tx-pool-keep-alive-seconds': 'acbd' is not an int");
   }
 }
