@@ -249,6 +249,67 @@ task deploy() {}
 
 subprojects {
 
+  if (file('src/main/java').directory) {
+    apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'maven-publish'
+
+    publishing {
+      publications {
+        mavenJava(MavenPublication) {
+          groupId "tech.pegasys.${project.group}"
+          version "${project.version}"
+          from components.java
+          //      artifact sourcesJar
+          //      artifact javadocJar
+          versionMapping {
+            usage('java-api') { fromResolutionOf('runtimeClasspath') }
+            usage('java-runtime') { fromResolutionResult() }
+          }
+          pom {
+            name = 'Pantheon'
+            description = 'Pantheon'
+            url = 'http://github.com/PegaSysEng/pantheon'
+            licenses {
+              license {
+                name = 'The Apache License, Version 2.0'
+                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+              }
+            }
+            scm {
+              connection = 'scm:git:git://github.com/PegaSysEng/pantheon.git'
+              developerConnection = 'scm:git:ssh://github.com/PegaSysEng/pantheon.git'
+              url = 'https://github.com/PegaSysEng/pantheon'
+            }
+          }
+        }
+      }
+    }
+
+    bintray {
+      user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+      key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
+
+      publications = ['mavenJava']
+
+      publish = true
+
+      pkg {
+        repo = 'pegasys-repo'
+        name = 'adrian-test'
+        userOrg = 'consensys'
+        licenses = ['Apache-2.0']
+        websiteUrl = 'https://github.com/PegaSysEng/pantheon'
+        issueTrackerUrl = 'https://github.com/PegaSysEng/pantheon/issues'
+        vcsUrl = 'https://github.com/PegaSysEng/pantheon.git'
+
+        version {
+          name = project.version
+          released = new Date()
+        }
+      }
+    }
+  }
+
   tasks.withType(Test) {
     // If GRADLE_MAX_TEST_FORKS is not set, use half the available processors
     maxParallelForks = (System.getenv('GRADLE_MAX_TEST_FORKS') ?: (Runtime.runtime.availableProcessors().intdiv(2) ?: 1)).toInteger()
@@ -548,7 +609,7 @@ bintray {
   publish = true
 
   pkg {
-    repo = 'pegasys-repo'
+    repo = 'adrian-test'
     name = 'pantheon'
     userOrg = 'consensys'
     licenses = ['Apache-2.0']
