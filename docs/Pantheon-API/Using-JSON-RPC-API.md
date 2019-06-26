@@ -78,7 +78,7 @@ Pantheon provides readiness and liveness endpoints to confirm the Pantheon node 
  
 By default, the readiness check requires a peer to be connected and the node to be within 2 blocks of the best
 known block. If [p2p communication is disabled](../Reference/Pantheon-CLI-Syntax.md#p2p-enabled), 
-no peers are required. 
+no peers are required. A live node with p2p disabled is always ready. 
 
 Use the query parameters `minPeers` and `maxBlocksBehind` to adjust the number of peers required and number of blocks tolerance.
 
@@ -86,12 +86,12 @@ Use the query parameters `minPeers` and `maxBlocksBehind` to adjust the number o
 http://<JSON-RPC-HTTP-endpoint:port>/readiness
 ```
     
-```bash tab="Example"
-curl 'http://localhost:8590/readiness'
+```bash tab="curl Request Example"
+curl -v 'http://localhost:8545/readiness'
 ```
 
 ```bash tab="Query Parameters Example"
-curl 'http://localhost:8590/readiness?minPeers=0&maxBlocksBehind=10'
+curl -v 'http://localhost:8545/readiness?minPeers=0&maxBlocksBehind=10'
 ```
 
 The liveness check requires the JSON RPC server to be up. 
@@ -100,8 +100,8 @@ The liveness check requires the JSON RPC server to be up.
 http://<JSON-RPC-HTTP-endpoint:port>/liveness
 ```
     
-```bash tab="Example"
-curl 'http://localhost:8590/liveness'
+```bash tab="curl Request Example"
+curl -v 'http://localhost:8545/liveness'
 ```
 
 ## API Methods Enabled by Default
