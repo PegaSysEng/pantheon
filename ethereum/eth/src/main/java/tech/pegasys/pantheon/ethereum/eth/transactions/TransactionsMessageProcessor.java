@@ -48,11 +48,10 @@ class TransactionsMessageProcessor {
     this.totalSkippedTransactionsMessageCounter =
         new RunnableCounter(
             metricsCounter,
-            () -> {
-              LOG.warn(
-                  "{} expired transaction messages have been skipped.",
-                  SKIPPED_MESSAGES_LOGGING_THRESHOLD);
-            },
+            () ->
+                LOG.warn(
+                    "{} expired transaction messages have been skipped.",
+                    SKIPPED_MESSAGES_LOGGING_THRESHOLD),
             SKIPPED_MESSAGES_LOGGING_THRESHOLD);
   }
 
