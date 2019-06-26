@@ -570,7 +570,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--tx-pool-keep-alive-seconds"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description = "Keep alive of transactions messages in seconds (default: ${DEFAULT-VALUE})",
+      description = "Keep alive of transactions in seconds (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer txMessageKeepAliveSeconds = TransactionPool.DEFAULT_TX_MSG_KEEP_ALIVE;
 
