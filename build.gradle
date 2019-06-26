@@ -290,6 +290,7 @@ subprojects {
       key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
 
       publications = ['mavenJava']
+      override = version.endsWith('SNAPSHOT')
 
       publish = true
 
@@ -607,6 +608,7 @@ bintray {
   }
 
   publish = true
+  override = version.endsWith('SNAPSHOT')
 
   pkg {
     repo = 'pegasys-repo'
