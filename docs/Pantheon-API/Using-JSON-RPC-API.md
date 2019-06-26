@@ -71,6 +71,33 @@ Send individual requests as a JSON data package at each prompt:
     `wscat` does not support headers. [Authentication](Authentication.md) requires an authentication token to be passed in the 
     request header. To use authentication with WebSockets, an app that supports headers is required. 
 
+### Readiness and Liveness Endpoints 
+
+Pantheon provides readiness and liveness endpoints that can be used to confirm the Pantheon node status. 
+ 
+Readiness check now by default requires a peer to be connected and the node to be within 2 blocks of its best peer (2 block tolerance allows for the delays that can incur with receiving and importing blocks after sync is complete).
+
+No peers are required if p2p is disabled.
+
+Query params can be used to adjust the number of peers required and number of blocks tolerance to be considered in sync.
+
+* `http://localhost:8590/readiness`
+* 
+
+```bash tab="Readiness Endpoint"
+http://<JSON-RPC-HTTP-endpoint:port>/readiness
+```
+    
+```bash tab="Example"
+curl 'http://localhost:8590/readiness'
+```
+
+```bash tab="Example with Parameters"
+curl 'http://localhost:8590/readiness?minPeers=0&maxBlocksBehind=10'
+```
+
+STATUS CODES RETURNED 
+
 ### API Methods Enabled by Default
 
 The `ETH`, `NET`, and `WEB3` API methods are enabled by default. 
