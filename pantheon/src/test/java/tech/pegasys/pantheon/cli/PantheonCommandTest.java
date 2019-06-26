@@ -2642,7 +2642,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains(
-            "Invalid value for option '--tx-pool-keep-alive-seconds': 'acbd' is not an int");
+        .contains("Invalid value for option '--tx-pool-keep-alive-seconds': 'acbd' is not an int");
   }
 }
