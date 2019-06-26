@@ -32,7 +32,7 @@ public class RunnableCounter implements Counter {
   /**
    * Increments the counter by 1
    *
-   * @see {@link #inc(long) inc} method
+   * {@link #inc(long) inc} method
    */
   @Override
   public void inc() {
