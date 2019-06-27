@@ -51,7 +51,7 @@ import tech.pegasys.pantheon.ethereum.eth.messages.ReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.StatusMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -1078,11 +1078,10 @@ public final class EthProtocolManagerTest {
           protocolContext,
           ethManager.ethContext(),
           TestClock.fixed(),
-          PendingTransactions.MAX_PENDING_TRANSACTIONS,
           metricsSystem,
           mock(SyncState.class),
-          PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
-          Wei.ZERO);
+          Wei.ZERO,
+          TransactionPoolConfiguration.builder().build());
 
       // Send just a transaction message.
       final PeerConnection peer = setupPeer(ethManager, (cap, msg, connection) -> {});
