@@ -10,11 +10,8 @@ are ready to receive requests.
 
 ## Determining When a Node is Ready 
 
-To determine when a node is ready use: 
-
-* [`net_peerCount`](../Reference/Pantheon-API-Methods.md#net_peercount) to confirm the minimum number of peers has been reached
-* [`eth_syncing`](../Reference/Pantheon-API-Methods.md#eth_syncing) to confirm the node is within the required number of blocks 
-from the best known block for that node 
+Use the [readiness endpoint](../Pantheon-API/Using-JSON-RPC-API.md#readiness-and-liveness-endpoints) 
+to determine when a node is ready. 
 
 !!! note
     The minimum number of peers and number of blocks from the best known block for a node to be considered ready
