@@ -65,7 +65,7 @@ public class ColumnarRocksDbKeyValueStorage
   private final Statistics stats;
   private final Map<String, ColumnFamilyHandle> columnHandlesByName;
 
-  public static SegmentedKeyValueStorage<ColumnFamilyHandle> create(
+  public static ColumnarRocksDbKeyValueStorage create(
       final RocksDbConfiguration rocksDbConfiguration,
       final List<Segment> segments,
       final MetricsSystem metricsSystem)
