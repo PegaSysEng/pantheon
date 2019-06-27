@@ -211,7 +211,7 @@ public class MainnetTransactionValidatorTest {
 
     validator.validateForSender(basicTransaction, accountWithNonce(0), validationParams);
 
-    assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
+    assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), validationParams))
         .isEqualTo(ValidationResult.valid());
 
     verifyZeroInteractions(transactionFilter);
