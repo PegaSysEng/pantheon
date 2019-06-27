@@ -197,8 +197,7 @@ public class MainnetTransactionValidatorTest {
   @Test
   public void shouldNotCheckAccountPermissionIfBothValidationParamsCheckPermissionsAreFalse() {
     final TransactionFilter transactionFilter = mock(TransactionFilter.class);
-    when(transactionFilter.permitted(any(Transaction.class), anyBoolean()))
-        .thenReturn(false);
+    when(transactionFilter.permitted(any(Transaction.class), anyBoolean())).thenReturn(false);
 
     final MainnetTransactionValidator validator =
         new MainnetTransactionValidator(gasCalculator, false, Optional.empty());

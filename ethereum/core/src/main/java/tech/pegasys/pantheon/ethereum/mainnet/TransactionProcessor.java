@@ -119,7 +119,7 @@ public interface TransactionProcessor {
       final Address miningBeneficiary,
       final BlockHashLookup blockHashLookup,
       final Boolean isPersistingState,
-      final Boolean checkOnchainPermissions) {
+      final TransactionValidationParams transactionValidationParams) {
     return processTransaction(
         blockchain,
         worldState,
@@ -129,7 +129,7 @@ public interface TransactionProcessor {
         NO_TRACING,
         blockHashLookup,
         isPersistingState,
-        checkOnchainPermissions);
+        transactionValidationParams);
   }
 
   /**
@@ -163,7 +163,7 @@ public interface TransactionProcessor {
         operationTracer,
         blockHashLookup,
         isPersistingState,
-        false);
+        new TransactionValidationParams.Builder().build());
   }
 
   Result processTransaction(
@@ -175,5 +175,5 @@ public interface TransactionProcessor {
       OperationTracer operationTracer,
       BlockHashLookup blockHashLookup,
       Boolean isPersistingState,
-      Boolean checkOnchainPermissions);
+      TransactionValidationParams transactionValidationParams);
 }

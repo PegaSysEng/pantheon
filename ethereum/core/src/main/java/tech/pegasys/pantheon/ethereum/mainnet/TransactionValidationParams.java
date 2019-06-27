@@ -19,7 +19,8 @@ public class TransactionValidationParams {
   private final boolean checkLocalPermissions;
 
   private TransactionValidationParams(
-      final boolean allowFutureNonce, final boolean checkOnchainPermissions,
+      final boolean allowFutureNonce,
+      final boolean checkOnchainPermissions,
       final boolean checkLocalPermissions) {
     this.allowFutureNonce = allowFutureNonce;
     this.checkOnchainPermissions = checkOnchainPermissions;
@@ -38,11 +39,51 @@ public class TransactionValidationParams {
     return checkLocalPermissions;
   }
 
-  public static class Builder {
+  public static TransactionValidationParams transactionSimulator() {
+    return new Builder()
+        .checkLocalPermissions(false)
+        .checkOnchainPermissions(false)
+        .allowFutureNonce(false)
+        .build();
+  }
+
+  public static TransactionValidationParams processingBlock() {
+    return new Builder()
+        .checkLocalPermissions(false)
+        .checkOnchainPermissions(true)
+        .allowFutureNonce(false)
+        .build();
+  }
+
+  public static TransactionValidationParams transactionPool() {
+    return new Builder()
+        .checkLocalPermissions(true)
+        .checkOnchainPermissions(false)
+        .allowFutureNonce(true)
+        .build();
+  }
+
+  public static TransactionValidationParams mining() {
+    return new Builder()
+        .checkLocalPermissions(true)
+        .checkOnchainPermissions(true)
+        .allowFutureNonce(false)
+        .build();
+  }
+
+  public static TransactionValidationParams blockReplay() {
+    return new Builder()
+        .checkLocalPermissions(false)
+        .checkOnchainPermissions(false)
+        .allowFutureNonce(false)
+        .build();
+  }
+
+  static class Builder {
 
     private boolean allowFutureNonce = false;
     private boolean checkOnchainPermissions = false;
-    private boolean checkLocalPermissions = false;
+    private boolean checkLocalPermissions = true;
 
     public Builder allowFutureNonce(final boolean allowFutureNonce) {
       this.allowFutureNonce = allowFutureNonce;
@@ -60,8 +101,8 @@ public class TransactionValidationParams {
     }
 
     public TransactionValidationParams build() {
-      return new TransactionValidationParams(allowFutureNonce, checkOnchainPermissions,
-          checkLocalPermissions);
+      return new TransactionValidationParams(
+          allowFutureNonce, checkOnchainPermissions, checkLocalPermissions);
     }
   }
 }
