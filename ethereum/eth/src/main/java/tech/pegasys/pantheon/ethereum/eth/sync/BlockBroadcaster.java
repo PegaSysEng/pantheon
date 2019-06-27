@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.ethereum.eth.sync;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockMessage;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -28,7 +28,7 @@ public class BlockBroadcaster {
   private static final Logger LOG = LogManager.getLogger();
 
   private final EthContext ethContext;
-  private final Subscribers<Consumer<Block>> blockPropagatedSubscribers = new Subscribers<>();
+  private final Subscribers<Consumer<Block>> blockPropagatedSubscribers = Subscribers.create();
 
   public BlockBroadcaster(final EthContext ethContext) {
     this.ethContext = ethContext;

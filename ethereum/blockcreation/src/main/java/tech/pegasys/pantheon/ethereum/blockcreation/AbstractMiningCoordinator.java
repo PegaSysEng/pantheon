@@ -36,7 +36,7 @@ public abstract class AbstractMiningCoordinator<
   protected boolean isEnabled = false;
   protected volatile Optional<M> currentRunningMiner = Optional.empty();
 
-  private final Subscribers<MinedBlockObserver> minedBlockObservers = new Subscribers<>();
+  private final Subscribers<MinedBlockObserver> minedBlockObservers = Subscribers.create();
   private final AbstractMinerExecutor<C, M> executor;
   protected final Blockchain blockchain;
   private final SyncState syncState;
@@ -123,12 +123,6 @@ public abstract class AbstractMiningCoordinator<
 
   public void addMinedBlockObserver(final MinedBlockObserver obs) {
     minedBlockObservers.subscribe(obs);
-  }
-
-  // Required for JSON RPC, and are deemed to be valid for all mining mechanisms
-  @Override
-  public void setMinTransactionGasPrice(final Wei minGasPrice) {
-    executor.setMinTransactionGasPrice(minGasPrice);
   }
 
   @Override

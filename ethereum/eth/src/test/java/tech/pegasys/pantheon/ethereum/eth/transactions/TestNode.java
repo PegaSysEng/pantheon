@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
@@ -35,16 +36,16 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.p2p.NetworkRunner;
-import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.network.DefaultP2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.network.NetworkRunner;
+import tech.pegasys.pantheon.ethereum.p2p.network.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.peers.DefaultPeer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -86,8 +87,10 @@ public class TestNode implements Closeable {
     final NetworkingConfiguration networkingConfiguration =
         NetworkingConfiguration.create()
             .setDiscovery(discoveryCfg)
-            .setRlpx(RlpxConfiguration.create().setBindPort(listenPort))
-            .setSupportedProtocols(EthProtocol.get());
+            .setRlpx(
+                RlpxConfiguration.create()
+                    .setBindPort(listenPort)
+                    .setSupportedProtocols(EthProtocol.get()));
 
     final GenesisConfigFile genesisConfigFile = GenesisConfigFile.development();
     final ProtocolSchedule<Void> protocolSchedule =
@@ -148,7 +151,9 @@ public class TestNode implements Closeable {
             PendingTransactions.MAX_PENDING_TRANSACTIONS,
             metricsSystem,
             syncState,
-            PendingTransactions.DEFAULT_TX_RETENTION_HOURS);
+            PendingTransactions.DEFAULT_TX_RETENTION_HOURS,
+            Wei.ZERO,
+            TransactionPool.DEFAULT_TX_MSG_KEEP_ALIVE);
 
     networkRunner.start();
     selfPeer = DefaultPeer.fromEnodeURL(network.getLocalEnode().get());

@@ -17,7 +17,6 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.atLeast;
@@ -46,14 +45,13 @@ import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioningController;
-import tech.pegasys.pantheon.metrics.MetricCategory;
+import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.File;
 import java.io.IOException;
@@ -114,7 +112,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     defaultWebSocketConfiguration = WebSocketConfiguration.createDefault();
 
-    defaultMetricsConfiguration = MetricsConfiguration.createDefault();
+    defaultMetricsConfiguration = MetricsConfiguration.builder().build();
   }
 
   @Test
@@ -299,10 +297,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     webSocketConfiguration.setPort(9101);
     webSocketConfiguration.setRpcApis(expectedApis);
 
-    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
-    metricsConfiguration.setEnabled(false);
-    metricsConfiguration.setHost("8.6.7.5");
-    metricsConfiguration.setPort(309);
+    final MetricsConfiguration metricsConfiguration =
+        MetricsConfiguration.builder().enabled(false).host("8.6.7.5").port(309).build();
 
     parseCommand("--config-file", toml.toString());
 
@@ -476,7 +472,17 @@ public class PantheonCommandTest extends CommandTestAbstract {
         Address.fromHexString(smartContractAddress));
     smartContractPermissioningConfiguration.setSmartContractAccountWhitelistEnabled(true);
 
-    verify(mockController.getProtocolSchedule()).setTransactionFilter(any());
+    verify(mockRunnerBuilder)
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    PermissioningConfiguration permissioningConfiguration =
+        permissioningConfigurationArgumentCaptor.getValue();
+    assertThat(permissioningConfiguration.getSmartContractConfig()).isPresent();
+
+    SmartContractPermissioningConfiguration effectiveSmartContractConfig =
+        permissioningConfiguration.getSmartContractConfig().get();
+    assertThat(effectiveSmartContractConfig.isSmartContractAccountWhitelistEnabled()).isTrue();
+    assertThat(effectiveSmartContractConfig.getAccountSmartContractAddress())
+        .isEqualTo(Address.fromHexString(smartContractAddress));
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
@@ -621,11 +627,16 @@ public class PantheonCommandTest extends CommandTestAbstract {
         Collections.singletonList("0x0000000000000000000000000000000000000009"));
 
     verify(mockRunnerBuilder)
-        .accountPermissioningController(accountPermissioningControllerArgumentCaptor.capture());
+        .permissioningConfiguration(permissioningConfigurationArgumentCaptor.capture());
+    PermissioningConfiguration permissioningConfiguration =
+        permissioningConfigurationArgumentCaptor.getValue();
+    assertThat(permissioningConfiguration.getLocalConfig()).isPresent();
 
-    AccountPermissioningController controller =
-        accountPermissioningControllerArgumentCaptor.getValue();
-    assertThat(controller.getAccountLocalConfigPermissioningController()).isPresent();
+    LocalPermissioningConfiguration effectiveLocalPermissioningConfig =
+        permissioningConfiguration.getLocalConfig().get();
+    assertThat(effectiveLocalPermissioningConfig.isAccountWhitelistEnabled()).isTrue();
+    assertThat(effectiveLocalPermissioningConfig.getAccountPermissioningConfigFilePath())
+        .isEqualTo(permToml.toString());
 
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(commandOutput.toString()).isEmpty();
@@ -688,7 +699,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final WebSocketConfiguration webSocketConfiguration = WebSocketConfiguration.createDefault();
 
-    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
+    final MetricsConfiguration metricsConfiguration = MetricsConfiguration.builder().build();
 
     verify(mockRunnerBuilder).discovery(eq(true));
     verify(mockRunnerBuilder)
@@ -719,6 +730,42 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void envVariableOverridesValueFromConfigFile() {
+    assumeTrue(isFullInstantiation());
+
+    final String configFile = this.getClass().getResource("/partial_config.toml").getFile();
+    final String expectedCoinbase = "0x0000000000000000000000000000000000000004";
+    setEnvironemntVariable("PANTHEON_MINER_COINBASE", expectedCoinbase);
+    parseCommand("--config-file", configFile);
+
+    verify(mockControllerBuilder)
+        .miningParameters(
+            new MiningParameters(
+                Address.fromHexString(expectedCoinbase),
+                DefaultCommandValues.DEFAULT_MIN_TRANSACTION_GAS_PRICE,
+                DefaultCommandValues.DEFAULT_EXTRA_DATA,
+                false));
+  }
+
+  @Test
+  public void cliOptionOverridesEnvVariableAndConfig() {
+    assumeTrue(isFullInstantiation());
+
+    final String configFile = this.getClass().getResource("/partial_config.toml").getFile();
+    final String expectedCoinbase = "0x0000000000000000000000000000000000000006";
+    setEnvironemntVariable("PANTHEON_MINER_COINBASE", "0x0000000000000000000000000000000000000004");
+    parseCommand("--config-file", configFile, "--miner-coinbase", expectedCoinbase);
+
+    verify(mockControllerBuilder)
+        .miningParameters(
+            new MiningParameters(
+                Address.fromHexString(expectedCoinbase),
+                DefaultCommandValues.DEFAULT_MIN_TRANSACTION_GAS_PRICE,
+                DefaultCommandValues.DEFAULT_EXTRA_DATA,
+                false));
   }
 
   @Test
@@ -2043,13 +2090,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsCategoryPropertyMustBeUsed() {
-    parseCommand("--metrics-enabled", "--metrics-category", MetricCategory.JVM.toString());
+    parseCommand("--metrics-enabled", "--metrics-category", StandardMetricCategory.JVM.toString());
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(metricsConfigArgumentCaptor.getValue().getMetricCategories())
-        .containsExactly(MetricCategory.JVM);
+        .containsExactly(StandardMetricCategory.JVM);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -2573,5 +2620,28 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void txMessageKeepAliveSeconds() {
+    final int txMessageKeepAliveSeconds = 999;
+    parseCommand("--tx-pool-keep-alive-seconds", String.valueOf(txMessageKeepAliveSeconds));
+
+    verify(mockControllerBuilder).txMessageKeepAliveSeconds(intArgumentCaptor.capture());
+    verify(mockControllerBuilder).txMessageKeepAliveSeconds(eq(txMessageKeepAliveSeconds));
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void txMessageKeepAliveSecondsWithInvalidInputShouldFail() {
+    parseCommand("--tx-pool-keep-alive-seconds", "acbd");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains("Invalid value for option '--tx-pool-keep-alive-seconds': 'acbd' is not an int");
   }
 }

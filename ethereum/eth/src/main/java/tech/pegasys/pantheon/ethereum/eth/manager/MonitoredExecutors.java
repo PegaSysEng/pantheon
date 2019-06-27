@@ -12,11 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
+import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedQueue;
 import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
 import java.util.Locale;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -35,6 +37,26 @@ public class MonitoredExecutors {
 
   public static ExecutorService newFixedThreadPool(
       final String name, final int workerCount, final MetricsSystem metricsSystem) {
+    return newFixedThreadPool(name, workerCount, new LinkedBlockingQueue<>(), metricsSystem);
+  }
+
+  public static ExecutorService newBoundedThreadPool(
+      final String name,
+      final int workerCount,
+      final int queueSize,
+      final MetricsSystem metricsSystem) {
+    return newFixedThreadPool(
+        name,
+        workerCount,
+        new BoundedQueue(queueSize, toMetricName(name), metricsSystem),
+        metricsSystem);
+  }
+
+  public static ExecutorService newFixedThreadPool(
+      final String name,
+      final int workerCount,
+      final BlockingQueue<Runnable> workingQueue,
+      final MetricsSystem metricsSystem) {
     return newMonitoredExecutor(
         name,
         metricsSystem,
@@ -44,7 +66,7 @@ public class MonitoredExecutors {
                 workerCount,
                 0L,
                 TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(),
+                workingQueue,
                 threadFactory,
                 rejectedExecutionHandler));
   }
@@ -79,7 +101,7 @@ public class MonitoredExecutors {
       final MetricsSystem metricsSystem,
       final BiFunction<RejectedExecutionHandler, ThreadFactory, T> creator) {
 
-    final String metricName = name.toLowerCase(Locale.US).replace('-', '_');
+    final String metricName = toMetricName(name);
 
     final T executor =
         creator.apply(
@@ -87,36 +109,40 @@ public class MonitoredExecutors {
             new ThreadFactoryBuilder().setNameFormat(name + "-%d").build());
 
     metricsSystem.createIntegerGauge(
-        MetricCategory.EXECUTORS,
+        PantheonMetricCategory.EXECUTORS,
         metricName + "_queue_length_current",
         "Current number of tasks awaiting execution",
         executor.getQueue()::size);
 
     metricsSystem.createIntegerGauge(
-        MetricCategory.EXECUTORS,
+        PantheonMetricCategory.EXECUTORS,
         metricName + "_active_threads_current",
         "Current number of threads executing tasks",
         executor::getActiveCount);
 
     metricsSystem.createIntegerGauge(
-        MetricCategory.EXECUTORS,
+        PantheonMetricCategory.EXECUTORS,
         metricName + "_pool_size_current",
         "Current number of threads in the thread pool",
         executor::getPoolSize);
 
     metricsSystem.createLongGauge(
-        MetricCategory.EXECUTORS,
+        PantheonMetricCategory.EXECUTORS,
         metricName + "_completed_tasks_total",
         "Total number of tasks executed",
         executor::getCompletedTaskCount);
 
     metricsSystem.createLongGauge(
-        MetricCategory.EXECUTORS,
+        PantheonMetricCategory.EXECUTORS,
         metricName + "_submitted_tasks_total",
         "Total number of tasks executed",
         executor::getTaskCount);
 
     return executor;
+  }
+
+  private static String toMetricName(final String name) {
+    return name.toLowerCase(Locale.US).replace('-', '_');
   }
 
   private static class CountingAbortPolicy extends AbortPolicy {
@@ -126,7 +152,7 @@ public class MonitoredExecutors {
     public CountingAbortPolicy(final String metricName, final MetricsSystem metricsSystem) {
       this.rejectedTaskCounter =
           metricsSystem.createCounter(
-              MetricCategory.EXECUTORS,
+              PantheonMetricCategory.EXECUTORS,
               metricName + "_rejected_tasks_total",
               "Total number of tasks rejected by this executor");
     }

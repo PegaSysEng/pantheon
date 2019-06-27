@@ -22,9 +22,9 @@ import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
-import tech.pegasys.pantheon.ethereum.core.AccountFilter;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
@@ -35,13 +35,12 @@ import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionIn
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.logging.log4j.Logger;
@@ -56,6 +55,8 @@ import org.apache.logging.log4j.Logger;
 public class TransactionPool implements BlockAddedObserver {
 
   private static final Logger LOG = getLogger();
+  public static final int DEFAULT_TX_MSG_KEEP_ALIVE = 60;
+
   private static final long SYNC_TOLERANCE = 100L;
   private static final String REMOTE = "remote";
   private static final String LOCAL = "local";
@@ -64,8 +65,8 @@ public class TransactionPool implements BlockAddedObserver {
   private final ProtocolContext<?> protocolContext;
   private final TransactionBatchAddedListener transactionBatchAddedListener;
   private final SyncState syncState;
+  private final Wei minTransactionGasPrice;
   private final LabelledMetric<Counter> duplicateTransactionCounter;
-  private Optional<AccountFilter> accountFilter = Optional.empty();
   private final PeerTransactionTracker peerTransactionTracker;
 
   public TransactionPool(
@@ -76,6 +77,7 @@ public class TransactionPool implements BlockAddedObserver {
       final SyncState syncState,
       final EthContext ethContext,
       final PeerTransactionTracker peerTransactionTracker,
+      final Wei minTransactionGasPrice,
       final MetricsSystem metricsSystem) {
     this.pendingTransactions = pendingTransactions;
     this.protocolSchedule = protocolSchedule;
@@ -83,10 +85,11 @@ public class TransactionPool implements BlockAddedObserver {
     this.transactionBatchAddedListener = transactionBatchAddedListener;
     this.syncState = syncState;
     this.peerTransactionTracker = peerTransactionTracker;
+    this.minTransactionGasPrice = minTransactionGasPrice;
 
     duplicateTransactionCounter =
         metricsSystem.createLabelledCounter(
-            MetricCategory.TRANSACTION_POOL,
+            PantheonMetricCategory.TRANSACTION_POOL,
             "transactions_duplicates_total",
             "Total number of duplicate transactions received",
             "source");
@@ -107,6 +110,9 @@ public class TransactionPool implements BlockAddedObserver {
 
   public ValidationResult<TransactionInvalidReason> addLocalTransaction(
       final Transaction transaction) {
+    if (transaction.getGasPrice().compareTo(minTransactionGasPrice) < 0) {
+      return ValidationResult.invalid(TransactionInvalidReason.GAS_PRICE_TOO_LOW);
+    }
     final ValidationResult<TransactionInvalidReason> validationResult =
         validateTransaction(transaction);
 
@@ -131,6 +137,9 @@ public class TransactionPool implements BlockAddedObserver {
       if (pendingTransactions.containsTransaction(transaction.hash())) {
         // We already have this transaction, don't even validate it.
         duplicateTransactionCounter.labels(REMOTE).inc();
+        continue;
+      }
+      if (transaction.getGasPrice().compareTo(minTransactionGasPrice) < 0) {
         continue;
       }
       final ValidationResult<TransactionInvalidReason> validationResult =
@@ -186,13 +195,6 @@ public class TransactionPool implements BlockAddedObserver {
       return basicValidationResult;
     }
 
-    final String sender = transaction.getSender().toString();
-    if (accountIsNotPermitted(sender)) {
-      return ValidationResult.invalid(
-          TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED,
-          String.format("Sender %s is not on the Account Whitelist", sender));
-    }
-
     final BlockHeader chainHeadBlockHeader = getChainHeadBlockHeader();
     if (transaction.getGasLimit() > chainHeadBlockHeader.getGasLimit()) {
       return ValidationResult.invalid(
@@ -203,7 +205,10 @@ public class TransactionPool implements BlockAddedObserver {
     }
 
     final TransactionValidationParams validationParams =
-        new TransactionValidationParams.Builder().allowFutureNonce(true).stateChange(false).build();
+        new TransactionValidationParams.Builder()
+            .allowFutureNonce(true)
+            .checkOnchainPermissions(false)
+            .build();
 
     return protocolContext
         .getWorldStateArchive()
@@ -217,10 +222,6 @@ public class TransactionPool implements BlockAddedObserver {
         .orElseGet(() -> ValidationResult.invalid(CHAIN_HEAD_WORLD_STATE_NOT_AVAILABLE));
   }
 
-  private boolean accountIsNotPermitted(final String account) {
-    return accountFilter.map(c -> !c.permitted(account)).orElse(false);
-  }
-
   private BlockHeader getChainHeadBlockHeader() {
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
     return blockchain.getBlockHeader(blockchain.getChainHeadHash()).get();
@@ -229,9 +230,5 @@ public class TransactionPool implements BlockAddedObserver {
   public interface TransactionBatchAddedListener {
 
     void onTransactionsAdded(Iterable<Transaction> transactions);
-  }
-
-  public void setAccountFilter(final AccountFilter accountFilter) {
-    this.accountFilter = Optional.of(accountFilter);
   }
 }

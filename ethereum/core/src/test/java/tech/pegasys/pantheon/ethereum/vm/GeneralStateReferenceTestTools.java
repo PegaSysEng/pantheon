@@ -51,7 +51,7 @@ public class GeneralStateReferenceTestTools {
     final String eips =
         System.getProperty(
             "test.ethereum.state.eips",
-            "Frontier,Homestead,EIP150,EIP158,Byzantium,Constantinople,ConstantinopleFix");
+            "Frontier,Homestead,EIP150,EIP158,Byzantium,Constantinople,ConstantinopleFix,Istanbul");
     EIPS_TO_RUN = Arrays.asList(eips.split(","));
   }
 
@@ -116,6 +116,7 @@ public class GeneralStateReferenceTestTools {
             transaction,
             blockHeader.getCoinbase(),
             new BlockHashLookup(blockHeader, blockchain),
+            false,
             false);
     final Account coinbase = worldStateUpdater.getOrCreate(spec.blockHeader().getCoinbase());
     if (coinbase != null && coinbase.isEmpty() && shouldClearEmptyAccounts(spec.eip())) {

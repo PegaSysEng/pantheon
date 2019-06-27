@@ -36,7 +36,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioningController;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
@@ -50,6 +49,8 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -76,6 +77,7 @@ public abstract class CommandTestAbstract {
 
   protected final ByteArrayOutputStream commandErrorOutput = new ByteArrayOutputStream();
   private final PrintStream errPrintStream = new PrintStream(commandErrorOutput);
+  private final HashMap<String, String> environment = new HashMap<>();
 
   @Mock RunnerBuilder mockRunnerBuilder;
   @Mock Runner mockRunner;
@@ -108,11 +110,7 @@ public abstract class CommandTestAbstract {
   @Captor ArgumentCaptor<GraphQLConfiguration> graphQLConfigArgumentCaptor;
   @Captor ArgumentCaptor<WebSocketConfiguration> wsRpcConfigArgumentCaptor;
   @Captor ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
-
   @Captor ArgumentCaptor<PermissioningConfiguration> permissioningConfigurationArgumentCaptor;
-
-  @Captor
-  ArgumentCaptor<AccountPermissioningController> accountPermissioningControllerArgumentCaptor;
 
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
@@ -135,6 +133,8 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.miningParameters(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.maxPendingTransactions(anyInt())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.pendingTransactionRetentionPeriod(anyInt()))
+        .thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.txMessageKeepAliveSeconds(anyInt()))
         .thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.nodePrivateKeyFile(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
@@ -176,7 +176,6 @@ public abstract class CommandTestAbstract {
     when(mockRunnerBuilder.metricsSystem(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.metricsConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.staticNodes(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.accountPermissioningController(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.build()).thenReturn(mockRunner);
   }
 
@@ -191,6 +190,10 @@ public abstract class CommandTestAbstract {
 
     errPrintStream.close();
     commandErrorOutput.close();
+  }
+
+  protected void setEnvironemntVariable(final String name, final String value) {
+    environment.put(name, value);
   }
 
   protected CommandLine.Model.CommandSpec parseCommand(final String... args) {
@@ -221,7 +224,8 @@ public abstract class CommandTestAbstract {
             mockEthereumWireProtocolConfigurationBuilder,
             mockRocksDbConfBuilder,
             keyLoader,
-            mockPantheonPluginContext);
+            mockPantheonPluginContext,
+            environment);
 
     // parse using Ansi.OFF to be able to assert on non formatted output results
     pantheonCommand.parse(
@@ -251,7 +255,8 @@ public abstract class CommandTestAbstract {
         final EthereumWireProtocolConfiguration.Builder mockEthereumConfigurationMockBuilder,
         final RocksDbConfiguration.Builder mockRocksDbConfBuilder,
         final KeyLoader keyLoader,
-        final PantheonPluginContextImpl pantheonPluginContext) {
+        final PantheonPluginContextImpl pantheonPluginContext,
+        final Map<String, String> environment) {
       super(
           mockLogger,
           mockBlockImporter,
@@ -260,7 +265,8 @@ public abstract class CommandTestAbstract {
           mockSyncConfBuilder,
           mockEthereumConfigurationMockBuilder,
           mockRocksDbConfBuilder,
-          pantheonPluginContext);
+          pantheonPluginContext,
+          environment);
       this.keyLoader = keyLoader;
     }
   }

@@ -12,10 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning.node;
 
+import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
 import tech.pegasys.pantheon.util.Subscribers;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +31,7 @@ public class NodePermissioningController {
   private Optional<ContextualNodePermissioningProvider> insufficientPeersPermissioningProvider =
       Optional.empty();
   private final List<NodePermissioningProvider> providers;
-  private final Subscribers<Runnable> permissioningUpdateSubscribers = new Subscribers<>();
+  private final Subscribers<Runnable> permissioningUpdateSubscribers = Subscribers.create();
 
   public NodePermissioningController(
       final Optional<SyncStatusNodePermissioningProvider> syncStatusNodePermissioningProvider,

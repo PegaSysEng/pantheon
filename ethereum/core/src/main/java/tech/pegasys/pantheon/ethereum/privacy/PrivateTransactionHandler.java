@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendResponse;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
@@ -32,7 +33,6 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
-import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +48,7 @@ public class PrivateTransactionHandler {
   private final Enclave enclave;
   private final Address privacyPrecompileAddress;
   private final SECP256K1.KeyPair nodeKeyPair;
+  private final Address signerAddress;
   private final PrivateStateStorage privateStateStorage;
   private final WorldStateArchive privateWorldStateArchive;
 
@@ -69,11 +70,12 @@ public class PrivateTransactionHandler {
     this.enclave = enclave;
     this.privacyPrecompileAddress = privacyPrecompileAddress;
     this.nodeKeyPair = nodeKeyPair;
+    this.signerAddress = Address.extract(Hash.hash(nodeKeyPair.getPublicKey().getEncodedBytes()));
     this.privateStateStorage = privateStateStorage;
     this.privateWorldStateArchive = privateWorldStateArchive;
   }
 
-  public String sendToOrion(final PrivateTransaction privateTransaction) throws IOException {
+  public String sendToOrion(final PrivateTransaction privateTransaction) throws Exception {
     final SendRequest sendRequest = createSendRequest(privateTransaction);
     final SendResponse sendResponse;
 
@@ -81,13 +83,13 @@ public class PrivateTransactionHandler {
       LOG.trace("Storing private transaction in enclave");
       sendResponse = enclave.send(sendRequest);
       return sendResponse.getKey();
-    } catch (IOException e) {
+    } catch (Exception e) {
       LOG.error("Failed to store private transaction in enclave", e);
       throw e;
     }
   }
 
-  public String getPrivacyGroup(final String key, final BytesValue from) throws IOException {
+  public String getPrivacyGroup(final String key, final BytesValue from) throws Exception {
     final ReceiveRequest receiveRequest = new ReceiveRequest(key, BytesValues.asString(from));
     LOG.debug("Getting privacy group for {}", BytesValues.asString(from));
     final ReceiveResponse receiveResponse;
@@ -95,7 +97,7 @@ public class PrivateTransactionHandler {
       receiveResponse = enclave.receive(receiveRequest);
       return BytesValue.wrap(receiveResponse.getPrivacyGroupId().getBytes(Charsets.UTF_8))
           .toString();
-    } catch (IOException e) {
+    } catch (Exception e) {
       LOG.error("Failed to retrieve private transaction in enclave", e);
       throw e;
     }
@@ -113,7 +115,7 @@ public class PrivateTransactionHandler {
         .to(privacyPrecompileAddress)
         .value(privateTransaction.getValue())
         .payload(BytesValue.wrap(transactionEnclaveKey.getBytes(Charsets.UTF_8)))
-        .sender(privateTransaction.getSender())
+        .sender(signerAddress)
         .signAndBuild(nodeKeyPair);
   }
 
@@ -185,5 +187,9 @@ public class PrivateTransactionHandler {
         .orElse(
             // private state does not exist
             Account.DEFAULT_NONCE);
+  }
+
+  public Address getSignerAddress() {
+    return signerAddress;
   }
 }

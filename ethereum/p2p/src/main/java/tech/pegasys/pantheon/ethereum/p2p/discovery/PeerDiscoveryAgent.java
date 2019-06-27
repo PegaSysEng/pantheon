@@ -18,20 +18,19 @@ import static tech.pegasys.pantheon.util.bytes.BytesValue.wrapBuffer;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.Packet;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerDiscoveryController;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerDiscoveryController.AsyncExecutor;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerRequirement;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PingPacketData;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.TimerUtil;
+import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerId;
 import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.util.NetworkUtility;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -40,7 +39,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -79,7 +77,7 @@ public abstract class PeerDiscoveryAgent {
 
   /* Is discovery enabled? */
   private boolean isActive = false;
-  private final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers = new Subscribers<>();
+  protected final Subscribers<PeerBondedObserver> peerBondedObservers = Subscribers.create();
 
   public PeerDiscoveryAgent(
       final SECP256K1.KeyPair keyPair,
@@ -248,7 +246,7 @@ public abstract class PeerDiscoveryAgent {
    * @param observer The observer to call.
    * @return A unique ID identifying this observer, to that it can be removed later.
    */
-  public long observePeerBondedEvents(final Consumer<PeerBondedEvent> observer) {
+  public long observePeerBondedEvents(final PeerBondedObserver observer) {
     checkNotNull(observer);
     return peerBondedObservers.subscribe(observer);
   }

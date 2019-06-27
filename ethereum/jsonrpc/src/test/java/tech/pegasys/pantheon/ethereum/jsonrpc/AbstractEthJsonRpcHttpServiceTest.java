@@ -33,6 +33,7 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.jsonrpc.health.HealthService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterIdGenerator;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterRepository;
@@ -45,8 +46,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
-import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.network.P2PNetwork;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
 import tech.pegasys.pantheon.ethereum.util.RawBlockIterator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -199,7 +200,13 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
     config.setPort(0);
     service =
         new JsonRpcHttpService(
-            vertx, folder.newFolder().toPath(), config, new NoOpMetricsSystem(), methods);
+            vertx,
+            folder.newFolder().toPath(),
+            config,
+            new NoOpMetricsSystem(),
+            methods,
+            HealthService.ALWAYS_HEALTHY,
+            HealthService.ALWAYS_HEALTHY);
     service.start().join();
 
     client = new OkHttpClient();

@@ -22,7 +22,7 @@ import static tech.pegasys.pantheon.ethereum.p2p.discovery.internal.PeerTable.Ad
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent;
+import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerBondedObserver;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
@@ -30,8 +30,8 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.PeerId;
 import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -138,7 +138,7 @@ public class PeerDiscoveryController {
   private OptionalLong cleanTableTimerId = OptionalLong.empty();
 
   // Observers for "peer bonded" discovery events.
-  private final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers;
+  private final Subscribers<PeerBondedObserver> peerBondedObservers;
 
   private RecursivePeerRefreshState recursivePeerRefreshState;
 
@@ -154,7 +154,7 @@ public class PeerDiscoveryController {
       final long cleanPeerTableIntervalMs,
       final PeerRequirement peerRequirement,
       final PeerPermissions peerPermissions,
-      final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers,
+      final Subscribers<PeerBondedObserver> peerBondedObservers,
       final MetricsSystem metricsSystem) {
     this.timerUtil = timerUtil;
     this.keypair = keypair;
@@ -172,21 +172,21 @@ public class PeerDiscoveryController {
     this.peerPermissions = new PeerDiscoveryPermissions(localPeer, peerPermissions);
 
     metricsSystem.createIntegerGauge(
-        MetricCategory.NETWORK,
+        PantheonMetricCategory.NETWORK,
         "discovery_inflight_interactions_current",
         "Current number of inflight discovery interactions",
         inflightInteractions::size);
 
     interactionCounter =
         metricsSystem.createLabelledCounter(
-            MetricCategory.NETWORK,
+            PantheonMetricCategory.NETWORK,
             "discovery_interaction_count",
             "Total number of discovery interactions initiated",
             "type");
 
     interactionRetryCounter =
         metricsSystem.createLabelledCounter(
-            MetricCategory.NETWORK,
+            PantheonMetricCategory.NETWORK,
             "discovery_interaction_retry_count",
             "Total number of interaction retries performed",
             "type");
@@ -382,7 +382,7 @@ public class PeerDiscoveryController {
 
   private void notifyPeerBonded(final DiscoveryPeer peer, final long now) {
     final PeerBondedEvent event = new PeerBondedEvent(peer, now);
-    dispatchEvent(peerBondedObservers, event);
+    dispatchPeerBondedEvent(peerBondedObservers, event);
   }
 
   private Optional<PeerInteractionState> matchInteraction(final Packet packet) {
@@ -546,9 +546,9 @@ public class PeerDiscoveryController {
   }
 
   // Dispatches an event to a set of observers.
-  private <T extends PeerDiscoveryEvent> void dispatchEvent(
-      final Subscribers<Consumer<T>> observers, final T event) {
-    observers.forEach(observer -> observer.accept(event));
+  private void dispatchPeerBondedEvent(
+      final Subscribers<PeerBondedObserver> observers, final PeerBondedEvent event) {
+    observers.forEach(observer -> observer.onPeerBonded(event));
   }
 
   /**
@@ -654,7 +654,7 @@ public class PeerDiscoveryController {
     private long cleanPeerTableIntervalMs = MILLISECONDS.convert(1, TimeUnit.MINUTES);
     private List<DiscoveryPeer> bootstrapNodes = new ArrayList<>();
     private PeerTable peerTable;
-    private Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers = new Subscribers<>();
+    private Subscribers<PeerBondedObserver> peerBondedObservers = Subscribers.create();
 
     // Required dependencies
     private KeyPair keypair;
@@ -766,8 +766,7 @@ public class PeerDiscoveryController {
       return this;
     }
 
-    public Builder peerBondedObservers(
-        final Subscribers<Consumer<PeerBondedEvent>> peerBondedObservers) {
+    public Builder peerBondedObservers(final Subscribers<PeerBondedObserver> peerBondedObservers) {
       checkNotNull(peerBondedObservers);
       this.peerBondedObservers = peerBondedObservers;
       return this;

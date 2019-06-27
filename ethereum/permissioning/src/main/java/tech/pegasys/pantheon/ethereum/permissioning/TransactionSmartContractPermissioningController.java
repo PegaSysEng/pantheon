@@ -23,8 +23,8 @@ import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
 import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
@@ -84,17 +84,17 @@ public class TransactionSmartContractPermissioningController
 
     this.checkCounter =
         metricsSystem.createCounter(
-            MetricCategory.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "transaction_smart_contract_check_count",
             "Number of times the transaction smart contract permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
-            MetricCategory.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "transaction_smart_contract_check_count_permitted",
             "Number of times the transaction smart contract permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
-            MetricCategory.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "transaction_smart_contract_check_count_unpermitted",
             "Number of times the transaction smart contract permissioning provider has been checked and returned unpermitted");
   }
@@ -121,7 +121,11 @@ public class TransactionSmartContractPermissioningController
         transactionSimulator.doesAddressExistAtHead(contractAddress);
 
     if (contractExists.isPresent() && !contractExists.get()) {
-      throw new IllegalStateException("Transaction permissioning contract does not exist");
+      this.checkCounterPermitted.inc();
+      LOG.warn(
+          "Account permissioning smart contract not found at address {} in current head block. Any transaction will be allowed.",
+          contractAddress);
+      return true;
     }
 
     final Optional<TransactionSimulatorResult> result =
@@ -219,9 +223,11 @@ public class TransactionSmartContractPermissioningController
 
   // A bytes array is a uint256 of its length, then the bytes that make up its value, then pad to
   // next 32 bytes interval
+  // It needs to be preceded by the bytes offset of the first dynamic parameter (192 bytes)
   private static BytesValue encodeBytes(final BytesValue value) {
+    final BytesValue dynamicParameterOffset = encodeLong(192);
     final BytesValue length = encodeLong(value.size());
     final BytesValue padding = BytesValue.wrap(new byte[(32 - (value.size() % 32))]);
-    return BytesValues.concatenate(length, value, padding);
+    return BytesValues.concatenate(dynamicParameterOffset, length, value, padding);
   }
 }
