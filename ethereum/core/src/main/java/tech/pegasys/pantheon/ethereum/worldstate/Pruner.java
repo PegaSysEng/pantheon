@@ -101,6 +101,8 @@ public class Pruner {
   }
 
   private void sweep() {
+    LOG.info(
+        "Begin sweeping unused nodes for pruning. Retention period: {}", retentionPeriodInBlocks);
     execute(
         () -> {
           pruningStrategy.sweep();
