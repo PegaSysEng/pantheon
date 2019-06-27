@@ -12,81 +12,80 @@
  */
 package tech.pegasys.pantheon.ethereum.worldstate;
 
-import tech.pegasys.pantheon.consensus.clique.CliqueBlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
-import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchainTest;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator.BlockOptions;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.WorldStateKeyValueStorage;
-import tech.pegasys.pantheon.ethereum.vm.TestBlockchain;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 
-import org.junit.Test;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
-
 import java.util.List;
+
+import org.junit.Test;
+import org.mockito.Mock;
 
 public class PrunerTest {
 
   private final NoOpMetricsSystem metricsSystem = new NoOpMetricsSystem();
 
-  @Test
-  public void doesNotLoseStateDuringReorg() {
-    final InMemoryKeyValueStorage markStorage = new InMemoryKeyValueStorage();
-    final InMemoryKeyValueStorage stateStorage = new InMemoryKeyValueStorage();
-    final WorldStateStorage worldStateStorage = new WorldStateKeyValueStorage(stateStorage);
-//    final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
+  @Mock private final BlockDataGenerator gen = new BlockDataGenerator();
 
-    final BlockDataGenerator gen = new BlockDataGenerator();
-    final KeyValueStorage kvStore = new InMemoryKeyValueStorage();
+  @Mock private MarkSweepPruner markSweepPruner;
+
+  @Test
+  public void abortsPruningWhenFullyMarkedBlockNoLongerOnCanonicalChain() {
+    markSweepPruner = mock(MarkSweepPruner.class);
     final Block genesisBlock = gen.genesisBlock();
-    final DefaultMutableBlockchain blockchain = createBlockchain(kvStore, genesisBlock);
+    final DefaultMutableBlockchain blockchain =
+        new DefaultMutableBlockchain(
+            genesisBlock,
+            new KeyValueStoragePrefixedKeyBlockchainStorage(
+                new InMemoryKeyValueStorage(), new MainnetBlockHeaderFunctions()),
+            metricsSystem);
+
+    // start pruner so it can start handling block added events
+    final Pruner pruner = new Pruner(markSweepPruner, blockchain, 0);
+    pruner.start();
 
     /*
      Set up pre-marking state:
-      O    <--- this is a fork as of now (non-canonical)
-      |  O <--- marking of the full state trie will begin at this block
+      O <---- this is a fork as of now (non-canonical)
+      |  O <- marking of the full state trie will begin at this block
        \/
-       O   <--- the common ancestor when the reorg happens
+       O <--- the common ancestor when the reorg happens
     */
     BlockOptions options =
-            new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
-    Block newBlock = gen.block(options);
-    List<TransactionReceipt> receipts = gen.receipts(newBlock);
-    blockchain.appendBlock(newBlock, receipts);
+        new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+    final Block canonicalHead = gen.block(options);
+    List<TransactionReceipt> receipts = gen.receipts(canonicalHead);
+    blockchain.appendBlock(canonicalHead, receipts);
 
     options = new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
-    newBlock = gen.block(options);
-    receipts = gen.receipts(newBlock);
-    blockchain.appendBlock(newBlock, receipts);
+    final Block forkBlock = gen.block(options);
+    receipts = gen.receipts(forkBlock);
+    blockchain.appendBlock(forkBlock, receipts);
     /*
       Cause reorg:
-      O <-- this block causes a reorg, this branch becomes canonical
+      O <---- this block causes a reorg; this branch becomes canonical
       |
-      O <-- which means that state here is referring to nodes from the common ancestor block,
-      |     which is not fully marked
-      |  O <--- because this was the last fully marked block
+      O <---- which means that state here is referring to nodes from the common ancestor block,
+      |       which is not fully marked
+      |  O <- because this was block at which marking began
        \/
        O
     */
-    final Pruner pruner =
-        new Pruner(
-            new MarkSweepPruner(worldStateStorage, markStorage, metricsSystem), blockchain, 2);
-    pruner.start();
-  }
-
-  private DefaultMutableBlockchain createBlockchain(
-          final KeyValueStorage kvStore, final Block genesisBlock) {
-    return new DefaultMutableBlockchain(
-            genesisBlock,
-            new KeyValueStoragePrefixedKeyBlockchainStorage(kvStore, new MainnetBlockHeaderFunctions()),
-            new NoOpMetricsSystem());
+    options = new BlockOptions().setBlockNumber(2L).setParentHash(forkBlock.getHash());
+    final Block reorgCausingBlock = gen.block(options);
+    receipts = gen.receipts(reorgCausingBlock);
+    blockchain.appendBlock(reorgCausingBlock, receipts);
+    // after the reorg, the sweep should have been aborted, so the genesis block state should remain
+    verify(markSweepPruner, never()).sweep();
   }
 }
