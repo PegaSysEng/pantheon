@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.transactions;
 
+import java.util.Objects;
+
 public class TransactionPoolConfiguration {
 
   private final int txPoolMaxSize;
@@ -37,6 +39,37 @@ public class TransactionPoolConfiguration {
 
   public int getTxMessageKeepAliveSeconds() {
     return txMessageKeepAliveSeconds;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final TransactionPoolConfiguration that = (TransactionPoolConfiguration) o;
+    return txPoolMaxSize == that.txPoolMaxSize
+        && Objects.equals(pendingTxRetentionPeriod, that.pendingTxRetentionPeriod)
+        && Objects.equals(txMessageKeepAliveSeconds, that.txMessageKeepAliveSeconds);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(txPoolMaxSize, pendingTxRetentionPeriod, txMessageKeepAliveSeconds);
+  }
+
+  @Override
+  public String toString() {
+    return "TransactionPoolConfiguration{"
+        + "txPoolMaxSize="
+        + txPoolMaxSize
+        + ", pendingTxRetentionPeriod="
+        + pendingTxRetentionPeriod
+        + ", txMessageKeepAliveSeconds="
+        + txMessageKeepAliveSeconds
+        + '}';
   }
 
   public static Builder builder() {
