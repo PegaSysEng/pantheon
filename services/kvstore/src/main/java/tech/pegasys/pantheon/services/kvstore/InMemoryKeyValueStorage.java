@@ -75,7 +75,7 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
   }
 
   public Set<BytesValue> keySet() {
-    return Collections.unmodifiableSet(new HashSet(hashValueStore.keySet()));
+    return Collections.unmodifiableSet(new HashSet<>(hashValueStore.keySet()));
   }
 
   @Override
