@@ -16,11 +16,14 @@ public class TransactionValidationParams {
 
   private final boolean allowFutureNonce;
   private final boolean checkOnchainPermissions;
+  private final boolean checkLocalPermissions;
 
   private TransactionValidationParams(
-      final boolean allowFutureNonce, final boolean checkOnchainPermissions) {
+      final boolean allowFutureNonce, final boolean checkOnchainPermissions,
+      final boolean checkLocalPermissions) {
     this.allowFutureNonce = allowFutureNonce;
     this.checkOnchainPermissions = checkOnchainPermissions;
+    this.checkLocalPermissions = checkLocalPermissions;
   }
 
   public boolean isAllowFutureNonce() {
@@ -31,10 +34,15 @@ public class TransactionValidationParams {
     return checkOnchainPermissions;
   }
 
+  public boolean checkLocalPermissions() {
+    return checkLocalPermissions;
+  }
+
   public static class Builder {
 
     private boolean allowFutureNonce = false;
     private boolean checkOnchainPermissions = false;
+    private boolean checkLocalPermissions = false;
 
     public Builder allowFutureNonce(final boolean allowFutureNonce) {
       this.allowFutureNonce = allowFutureNonce;
@@ -46,8 +54,14 @@ public class TransactionValidationParams {
       return this;
     }
 
+    public Builder checkLocalPermissions(final boolean checkLocalPermissions) {
+      this.checkLocalPermissions = checkLocalPermissions;
+      return this;
+    }
+
     public TransactionValidationParams build() {
-      return new TransactionValidationParams(allowFutureNonce, checkOnchainPermissions);
+      return new TransactionValidationParams(allowFutureNonce, checkOnchainPermissions,
+          checkLocalPermissions);
     }
   }
 }
