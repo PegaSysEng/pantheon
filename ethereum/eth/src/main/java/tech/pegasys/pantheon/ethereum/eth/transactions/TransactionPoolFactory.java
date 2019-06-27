@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
 import java.time.Clock;
 
@@ -29,15 +30,17 @@ public class TransactionPoolFactory {
       final ProtocolContext<?> protocolContext,
       final EthContext ethContext,
       final Clock clock,
-      final int maxPendingTransactions,
       final MetricsSystem metricsSystem,
       final SyncState syncState,
-      final int maxTransactionRetentionHours,
-      final Wei minTransactionGasPrice) {
+      final Wei minTransactionGasPrice,
+      final TransactionPoolConfiguration transactionPoolConfiguration) {
 
     final PendingTransactions pendingTransactions =
         new PendingTransactions(
-            maxTransactionRetentionHours, maxPendingTransactions, clock, metricsSystem);
+            transactionPoolConfiguration.getPendingTxRetentionPeriod(),
+            transactionPoolConfiguration.getTxPoolMaxSize(),
+            clock,
+            metricsSystem);
 
     final PeerTransactionTracker transactionTracker = new PeerTransactionTracker();
     final TransactionsMessageSender transactionsMessageSender =
@@ -58,7 +61,14 @@ public class TransactionPoolFactory {
     final TransactionsMessageHandler transactionsMessageHandler =
         new TransactionsMessageHandler(
             ethContext.getScheduler(),
-            new TransactionsMessageProcessor(transactionTracker, transactionPool));
+            new TransactionsMessageProcessor(
+                transactionTracker,
+                transactionPool,
+                metricsSystem.createCounter(
+                    PantheonMetricCategory.TRANSACTION_POOL,
+                    "transactions_messages_skipped_total",
+                    "Total number of transactions messages skipped by the processor.")),
+            transactionPoolConfiguration.getTxMessageKeepAliveSeconds());
 
     ethContext.getEthMessages().subscribe(EthPV62.TRANSACTIONS, transactionsMessageHandler);
     protocolContext.getBlockchain().observeBlockAdded(transactionPool);
