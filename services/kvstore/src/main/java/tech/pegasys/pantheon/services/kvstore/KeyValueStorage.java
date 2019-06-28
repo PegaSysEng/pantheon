@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.Closeable;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /** Service provided by pantheon to facilitate persistent data storage. */
 public interface KeyValueStorage extends Closeable {
@@ -29,12 +30,20 @@ public interface KeyValueStorage extends Closeable {
    */
   Optional<BytesValue> get(BytesValue key) throws StorageException;
 
+  default boolean containsKey(final BytesValue key) throws StorageException {
+    return get(key).isPresent();
+  }
+
   /**
    * Begins a transaction. Returns a transaction object that can be updated and committed.
    *
    * @return An object representing the transaction.
    */
   Transaction startTransaction() throws StorageException;
+
+  long removeUnless(Predicate<BytesValue> inUseCheck);
+
+  void clear();
 
   class Entry {
     private final BytesValue key;
