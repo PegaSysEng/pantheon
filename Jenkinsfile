@@ -263,7 +263,7 @@ try {
         }
 
 
-//        if (env.BRANCH_NAME != "master") {
+        if (env.BRANCH_NAME == "master") {
             BintrayPublish: {
                 def stage_name = "Bintray publish node: "
                 node {
@@ -272,7 +272,7 @@ try {
                     docker.image(docker_image_dind).withRun('--privileged') { d ->
                         docker.image(build_image).inside("--link ${d.id}:docker") {
                             stage(stage_name + 'Prepare') {
-                                sh './gradlew --no-daemon --parallel clean compileJava compileTestJava assemble'
+                                sh './gradlew --no-daemon --parallel clean'
                             }
                             stage(stage_name + 'Publish') {
                                 withCredentials([
@@ -289,7 +289,7 @@ try {
                     }
                 }
             }
-//        }
+        }
     }
 } catch (e) {
     currentBuild.result = 'FAILURE'

@@ -276,8 +276,7 @@ subprojects {
             usage('java-runtime') { fromResolutionResult() }
           }
           pom {
-            name = 'Pantheon'
-            description = 'Pantheon'
+            name = "Pantheon - ${project.name}"
             url = 'http://github.com/PegaSysEng/pantheon'
             licenses {
               license {
@@ -306,7 +305,7 @@ subprojects {
 
       pkg {
         repo = 'pegasys-repo'
-        name = 'adrian-test'
+        name = 'pantheon'
         userOrg = 'consensys'
         licenses = ['Apache-2.0']
         websiteUrl = 'https://github.com/PegaSysEng/pantheon'
@@ -330,7 +329,6 @@ subprojects {
     options.fork = true
     options.incremental = true
   }
-  apply plugin: 'maven-publish'
 
   sourceSets {
     // test-support can be consumed as a library by other projects in their tests
@@ -624,7 +622,7 @@ bintray {
 
   pkg {
     repo = 'pegasys-repo'
-    name = 'adrian-test'
+    name = 'pantheon'
     userOrg = 'consensys'
     licenses = ['Apache-2.0']
     websiteUrl = 'https://github.com/PegaSysEng/pantheon'
