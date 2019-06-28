@@ -3783,6 +3783,10 @@ data using `eea_sendRawTransaction`.
     }
     ```
 
+### eea_getTransactionCount
+
+
+
 ### eea_getTransactionReceipt
 
 Returns information about the private transaction after the transaction was mined. Receipts for pending transactions 
