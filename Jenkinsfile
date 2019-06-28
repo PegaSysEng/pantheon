@@ -263,7 +263,7 @@ try {
         }
 
 
-        if (env.BRANCH_NAME == "master") {
+//        if (env.BRANCH_NAME == "master") {
             BintrayPublish: {
                 def stage_name = "Bintray publish node: "
                 node {
@@ -288,7 +288,7 @@ try {
                         }
                     }
                 }
-            }
+//            }
         }
     }
 } catch (e) {
