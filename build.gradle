@@ -36,7 +36,7 @@ def buildAliases = ['dev': [
     'build',
     'checkLicenses',
     'javadoc'
-]]
+  ]]
 
 def expandedTaskList = []
 gradle.startParameter.taskNames.each {
@@ -163,14 +163,14 @@ allprojects {
 
   tasks.withType(JavaCompile) {
     options.compilerArgs += [
-        '-Xlint:unchecked',
-        '-Xlint:cast',
-        '-Xlint:rawtypes',
-        '-Xlint:overloads',
-        '-Xlint:divzero',
-        '-Xlint:finally',
-        '-Xlint:static',
-        '-Werror',
+      '-Xlint:unchecked',
+      '-Xlint:cast',
+      '-Xlint:rawtypes',
+      '-Xlint:overloads',
+      '-Xlint:divzero',
+      '-Xlint:finally',
+      '-Xlint:static',
+      '-Werror',
     ]
 
     options.errorprone {
@@ -225,14 +225,14 @@ allprojects {
    */
   test {
     jvmArgs = [
-        '-Xmx4g',
-        '-XX:-UseGCOverheadLimit'
+      '-Xmx4g',
+      '-XX:-UseGCOverheadLimit'
     ]
     Set toImport = [
-        'test.ethereum.include',
-        'test.ethereum.state.eip',
-        'root.log.level',
-        'evm.log.level'
+      'test.ethereum.include',
+      'test.ethereum.state.eip',
+      'root.log.level',
+      'evm.log.level'
     ]
     for (String name : toImport) {
       if (System.getProperty(name) != null) {
@@ -403,11 +403,11 @@ jar { enabled = false }
 apply plugin: 'application'
 mainClassName = "tech.pegasys.pantheon.Pantheon"
 applicationDefaultJvmArgs = [
-    "-Dvertx.disableFileCPResolving=true",
-    "-Dpantheon.home=PANTHEON_HOME",
-    // We shutdown log4j ourselves, as otherwise his shutdown hook runs before our own and whatever
-    // happens during shutdown is not logged.
-    "-Dlog4j.shutdownHookEnabled=false"
+  "-Dvertx.disableFileCPResolving=true",
+  "-Dpantheon.home=PANTHEON_HOME",
+  // We shutdown log4j ourselves, as otherwise his shutdown hook runs before our own and whatever
+  // happens during shutdown is not logged.
+  "-Dlog4j.shutdownHookEnabled=false"
 ]
 
 run {
@@ -431,10 +431,10 @@ startScripts {
 
     // Prevent the error originating from the 8191 chars limit on Windows
     windowsScript.text =
-        windowsScript
-            .readLines()
-            .collect(shortenWindowsClasspath)
-            .join('\r\n')
+      windowsScript
+      .readLines()
+      .collect(shortenWindowsClasspath)
+      .join('\r\n')
   }
 }
 
@@ -579,9 +579,9 @@ task releaseIntegrationTest(type: Test) {
 }
 
 task releaseReferenceTest(type: Test, dependsOn: [
-    ':ethereum:core:referenceTests',
-    ':ethereum:rlp:referenceTests',
-    ':ethereum:trie:referenceTests'
+  ':ethereum:core:referenceTests',
+  ':ethereum:rlp:referenceTests',
+  ':ethereum:trie:referenceTests'
 ]) {
 }
 
@@ -592,12 +592,12 @@ release {
   tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
   newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
   buildTasks = [
-      'build',
-      'releaseIntegrationTest',
-      'releaseAcceptanceTest',
-      'releaseReferenceTest',
-      'checkLicenses',
-      'javadoc'
+    'build',
+    'releaseIntegrationTest',
+    'releaseAcceptanceTest',
+    'releaseReferenceTest',
+    'checkLicenses',
+    'javadoc'
   ]
 
   git {
