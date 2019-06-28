@@ -272,7 +272,7 @@ try {
                     docker.image(docker_image_dind).withRun('--privileged') { d ->
                         docker.image(build_image).inside("--link ${d.id}:docker") {
                             stage(stage_name + 'Prepare') {
-                                sh './gradlew --no-daemon --parallel clean'
+                                sh './gradlew --no-daemon --parallel clean assemble'
                             }
                             stage(stage_name + 'Publish') {
                                 withCredentials([
@@ -288,8 +288,8 @@ try {
                         }
                     }
                 }
-//            }
-        }
+            }
+//        }
     }
 } catch (e) {
     currentBuild.result = 'FAILURE'
