@@ -30,6 +30,7 @@ import tech.pegasys.pantheon.ethereum.debug.TraceOptions;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor.Result;
+import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidationParams;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
@@ -92,7 +93,8 @@ public class TraceTransactionIntegrationTest {
             createTransaction,
             genesisBlock.getHeader().getCoinbase(),
             blockHashLookup,
-            false);
+            false,
+            TransactionValidationParams.blockReplay());
     assertThat(result.isSuccessful()).isTrue();
     final Account createdContract =
         createTransactionUpdater.getTouchedAccounts().stream()

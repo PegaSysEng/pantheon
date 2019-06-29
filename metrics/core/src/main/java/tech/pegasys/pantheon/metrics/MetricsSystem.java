@@ -55,7 +55,5 @@ public interface MetricsSystem {
 
   Stream<Observation> streamObservations(MetricCategory category);
 
-  default Stream<Observation> streamObservations() {
-    return Stream.of(MetricCategory.values()).flatMap(this::streamObservations);
-  }
+  Stream<Observation> streamObservations();
 }

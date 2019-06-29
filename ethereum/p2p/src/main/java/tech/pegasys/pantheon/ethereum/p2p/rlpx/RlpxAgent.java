@@ -17,30 +17,27 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.isNull;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.p2p.api.ConnectCallback;
-import tech.pegasys.pantheon.ethereum.p2p.api.DisconnectCallback;
-import tech.pegasys.pantheon.ethereum.p2p.api.MessageCallback;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.DiscoveryPeer;
+import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.p2p.peers.LocalNode;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
 import tech.pegasys.pantheon.ethereum.p2p.peers.PeerProperties;
 import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissions;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.ConnectionInitializer;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerRlpxPermissions;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.RlpxConnection;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.netty.NettyConnectionInitializer;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.FutureUtils;
 import tech.pegasys.pantheon.util.Subscribers;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +51,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -67,7 +65,10 @@ public class RlpxAgent {
   private final ConnectionInitializer connectionInitializer;
 
   private final int maxPeers;
-  private final Map<BytesValue, RlpxConnection> connectionsById = new ConcurrentHashMap<>();
+
+  @VisibleForTesting
+  final Map<BytesValue, RlpxConnection> connectionsById = new ConcurrentHashMap<>();
+
   private final PeerProperties peerProperties;
 
   private final AtomicBoolean started = new AtomicBoolean(false);
@@ -93,15 +94,15 @@ public class RlpxAgent {
     // Setup metrics
     connectedPeersCounter =
         metricsSystem.createCounter(
-            MetricCategory.PEERS, "connected_total", "Total number of peers connected");
+            PantheonMetricCategory.PEERS, "connected_total", "Total number of peers connected");
 
     metricsSystem.createGauge(
-        MetricCategory.PEERS,
+        PantheonMetricCategory.PEERS,
         "peer_count_current",
         "Number of peers currently connected",
         () -> (double) getConnectionCount());
     metricsSystem.createIntegerGauge(
-        MetricCategory.NETWORK,
+        PantheonMetricCategory.NETWORK,
         "peers_limit",
         "Maximum P2P peer connections that can be established",
         () -> maxPeers);
@@ -164,7 +165,9 @@ public class RlpxAgent {
 
   public Optional<CompletableFuture<PeerConnection>> getPeerConnection(final Peer peer) {
     final RlpxConnection connection = connectionsById.get(peer.getId());
-    return isNull(connection) ? Optional.empty() : Optional.of(connection.getFuture());
+    return Optional.ofNullable(connection)
+        .filter(conn -> !conn.isFailedOrDisconnected())
+        .map(RlpxConnection::getFuture);
   }
 
   /**
@@ -230,7 +233,8 @@ public class RlpxAgent {
                 (conn) -> {
                   this.dispatchConnect(conn.getPeerConnection());
                   this.enforceConnectionLimits();
-                });
+                },
+                (failedConn) -> cleanUpPeerConnection(failedConn.getId()));
             return newConnection;
           }
         });
@@ -248,9 +252,13 @@ public class RlpxAgent {
       final PeerConnection peerConnection,
       final DisconnectReason disconnectReason,
       final boolean initiatedByPeer) {
+    cleanUpPeerConnection(peerConnection.getPeer().getId());
+  }
+
+  private void cleanUpPeerConnection(final BytesValue peerId) {
     connectionsById.compute(
-        peerConnection.getPeer().getId(),
-        (peerId, trackedConnection) -> {
+        peerId,
+        (id, trackedConnection) -> {
           if (isNull(trackedConnection) || trackedConnection.isFailedOrDisconnected()) {
             // Remove if failed or disconnected
             return null;
@@ -278,7 +286,8 @@ public class RlpxAgent {
 
     connectionsToCheck.forEach(
         connection -> {
-          if (!peerPermissions.allowOngoingConnection(connection.getPeer())) {
+          if (!peerPermissions.allowOngoingConnection(
+              connection.getPeer(), connection.initiatedRemotely())) {
             connection.disconnect(DisconnectReason.REQUESTED);
           }
         });

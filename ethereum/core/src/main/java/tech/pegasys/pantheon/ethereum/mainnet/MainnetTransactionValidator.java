@@ -114,7 +114,7 @@ public class MainnetTransactionValidator implements TransactionValidator {
               transaction.getNonce(), senderNonce));
     }
 
-    if (!isSenderAllowed(transaction, validationParams.isStateChange())) {
+    if (!isSenderAllowed(transaction, validationParams)) {
       return ValidationResult.invalid(
           TX_SENDER_NOT_AUTHORIZED,
           String.format("Sender %s is not on the Account Whitelist", transaction.getSender()));
@@ -162,8 +162,15 @@ public class MainnetTransactionValidator implements TransactionValidator {
     return ValidationResult.valid();
   }
 
-  private boolean isSenderAllowed(final Transaction transaction, final boolean isStateChange) {
-    return transactionFilter.map(c -> c.permitted(transaction, isStateChange)).orElse(true);
+  private boolean isSenderAllowed(
+      final Transaction transaction, final TransactionValidationParams validationParams) {
+    if (validationParams.checkLocalPermissions() || validationParams.checkOnchainPermissions()) {
+      return transactionFilter
+          .map(c -> c.permitted(transaction, validationParams.checkOnchainPermissions()))
+          .orElse(true);
+    } else {
+      return true;
+    }
   }
 
   @Override

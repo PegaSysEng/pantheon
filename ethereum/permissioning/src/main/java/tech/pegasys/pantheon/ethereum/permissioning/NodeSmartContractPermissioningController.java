@@ -16,16 +16,16 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import tech.pegasys.pantheon.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.core.Address;
+import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
 import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
 import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.net.InetAddress;
 import java.util.Optional;
@@ -77,17 +77,17 @@ public class NodeSmartContractPermissioningController implements NodePermissioni
 
     this.checkCounter =
         metricsSystem.createCounter(
-            MetricCategory.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "node_smart_contract_check_count",
             "Number of times the node smart contract permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
-            MetricCategory.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "node_smart_contract_check_count_permitted",
             "Number of times the node smart contract permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
-            MetricCategory.PERMISSIONING,
+            PantheonMetricCategory.PERMISSIONING,
             "node_smart_contract_check_count_unpermitted",
             "Number of times the node smart contract permissioning provider has been checked and returned unpermitted");
   }

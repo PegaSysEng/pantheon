@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
+import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
@@ -34,8 +35,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionIn
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -54,6 +55,8 @@ import org.apache.logging.log4j.Logger;
 public class TransactionPool implements BlockAddedObserver {
 
   private static final Logger LOG = getLogger();
+  public static final int DEFAULT_TX_MSG_KEEP_ALIVE = 60;
+
   private static final long SYNC_TOLERANCE = 100L;
   private static final String REMOTE = "remote";
   private static final String LOCAL = "local";
@@ -62,6 +65,7 @@ public class TransactionPool implements BlockAddedObserver {
   private final ProtocolContext<?> protocolContext;
   private final TransactionBatchAddedListener transactionBatchAddedListener;
   private final SyncState syncState;
+  private final Wei minTransactionGasPrice;
   private final LabelledMetric<Counter> duplicateTransactionCounter;
   private final PeerTransactionTracker peerTransactionTracker;
 
@@ -73,6 +77,7 @@ public class TransactionPool implements BlockAddedObserver {
       final SyncState syncState,
       final EthContext ethContext,
       final PeerTransactionTracker peerTransactionTracker,
+      final Wei minTransactionGasPrice,
       final MetricsSystem metricsSystem) {
     this.pendingTransactions = pendingTransactions;
     this.protocolSchedule = protocolSchedule;
@@ -80,10 +85,11 @@ public class TransactionPool implements BlockAddedObserver {
     this.transactionBatchAddedListener = transactionBatchAddedListener;
     this.syncState = syncState;
     this.peerTransactionTracker = peerTransactionTracker;
+    this.minTransactionGasPrice = minTransactionGasPrice;
 
     duplicateTransactionCounter =
         metricsSystem.createLabelledCounter(
-            MetricCategory.TRANSACTION_POOL,
+            PantheonMetricCategory.TRANSACTION_POOL,
             "transactions_duplicates_total",
             "Total number of duplicate transactions received",
             "source");
@@ -104,6 +110,9 @@ public class TransactionPool implements BlockAddedObserver {
 
   public ValidationResult<TransactionInvalidReason> addLocalTransaction(
       final Transaction transaction) {
+    if (transaction.getGasPrice().compareTo(minTransactionGasPrice) < 0) {
+      return ValidationResult.invalid(TransactionInvalidReason.GAS_PRICE_TOO_LOW);
+    }
     final ValidationResult<TransactionInvalidReason> validationResult =
         validateTransaction(transaction);
 
@@ -128,6 +137,9 @@ public class TransactionPool implements BlockAddedObserver {
       if (pendingTransactions.containsTransaction(transaction.hash())) {
         // We already have this transaction, don't even validate it.
         duplicateTransactionCounter.labels(REMOTE).inc();
+        continue;
+      }
+      if (transaction.getGasPrice().compareTo(minTransactionGasPrice) < 0) {
         continue;
       }
       final ValidationResult<TransactionInvalidReason> validationResult =
@@ -192,9 +204,6 @@ public class TransactionPool implements BlockAddedObserver {
               transaction.getGasLimit(), chainHeadBlockHeader.getGasLimit()));
     }
 
-    final TransactionValidationParams validationParams =
-        new TransactionValidationParams.Builder().allowFutureNonce(true).stateChange(false).build();
-
     return protocolContext
         .getWorldStateArchive()
         .get(chainHeadBlockHeader.getStateRoot())
@@ -202,7 +211,8 @@ public class TransactionPool implements BlockAddedObserver {
             worldState -> {
               final Account senderAccount = worldState.get(transaction.getSender());
               return getTransactionValidator()
-                  .validateForSender(transaction, senderAccount, validationParams);
+                  .validateForSender(
+                      transaction, senderAccount, TransactionValidationParams.transactionPool());
             })
         .orElseGet(() -> ValidationResult.invalid(CHAIN_HEAD_WORLD_STATE_NOT_AVAILABLE));
   }

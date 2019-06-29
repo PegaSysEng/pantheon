@@ -121,6 +121,7 @@ public class MainnetBlockProcessor implements BlockProcessor {
       final BlockHashLookup blockHashLookup = new BlockHashLookup(blockHeader, blockchain);
       final Address miningBeneficiary =
           miningBeneficiaryCalculator.calculateBeneficiary(blockHeader);
+
       final TransactionProcessor.Result result =
           transactionProcessor.processTransaction(
               blockchain,
@@ -129,7 +130,8 @@ public class MainnetBlockProcessor implements BlockProcessor {
               transaction,
               miningBeneficiary,
               blockHashLookup,
-              true);
+              true,
+              TransactionValidationParams.processingBlock());
       if (result.isInvalid()) {
         return Result.failed();
       }

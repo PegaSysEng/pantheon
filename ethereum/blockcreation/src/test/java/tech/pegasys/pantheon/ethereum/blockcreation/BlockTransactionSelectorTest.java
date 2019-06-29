@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.blockcreation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,7 +43,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldStateStorage;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.WorldStateKeyValueStorage;
 import tech.pegasys.pantheon.ethereum.vm.TestBlockchain;
 import tech.pegasys.pantheon.ethereum.worldstate.DefaultMutableWorldState;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -122,7 +123,7 @@ public class BlockTransactionSelectorTest {
     pendingTransactions.addRemoteTransaction(transaction);
 
     when(transactionProcessor.processTransaction(
-            any(), any(), any(), eq(transaction), any(), any(), any()))
+            any(), any(), any(), eq(transaction), any(), any(), anyBoolean(), any()))
         .thenReturn(MainnetTransactionProcessor.Result.failed(5, ValidationResult.valid()));
 
     // The block should fit 3 transactions only
@@ -160,7 +161,8 @@ public class BlockTransactionSelectorTest {
       pendingTransactions.addRemoteTransaction(tx);
     }
 
-    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
+    when(transactionProcessor.processTransaction(
+            any(), any(), any(), any(), any(), any(), anyBoolean(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.successful(
                 new LogSeries(Lists.newArrayList()),
@@ -168,7 +170,14 @@ public class BlockTransactionSelectorTest {
                 BytesValue.EMPTY,
                 ValidationResult.valid()));
     when(transactionProcessor.processTransaction(
-            any(), any(), any(), eq(transactionsToInject.get(1)), any(), any(), any()))
+            any(),
+            any(),
+            any(),
+            eq(transactionsToInject.get(1)),
+            any(),
+            any(),
+            anyBoolean(),
+            any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.invalid(ValidationResult.invalid(NONCE_TOO_LOW)));
 
@@ -208,7 +217,8 @@ public class BlockTransactionSelectorTest {
       pendingTransactions.addRemoteTransaction(tx);
     }
 
-    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
+    when(transactionProcessor.processTransaction(
+            any(), any(), any(), any(), any(), any(), anyBoolean(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.successful(
                 new LogSeries(Lists.newArrayList()),
@@ -278,7 +288,8 @@ public class BlockTransactionSelectorTest {
   public void transactionTooLargeForBlockDoesNotPreventMoreBeingAddedIfBlockOccupancyNotReached() {
     final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(300);
 
-    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
+    when(transactionProcessor.processTransaction(
+            any(), any(), any(), any(), any(), any(), anyBoolean(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.successful(
                 new LogSeries(Lists.newArrayList()),
@@ -334,7 +345,8 @@ public class BlockTransactionSelectorTest {
     final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(300);
 
     // TransactionProcessor mock assumes all gas in the transaction was used (i.e. gasLimit).
-    when(transactionProcessor.processTransaction(any(), any(), any(), any(), any(), any(), any()))
+    when(transactionProcessor.processTransaction(
+            any(), any(), any(), any(), any(), any(), anyBoolean(), any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.successful(
                 new LogSeries(Lists.newArrayList()),
@@ -429,6 +441,7 @@ public class BlockTransactionSelectorTest {
             eq(validTransaction),
             any(),
             any(),
+            anyBoolean(),
             any()))
         .thenReturn(
             Result.successful(
@@ -440,6 +453,7 @@ public class BlockTransactionSelectorTest {
             eq(invalidTransaction),
             any(),
             any(),
+            anyBoolean(),
             any()))
         .thenReturn(
             Result.invalid(
@@ -468,6 +482,7 @@ public class BlockTransactionSelectorTest {
             eq(futureTransaction),
             any(),
             any(),
+            anyBoolean(),
             any()))
         .thenReturn(
             Result.invalid(ValidationResult.invalid(TransactionInvalidReason.INCORRECT_NONCE)));
@@ -513,6 +528,6 @@ public class BlockTransactionSelectorTest {
 
   private DefaultMutableWorldState inMemoryWorldState() {
     return new DefaultMutableWorldState(
-        new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage()));
+        new WorldStateKeyValueStorage(new InMemoryKeyValueStorage()));
   }
 }

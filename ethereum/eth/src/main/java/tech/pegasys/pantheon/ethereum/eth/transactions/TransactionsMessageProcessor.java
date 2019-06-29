@@ -12,14 +12,19 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.transactions;
 
+import static java.time.Instant.now;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
-import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
+import tech.pegasys.pantheon.metrics.Counter;
+import tech.pegasys.pantheon.metrics.RunnableCounter;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -28,17 +33,42 @@ import org.apache.logging.log4j.Logger;
 
 class TransactionsMessageProcessor {
 
+  private static final int SKIPPED_MESSAGES_LOGGING_THRESHOLD = 1000;
   private static final Logger LOG = getLogger();
   private final PeerTransactionTracker transactionTracker;
   private final TransactionPool transactionPool;
+  private final Counter totalSkippedTransactionsMessageCounter;
 
   public TransactionsMessageProcessor(
-      final PeerTransactionTracker transactionTracker, final TransactionPool transactionPool) {
+      final PeerTransactionTracker transactionTracker,
+      final TransactionPool transactionPool,
+      final Counter metricsCounter) {
     this.transactionTracker = transactionTracker;
     this.transactionPool = transactionPool;
+    this.totalSkippedTransactionsMessageCounter =
+        new RunnableCounter(
+            metricsCounter,
+            () ->
+                LOG.warn(
+                    "{} expired transaction messages have been skipped.",
+                    SKIPPED_MESSAGES_LOGGING_THRESHOLD),
+            SKIPPED_MESSAGES_LOGGING_THRESHOLD);
   }
 
   void processTransactionsMessage(
+      final EthPeer peer,
+      final TransactionsMessage transactionsMessage,
+      final Instant startedAt,
+      final Duration keepAlive) {
+    // Check if message not expired.
+    if (startedAt.plus(keepAlive).isAfter(now())) {
+      this.processTransactionsMessage(peer, transactionsMessage);
+    } else {
+      totalSkippedTransactionsMessageCounter.inc();
+    }
+  }
+
+  private void processTransactionsMessage(
       final EthPeer peer, final TransactionsMessage transactionsMessage) {
     try {
       LOG.trace("Received transactions message from {}", peer);

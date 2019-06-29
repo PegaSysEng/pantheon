@@ -220,7 +220,7 @@ The default is 8547. Ports must be [exposed appropriately](../Configuring-Panthe
 ### host-whitelist
 
 ```bash tab="Syntax"
---host-whitelist=<hostname>[,<hostname>...]... or *
+--host-whitelist=<hostname>[,<hostname>...]... or "*"
 ```
 
 ```bash tab="Example Command Line"
@@ -235,7 +235,7 @@ Comma-separated list of hostnames to allow [access to the JSON-RPC API](../Panth
 By default, access from `localhost` and `127.0.0.1` is accepted. 
 
 !!!tip
-    To allow all hostnames, use `*`. We don't recommend allowing all hostnames for production code.
+    To allow all hostnames, use `"*"`. We don't recommend allowing all hostnames for production code.
 
 ### max-peers
 
@@ -281,7 +281,7 @@ Comma separated list of categories for which to track metrics. The default is al
 metrics-enabled=true
 ```
 
-Set to `true` to enable the [metrics exporter](../Using-Pantheon/Monitoring.md#monitor-node-performance-using-prometheus).
+Set to `true` to enable the [metrics exporter](../Monitoring/Monitoring-Performance.md#monitor-node-performance-using-prometheus).
 The default is `false`.
 
 `--metrics-enabled` cannot be specified with `--metrics-push-enabled`. That is, either Prometheus polling or Prometheus 
@@ -301,7 +301,7 @@ push gateway support can be enabled but not both at once.
 metrics-host="127.0.0.1"
 ```
 
-Specifies the host on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Monitoring.md#monitor-node-performance-using-prometheus). 
+Specifies the host on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Monitoring/Monitoring-Performance.md#monitor-node-performance-using-prometheus). 
 The metrics server respects the [`--host-whitelist` option](#host-whitelist).
 
 The default is `127.0.0.1`. 
@@ -320,7 +320,7 @@ The default is `127.0.0.1`.
 metrics-port="6174"
 ```
 
-Specifies the port (TCP) on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Using-Pantheon/Monitoring.md#monitor-node-performance-using-prometheus).
+Specifies the port (TCP) on which [Prometheus](https://prometheus.io/) accesses [Pantheon metrics](../Monitoring/Monitoring-Performance.md#monitor-node-performance-using-prometheus).
 The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
 
 ### metrics-push-enabled 
@@ -337,7 +337,7 @@ The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pant
 metrics-push-enabled="true"
 ```
 
-Set to `true` to start the [push gateway integration](../Using-Pantheon/Monitoring.md#running-prometheus-with-pantheon-in-push-mode).
+Set to `true` to start the [push gateway integration](../Monitoring/Monitoring-Performance.md#running-prometheus-with-pantheon-in-push-mode).
 
 `--metrics-push-enabled` cannot be specified with `--metrics-enabled`. That is, either Prometheus polling or Prometheus 
 push gateway support can be enabled but not both at once.
@@ -858,7 +858,7 @@ Set to `true` to require [authentication](../Pantheon-API/Authentication.md) for
 ### rpc-http-cors-origins
 
 ```bash tab="Syntax"
---rpc-http-cors-origins=<url>[,<url>...]... or all or *
+--rpc-http-cors-origins=<url>[,<url>...]... or all or "*"
 ```
 
 ```bash tab="Example Command Line"
@@ -1175,13 +1175,11 @@ fast-sync-min-peers=2
 
 Minimum number of peers required before starting fast sync. Default is 5. 
 
-## Commands
-
-Pantheon subcommands are: 
+## Subcommands
 
 ### blocks
 
-This command provides blocks related actions.
+Provides blocks related actions.
 
 ### import
 
@@ -1235,7 +1233,7 @@ Outputs the node public key address to standard output or writes it to the speci
 
 ### password
 
-This command provides password related actions.
+Provides password related actions.
 
 ### hash
 
@@ -1250,9 +1248,29 @@ pantheon password hash --password=<my-password>
 pantheon password hash --password=myPassword123
 ```
 
+### operator
+
+Provides operator actions.
+
+### generate-blockchain-config
+
+This command generates [IBFT 2.0 configuration files](../Tutorials/Create-IBFT-Network.md). 
+
+```bash tab="Syntax"
+pantheon operator generate-blockchain-config --config-file=<FILE> --to=<DIRECTORY> [--genesis-file-name=<FILE>] [--private-key-file-name=<FILE>] [--public-key-file-name=<FILE>]
+```
+
+```bash tab="Example"
+pantheon operator generate-blockchain-config --config-file=config.json --to=myNetworkFiles
+```
+
+The configuration file has 2 subnested JSON nodes. The first is the `genesis` property defining 
+the [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT.md#genesis-file) except for the `extraData` string. The 
+second is the `blockchain` property defining the number of key pairs to generate.  
+
 ### rlp
 
-This command provides RLP related actions.
+Provides RLP related actions.
 
 ### encode
 
@@ -1315,3 +1333,4 @@ This data is included in the [IBFT 2.0 genesis file](../Consensus-Protocols/IBFT
         ``` tab="RLP Output"
         0xf853a00000000000000000000000000000000000000000000000000000000000000000ea94be068f726a13c8d46c44be6ce9d275600e1735a4945ff6f4b66a46a2b2310a6f3a93aaddc0d9a1c193808400000000c0
         ```
+

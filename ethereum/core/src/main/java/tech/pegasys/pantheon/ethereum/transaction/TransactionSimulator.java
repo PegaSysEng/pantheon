@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
+import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidationParams;
 import tech.pegasys.pantheon.ethereum.vm.BlockHashLookup;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -122,7 +123,8 @@ public class TransactionSimulator {
             transaction,
             protocolSpec.getMiningBeneficiaryCalculator().calculateBeneficiary(header),
             new BlockHashLookup(header, blockchain),
-            false);
+            false,
+            TransactionValidationParams.transactionSimulator());
 
     return Optional.of(new TransactionSimulatorResult(transaction, result));
   }

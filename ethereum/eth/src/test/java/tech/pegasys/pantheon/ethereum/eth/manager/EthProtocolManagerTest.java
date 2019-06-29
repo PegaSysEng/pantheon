@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol.EthVersion;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
@@ -50,15 +51,15 @@ import tech.pegasys.pantheon.ethereum.eth.messages.ReceiptsMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.StatusMessage;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.p2p.api.MessageData;
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.p2p.wire.DefaultMessage;
-import tech.pegasys.pantheon.ethereum.p2p.wire.RawMessage;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.DefaultMessage;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.RawMessage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
@@ -1077,10 +1078,10 @@ public final class EthProtocolManagerTest {
           protocolContext,
           ethManager.ethContext(),
           TestClock.fixed(),
-          PendingTransactions.MAX_PENDING_TRANSACTIONS,
           metricsSystem,
           mock(SyncState.class),
-          PendingTransactions.DEFAULT_TX_RETENTION_HOURS);
+          Wei.ZERO,
+          TransactionPoolConfiguration.builder().build());
 
       // Send just a transaction message.
       final PeerConnection peer = setupPeer(ethManager, (cap, msg, connection) -> {});

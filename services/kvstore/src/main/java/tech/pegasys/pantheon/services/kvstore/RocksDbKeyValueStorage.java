@@ -13,9 +13,9 @@
 package tech.pegasys.pantheon.services.kvstore;
 
 import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.rocksdb.RocksDBStats;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
@@ -24,11 +24,13 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.Closeable;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
 import org.rocksdb.Statistics;
 import org.rocksdb.TransactionDB;
 import org.rocksdb.TransactionDBOptions;
@@ -76,7 +78,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
       readLatency =
           metricsSystem
               .createLabelledTimer(
-                  MetricCategory.KVSTORE_ROCKSDB,
+                  PantheonMetricCategory.KVSTORE_ROCKSDB,
                   "read_latency_seconds",
                   "Latency for read from RocksDB.",
                   "database")
@@ -84,7 +86,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
       removeLatency =
           metricsSystem
               .createLabelledTimer(
-                  MetricCategory.KVSTORE_ROCKSDB,
+                  PantheonMetricCategory.KVSTORE_ROCKSDB,
                   "remove_latency_seconds",
                   "Latency of remove requests from RocksDB.",
                   "database")
@@ -92,7 +94,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
       writeLatency =
           metricsSystem
               .createLabelledTimer(
-                  MetricCategory.KVSTORE_ROCKSDB,
+                  PantheonMetricCategory.KVSTORE_ROCKSDB,
                   "write_latency_seconds",
                   "Latency for write to RocksDB.",
                   "database")
@@ -100,7 +102,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
       commitLatency =
           metricsSystem
               .createLabelledTimer(
-                  MetricCategory.KVSTORE_ROCKSDB,
+                  PantheonMetricCategory.KVSTORE_ROCKSDB,
                   "commit_latency_seconds",
                   "Latency for commits to RocksDB.",
                   "database")
@@ -111,7 +113,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
       }
 
       metricsSystem.createLongGauge(
-          MetricCategory.KVSTORE_ROCKSDB,
+          PantheonMetricCategory.KVSTORE_ROCKSDB,
           "rocks_db_table_readers_memory_bytes",
           "Estimated memory used for RocksDB index and filter blocks in bytes",
           () -> {
@@ -126,7 +128,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
       rollbackCount =
           metricsSystem
               .createLabelledCounter(
-                  MetricCategory.KVSTORE_ROCKSDB,
+                  PantheonMetricCategory.KVSTORE_ROCKSDB,
                   "rollback_count",
                   "Number of RocksDB transactions rolled back.",
                   "database")
@@ -152,6 +154,43 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
     throwIfClosed();
     final WriteOptions options = new WriteOptions();
     return new RocksDbTransaction(db.beginTransaction(options), options);
+  }
+
+  @Override
+  public long removeUnless(final Predicate<BytesValue> inUseCheck) throws StorageException {
+    long removedNodeCounter = 0;
+    try (final RocksIterator rocksIterator = db.newIterator()) {
+      rocksIterator.seekToFirst();
+      while (rocksIterator.isValid()) {
+        final byte[] key = rocksIterator.key();
+        if (!inUseCheck.test(BytesValue.wrap(key))) {
+          removedNodeCounter++;
+          db.delete(key);
+        }
+        rocksIterator.next();
+      }
+    } catch (final RocksDBException e) {
+      throw new StorageException(e);
+    }
+    return removedNodeCounter;
+  }
+
+  @Override
+  public void clear() {
+    try (final RocksIterator rocksIterator = db.newIterator()) {
+      if (!rocksIterator.isValid()) {
+        return;
+      }
+      rocksIterator.seekToFirst();
+      final byte[] firstKey = rocksIterator.key();
+      rocksIterator.seekToLast();
+      if (!rocksIterator.isValid()) {
+        return;
+      }
+      db.deleteRange(firstKey, rocksIterator.key());
+    } catch (final RocksDBException e) {
+      throw new StorageException(e);
+    }
   }
 
   @Override

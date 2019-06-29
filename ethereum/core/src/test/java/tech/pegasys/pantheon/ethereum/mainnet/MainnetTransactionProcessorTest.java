@@ -65,13 +65,12 @@ public class MainnetTransactionProcessorTest {
   }
 
   @Test
-  public void
-      shouldCallTransactionValidatorWithExpectedTransactionValidationParamsWhenNotPersistingState() {
+  public void shouldCallTransactionValidatorWithExpectedTransactionValidationParams() {
     final ArgumentCaptor<TransactionValidationParams> txValidationParamCaptor =
         transactionValidationParamCaptor();
 
     final TransactionValidationParams expectedValidationParams =
-        new TransactionValidationParams.Builder().stateChange(false).build();
+        new TransactionValidationParams.Builder().build();
 
     transactionProcessor.processTransaction(
         blockchain,
@@ -80,29 +79,8 @@ public class MainnetTransactionProcessorTest {
         transaction,
         Address.fromHexString("1"),
         blockHashLookup,
-        false);
-
-    assertThat(txValidationParamCaptor.getValue())
-        .isEqualToComparingFieldByField(expectedValidationParams);
-  }
-
-  @Test
-  public void
-      shouldCallTransactionValidatorWithExpectedTransactionValidationParamsWhenPersistingState() {
-    final ArgumentCaptor<TransactionValidationParams> txValidationParamCaptor =
-        transactionValidationParamCaptor();
-
-    final TransactionValidationParams expectedValidationParams =
-        new TransactionValidationParams.Builder().stateChange(true).build();
-
-    transactionProcessor.processTransaction(
-        blockchain,
-        worldState,
-        blockHeader,
-        transaction,
-        Address.fromHexString("1"),
-        blockHashLookup,
-        true);
+        false,
+        new TransactionValidationParams.Builder().build());
 
     assertThat(txValidationParamCaptor.getValue())
         .isEqualToComparingFieldByField(expectedValidationParams);

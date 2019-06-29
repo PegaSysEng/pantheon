@@ -12,29 +12,38 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.transactions;
 
+import static java.time.Instant.now;
+
 import tech.pegasys.pantheon.ethereum.eth.manager.EthMessage;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthMessages.MessageCallback;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
 
+import java.time.Duration;
+import java.time.Instant;
+
 class TransactionsMessageHandler implements MessageCallback {
 
   private final TransactionsMessageProcessor transactionsMessageProcessor;
   private final EthScheduler scheduler;
+  private final Duration txMsgKeepAlive;
 
   public TransactionsMessageHandler(
       final EthScheduler scheduler,
-      final TransactionsMessageProcessor transactionsMessageProcessor) {
+      final TransactionsMessageProcessor transactionsMessageProcessor,
+      final int txMsgKeepAliveSeconds) {
     this.scheduler = scheduler;
     this.transactionsMessageProcessor = transactionsMessageProcessor;
+    this.txMsgKeepAlive = Duration.ofSeconds(txMsgKeepAliveSeconds);
   }
 
   @Override
   public void exec(final EthMessage message) {
     final TransactionsMessage transactionsMessage = TransactionsMessage.readFrom(message.getData());
+    final Instant startedAt = now();
     scheduler.scheduleTxWorkerTask(
         () ->
             transactionsMessageProcessor.processTransactionsMessage(
-                message.getPeer(), transactionsMessage));
+                message.getPeer(), transactionsMessage, startedAt, txMsgKeepAlive));
   }
 }

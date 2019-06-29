@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions.TransactionSelectionResult;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
+import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidationParams;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 import tech.pegasys.pantheon.ethereum.vm.BlockHashLookup;
 
@@ -168,7 +169,8 @@ public class BlockTransactionSelector {
             transaction,
             miningBeneficiary,
             blockHashLookup,
-            false);
+            false,
+            TransactionValidationParams.mining());
 
     if (!result.isInvalid()) {
       worldStateUpdater.commit();

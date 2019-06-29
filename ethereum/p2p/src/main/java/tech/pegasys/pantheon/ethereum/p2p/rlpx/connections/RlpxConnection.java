@@ -12,9 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.rlpx.connections;
 
-import tech.pegasys.pantheon.ethereum.p2p.api.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.ethereum.p2p.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Objects;
@@ -61,13 +60,15 @@ public abstract class RlpxConnection {
 
   public abstract boolean initiatedRemotely();
 
-  public void subscribeConnectionEstablished(final RlpxConnectCallback callback) {
+  public void subscribeConnectionEstablished(
+      final RlpxConnectCallback successCallback, final RlpxConnectFailedCallback failedCallback) {
     future.whenComplete(
         (conn, err) -> {
           if (err != null) {
-            return;
+            failedCallback.onFailure(this);
+          } else {
+            successCallback.onConnect(this);
           }
-          callback.onConnect(this);
         });
   }
 
@@ -221,5 +222,10 @@ public abstract class RlpxConnection {
   @FunctionalInterface
   public interface RlpxConnectCallback {
     void onConnect(RlpxConnection connection);
+  }
+
+  @FunctionalInterface
+  public interface RlpxConnectFailedCallback {
+    void onFailure(RlpxConnection connection);
   }
 }

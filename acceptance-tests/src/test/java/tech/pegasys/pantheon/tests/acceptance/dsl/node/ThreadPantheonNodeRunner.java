@@ -22,8 +22,10 @@ import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
+import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
+import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
@@ -32,7 +34,6 @@ import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
-import tech.pegasys.pantheon.util.enode.EnodeURL;
 
 import java.io.File;
 import java.io.IOException;
@@ -113,8 +114,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .privacyParameters(node.getPrivacyParameters())
               .nodePrivateKeyFile(KeyPairUtil.getDefaultKeyFile(node.homeDirectory()))
               .metricsSystem(noOpMetricsSystem)
-              .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
-              .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_HOURS)
+              .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
               .rocksDbConfiguration(new RocksDbConfiguration.Builder().databaseDir(tempDir).build())
               .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
               .clock(Clock.systemUTC())
@@ -124,7 +124,12 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     }
 
     final RunnerBuilder runnerBuilder = new RunnerBuilder();
-    node.getPermissioningConfiguration().ifPresent(runnerBuilder::permissioningConfiguration);
+    if (node.getPermissioningConfiguration().isPresent()) {
+      PermissioningConfiguration permissioningConfiguration =
+          node.getPermissioningConfiguration().get();
+
+      runnerBuilder.permissioningConfiguration(permissioningConfiguration);
+    }
 
     pantheonPluginContext.addService(
         PantheonEvents.class,
