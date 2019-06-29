@@ -13,8 +13,12 @@ RLP-encoded transactions using JSON-RPC.
 ## Prerequisites
 
 - [Node.js (version > 10)](https://nodejs.org/en/download/)  
-- [web3.js 1.0.0](https://web3js.readthedocs.io/en/1.0/getting-started.html)
 
+## Add web3.js-eea to Project 
+
+```bash
+npm install web3-eea
+```
 
 ## Initialize EEA Client 
 
