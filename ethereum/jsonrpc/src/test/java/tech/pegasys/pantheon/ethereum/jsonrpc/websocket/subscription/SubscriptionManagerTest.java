@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.Sub
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +43,7 @@ public class SubscriptionManagerTest {
 
   @Before
   public void before() {
-    subscriptionManager = new SubscriptionManager();
+    subscriptionManager = new SubscriptionManager(new NoOpMetricsSystem());
   }
 
   @Test
@@ -52,9 +53,10 @@ public class SubscriptionManagerTest {
     final Long subscriptionId = subscriptionManager.subscribe(subscribeRequest);
 
     final SyncingSubscription expectedSubscription =
-        new SyncingSubscription(subscriptionId, subscribeRequest.getSubscriptionType());
+        new SyncingSubscription(
+            subscriptionId, CONNECTION_ID, subscribeRequest.getSubscriptionType());
     final Subscription createdSubscription =
-        subscriptionManager.subscriptions().get(subscriptionId);
+        subscriptionManager.getSubscriptionById(subscriptionId);
 
     assertThat(subscriptionId).isEqualTo(1L);
     assertThat(createdSubscription).isEqualTo(expectedSubscription);
@@ -65,14 +67,14 @@ public class SubscriptionManagerTest {
     final SubscribeRequest subscribeRequest = subscribeRequest(CONNECTION_ID);
     final Long subscriptionId = subscriptionManager.subscribe(subscribeRequest);
 
-    assertThat(subscriptionManager.subscriptions().get(subscriptionId)).isNotNull();
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId)).isNotNull();
 
     final UnsubscribeRequest unsubscribeRequest =
         new UnsubscribeRequest(subscriptionId, CONNECTION_ID);
     final boolean unsubscribed = subscriptionManager.unsubscribe(unsubscribeRequest);
 
     assertThat(unsubscribed).isTrue();
-    assertThat(subscriptionManager.subscriptions().get(subscriptionId)).isNull();
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId)).isNull();
   }
 
   @Test
@@ -90,32 +92,23 @@ public class SubscriptionManagerTest {
   public void shouldAddSubscriptionToNewConnection() {
     final SubscribeRequest subscribeRequest = subscribeRequest(CONNECTION_ID);
 
-    subscriptionManager.subscribe(subscribeRequest);
+    final Long subscriptionId = subscriptionManager.subscribe(subscribeRequest);
 
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().containsKey(CONNECTION_ID))
-        .isTrue();
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).size())
-        .isEqualTo(1);
+    final Subscription subscription = subscriptionManager.getSubscriptionById(subscriptionId);
+    assertThat(subscription.getConnectionId()).isEqualTo(CONNECTION_ID);
   }
 
   @Test
   public void shouldAddSubscriptionToExistingConnection() {
     final SubscribeRequest subscribeRequest = subscribeRequest(CONNECTION_ID);
 
-    subscriptionManager.subscribe(subscribeRequest);
+    final Long subscriptionId1 = subscriptionManager.subscribe(subscribeRequest);
+    final Long subscriptionId2 = subscriptionManager.subscribe(subscribeRequest);
 
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().containsKey(CONNECTION_ID))
-        .isTrue();
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).size())
-        .isEqualTo(1);
-
-    subscriptionManager.subscribe(subscribeRequest);
-
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).size())
-        .isEqualTo(2);
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId1).getConnectionId())
+        .isEqualTo(CONNECTION_ID);
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId2).getConnectionId())
+        .isEqualTo(CONNECTION_ID);
   }
 
   @Test
@@ -123,28 +116,20 @@ public class SubscriptionManagerTest {
     final SubscribeRequest subscribeRequest = subscribeRequest(CONNECTION_ID);
 
     final Long subscriptionId1 = subscriptionManager.subscribe(subscribeRequest);
-
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().containsKey(CONNECTION_ID))
-        .isTrue();
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).size())
-        .isEqualTo(1);
-
     final Long subscriptionId2 = subscriptionManager.subscribe(subscribeRequest);
 
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).size())
-        .isEqualTo(2);
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId1).getConnectionId())
+        .isEqualTo(CONNECTION_ID);
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId2).getConnectionId())
+        .isEqualTo(CONNECTION_ID);
 
     final UnsubscribeRequest unsubscribeRequest =
         new UnsubscribeRequest(subscriptionId1, CONNECTION_ID);
     subscriptionManager.unsubscribe(unsubscribeRequest);
 
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).size())
-        .isEqualTo(1);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).get(0))
-        .isEqualTo(subscriptionId2);
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId1)).isNull();
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId2).getConnectionId())
+        .isEqualTo(CONNECTION_ID);
   }
 
   @Test
@@ -153,17 +138,14 @@ public class SubscriptionManagerTest {
 
     final Long subscriptionId1 = subscriptionManager.subscribe(subscribeRequest);
 
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().size()).isEqualTo(1);
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().containsKey(CONNECTION_ID))
-        .isTrue();
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().get(CONNECTION_ID).size())
-        .isEqualTo(1);
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId1).getConnectionId())
+        .isEqualTo(CONNECTION_ID);
 
     final UnsubscribeRequest unsubscribeRequest =
         new UnsubscribeRequest(subscriptionId1, CONNECTION_ID);
     subscriptionManager.unsubscribe(unsubscribeRequest);
 
-    assertThat(subscriptionManager.getConnectionSubscriptionsMap().isEmpty()).isTrue();
+    assertThat(subscriptionManager.getSubscriptionById(subscriptionId1)).isNull();
   }
 
   @Test

@@ -30,14 +30,12 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.EXCEEDS_BLOCK_GAS_LIMIT;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
-import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED;
 import static tech.pegasys.pantheon.ethereum.mainnet.ValidationResult.valid;
 
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
-import tech.pegasys.pantheon.ethereum.core.AccountFilter;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -103,7 +101,6 @@ public class TransactionPoolTest {
   private final ProtocolContext<Void> protocolContext = executionContext.getProtocolContext();
   private TransactionPool transactionPool;
   private long genesisBlockGasLimit;
-  private final AccountFilter accountFilter = mock(AccountFilter.class);
   private SyncState syncState;
   private EthContext ethContext;
   private PeerTransactionTracker peerTransactionTracker;
@@ -128,7 +125,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            metricsSystem);
     blockchain.observeBlockAdded(transactionPool);
   }
 
@@ -336,6 +334,29 @@ public class TransactionPoolTest {
   }
 
   @Test
+  public void shouldDiscardRemoteTransactionThatAlreadyExistsBeforeValidation() {
+    final PendingTransactions pendingTransactions = mock(PendingTransactions.class);
+    final TransactionPool transactionPool =
+        new TransactionPool(
+            pendingTransactions,
+            protocolSchedule,
+            protocolContext,
+            batchAddedListener,
+            syncState,
+            ethContext,
+            peerTransactionTracker,
+            metricsSystem);
+
+    when(pendingTransactions.containsTransaction(transaction1.hash())).thenReturn(true);
+
+    transactionPool.addRemoteTransactions(singletonList(transaction1));
+
+    verify(pendingTransactions).containsTransaction(transaction1.hash());
+    verifyZeroInteractions(transactionValidator);
+    verifyNoMoreInteractions(pendingTransactions);
+  }
+
+  @Test
   public void shouldNotNotifyBatchListenerWhenRemoteTransactionDoesNotReplaceExisting() {
     final TransactionTestFixture builder = new TransactionTestFixture();
     final Transaction transaction1 =
@@ -419,32 +440,6 @@ public class TransactionPoolTest {
   }
 
   @Test
-  public void shouldAllowWhitelistedTransactionWhenWhitelistEnabled() {
-    transactionPool.setAccountFilter(accountFilter);
-    givenTransactionIsValid(transaction1);
-
-    when(accountFilter.permitted(transaction1.getSender().toString())).thenReturn(true);
-
-    assertThat(transactionPool.addLocalTransaction(transaction1)).isEqualTo(valid());
-
-    assertTransactionPending(transaction1);
-  }
-
-  @Test
-  public void shouldRejectNonWhitelistedTransactionWhenWhitelistEnabled() {
-    transactionPool.setAccountFilter(accountFilter);
-    givenTransactionIsValid(transaction1);
-
-    when(accountFilter.permitted(transaction1.getSender().toString())).thenReturn(false);
-
-    assertThat(transactionPool.addLocalTransaction(transaction1))
-        .isEqualTo(ValidationResult.invalid(TX_SENDER_NOT_AUTHORIZED));
-
-    assertTransactionNotPending(transaction1);
-    verifyZeroInteractions(batchAddedListener);
-  }
-
-  @Test
   public void shouldAllowTransactionWhenAccountWhitelistControllerIsNotPresent() {
     givenTransactionIsValid(transaction1);
 
@@ -465,7 +460,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            metricsSystem);
 
     final TransactionTestFixture builder = new TransactionTestFixture();
     final Transaction transaction1 = builder.nonce(1).createTransaction(KEY_PAIR1);
@@ -529,7 +525,8 @@ public class TransactionPoolTest {
             batchAddedListener,
             syncState,
             ethContext,
-            peerTransactionTracker);
+            peerTransactionTracker,
+            metricsSystem);
 
     final TransactionTestFixture builder = new TransactionTestFixture();
     final Transaction transactionLocal = builder.nonce(1).createTransaction(KEY_PAIR1);
