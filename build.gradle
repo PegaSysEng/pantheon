@@ -284,7 +284,7 @@ subprojects {
     publishing {
       publications {
         mavenJava(MavenPublication) {
-          groupId "tech.pegasys.${project.group}"
+          groupId "tech.pegasys.pantheon"
           version "${project.version}"
           from components.java
           artifact sourcesJar
