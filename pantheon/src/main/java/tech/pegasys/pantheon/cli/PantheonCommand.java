@@ -569,7 +569,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer pendingTxRetentionPeriod = PendingTransactions.DEFAULT_TX_RETENTION_HOURS;
 
   @Option(
-      names = {"--tx-pool-keep-alive-seconds"},
+      names = {"--Xincoming-tx-messages-keep-alive-seconds"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description = "Keep alive of transactions in seconds (default: ${DEFAULT-VALUE})",
       arity = "1")
