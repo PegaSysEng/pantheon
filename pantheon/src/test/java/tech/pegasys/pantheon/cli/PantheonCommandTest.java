@@ -716,9 +716,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
     verify(mockRunnerBuilder).metricsConfiguration(eq(metricsConfiguration));
     verify(mockRunnerBuilder).build();
-
-    verify(mockControllerBuilder)
-        .transactionPoolConfiguration(eq(TransactionPoolConfiguration.builder().build()));
     verify(mockControllerBuilder).build();
 
     verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FULL));

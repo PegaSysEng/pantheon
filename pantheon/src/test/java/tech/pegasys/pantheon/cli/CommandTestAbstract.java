@@ -163,8 +163,6 @@ public abstract class CommandTestAbstract {
 
     when(mockTransactionPoolConfigurationBuilder.pendingTxRetentionPeriod(anyInt()))
         .thenReturn(mockTransactionPoolConfigurationBuilder);
-    when(mockTransactionPoolConfigurationBuilder.txMessageKeepAliveSeconds(anyInt()))
-        .thenReturn(mockTransactionPoolConfigurationBuilder);
     when(mockTransactionPoolConfigurationBuilder.txPoolMaxSize(anyInt()))
         .thenReturn(mockTransactionPoolConfigurationBuilder);
     when(mockTransactionPoolConfigurationBuilder.build())
