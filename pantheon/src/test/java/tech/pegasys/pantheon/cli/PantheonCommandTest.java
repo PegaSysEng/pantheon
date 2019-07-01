@@ -2617,4 +2617,26 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
+
+  @Test
+  public void txMessageKeepAliveSeconds() {
+    final int txMessageKeepAliveSeconds = 999;
+    parseCommand(
+        "--Xincoming-tx-messages-keep-alive-seconds", String.valueOf(txMessageKeepAliveSeconds));
+    verify(mockTransactionPoolConfigurationBuilder).build();
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void txMessageKeepAliveSecondsWithInvalidInputShouldFail() {
+    parseCommand("--Xincoming-tx-messages-keep-alive-seconds", "acbd");
+
+    verifyZeroInteractions(mockRunnerBuilder);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains(
+            "Invalid value for option '--Xincoming-tx-messages-keep-alive-seconds': 'acbd' is not an int");
+  }
 }
