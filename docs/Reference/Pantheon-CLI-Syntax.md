@@ -24,15 +24,15 @@ configuration file.
 
 ### Pantheon Environment Variables
 
-## Options
-
-For each command line option, the equivalent environment is: 
+For each command line option, the equivalent environment variable is: 
 
 * Upper-case
 * `-` is replaced by `_` 
 * Has a `PANTHEON_` prefix
 
-For example, the `--miner-coinbase` can be set using the `PANTHEON_MINER_COINBASE` environment variable. 
+For example, set `--miner-coinbase` using the `PANTHEON_MINER_COINBASE` environment variable. 
+
+## Options
 
 ### banned-node-ids
 
@@ -1150,6 +1150,7 @@ To allow remote connections, set to `0.0.0.0`
 ```bash tab="Command Line"
 # to listen on port 3435
 --rpc-http-port=3435
+```
 
 ```bash tab="Environment Variable"
 PANTHEON_RPC_HTTP_PORT=3435
