@@ -95,7 +95,8 @@ public abstract class CommandTestAbstract {
   @Mock SynchronizerConfiguration mockSyncConf;
   @Mock RocksDbConfiguration.Builder mockRocksDbConfBuilder;
   @Mock RocksDbConfiguration mockRocksDbConf;
-  @Mock protected TransactionPoolConfiguration.Builder mockTransactionPoolConfigurationBuilder;
+  protected TransactionPoolConfiguration.Builder mockTransactionPoolConfigurationBuilder =
+      TransactionPoolConfiguration.builder();
   @Mock TransactionPoolConfiguration mockTransactionPoolConfiguration;
   @Mock PantheonController<Object> mockController;
   @Mock BlockImporter mockBlockImporter;
@@ -161,12 +162,12 @@ public abstract class CommandTestAbstract {
     when(mockRocksDbConfBuilder.databaseDir(any())).thenReturn(mockRocksDbConfBuilder);
     when(mockRocksDbConfBuilder.build()).thenReturn(mockRocksDbConf);
 
-    when(mockTransactionPoolConfigurationBuilder.pendingTxRetentionPeriod(anyInt()))
+    /*when(mockTransactionPoolConfigurationBuilder.pendingTxRetentionPeriod(anyInt()))
         .thenReturn(mockTransactionPoolConfigurationBuilder);
     when(mockTransactionPoolConfigurationBuilder.txPoolMaxSize(anyInt()))
         .thenReturn(mockTransactionPoolConfigurationBuilder);
     when(mockTransactionPoolConfigurationBuilder.build())
-        .thenReturn(mockTransactionPoolConfiguration);
+        .thenReturn(mockTransactionPoolConfiguration);*/
 
     when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
