@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INCORRECT_PRIVATE_NONCE;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.PRIVATE_NONCE_TOO_LOW;
 
+import tech.pegasys.orion.testutil.OrionKeyUtils;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.enclave.Enclave;
@@ -107,7 +108,7 @@ public class PrivateTransactionHandlerTest {
             mockEnclave(),
             Address.DEFAULT_PRIVACY,
             KEY_PAIR,
-            "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=",
+            OrionKeyUtils.loadKey("orion_key_0.pub"),
             privateStateStorage,
             worldStateArchive);
     brokenPrivateTransactionHandler =
@@ -115,7 +116,7 @@ public class PrivateTransactionHandlerTest {
             brokenMockEnclave(),
             Address.DEFAULT_PRIVACY,
             KEY_PAIR,
-            "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=",
+            OrionKeyUtils.loadKey("orion_key_0.pub"),
             privateStateStorage,
             worldStateArchive);
   }
