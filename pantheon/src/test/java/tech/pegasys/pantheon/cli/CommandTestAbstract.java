@@ -162,13 +162,6 @@ public abstract class CommandTestAbstract {
     when(mockRocksDbConfBuilder.databaseDir(any())).thenReturn(mockRocksDbConfBuilder);
     when(mockRocksDbConfBuilder.build()).thenReturn(mockRocksDbConf);
 
-    /*when(mockTransactionPoolConfigurationBuilder.pendingTxRetentionPeriod(anyInt()))
-        .thenReturn(mockTransactionPoolConfigurationBuilder);
-    when(mockTransactionPoolConfigurationBuilder.txPoolMaxSize(anyInt()))
-        .thenReturn(mockTransactionPoolConfigurationBuilder);
-    when(mockTransactionPoolConfigurationBuilder.build())
-        .thenReturn(mockTransactionPoolConfiguration);*/
-
     when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.discovery(anyBoolean())).thenReturn(mockRunnerBuilder);
