@@ -95,6 +95,8 @@ public abstract class CommandTestAbstract {
   @Mock SynchronizerConfiguration mockSyncConf;
   @Mock RocksDbConfiguration.Builder mockRocksDbConfBuilder;
   @Mock RocksDbConfiguration mockRocksDbConf;
+  @Mock protected TransactionPoolConfiguration.Builder mockTransactionPoolConfigurationBuilder;
+  @Mock TransactionPoolConfiguration mockTransactionPoolConfiguration;
   @Mock PantheonController<Object> mockController;
   @Mock BlockImporter mockBlockImporter;
   @Mock Logger mockLogger;
@@ -131,11 +133,10 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.ethereumWireProtocolConfiguration(any()))
         .thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.rocksDbConfiguration(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.transactionPoolConfiguration(any()))
+        .thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.dataDirectory(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.miningParameters(any())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.transactionPoolConfiguration(
-            any(TransactionPoolConfiguration.class)))
-        .thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.nodePrivateKeyFile(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
@@ -159,6 +160,15 @@ public abstract class CommandTestAbstract {
 
     when(mockRocksDbConfBuilder.databaseDir(any())).thenReturn(mockRocksDbConfBuilder);
     when(mockRocksDbConfBuilder.build()).thenReturn(mockRocksDbConf);
+
+    when(mockTransactionPoolConfigurationBuilder.pendingTxRetentionPeriod(anyInt()))
+        .thenReturn(mockTransactionPoolConfigurationBuilder);
+    when(mockTransactionPoolConfigurationBuilder.txMessageKeepAliveSeconds(anyInt()))
+        .thenReturn(mockTransactionPoolConfigurationBuilder);
+    when(mockTransactionPoolConfigurationBuilder.txPoolMaxSize(anyInt()))
+        .thenReturn(mockTransactionPoolConfigurationBuilder);
+    when(mockTransactionPoolConfigurationBuilder.build())
+        .thenReturn(mockTransactionPoolConfiguration);
 
     when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
@@ -223,6 +233,7 @@ public abstract class CommandTestAbstract {
             mockSyncConfBuilder,
             mockEthereumWireProtocolConfigurationBuilder,
             mockRocksDbConfBuilder,
+            mockTransactionPoolConfigurationBuilder,
             keyLoader,
             mockPantheonPluginContext,
             environment);
@@ -254,6 +265,7 @@ public abstract class CommandTestAbstract {
         final SynchronizerConfiguration.Builder mockSyncConfBuilder,
         final EthereumWireProtocolConfiguration.Builder mockEthereumConfigurationMockBuilder,
         final RocksDbConfiguration.Builder mockRocksDbConfBuilder,
+        final TransactionPoolConfiguration.Builder mockTransactionPoolConfigurationBuilder,
         final KeyLoader keyLoader,
         final PantheonPluginContextImpl pantheonPluginContext,
         final Map<String, String> environment) {
@@ -265,6 +277,7 @@ public abstract class CommandTestAbstract {
           mockSyncConfBuilder,
           mockEthereumConfigurationMockBuilder,
           mockRocksDbConfBuilder,
+          mockTransactionPoolConfigurationBuilder,
           pantheonPluginContext,
           environment);
       this.keyLoader = keyLoader;

@@ -2612,40 +2612,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void pendingTransactionRetentionPeriod() {
     final int pendingTxRetentionHours = 999;
     parseCommand("--tx-pool-retention-hours", String.valueOf(pendingTxRetentionHours));
-
-    verify(mockControllerBuilder)
-        .transactionPoolConfiguration(transactionPoolConfigurationArgumentCaptor.capture());
-    assertThat(transactionPoolConfigurationArgumentCaptor.getValue().getPendingTxRetentionPeriod())
-        .isEqualTo(pendingTxRetentionHours);
-
+    verify(mockTransactionPoolConfigurationBuilder)
+        .pendingTxRetentionPeriod(pendingTxRetentionHours);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void txMessageKeepAliveSeconds() {
-    final int txMessageKeepAliveSeconds = 999;
-    parseCommand(
-        "--Xincoming-tx-messages-keep-alive-seconds", String.valueOf(txMessageKeepAliveSeconds));
-
-    verify(mockControllerBuilder)
-        .transactionPoolConfiguration(transactionPoolConfigurationArgumentCaptor.capture());
-    assertThat(transactionPoolConfigurationArgumentCaptor.getValue().getTxMessageKeepAliveSeconds())
-        .isEqualTo(txMessageKeepAliveSeconds);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void txMessageKeepAliveSecondsWithInvalidInputShouldFail() {
-    parseCommand("--Xincoming-tx-messages-keep-alive-seconds", "acbd");
-
-    verifyZeroInteractions(mockRunnerBuilder);
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .contains(
-            "Invalid value for option '--Xincoming-tx-messages-keep-alive-seconds': 'acbd' is not an int");
   }
 }
