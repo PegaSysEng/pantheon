@@ -857,7 +857,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  PantheonController buildController() {
+  PantheonController<?> buildController() {
     try {
       return controllerBuilderFactory
           .fromEthNetworkConfig(updateNetworkConfig(getNetwork()))
