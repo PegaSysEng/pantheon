@@ -208,7 +208,8 @@ public abstract class PantheonControllerBuilder<C> {
                 storageProvider.createPruningStorage(),
                 metricsSystem),
             protocolContext.getBlockchain(),
-            1000);
+            1000,
+            10);
     addShutdownAction(pruner::stop);
 
     final boolean fastSyncEnabled = syncConfig.getSyncMode().equals(SyncMode.FAST);
