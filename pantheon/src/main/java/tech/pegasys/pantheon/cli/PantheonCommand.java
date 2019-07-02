@@ -633,17 +633,24 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final PantheonExceptionHandler exceptionHandler,
       final InputStream in,
       final String... args) {
+    commandLine = new CommandLine(this).setCaseInsensitiveEnumValuesAllowed(true);
+    handleStandaloneCommand();
+    addSubCommands(resultHandler, in);
+    registerConverters();
+    handleUnstableOptions();
+    preparePlugins();
+    parse(resultHandler, exceptionHandler, args);
+  }
 
-    commandLine = new CommandLine(this);
-
-    commandLine.setCaseInsensitiveEnumValuesAllowed(true);
-
+  private void handleStandaloneCommand() {
     standaloneCommands = new StandaloneCommand();
-
     if (isFullInstantiation()) {
       commandLine.addMixin("standaloneCommands", standaloneCommands);
     }
+  }
 
+  private void addSubCommands(
+      final AbstractParseResultHandler<List<Object>> resultHandler, final InputStream in) {
     commandLine.addSubcommand(
         BlocksSubCommand.COMMAND_NAME, new BlocksSubCommand(blockImporter, resultHandler.out()));
     commandLine.addSubcommand(
@@ -655,7 +662,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         RLPSubCommand.COMMAND_NAME, new RLPSubCommand(resultHandler.out(), in));
     commandLine.addSubcommand(
         OperatorSubCommand.COMMAND_NAME, new OperatorSubCommand(resultHandler.out()));
+  }
 
+  private void registerConverters() {
     commandLine.registerConverter(Address.class, Address::fromHexStringStrict);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
     commandLine.registerConverter(Level.class, Level::valueOf);
@@ -663,13 +672,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
-
     final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
     metricCategoryConverter.addCategories(PantheonMetricCategory.class);
     metricCategoryConverter.addCategories(StandardMetricCategory.class);
     commandLine.registerConverter(MetricCategory.class, metricCategoryConverter);
+  }
 
-    // Add performance options
+  private void handleUnstableOptions() {
+    // Add unstable options
     UnstableOptionsSubCommand.createUnstableOptions(
         commandLine,
         ImmutableMap.of(
@@ -681,10 +691,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             ethereumWireConfigurationBuilder,
             "TransactionPool",
             transactionPoolConfigurationBuilder));
+  }
 
+  private void preparePlugins() {
     pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
     pantheonPluginContext.registerPlugins(pluginsDir());
+  }
 
+  private void parse(
+      final AbstractParseResultHandler<List<Object>> resultHandler,
+      final PantheonExceptionHandler exceptionHandler,
+      final String... args) {
     // Create a handler that will search for a config file option and use it for
     // default values
     // and eventually it will run regular parsing of the remaining options.
