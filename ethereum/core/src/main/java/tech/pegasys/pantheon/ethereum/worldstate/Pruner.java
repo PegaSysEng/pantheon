@@ -33,13 +33,15 @@ public class Pruner {
   private final ExecutorService executor;
   private final long retentionPeriodInBlocks;
   private final AtomicReference<State> state = new AtomicReference<>(State.IDLE);
-  private volatile long markedBlockNumber = 0;
-  private volatile Hash markedBlockHash;
+  private volatile long markBlockNumber = 0;
+  private volatile BlockHeader markedBlockHeader;
+  private long transientForkThreshold;
 
   public Pruner(
       final MarkSweepPruner pruningStrategy,
       final Blockchain blockchain,
-      final long retentionPeriodInBlocks) {
+      final long retentionPeriodInBlocks,
+      final long transientForkThreshold) {
     this.pruningStrategy = pruningStrategy;
     this.blockchain = blockchain;
     this.executor =
@@ -50,6 +52,7 @@ public class Pruner {
                 .setNameFormat("StatePruning-%d")
                 .build());
     this.retentionPeriodInBlocks = retentionPeriodInBlocks;
+    this.transientForkThreshold = transientForkThreshold;
   }
 
   public void start() {
@@ -66,32 +69,29 @@ public class Pruner {
       return;
     }
     final BlockHeader header = event.getBlock().getHeader();
-    // Only kick off pruning every million blocks.
-    if (state.compareAndSet(State.IDLE, State.MARKING)) {
-      /* TODO: We don't currently handle re-orgs.
-      Will need to:
-       1. start listening for new nodes at this point
-       2. then after a few blocks mark the world state of the block when we started listening (now a few blocks back)
-       3. check the block we marked is still on the canonical chain when we begin sweeping and abort that round of pruning if not
-       */
-
-      mark(header);
-    } else if (header.getNumber() > markedBlockNumber + retentionPeriodInBlocks
-        && blockchain.blockIsOnCanonicalChain(markedBlockHash)
+    if (state.compareAndSet(State.IDLE, State.TRANSIENT_FORK_OUTLIVING)) {
+      pruningStrategy
+          .prepare(); // implications for calling prepare here when blocks can come from multiple
+      // threads?
+      markBlockNumber = header.getNumber();
+    } else if (header.getNumber() > markBlockNumber + transientForkThreshold
+        && state.compareAndSet(State.TRANSIENT_FORK_OUTLIVING, State.MARKING)) {
+      markedBlockHeader = blockchain.getBlockHeader(markBlockNumber).get();
+      mark(markedBlockHeader);
+    } else if (header.getNumber() > markBlockNumber + retentionPeriodInBlocks
+        && blockchain.blockIsOnCanonicalChain(markedBlockHeader.getHash())
         && state.compareAndSet(State.MARKING_COMPLETE, State.SWEEPING)) {
       sweep();
     }
   }
 
   private void mark(final BlockHeader header) {
-    markedBlockNumber = header.getNumber();
-    markedBlockHash = header.getHash();
+    markBlockNumber = header.getNumber();
     final Hash stateRoot = header.getStateRoot();
     LOG.info(
         "Begin marking used nodes for pruning. Block number: {} State root: {}",
-        markedBlockNumber,
+        markBlockNumber,
         stateRoot);
-    pruningStrategy.prepare();
     execute(
         () -> {
           pruningStrategy.mark(stateRoot);
@@ -121,8 +121,9 @@ public class Pruner {
 
   private enum State {
     IDLE,
+    TRANSIENT_FORK_OUTLIVING,
     MARKING,
     MARKING_COMPLETE,
-    SWEEPING
+    SWEEPING;
   }
 }
