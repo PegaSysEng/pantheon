@@ -34,6 +34,7 @@ public class Pruner {
   private final long retentionPeriodInBlocks;
   private final AtomicReference<State> state = new AtomicReference<>(State.IDLE);
   private volatile long markedBlockNumber = 0;
+  private volatile Hash markedBlockHash;
 
   public Pruner(
       final MarkSweepPruner pruningStrategy,
@@ -80,6 +81,7 @@ public class Pruner {
 
       mark(header);
     } else if (header.getNumber() > markedBlockNumber + retentionPeriodInBlocks
+        && blockchain.blockIsOnCanonicalChain(markedBlockHash)
         && state.compareAndSet(State.MARKING_COMPLETE, State.SWEEPING)) {
       sweep();
     }
@@ -87,6 +89,7 @@ public class Pruner {
 
   private void mark(final BlockHeader header) {
     markedBlockNumber = header.getNumber();
+    markedBlockHash = header.getHash();
     final Hash stateRoot = header.getStateRoot();
     LOG.info(
         "Begin marking used nodes for pruning. Block number: {} State root: {}",
