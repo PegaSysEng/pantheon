@@ -52,10 +52,6 @@ public class Pruner {
     this.retentionPeriodInBlocks = retentionPeriodInBlocks;
   }
 
-  public AtomicReference<State> getState() {
-    return state;
-  }
-
   public void start() {
     // TODO: Don't attempt pruning while a fast sync is in progress.
     blockchain.observeBlockAdded((event, blockchain) -> handleNewBlock(event));
@@ -123,7 +119,7 @@ public class Pruner {
     }
   }
 
-  public enum State {
+  private enum State {
     IDLE,
     MARKING,
     MARKING_COMPLETE,
