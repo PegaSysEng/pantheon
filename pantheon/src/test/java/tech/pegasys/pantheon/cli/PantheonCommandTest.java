@@ -22,11 +22,11 @@ import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static tech.pegasys.pantheon.cli.NetworkName.DEV;
-import static tech.pegasys.pantheon.cli.NetworkName.GOERLI;
-import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
-import static tech.pegasys.pantheon.cli.NetworkName.RINKEBY;
-import static tech.pegasys.pantheon.cli.NetworkName.ROPSTEN;
+import static tech.pegasys.pantheon.cli.config.NetworkName.DEV;
+import static tech.pegasys.pantheon.cli.config.NetworkName.GOERLI;
+import static tech.pegasys.pantheon.cli.config.NetworkName.MAINNET;
+import static tech.pegasys.pantheon.cli.config.NetworkName.RINKEBY;
+import static tech.pegasys.pantheon.cli.config.NetworkName.ROPSTEN;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.ETH;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.NET;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.PERM;
@@ -34,13 +34,13 @@ import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.WEB3;
 import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
 
 import tech.pegasys.pantheon.PantheonInfo;
+import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
@@ -716,9 +716,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
     verify(mockRunnerBuilder).metricsConfiguration(eq(metricsConfiguration));
     verify(mockRunnerBuilder).build();
-
-    verify(mockControllerBuilder)
-        .transactionPoolConfiguration(eq(TransactionPoolConfiguration.builder().build()));
     verify(mockControllerBuilder).build();
 
     verify(mockSyncConfBuilder).syncMode(eq(SyncMode.FULL));
@@ -2612,12 +2609,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void pendingTransactionRetentionPeriod() {
     final int pendingTxRetentionHours = 999;
     parseCommand("--tx-pool-retention-hours", String.valueOf(pendingTxRetentionHours));
-
     verify(mockControllerBuilder)
         .transactionPoolConfiguration(transactionPoolConfigurationArgumentCaptor.capture());
     assertThat(transactionPoolConfigurationArgumentCaptor.getValue().getPendingTxRetentionPeriod())
         .isEqualTo(pendingTxRetentionHours);
-
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -2625,25 +2620,25 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void txMessageKeepAliveSeconds() {
     final int txMessageKeepAliveSeconds = 999;
-    parseCommand("--tx-pool-keep-alive-seconds", String.valueOf(txMessageKeepAliveSeconds));
-
+    parseCommand(
+        "--Xincoming-tx-messages-keep-alive-seconds", String.valueOf(txMessageKeepAliveSeconds));
     verify(mockControllerBuilder)
         .transactionPoolConfiguration(transactionPoolConfigurationArgumentCaptor.capture());
     assertThat(transactionPoolConfigurationArgumentCaptor.getValue().getTxMessageKeepAliveSeconds())
         .isEqualTo(txMessageKeepAliveSeconds);
-
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
   public void txMessageKeepAliveSecondsWithInvalidInputShouldFail() {
-    parseCommand("--tx-pool-keep-alive-seconds", "acbd");
+    parseCommand("--Xincoming-tx-messages-keep-alive-seconds", "acbd");
 
     verifyZeroInteractions(mockRunnerBuilder);
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
-        .contains("Invalid value for option '--tx-pool-keep-alive-seconds': 'acbd' is not an int");
+        .contains(
+            "Invalid value for option '--Xincoming-tx-messages-keep-alive-seconds': 'acbd' is not an int");
   }
 }

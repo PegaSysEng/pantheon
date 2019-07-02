@@ -22,7 +22,8 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
-import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
+import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
+import tech.pegasys.pantheon.cli.subcommands.PublicKeySubCommand.KeyLoader;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -95,6 +96,9 @@ public abstract class CommandTestAbstract {
   @Mock SynchronizerConfiguration mockSyncConf;
   @Mock RocksDbConfiguration.Builder mockRocksDbConfBuilder;
   @Mock RocksDbConfiguration mockRocksDbConf;
+  protected TransactionPoolConfiguration.Builder mockTransactionPoolConfigurationBuilder =
+      TransactionPoolConfiguration.builder();
+  @Mock TransactionPoolConfiguration mockTransactionPoolConfiguration;
   @Mock PantheonController<Object> mockController;
   @Mock BlockImporter mockBlockImporter;
   @Mock Logger mockLogger;
@@ -131,11 +135,10 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.ethereumWireProtocolConfiguration(any()))
         .thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.rocksDbConfiguration(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.transactionPoolConfiguration(any()))
+        .thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.dataDirectory(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.miningParameters(any())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.transactionPoolConfiguration(
-            any(TransactionPoolConfiguration.class)))
-        .thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.nodePrivateKeyFile(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
@@ -223,6 +226,7 @@ public abstract class CommandTestAbstract {
             mockSyncConfBuilder,
             mockEthereumWireProtocolConfigurationBuilder,
             mockRocksDbConfBuilder,
+            mockTransactionPoolConfigurationBuilder,
             keyLoader,
             mockPantheonPluginContext,
             environment);
@@ -254,6 +258,7 @@ public abstract class CommandTestAbstract {
         final SynchronizerConfiguration.Builder mockSyncConfBuilder,
         final EthereumWireProtocolConfiguration.Builder mockEthereumConfigurationMockBuilder,
         final RocksDbConfiguration.Builder mockRocksDbConfBuilder,
+        final TransactionPoolConfiguration.Builder mockTransactionPoolConfigurationBuilder,
         final KeyLoader keyLoader,
         final PantheonPluginContextImpl pantheonPluginContext,
         final Map<String, String> environment) {
@@ -265,6 +270,7 @@ public abstract class CommandTestAbstract {
           mockSyncConfBuilder,
           mockEthereumConfigurationMockBuilder,
           mockRocksDbConfBuilder,
+          mockTransactionPoolConfigurationBuilder,
           pantheonPluginContext,
           environment);
       this.keyLoader = keyLoader;
