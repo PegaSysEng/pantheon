@@ -89,7 +89,7 @@ public class RocksDbConfiguration {
     long cacheCapacity = DEFAULT_CACHE_CAPACITY;
     int maxBackgroundCompactions = DEFAULT_MAX_BACKGROUND_COMPACTIONS;
     int backgroundThreadCount = DEFAULT_BACKGROUND_THREAD_COUNT;
-    boolean useColumns = true;
+    boolean useColumns = false;
 
     private Builder() {}
 
