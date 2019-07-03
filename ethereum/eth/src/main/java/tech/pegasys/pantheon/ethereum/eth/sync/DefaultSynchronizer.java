@@ -168,7 +168,8 @@ public class DefaultSynchronizer<C> implements Synchronizer {
 
   private void startFullSync() {
     fullSyncDownloader.start();
-    pruner.start();
+    // TODO: enable when pruning cli implemented
+    // pruner.start();
   }
 
   @Override
