@@ -61,7 +61,8 @@ public class BlockchainReferenceTestTools {
     }
 
     // Known bad test.
-    params.blacklist("RevertPrecompiledTouch(_storage)?_d(0|3)g0v0_(EIP158|Byzantium|Constantinople|ConstantinopleFix)");
+    params.blacklist(
+        "RevertPrecompiledTouch(_storage)?_d(0|3)g0v0_(EIP158|Byzantium|Constantinople|ConstantinopleFix)");
 
     // Consumes a huge amount of memory
     params.blacklist(
