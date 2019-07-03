@@ -16,14 +16,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_LONG_FORMAT_HELP;
-import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.Hash;
 import static tech.pegasys.pantheon.cli.subcommands.blocks.BlocksSubCommand.COMMAND_NAME;
 
 import tech.pegasys.pantheon.cli.PantheonCommand;
-import tech.pegasys.pantheon.cli.subcommands.blocks.BlocksSubCommand.ImportSubCommand;
 import tech.pegasys.pantheon.cli.subcommands.blocks.BlocksSubCommand.DumpSubCommand;
+import tech.pegasys.pantheon.cli.subcommands.blocks.BlocksSubCommand.ImportSubCommand;
+import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
+import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
 import tech.pegasys.pantheon.util.BlockImporter;
@@ -54,7 +54,7 @@ import picocli.CommandLine.Spec;
     description = "This command provides blocks related actions.",
     mixinStandardHelpOptions = true,
     subcommands = {ImportSubCommand.class, DumpSubCommand.class})
-class BlocksSubCommand implements Runnable {
+public class BlocksSubCommand implements Runnable {
 
   private static final Logger LOG = LogManager.getLogger();
 
