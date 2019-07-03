@@ -61,5 +61,6 @@ public class MarkSweepPrunerTest {
     // All those new nodes should be removed when we sweep
     pruner.sweep();
     assertThat(stateStorage.keySet()).containsExactlyInAnyOrderElementsOf(keysToKeep);
+    assertThat(markStorage.keySet()).isEmpty();
   }
 }
