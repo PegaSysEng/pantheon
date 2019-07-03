@@ -22,14 +22,17 @@ import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.OptionalLong;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SyncStatusNodePermissioningProvider implements NodePermissioningProvider {
 
   private final Synchronizer synchronizer;
-  private final Collection<EnodeURL> fixedNodes = new HashSet<>();
+  private final Set<URI> fixedNodes;
   private final Counter checkCounter;
   private final Counter checkCounterPermitted;
   private final Counter checkCounterUnpermitted;
@@ -44,7 +47,11 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
     this.synchronizer = synchronizer;
     long id = this.synchronizer.observeSyncStatus(this::handleSyncStatusUpdate);
     this.syncStatusObserverId = OptionalLong.of(id);
-    this.fixedNodes.addAll(fixedNodes);
+    this.fixedNodes =
+        fixedNodes.stream()
+            .map(EnodeURL::toURI)
+            .map(SyncStatusNodePermissioningProvider::removeQueryFromURI)
+            .collect(Collectors.toSet());
 
     metricsSystem.createIntegerGauge(
         PantheonMetricCategory.PERMISSIONING,
@@ -103,7 +110,7 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
       return true;
     } else {
       checkCounter.inc();
-      if (fixedNodes.stream().anyMatch(p -> EnodeURL.sameListeningEndpoint(p, destinationEnode))) {
+      if (fixedNodes.contains(removeQueryFromURI(destinationEnode.toURI()))) {
         checkCounterPermitted.inc();
         return true;
       } else {
@@ -115,5 +122,20 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
 
   public boolean hasReachedSync() {
     return hasReachedSync;
+  }
+
+  private static URI removeQueryFromURI(final URI uri) {
+    try {
+      return new URI(
+          uri.getScheme(),
+          uri.getUserInfo(),
+          uri.getHost(),
+          uri.getPort(),
+          uri.getPath(),
+          null,
+          uri.getFragment());
+    } catch (URISyntaxException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 }
