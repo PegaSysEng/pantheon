@@ -23,13 +23,17 @@ import static org.mockito.Mockito.when;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
+import tech.pegasys.pantheon.cli.options.EthProtocolOptions;
+import tech.pegasys.pantheon.cli.options.NetworkingOptions;
+import tech.pegasys.pantheon.cli.options.RocksDBOptions;
+import tech.pegasys.pantheon.cli.options.SynchronizerOptions;
+import tech.pegasys.pantheon.cli.options.TransactionPoolOptions;
 import tech.pegasys.pantheon.cli.subcommands.PublicKeySubCommand.KeyLoader;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -41,7 +45,6 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -68,6 +71,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import picocli.CommandLine;
 import picocli.CommandLine.Help.Ansi;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.RunLast;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -82,43 +86,38 @@ public abstract class CommandTestAbstract {
   private final PrintStream errPrintStream = new PrintStream(commandErrorOutput);
   private final HashMap<String, String> environment = new HashMap<>();
 
-  @Mock RunnerBuilder mockRunnerBuilder;
-  @Mock Runner mockRunner;
+  @Mock protected RunnerBuilder mockRunnerBuilder;
+  @Mock protected Runner mockRunner;
 
-  @Mock PantheonController.Builder mockControllerBuilderFactory;
+  @Mock protected PantheonController.Builder mockControllerBuilderFactory;
 
-  @Mock PantheonControllerBuilder<Void> mockControllerBuilder;
-  @Mock EthProtocolManager mockEthProtocolManager;
-  @Mock ProtocolSchedule<Object> mockProtocolSchedule;
-  @Mock ProtocolContext<Object> mockProtocolContext;
-  @Mock MutableBlockchain mockMutableBlockchain;
-  @Mock BlockBroadcaster mockBlockBroadcaster;
-  @Mock SynchronizerConfiguration.Builder mockSyncConfBuilder;
-  @Mock EthereumWireProtocolConfiguration.Builder mockEthereumWireProtocolConfigurationBuilder;
-  @Mock SynchronizerConfiguration mockSyncConf;
-  @Mock RocksDbConfiguration.Builder mockRocksDbConfBuilder;
-  @Mock RocksDbConfiguration mockRocksDbConf;
-  protected TransactionPoolConfiguration.Builder mockTransactionPoolConfigurationBuilder =
-      TransactionPoolConfiguration.builder();
-  @Mock TransactionPoolConfiguration mockTransactionPoolConfiguration;
-  @Mock PantheonController<Object> mockController;
-  @Mock BlockImporter mockBlockImporter;
-  @Mock Logger mockLogger;
-  @Mock PantheonPluginContextImpl mockPantheonPluginContext;
+  @Mock protected PantheonControllerBuilder<Void> mockControllerBuilder;
+  @Mock protected EthProtocolManager mockEthProtocolManager;
+  @Mock protected ProtocolSchedule<Object> mockProtocolSchedule;
+  @Mock protected ProtocolContext<Object> mockProtocolContext;
+  @Mock protected MutableBlockchain mockMutableBlockchain;
+  @Mock protected BlockBroadcaster mockBlockBroadcaster;
+  @Mock protected PantheonController<Object> mockController;
+  @Mock protected BlockImporter mockBlockImporter;
+  @Mock protected Logger mockLogger;
+  @Mock protected PantheonPluginContextImpl mockPantheonPluginContext;
 
-  @Captor ArgumentCaptor<Collection<BytesValue>> bytesValueCollectionCollector;
-  @Captor ArgumentCaptor<Collection<String>> stringListArgumentCaptor;
-  @Captor ArgumentCaptor<Path> pathArgumentCaptor;
-  @Captor ArgumentCaptor<File> fileArgumentCaptor;
-  @Captor ArgumentCaptor<String> stringArgumentCaptor;
-  @Captor ArgumentCaptor<Integer> intArgumentCaptor;
-  @Captor ArgumentCaptor<EthNetworkConfig> ethNetworkConfigArgumentCaptor;
-  @Captor ArgumentCaptor<JsonRpcConfiguration> jsonRpcConfigArgumentCaptor;
-  @Captor ArgumentCaptor<GraphQLConfiguration> graphQLConfigArgumentCaptor;
-  @Captor ArgumentCaptor<WebSocketConfiguration> wsRpcConfigArgumentCaptor;
-  @Captor ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
-  @Captor ArgumentCaptor<PermissioningConfiguration> permissioningConfigurationArgumentCaptor;
-  @Captor ArgumentCaptor<TransactionPoolConfiguration> transactionPoolConfigurationArgumentCaptor;
+  @Captor protected ArgumentCaptor<Collection<BytesValue>> bytesValueCollectionCollector;
+  @Captor protected ArgumentCaptor<Path> pathArgumentCaptor;
+  @Captor protected ArgumentCaptor<File> fileArgumentCaptor;
+  @Captor protected ArgumentCaptor<String> stringArgumentCaptor;
+  @Captor protected ArgumentCaptor<Integer> intArgumentCaptor;
+  @Captor protected ArgumentCaptor<EthNetworkConfig> ethNetworkConfigArgumentCaptor;
+  @Captor protected ArgumentCaptor<SynchronizerConfiguration> syncConfigurationCaptor;
+  @Captor protected ArgumentCaptor<JsonRpcConfiguration> jsonRpcConfigArgumentCaptor;
+  @Captor protected ArgumentCaptor<GraphQLConfiguration> graphQLConfigArgumentCaptor;
+  @Captor protected ArgumentCaptor<WebSocketConfiguration> wsRpcConfigArgumentCaptor;
+  @Captor protected ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
+
+  @Captor
+  protected ArgumentCaptor<PermissioningConfiguration> permissioningConfigurationArgumentCaptor;
+
+  @Captor protected ArgumentCaptor<TransactionPoolConfiguration> transactionPoolConfigCaptor;
 
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
@@ -134,8 +133,7 @@ public abstract class CommandTestAbstract {
     // doReturn used because of generic PantheonController
     doReturn(mockControllerBuilder).when(mockControllerBuilderFactory).fromEthNetworkConfig(any());
     when(mockControllerBuilder.synchronizerConfiguration(any())).thenReturn(mockControllerBuilder);
-    when(mockControllerBuilder.ethereumWireProtocolConfiguration(any()))
-        .thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.ethProtocolConfiguration(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.rocksDbConfiguration(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.transactionPoolConfiguration(any()))
         .thenReturn(mockControllerBuilder);
@@ -145,6 +143,7 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.clock(any())).thenReturn(mockControllerBuilder);
+
     // doReturn used because of generic PantheonController
     doReturn(mockController).when(mockControllerBuilder).build();
     lenient().when(mockProtocolContext.getBlockchain()).thenReturn(mockMutableBlockchain);
@@ -154,21 +153,11 @@ public abstract class CommandTestAbstract {
 
     when(mockEthProtocolManager.getBlockBroadcaster()).thenReturn(mockBlockBroadcaster);
 
-    when(mockSyncConfBuilder.syncMode(any())).thenReturn(mockSyncConfBuilder);
-    when(mockSyncConfBuilder.maxTrailingPeers(anyInt())).thenReturn(mockSyncConfBuilder);
-    when(mockSyncConfBuilder.fastSyncMinimumPeerCount(anyInt())).thenReturn(mockSyncConfBuilder);
-    when(mockSyncConfBuilder.build()).thenReturn(mockSyncConf);
-
-    when(mockEthereumWireProtocolConfigurationBuilder.build())
-        .thenReturn(EthereumWireProtocolConfiguration.defaultConfig());
-
-    when(mockRocksDbConfBuilder.databaseDir(any())).thenReturn(mockRocksDbConfBuilder);
-    when(mockRocksDbConfBuilder.build()).thenReturn(mockRocksDbConf);
-
     when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.discovery(anyBoolean())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.ethNetworkConfig(any())).thenReturn(mockRunnerBuilder);
+    when(mockRunnerBuilder.networkingConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.p2pAdvertisedHost(anyString())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.p2pListenPort(anyInt())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.maxPeers(anyInt())).thenReturn(mockRunnerBuilder);
@@ -201,20 +190,19 @@ public abstract class CommandTestAbstract {
     environment.put(name, value);
   }
 
-  protected CommandLine.Model.CommandSpec parseCommand(final String... args) {
+  protected TestPantheonCommand parseCommand(final String... args) {
     return parseCommand(System.in, args);
   }
 
-  protected CommandLine.Model.CommandSpec parseCommand(
-      final KeyLoader keyLoader, final String... args) {
+  protected TestPantheonCommand parseCommand(final KeyLoader keyLoader, final String... args) {
     return parseCommand(keyLoader, System.in, args);
   }
 
-  protected CommandLine.Model.CommandSpec parseCommand(final InputStream in, final String... args) {
+  protected TestPantheonCommand parseCommand(final InputStream in, final String... args) {
     return parseCommand(f -> KeyPair.generate(), in, args);
   }
 
-  private CommandLine.Model.CommandSpec parseCommand(
+  private TestPantheonCommand parseCommand(
       final KeyLoader keyLoader, final InputStream in, final String... args) {
     // turn off ansi usage globally in picocli
     System.setProperty("picocli.ansi", "false");
@@ -225,10 +213,6 @@ public abstract class CommandTestAbstract {
             mockBlockImporter,
             mockRunnerBuilder,
             mockControllerBuilderFactory,
-            mockSyncConfBuilder,
-            mockEthereumWireProtocolConfigurationBuilder,
-            mockRocksDbConfBuilder,
-            mockTransactionPoolConfigurationBuilder,
             keyLoader,
             mockPantheonPluginContext,
             environment);
@@ -239,11 +223,11 @@ public abstract class CommandTestAbstract {
         pantheonCommand.exceptionHandler().useErr(errPrintStream).useAnsi(Ansi.OFF),
         in,
         args);
-    return pantheonCommand.spec;
+    return pantheonCommand;
   }
 
   @CommandLine.Command
-  static class TestPantheonCommand extends PantheonCommand {
+  public static class TestPantheonCommand extends PantheonCommand {
     @CommandLine.Spec CommandLine.Model.CommandSpec spec;
     private final KeyLoader keyLoader;
 
@@ -257,10 +241,6 @@ public abstract class CommandTestAbstract {
         final BlockImporter mockBlockImporter,
         final RunnerBuilder mockRunnerBuilder,
         final PantheonController.Builder controllerBuilderFactory,
-        final SynchronizerConfiguration.Builder mockSyncConfBuilder,
-        final EthereumWireProtocolConfiguration.Builder mockEthereumConfigurationMockBuilder,
-        final RocksDbConfiguration.Builder mockRocksDbConfBuilder,
-        final TransactionPoolConfiguration.Builder mockTransactionPoolConfigurationBuilder,
         final KeyLoader keyLoader,
         final PantheonPluginContextImpl pantheonPluginContext,
         final Map<String, String> environment) {
@@ -269,13 +249,33 @@ public abstract class CommandTestAbstract {
           mockBlockImporter,
           mockRunnerBuilder,
           controllerBuilderFactory,
-          mockSyncConfBuilder,
-          mockEthereumConfigurationMockBuilder,
-          mockRocksDbConfBuilder,
-          mockTransactionPoolConfigurationBuilder,
           pantheonPluginContext,
           environment);
       this.keyLoader = keyLoader;
+    }
+
+    public CommandSpec getSpec() {
+      return spec;
+    }
+
+    public RocksDBOptions getRocksDBOptions() {
+      return rocksDBOptions;
+    }
+
+    public NetworkingOptions getNetworkingOptions() {
+      return networkingOptions;
+    }
+
+    public SynchronizerOptions getSynchronizerOptions() {
+      return synchronizerOptions;
+    }
+
+    public EthProtocolOptions getEthProtocolOptions() {
+      return ethProtocolOptions;
+    }
+
+    public TransactionPoolOptions getTransactionPoolOptions() {
+      return transactionPoolOptions;
     }
   }
 }
