@@ -27,6 +27,7 @@ import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
@@ -89,6 +90,7 @@ public abstract class CommandTestAbstract {
   @Mock EthProtocolManager mockEthProtocolManager;
   @Mock ProtocolSchedule<Object> mockProtocolSchedule;
   @Mock ProtocolContext<Object> mockProtocolContext;
+  @Mock MutableBlockchain mockMutableBlockchain;
   @Mock BlockBroadcaster mockBlockBroadcaster;
   @Mock SynchronizerConfiguration.Builder mockSyncConfBuilder;
   @Mock EthereumWireProtocolConfiguration.Builder mockEthereumWireProtocolConfigurationBuilder;
@@ -140,9 +142,9 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.clock(any())).thenReturn(mockControllerBuilder);
-
     // doReturn used because of generic PantheonController
     doReturn(mockController).when(mockControllerBuilder).build();
+    lenient().when(mockProtocolContext.getBlockchain()).thenReturn(mockMutableBlockchain);
     lenient().when(mockController.getProtocolManager()).thenReturn(mockEthProtocolManager);
     lenient().when(mockController.getProtocolSchedule()).thenReturn(mockProtocolSchedule);
     lenient().when(mockController.getProtocolContext()).thenReturn(mockProtocolContext);
