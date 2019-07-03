@@ -23,7 +23,6 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.OptionalLong;
 import java.util.Set;
@@ -48,10 +47,7 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
     long id = this.synchronizer.observeSyncStatus(this::handleSyncStatusUpdate);
     this.syncStatusObserverId = OptionalLong.of(id);
     this.fixedNodes =
-        fixedNodes.stream()
-            .map(EnodeURL::toURI)
-            .map(SyncStatusNodePermissioningProvider::removeQueryFromURI)
-            .collect(Collectors.toSet());
+        fixedNodes.stream().map(EnodeURL::toURIWithoutDiscoveryPort).collect(Collectors.toSet());
 
     metricsSystem.createIntegerGauge(
         PantheonMetricCategory.PERMISSIONING,
@@ -110,7 +106,7 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
       return true;
     } else {
       checkCounter.inc();
-      if (fixedNodes.contains(removeQueryFromURI(destinationEnode.toURI()))) {
+      if (fixedNodes.contains(destinationEnode.toURIWithoutDiscoveryPort())) {
         checkCounterPermitted.inc();
         return true;
       } else {
@@ -122,20 +118,5 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
 
   public boolean hasReachedSync() {
     return hasReachedSync;
-  }
-
-  private static URI removeQueryFromURI(final URI uri) {
-    try {
-      return new URI(
-          uri.getScheme(),
-          uri.getUserInfo(),
-          uri.getHost(),
-          uri.getPort(),
-          uri.getPath(),
-          null,
-          uri.getFragment());
-    } catch (URISyntaxException e) {
-      throw new IllegalArgumentException(e);
-    }
   }
 }
