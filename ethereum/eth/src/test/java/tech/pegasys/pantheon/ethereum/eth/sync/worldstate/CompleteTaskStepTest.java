@@ -77,7 +77,7 @@ public class CompleteTaskStepTest {
   public void shouldComputeWorldStateProgress() {
     completeTaskStep.markAsCompleteOrFailed(blockHeader, downloadState, validTask());
     // One task has been completed and there are 2 pending requests, progress should be 1/4 (25%)
-    assertThat(completeTaskStep.computeWorldStateSyncProgress()).isEqualTo(25.0);
+    assertThat(completeTaskStep.computeWorldStateSyncProgress()).isEqualTo(1.0 / 4.0);
   }
 
   private StubTask validTask() {

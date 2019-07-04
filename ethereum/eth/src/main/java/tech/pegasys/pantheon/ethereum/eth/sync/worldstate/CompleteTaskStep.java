@@ -34,8 +34,8 @@ public class CompleteTaskStep {
   private final RunnableCounter completedRequestsCounter;
   private final Counter retriedRequestsCounter;
   private final LongSupplier worldStatePendingRequestsCurrentSupplier;
-  private final DecimalFormat percentFormatter = new DecimalFormat("#.##");
-  private double estimatedWorldStateCompletionPercent;
+  private final DecimalFormat doubleFormatter = new DecimalFormat("#.##");
+  private double estimatedWorldStateCompletion;
 
   public CompleteTaskStep(
       final WorldStateStorage worldStateStorage,
@@ -77,23 +77,20 @@ public class CompleteTaskStep {
   }
 
   private void displayWorldStateSyncProgress() {
-    final String lastEstimatedWorldStateCompletionPercent =
-        percentFormatter.format(estimatedWorldStateCompletionPercent);
-    final String newEstimatedWorldStateCompletionPercent =
-        percentFormatter.format(computeWorldStateSyncProgress());
-    if (!Objects.equals(
-        newEstimatedWorldStateCompletionPercent, lastEstimatedWorldStateCompletionPercent)) {
-      LOG.info("Estimated World State completion: {} %", newEstimatedWorldStateCompletionPercent);
+    final String lastEstimatedWorldStateCompletion =
+        doubleFormatter.format(estimatedWorldStateCompletion);
+    final String newEstimatedWorldStateCompletion =
+        doubleFormatter.format(computeWorldStateSyncProgress());
+    if (!Objects.equals(newEstimatedWorldStateCompletion, lastEstimatedWorldStateCompletion)) {
+      LOG.info("Estimated World State completion: {}", newEstimatedWorldStateCompletion);
     }
   }
 
   public double computeWorldStateSyncProgress() {
     final double pendingRequests = worldStatePendingRequestsCurrentSupplier.getAsLong();
     final double completedRequests = completedRequestsCounter.getTotal();
-    final double estimatedWorldStateCompletion =
-        completedRequests / (completedRequests + pendingRequests);
-    estimatedWorldStateCompletionPercent = estimatedWorldStateCompletion * 100.0;
-    return estimatedWorldStateCompletionPercent;
+    estimatedWorldStateCompletion = completedRequests / (completedRequests + pendingRequests);
+    return this.estimatedWorldStateCompletion;
   }
 
   private void enqueueChildren(
