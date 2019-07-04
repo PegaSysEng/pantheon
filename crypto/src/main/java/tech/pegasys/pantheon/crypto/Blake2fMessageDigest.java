@@ -14,12 +14,10 @@ package tech.pegasys.pantheon.crypto;
 
 import static java.util.Arrays.copyOfRange;
 
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
-import com.google.common.primitives.UnsignedInts;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.jcajce.provider.digest.BCMessageDigest;
 import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.Pack;
 
 public class Blake2fMessageDigest extends BCMessageDigest {
 
@@ -39,8 +37,6 @@ public class Blake2fMessageDigest extends BCMessageDigest {
   public static class Blake2fDigest implements Digest {
 
     public static final int MESSAGE_LENGTH_BYTES = 213;
-
-    private static final int BLOCK_LENGTH_BYTES = 128;
 
     private static final long[] IV = {
       0x6a09e667f3bcc908L, 0xbb67ae8584caa73bL, 0x3c6ef372fe94f82bL,
@@ -66,7 +62,7 @@ public class Blake2fMessageDigest extends BCMessageDigest {
     // buffer which holds serialized input for this compression function
     // [ 4 bytes for rounds ][ 64 bytes for h ][ 128 bytes for m ]
     // [ 8 bytes for t_0 ][ 8 bytes for t_1 ][ 1 byte for f ]
-    private byte[] buffer;
+    private final byte[] buffer;
 
     private int bufferPos;
 
@@ -75,7 +71,7 @@ public class Blake2fMessageDigest extends BCMessageDigest {
     private final long[] m;
     private final long[] t;
     private boolean f;
-    private int rounds;
+    private long rounds; // unsigned integer represented as long
 
     private final long[] v;
 
@@ -88,6 +84,22 @@ public class Blake2fMessageDigest extends BCMessageDigest {
       t = new long[2];
       f = false;
       rounds = 12;
+
+      v = new long[16];
+    }
+
+    // for tests
+    Blake2fDigest(
+        final long[] h, final long[] m, final long[] t, final boolean f, final long rounds) {
+      assert rounds <= 4294967295L; // uint max value
+      buffer = new byte[MESSAGE_LENGTH_BYTES];
+      bufferPos = 0;
+
+      this.h = h;
+      this.m = m;
+      this.t = t;
+      this.f = f;
+      this.rounds = rounds;
 
       v = new long[16];
     }
@@ -110,12 +122,12 @@ public class Blake2fMessageDigest extends BCMessageDigest {
     @Override
     public void update(final byte in) {
 
-      if (MESSAGE_LENGTH_BYTES - bufferPos == 0) { // full buffer
+      if (bufferPos == MESSAGE_LENGTH_BYTES) { // full buffer
         throw new IllegalArgumentException();
       } else {
         buffer[bufferPos] = in;
         bufferPos++;
-        if (bufferPos == BLOCK_LENGTH_BYTES) {
+        if (bufferPos == MESSAGE_LENGTH_BYTES) {
           initialize();
         }
       }
@@ -134,13 +146,22 @@ public class Blake2fMessageDigest extends BCMessageDigest {
         return;
       }
 
-      if (in.length != MESSAGE_LENGTH_BYTES || len != 213 || offset != 0 || bufferPos != 0) {
-        throw new IllegalArgumentException();
+      if (len > MESSAGE_LENGTH_BYTES - bufferPos) {
+        throw new IllegalArgumentException(
+            "Attempting to update buffer with "
+                + len
+                + " byte(s) but there is "
+                + (MESSAGE_LENGTH_BYTES - bufferPos)
+                + " byte(s) left to fill");
       }
 
       System.arraycopy(in, offset, buffer, bufferPos, len);
 
-      initialize();
+      bufferPos += len;
+
+      if (bufferPos == MESSAGE_LENGTH_BYTES) {
+        initialize();
+      }
     }
 
     /**
@@ -151,10 +172,14 @@ public class Blake2fMessageDigest extends BCMessageDigest {
      */
     @Override
     public int doFinal(final byte[] out, final int offset) {
+      if (bufferPos != 213) {
+        throw new IllegalStateException("The buffer must be filled with 213 bytes");
+      }
+
       compress();
 
       for (int i = 0; i < h.length; i++) {
-        System.arraycopy(Longs.toByteArray(h[i]), 0, out, i * 8, 8);
+        System.arraycopy(Pack.longToBigEndian(h[i]), 0, out, i * 8, 8);
       }
 
       reset();
@@ -162,23 +187,44 @@ public class Blake2fMessageDigest extends BCMessageDigest {
       return 0;
     }
 
+    /** Reset the digest back to it's initial state. */
+    @Override
+    public void reset() {
+      bufferPos = 0;
+      Arrays.fill(buffer, (byte) 0);
+      Arrays.fill(h, 0);
+      Arrays.fill(m, (byte) 0);
+      Arrays.fill(t, 0);
+      f = false;
+      rounds = 12;
+      Arrays.fill(v, 0);
+    }
+
     private void initialize() {
-      rounds = Ints.fromByteArray(copyOfRange(buffer, 0, 4));
+      rounds = Integer.toUnsignedLong(bytesToInt(copyOfRange(buffer, 0, 4)));
 
       for (int i = 0; i < h.length; i++) {
         final int offset = 4 + i * 8;
-        h[i] = Longs.fromByteArray(copyOfRange(buffer, offset, offset + 8));
+        h[i] = bytesToLong((copyOfRange(buffer, offset, offset + 8)));
       }
 
       for (int i = 0; i < 16; i++) {
         final int offset = 68 + i * 8;
-        m[i] = Longs.fromByteArray(copyOfRange(buffer, offset, offset + 8));
+        m[i] = bytesToLong(copyOfRange(buffer, offset, offset + 8));
       }
 
-      t[0] = Longs.fromByteArray(copyOfRange(buffer, 196, 204));
-      t[1] = Longs.fromByteArray(copyOfRange(buffer, 204, 212));
+      t[0] = bytesToLong(copyOfRange(buffer, 196, 204));
+      t[1] = bytesToLong(copyOfRange(buffer, 204, 212));
 
       f = buffer[212] != 0;
+    }
+
+    private int bytesToInt(final byte[] bytes) {
+      return Pack.bigEndianToInt(bytes, 0);
+    }
+
+    private long bytesToLong(final byte[] bytes) {
+      return Pack.bigEndianToLong(bytes, 0);
     }
 
     /**
@@ -202,8 +248,8 @@ public class Blake2fMessageDigest extends BCMessageDigest {
         v[14] ^= 0xffffffffffffffffL;
       }
 
-      for (int j = 0; UnsignedInts.compare(j, rounds) < 0; ++j) {
-        byte[] s = PRECOMPUTED[j % 10];
+      for (long j = 0; j < rounds; ++j) {
+        byte[] s = PRECOMPUTED[(int) (j % 10)];
 
         mix(m[s[0]], m[s[4]], 0, 4, 8, 12);
         mix(m[s[1]], m[s[5]], 1, 5, 9, 13);
@@ -232,19 +278,6 @@ public class Blake2fMessageDigest extends BCMessageDigest {
       v[l] = Long.rotateLeft(v[l] ^ v[i], -16);
       v[k] += v[l];
       v[j] = Long.rotateLeft(v[j] ^ v[k], -63);
-    }
-
-    /** Reset the digest back to it's initial state. */
-    @Override
-    public void reset() {
-      bufferPos = 0;
-      Arrays.fill(buffer, (byte) 0);
-      Arrays.fill(h, 0);
-      Arrays.fill(m, (byte) 0);
-      Arrays.fill(t, 0);
-      f = false;
-      rounds = 12;
-      Arrays.fill(v, 0);
     }
   }
 }
