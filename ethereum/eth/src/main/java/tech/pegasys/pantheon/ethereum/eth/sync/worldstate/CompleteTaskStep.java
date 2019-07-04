@@ -17,23 +17,40 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import tech.pegasys.pantheon.metrics.RunnableCounter;
 import tech.pegasys.pantheon.services.tasks.Task;
 
-public class CompleteTaskStep {
+import java.text.DecimalFormat;
+import java.util.Objects;
+import java.util.function.LongSupplier;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public class CompleteTaskStep {
+  private static final Logger LOG = LogManager.getLogger();
+  private static final int DISPLAY_PROGRESS_STEP = 1000;
   private final WorldStateStorage worldStateStorage;
-  private final Counter completedRequestsCounter;
+  private final RunnableCounter completedRequestsCounter;
   private final Counter retriedRequestsCounter;
+  private final LongSupplier worldStatePendingRequestsCurrentSupplier;
+  private final DecimalFormat percentFormatter = new DecimalFormat("#.##");
+  private double estimatedWorldStateCompletionPercent;
 
   public CompleteTaskStep(
-      final WorldStateStorage worldStateStorage, final MetricsSystem metricsSystem) {
+      final WorldStateStorage worldStateStorage,
+      final MetricsSystem metricsSystem,
+      final LongSupplier worldStatePendingRequestsCurrentSupplier) {
     this.worldStateStorage = worldStateStorage;
-
+    this.worldStatePendingRequestsCurrentSupplier = worldStatePendingRequestsCurrentSupplier;
     completedRequestsCounter =
-        metricsSystem.createCounter(
-            PantheonMetricCategory.SYNCHRONIZER,
-            "world_state_completed_requests_total",
-            "Total number of node data requests completed as part of fast sync world state download");
+        new RunnableCounter(
+            metricsSystem.createCounter(
+                PantheonMetricCategory.SYNCHRONIZER,
+                "world_state_completed_requests_total",
+                "Total number of node data requests completed as part of fast sync world state download"),
+            this::displayWorldStateSyncProgress,
+            DISPLAY_PROGRESS_STEP);
     retriedRequestsCounter =
         metricsSystem.createCounter(
             PantheonMetricCategory.SYNCHRONIZER,
@@ -57,6 +74,26 @@ public class CompleteTaskStep {
       // waiting to read from the queue are notified.
       downloadState.notifyTaskAvailable();
     }
+  }
+
+  private void displayWorldStateSyncProgress() {
+    final String lastEstimatedWorldStateCompletionPercent =
+        percentFormatter.format(estimatedWorldStateCompletionPercent);
+    final String newEstimatedWorldStateCompletionPercent =
+        percentFormatter.format(computeWorldStateSyncProgress());
+    if (!Objects.equals(
+        newEstimatedWorldStateCompletionPercent, lastEstimatedWorldStateCompletionPercent)) {
+      LOG.info("Estimated World State completion: {} %", newEstimatedWorldStateCompletionPercent);
+    }
+  }
+
+  public double computeWorldStateSyncProgress() {
+    final double pendingRequests = worldStatePendingRequestsCurrentSupplier.getAsLong();
+    final double completedRequests = completedRequestsCounter.getTotal();
+    final double estimatedWorldStateCompletion =
+        completedRequests / (completedRequests + pendingRequests);
+    estimatedWorldStateCompletionPercent = estimatedWorldStateCompletion * 100.0;
+    return estimatedWorldStateCompletionPercent;
   }
 
   private void enqueueChildren(

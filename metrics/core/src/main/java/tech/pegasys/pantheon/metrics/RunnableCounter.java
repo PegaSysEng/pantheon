@@ -21,6 +21,7 @@ public class RunnableCounter implements Counter {
   private final Runnable task;
   private final int step;
   private AtomicInteger stepCounter;
+  private long total;
 
   public RunnableCounter(final Counter backedCounter, final Runnable task, final int step) {
     this.backedCounter = backedCounter;
@@ -48,9 +49,14 @@ public class RunnableCounter implements Counter {
   public void inc(final long amount) {
     stepCounter.addAndGet((int) amount);
     backedCounter.inc(amount);
+    total++;
     if (stepCounter.get() == step) {
       task.run();
       stepCounter = new AtomicInteger(0);
     }
+  }
+
+  public long getTotal() {
+    return total;
   }
 }
