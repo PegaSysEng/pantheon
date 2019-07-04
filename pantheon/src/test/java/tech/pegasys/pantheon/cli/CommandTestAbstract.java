@@ -33,7 +33,6 @@ import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
@@ -45,6 +44,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
+import tech.pegasys.pantheon.util.BlockExporter;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -95,10 +95,11 @@ public abstract class CommandTestAbstract {
   @Mock protected EthProtocolManager mockEthProtocolManager;
   @Mock protected ProtocolSchedule<Object> mockProtocolSchedule;
   @Mock protected ProtocolContext<Object> mockProtocolContext;
-  @Mock protected MutableBlockchain mockMutableBlockchain;
   @Mock protected BlockBroadcaster mockBlockBroadcaster;
   @Mock protected PantheonController<Object> mockController;
   @Mock protected BlockImporter mockBlockImporter;
+  @Mock protected BlockExporter mockBlockExporter;
+
   @Mock protected Logger mockLogger;
   @Mock protected PantheonPluginContextImpl mockPantheonPluginContext;
 
@@ -146,7 +147,6 @@ public abstract class CommandTestAbstract {
 
     // doReturn used because of generic PantheonController
     doReturn(mockController).when(mockControllerBuilder).build();
-    lenient().when(mockProtocolContext.getBlockchain()).thenReturn(mockMutableBlockchain);
     lenient().when(mockController.getProtocolManager()).thenReturn(mockEthProtocolManager);
     lenient().when(mockController.getProtocolSchedule()).thenReturn(mockProtocolSchedule);
     lenient().when(mockController.getProtocolContext()).thenReturn(mockProtocolContext);
@@ -211,6 +211,7 @@ public abstract class CommandTestAbstract {
         new TestPantheonCommand(
             mockLogger,
             mockBlockImporter,
+            mockBlockExporter,
             mockRunnerBuilder,
             mockControllerBuilderFactory,
             keyLoader,
@@ -239,6 +240,7 @@ public abstract class CommandTestAbstract {
     TestPantheonCommand(
         final Logger mockLogger,
         final BlockImporter mockBlockImporter,
+        final BlockExporter mockBlockExporter,
         final RunnerBuilder mockRunnerBuilder,
         final PantheonController.Builder controllerBuilderFactory,
         final KeyLoader keyLoader,
@@ -247,6 +249,7 @@ public abstract class CommandTestAbstract {
       super(
           mockLogger,
           mockBlockImporter,
+          mockBlockExporter,
           mockRunnerBuilder,
           controllerBuilderFactory,
           pantheonPluginContext,
