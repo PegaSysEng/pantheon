@@ -30,6 +30,8 @@ public class Blake2fMessageDigest extends BCMessageDigest {
   /**
    * Implementation of the `F` compression function of the Blake2b cryptographic hash function.
    *
+   * <p>RFC - https://tools.ietf.org/html/rfc7693
+   *
    * <p>Adapted from - https://github.com/keep-network/blake2b/blob/master/compression/f.go
    *
    * <p>Optimized for 64-bit platforms
