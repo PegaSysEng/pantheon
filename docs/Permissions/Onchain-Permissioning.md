@@ -3,44 +3,54 @@ description: Onchain Permissioning
 
 # Onchain Permissioning 
 
-Onchain permissioning uses smart contracts to store and maintain the node whitelist. Using onchain permissioning
-enables all nodes to read the node whitelist from one location. 
-                                                                       
-!!! note
-    Pantheon supports onchain permissioning for nodes. Onchain permissioning for accounts will be available 
-    in a future Pantheon release. 
-
+Onchain permissioning uses smart contracts to store and maintain the node and account whitelists. Using onchain permissioning
+enables all nodes to read the whitelists from one location. 
+                                        
 We have provided a set of smart contracts that interface with onchain permissioning in the 
 [PegaSysEng/permissioning-smart-contracts](https://github.com/PegaSysEng/permissioning-smart-contracts) repository. 
-We have also provided a management interface to interact with the contracts. 
+We have also provided a Dapp to interact with the contracts. 
 
 ## Provided Contracts
 
 The following smart contracts are provided in the [PegaSysEng/permissioning-smart-contracts](https://github.com/PegaSysEng/permissioning-smart-contracts) repository: 
 
-* Ingress - a simple contract functioning as a gateway to the Admin and Rules contracts. The Ingress contract is deployed 
-to a static address. 
+* Ingress contracts for nodes and accounts - simple contracts functioning as gateways to the Admin, Node Rules, 
+ and Account Rules contracts. The Ingress contracts are deployed to static addresses. 
 
 * Node Rules - stores the node whitelist and node whitelist operations (for example, add and remove). 
 
-* Admin - stores the list of admin accounts and admin list operations (for example, add and remove).
+* Account Rules - stores the account whitelist and account whitelist operations (for example, add and remove). 
+
+* Admin - stores the list of admin accounts and admin list operations (for example, add and remove) There is 
+one list of admin accounts for node and accounts.
 
 ## Pre-requisites 
 
-For nodes that are going to maintain the nodes whitelist or the list of admin accounts: 
+For nodes that are going to maintain the nodes whitelist, accounts whitelist, or the list of admin accounts: 
 
 * [NodeJS](https://nodejs.org/en/) v8.9.4 or later 
-
+* [Yarn](https://yarnpkg.com/en/) v1.15 or later
 * [Truffle](https://truffleframework.com/docs/truffle/getting-started/installation)
+* Browser with [MetaMask installed](https://metamask.io/)
 
-## Add Ingress Contract to Genesis File
+## Add Ingress Contracts to Genesis File
 
-Add the Ingress contract to the genesis file for your network by copying it from [`genesis.json`](https://github.com/PegaSysEng/permissioning-smart-contracts/blob/master/genesis.json) 
+Add the Ingress contracts to the genesis file for your network by copying them from [`genesis.json`](https://github.com/PegaSysEng/permissioning-smart-contracts/blob/master/genesis.json) 
 in the [`permissioning-smart-contracts` repository](https://github.com/PegaSysEng/permissioning-smart-contracts): 
    
 ```json
+
+"0x0000000000000000000000000000000000008888": {
+      "comment": "Account Ingress smart contract",
+      "balance": "0",
+      "code": <stripped>,
+      "storage": {
+         <stripped>
+      }
+}
+
 "0x0000000000000000000000000000000000009999": {
-      "comment": "Ingress smart contract",
+      "comment": "Node Ingress smart contract",
       "balance": "0",
       "code": <stripped>,
       "storage": {
@@ -56,11 +66,17 @@ in the [`permissioning-smart-contracts` repository](https://github.com/PegaSysEn
    
 1. Start your Pantheon node including command line options: 
 
+    * [--permissions-accounts-contract-enabled](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-contract-enabled)
+      to enable onchain accounts permissioning
+          
+    * [--permissions-accounts-contract-address](../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-contract-address)
+      set to the address of the Account Ingress contract in the genesis file (`"0x0000000000000000000000000000000000008888"`)
+
     * [--permissions-nodes-contract-enabled](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-contract-enabled)
-      to enable onchain permissioning
+      to enable onchain nodes permissioning
 
     * [--permissions-nodes-contract-address](../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-contract-address)
-      set to the address of the Ingress contract in the genesis file (`"0x0000000000000000000000000000000000009999"`)
+      set to the address of the Node Ingress contract in the genesis file (`"0x0000000000000000000000000000000000009999"`)
       
     * [--rpc-http-enabled](../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) to enable JSON-RPC
 
@@ -70,7 +86,9 @@ in the [`permissioning-smart-contracts` repository](https://github.com/PegaSysEn
 
     * `PANTHEON_NODE_PERM_KEY` - private key of the account used to interact with the permissioning contracts.
 
-    * `NODE_INGRESS_CONTRACT_ADDRESS` - address of the Ingress contract in the genesis file.  
+    * `ACCOUNT_INGRESS_CONTRACT_ADDRESS` - address of the Account Ingress contract in the genesis file.  
+
+    * `NODE_INGRESS_CONTRACT_ADDRESS` - address of the Node Ingress contract in the genesis file.  
 
     * `PANTHEON_NODE_PERM_ENDPOINT` - required only if your node is not using the default JSON-RPC host and port (`http://127.0.0.1:8545`). 
        Set to JSON-RPC host and port. 
@@ -88,7 +106,7 @@ in the [`permissioning-smart-contracts` repository](https://github.com/PegaSysEn
 1. Change into the `permissioning-smart-contracts` directory and run: 
 
     ```bash
-    npm install
+    yarn install
     ```
 
 ## Deploy Admin and Rules Contracts 
@@ -110,7 +128,24 @@ The migration logs the addresses of the Admin and Rules contracts.
 !!! important 
     The account that deploys the contracts is automatically an [Admin account](#add-and-remove-admin-accounts). 
 
-## Add and Remove Nodes from the Whitelist 
+## Start the Pantheon Permissioning Dapp
+
+1. In the `permissioning-smart-contracts` directory: 
+
+   ```bash
+   yarn start
+   ```
+
+1. Open the Dapp at [http://localhost:3000](http://localhost:3000). 
+
+1. Ensure MetaMask is connected to your local node (by default `http://localhost:8545`).
+
+   The Dapp is displayed with the account specified by the `PANTHEON_NODE_PERM_ACCOUNT` environment variable 
+   in the _Whitelisted Accounts_ tab. 
+
+ADD SCREENSHOT
+
+## Add and Remove Nodes from the Whitelist - UPDATE FOR DAPP
 
 !!! note  
     Only [Admin accounts](#add-and-remove-admin-accounts) can add or remove nodes from the whitelist. 
@@ -223,3 +258,7 @@ To display the list of admin accounts, paste the following into the Truffle Cons
 ```javascript
 Admin.deployed().then(function(instance) {instance.getAdmins().then(function(tx) {console.log(tx)});});
 ```
+
+!!! tip 
+    Prior to v1.2, we provided a [management interface using Truffle](https://docs.pantheon.pegasys.tech/en/1.1.4/Permissions/Onchain-Permissioning/).
+    The management interface using Truffle is deprecated and we recommend using the Dapp for an improved user experience. 

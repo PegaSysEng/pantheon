@@ -818,6 +818,47 @@ Default is the `permissions_config.toml` file in the [data directory](#data-path
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#permissions-configuration-file).
 
+### permissions-accounts-contract-address
+
+```bash tab="Syntax"
+--permissions-accounts-contract-address=<ContractAddress>
+```
+
+```bash tab="Command Line"
+--permissions-accounts-contract-address=xyz
+```
+
+```bash tab="Environment Variable"
+PANTHEON_PERMISSIONS_ACCOUNTS_CONTRACT_ADDRESS=xyz
+```
+
+```bash tab="Configuration File"
+permissions-accounts-contract-address=xyz
+```
+
+Specifies the contract address for [onchain accounts permissioning](../Permissions/Onchain-Permissioning.md).
+
+### permissions-accounts-contract-enabled
+
+```bash tab="Syntax"
+--permissions-accounts-contract-enabled[=<true|false>]
+```
+
+```bash tab="Command Line"
+--permissions-accounts-contract-enabled
+```
+
+```bash tab="Environment Variable"
+PANTHEON_PERMISSIONS_ACCOUNTS_CONTRACT_ENABLED=true
+```
+
+```bash tab="Configuration File"
+permissions-accounts-contract-enabled=true
+```
+
+Enables contract-based [onchain accounts permissioning](../Permissions/Onchain-Permissioning.md). Default is `false`.
+
+
 ### permissions-nodes-config-file-enabled
 
 ```bash tab="Syntax"
