@@ -24,6 +24,7 @@ import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
 import tech.pegasys.pantheon.cli.options.EthProtocolOptions;
+import tech.pegasys.pantheon.cli.options.NetworkingOptions;
 import tech.pegasys.pantheon.cli.options.RocksDBOptions;
 import tech.pegasys.pantheon.cli.options.SynchronizerOptions;
 import tech.pegasys.pantheon.cli.options.TransactionPoolOptions;
@@ -140,6 +141,7 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.clock(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.isRevertReasonEnabled(false)).thenReturn(mockControllerBuilder);
 
     // doReturn used because of generic PantheonController
     doReturn(mockController).when(mockControllerBuilder).build();
@@ -153,6 +155,7 @@ public abstract class CommandTestAbstract {
     when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.discovery(anyBoolean())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.ethNetworkConfig(any())).thenReturn(mockRunnerBuilder);
+    when(mockRunnerBuilder.networkingConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.p2pAdvertisedHost(anyString())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.p2pListenPort(anyInt())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.maxPeers(anyInt())).thenReturn(mockRunnerBuilder);
@@ -255,6 +258,10 @@ public abstract class CommandTestAbstract {
 
     public RocksDBOptions getRocksDBOptions() {
       return rocksDBOptions;
+    }
+
+    public NetworkingOptions getNetworkingOptions() {
+      return networkingOptions;
     }
 
     public SynchronizerOptions getSynchronizerOptions() {
