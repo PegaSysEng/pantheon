@@ -56,7 +56,6 @@ public class Pruner {
   }
 
   public void start() {
-    // TODO: Don't attempt pruning while a fast sync is in progress.
     blockchain.observeBlockAdded((event, blockchain) -> handleNewBlock(event));
   }
 

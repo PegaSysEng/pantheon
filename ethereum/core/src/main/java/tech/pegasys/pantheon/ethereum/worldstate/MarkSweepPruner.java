@@ -83,9 +83,6 @@ public class MarkSweepPruner {
     nodeAddedListenerId = worldStateStorage.addNodeAddedListener(this::markNewNodes);
   }
 
-  // Note chainHeadStateRoot must be the state root of the current chain head.
-  // We can delay the actual sweep until a certain number of blocks in the future if we want to
-  // have a certain number of block history available.
   // TODO: Need to ensure we only start marking when new world states aren't being persisted
   // Once we add our node added listener persisting world states can continue but we can't start
   // half way through persisting a world state.
