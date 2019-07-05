@@ -21,7 +21,6 @@ import tech.pegasys.pantheon.metrics.RunnableCounter;
 import tech.pegasys.pantheon.services.tasks.Task;
 
 import java.text.DecimalFormat;
-import java.util.Objects;
 import java.util.function.LongSupplier;
 
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 public class CompleteTaskStep {
   private static final Logger LOG = LogManager.getLogger();
-  private static final int DISPLAY_PROGRESS_STEP = 1000;
+  private static final int DISPLAY_PROGRESS_STEP = 100000;
   private final WorldStateStorage worldStateStorage;
   private final RunnableCounter completedRequestsCounter;
   private final Counter retriedRequestsCounter;
@@ -77,13 +76,11 @@ public class CompleteTaskStep {
   }
 
   private void displayWorldStateSyncProgress() {
-    final String lastEstimatedWorldStateCompletion =
-        doubleFormatter.format(estimatedWorldStateCompletion);
-    final String newEstimatedWorldStateCompletion =
-        doubleFormatter.format(computeWorldStateSyncProgress());
-    if (!Objects.equals(newEstimatedWorldStateCompletion, lastEstimatedWorldStateCompletion)) {
-      LOG.info("Estimated World State completion: {}", newEstimatedWorldStateCompletion);
-    }
+    LOG.info(
+        "Downloaded {} world state nodes. At least {} nodes remaining. Estimated World State completion: {} %.",
+        completedRequestsCounter.getTotal(),
+        worldStatePendingRequestsCurrentSupplier.getAsLong(),
+        doubleFormatter.format(computeWorldStateSyncProgress() * 100.0));
   }
 
   public double computeWorldStateSyncProgress() {
