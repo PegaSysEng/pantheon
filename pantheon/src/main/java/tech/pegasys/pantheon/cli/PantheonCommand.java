@@ -555,6 +555,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isPrivacyEnabled = false;
 
   @Option(
+      names = {"--revert-reason-enabled"},
+      description =
+          "Enable passing the revert reason back through TransactionReceipts (default: ${DEFAULT-VALUE})")
+  private final Boolean isRevertReasonEnabled = false;
+
+  @Option(
       names = {"--privacy-url"},
       description = "The URL on which the enclave is running")
   private final URI privacyUrl = PrivacyParameters.DEFAULT_ENCLAVE_URL;
@@ -851,6 +857,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
+          .isRevertReasonEnabled(isRevertReasonEnabled)
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(this.commandLine, e.getMessage());
