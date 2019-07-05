@@ -35,7 +35,7 @@ public class PrunerTest {
 
   private final NoOpMetricsSystem metricsSystem = new NoOpMetricsSystem();
 
-  @Mock private final BlockDataGenerator gen = new BlockDataGenerator();
+  private final BlockDataGenerator gen = new BlockDataGenerator();
 
   @Mock private MarkSweepPruner markSweepPruner;
 
