@@ -83,9 +83,6 @@ public class MarkSweepPruner {
     nodeAddedListenerId = worldStateStorage.addNodeAddedListener(this::markNewNodes);
   }
 
-  // TODO: Need to ensure we only start marking when new world states aren't being persisted
-  // Once we add our node added listener persisting world states can continue but we can't start
-  // half way through persisting a world state.
   public void mark(final Hash rootHash) {
     markOperationCounter.inc();
     markStorage.clear();
