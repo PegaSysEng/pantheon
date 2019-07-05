@@ -78,14 +78,14 @@ public class CompleteTaskStep {
   private void displayWorldStateSyncProgress() {
     LOG.info(
         "Downloaded {} world state nodes. At least {} nodes remaining. Estimated World State completion: {} %.",
-        completedRequestsCounter.getTotal(),
+        completedRequestsCounter.get(),
         worldStatePendingRequestsCurrentSupplier.getAsLong(),
         doubleFormatter.format(computeWorldStateSyncProgress() * 100.0));
   }
 
   public double computeWorldStateSyncProgress() {
     final double pendingRequests = worldStatePendingRequestsCurrentSupplier.getAsLong();
-    final double completedRequests = completedRequestsCounter.getTotal();
+    final double completedRequests = completedRequestsCounter.get();
     estimatedWorldStateCompletion = completedRequests / (completedRequests + pendingRequests);
     return this.estimatedWorldStateCompletion;
   }

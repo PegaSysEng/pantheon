@@ -52,7 +52,7 @@ public class RunnableCounter implements Counter {
     }
   }
 
-  public long getTotal() {
+  public long get() {
     return stepCounter.get();
   }
 }
