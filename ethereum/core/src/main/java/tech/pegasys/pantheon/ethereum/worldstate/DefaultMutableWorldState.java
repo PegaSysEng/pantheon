@@ -112,7 +112,7 @@ public class DefaultMutableWorldState implements MutableWorldState {
       final Wei balance,
       final Hash storageRoot,
       final Hash codeHash,
-      final long version) {
+      final int version) {
     final StateTrieAccountValue accountValue =
         new StateTrieAccountValue(nonce, balance, storageRoot, codeHash, version);
     return RLP.encode(accountValue::writeTo);
@@ -248,7 +248,7 @@ public class DefaultMutableWorldState implements MutableWorldState {
     }
 
     @Override
-    public long getVersion() {
+    public int getVersion() {
       return accountValue.getVersion();
     }
 

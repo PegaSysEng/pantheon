@@ -163,7 +163,7 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
 
     private long nonce;
     private Wei balance;
-    private long version;
+    private int version;
 
     @Nullable private BytesValue updatedCode; // Null if the underlying code has not been updated.
     @Nullable private Hash updatedCodeHash;
@@ -287,12 +287,12 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
     }
 
     @Override
-    public void setVersion(final long version) {
+    public void setVersion(final int version) {
       this.version = version;
     }
 
     @Override
-    public long getVersion() {
+    public int getVersion() {
       return version;
     }
 

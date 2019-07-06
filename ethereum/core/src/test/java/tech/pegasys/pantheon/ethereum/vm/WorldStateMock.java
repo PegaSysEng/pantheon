@@ -33,7 +33,7 @@ public class WorldStateMock extends DebuggableMutableWorldState {
     private final long nonce;
     private final Wei balance;
     private final BytesValue code;
-    private final long version;
+    private final int version;
     private final Map<UInt256, UInt256> storage;
 
     private static final Map<UInt256, UInt256> parseStorage(final Map<String, String> values) {
@@ -55,7 +55,7 @@ public class WorldStateMock extends DebuggableMutableWorldState {
       this.code = BytesValue.fromHexString(code);
       this.storage = parseStorage(storage);
       if (version != null) {
-        this.version = Long.decode(version);
+        this.version = Integer.decode(version);
       } else {
         this.version = 0;
       }
@@ -73,7 +73,7 @@ public class WorldStateMock extends DebuggableMutableWorldState {
       return code;
     }
 
-    public long getVersion() {
+    public int getVersion() {
       return version;
     }
 

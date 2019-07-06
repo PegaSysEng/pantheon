@@ -40,7 +40,7 @@ public class MainnetContractCreationProcessor extends AbstractMessageProcessor {
 
   private final int codeSizeLimit;
 
-  private final long accountVersion;
+  private final int accountVersion;
 
   public MainnetContractCreationProcessor(
       final GasCalculator gasCalculator,
@@ -49,7 +49,7 @@ public class MainnetContractCreationProcessor extends AbstractMessageProcessor {
       final int codeSizeLimit,
       final long initialContractNonce,
       final Collection<Address> forceCommitAddresses,
-      final long accountVersion) {
+      final int accountVersion) {
     super(evm, forceCommitAddresses);
     this.gasCalculator = gasCalculator;
     this.requireCodeDepositToSucceed = requireCodeDepositToSucceed;

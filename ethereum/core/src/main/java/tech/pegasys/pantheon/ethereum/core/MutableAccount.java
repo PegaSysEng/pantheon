@@ -87,7 +87,7 @@ public interface MutableAccount extends Account {
    *
    * @param version the version of the code being set
    */
-  void setVersion(long version);
+  void setVersion(int version);
 
   /**
    * Sets a particular key-value pair in the account storage.

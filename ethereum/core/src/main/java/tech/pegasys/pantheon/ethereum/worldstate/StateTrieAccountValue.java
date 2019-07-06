@@ -25,7 +25,7 @@ public class StateTrieAccountValue {
   private final Wei balance;
   private final Hash storageRoot;
   private final Hash codeHash;
-  private final long version;
+  private final int version;
 
   private StateTrieAccountValue(
       final long nonce, final Wei balance, final Hash storageRoot, final Hash codeHash) {
@@ -37,7 +37,7 @@ public class StateTrieAccountValue {
       final Wei balance,
       final Hash storageRoot,
       final Hash codeHash,
-      final long version) {
+      final int version) {
     this.nonce = nonce;
     this.balance = balance;
     this.storageRoot = storageRoot;
@@ -86,7 +86,7 @@ public class StateTrieAccountValue {
    *
    * @return the version of the account code.
    */
-  public long getVersion() {
+  public int getVersion() {
     return version;
   }
 
@@ -113,9 +113,9 @@ public class StateTrieAccountValue {
     final Wei balance = in.readUInt256Scalar(Wei::wrap);
     final Hash storageRoot = Hash.wrap(in.readBytes32());
     final Hash codeHash = Hash.wrap(in.readBytes32());
-    final long version;
+    final int version;
     if (!in.isEndOfCurrentList()) {
-      version = in.readLongScalar();
+      version = in.readIntScalar();
     } else {
       version = Account.DEFAULT_VERSION;
     }

@@ -220,7 +220,7 @@ public final class GenesisState {
     final Wei balance;
     final Map<UInt256, UInt256> storage;
     final BytesValue code;
-    final long version;
+    final int version;
 
     static GenesisAccount fromAllocation(final GenesisAllocation allocation) {
       return new GenesisAccount(
@@ -240,7 +240,7 @@ public final class GenesisState {
       this.address = withNiceErrorMessage("address", hexAddress, Address::fromHexString);
       this.balance = withNiceErrorMessage("balance", balance, this::parseBalance);
       this.code = hexCode != null ? BytesValue.fromHexString(hexCode) : null;
-      this.version = version != null ? Long.decode(version) : Account.DEFAULT_VERSION;
+      this.version = version != null ? Integer.decode(version) : Account.DEFAULT_VERSION;
       this.storage = parseStorage(storage);
     }
 

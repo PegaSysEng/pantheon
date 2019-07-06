@@ -38,7 +38,7 @@ public interface Account {
 
   long DEFAULT_NONCE = 0L;
   Wei DEFAULT_BALANCE = Wei.ZERO;
-  long DEFAULT_VERSION = 0L;
+  int DEFAULT_VERSION = 0;
 
   /**
    * The Keccak-256 hash of the account address.
@@ -106,7 +106,7 @@ public interface Account {
    *
    * @return the version of the account code. Default is zero.
    */
-  long getVersion();
+  int getVersion();
 
   /**
    * Retrieves a value in the account storage given its key.
