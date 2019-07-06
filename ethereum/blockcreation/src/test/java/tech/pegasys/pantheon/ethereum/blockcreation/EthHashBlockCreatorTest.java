@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolver;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHasher.Light;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
@@ -56,7 +57,8 @@ public class EthHashBlockCreatorTest {
                       GenesisConfigFile.DEFAULT.getConfigOptions(),
                       BigInteger.valueOf(42),
                       Function.identity(),
-                      PrivacyParameters.DEFAULT)
+                      PrivacyParameters.DEFAULT,
+                      false)
                   .createProtocolSchedule())
           .build();
 
@@ -66,7 +68,10 @@ public class EthHashBlockCreatorTest {
 
     final PendingTransactions pendingTransactions =
         new PendingTransactions(
-            PendingTransactions.DEFAULT_TX_RETENTION_HOURS, 1, TestClock.fixed(), metricsSystem);
+            TransactionPoolConfiguration.DEFAULT_TX_RETENTION_HOURS,
+            1,
+            TestClock.fixed(),
+            metricsSystem);
 
     final EthHashBlockCreator blockCreator =
         new EthHashBlockCreator(

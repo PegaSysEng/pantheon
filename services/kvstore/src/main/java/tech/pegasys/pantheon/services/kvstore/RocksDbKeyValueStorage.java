@@ -24,11 +24,15 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.Closeable;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.rocksdb.BlockBasedTableConfig;
+import org.rocksdb.LRUCache;
 import org.rocksdb.Options;
 import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
 import org.rocksdb.Statistics;
 import org.rocksdb.TransactionDB;
 import org.rocksdb.TransactionDBOptions;
@@ -65,7 +69,7 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
           new Options()
               .setCreateIfMissing(true)
               .setMaxOpenFiles(rocksDbConfiguration.getMaxOpenFiles())
-              .setTableFormatConfig(rocksDbConfiguration.getBlockBasedTableConfig())
+              .setTableFormatConfig(createBlockBasedTableConfig(rocksDbConfiguration))
               .setMaxBackgroundCompactions(rocksDbConfiguration.getMaxBackgroundCompactions())
               .setStatistics(stats);
       options.getEnv().setBackgroundThreads(rocksDbConfiguration.getBackgroundThreadCount());
@@ -136,6 +140,11 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
     }
   }
 
+  private BlockBasedTableConfig createBlockBasedTableConfig(final RocksDbConfiguration config) {
+    final LRUCache cache = new LRUCache(config.getCacheCapacity());
+    return new BlockBasedTableConfig().setBlockCache(cache);
+  }
+
   @Override
   public Optional<BytesValue> get(final BytesValue key) throws StorageException {
     throwIfClosed();
@@ -152,6 +161,43 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
     throwIfClosed();
     final WriteOptions options = new WriteOptions();
     return new RocksDbTransaction(db.beginTransaction(options), options);
+  }
+
+  @Override
+  public long removeUnless(final Predicate<BytesValue> inUseCheck) throws StorageException {
+    long removedNodeCounter = 0;
+    try (final RocksIterator rocksIterator = db.newIterator()) {
+      rocksIterator.seekToFirst();
+      while (rocksIterator.isValid()) {
+        final byte[] key = rocksIterator.key();
+        if (!inUseCheck.test(BytesValue.wrap(key))) {
+          removedNodeCounter++;
+          db.delete(key);
+        }
+        rocksIterator.next();
+      }
+    } catch (final RocksDBException e) {
+      throw new StorageException(e);
+    }
+    return removedNodeCounter;
+  }
+
+  @Override
+  public void clear() {
+    try (final RocksIterator rocksIterator = db.newIterator()) {
+      if (!rocksIterator.isValid()) {
+        return;
+      }
+      rocksIterator.seekToFirst();
+      final byte[] firstKey = rocksIterator.key();
+      rocksIterator.seekToLast();
+      if (!rocksIterator.isValid()) {
+        return;
+      }
+      db.deleteRange(firstKey, rocksIterator.key());
+    } catch (final RocksDBException e) {
+      throw new StorageException(e);
+    }
   }
 
   @Override

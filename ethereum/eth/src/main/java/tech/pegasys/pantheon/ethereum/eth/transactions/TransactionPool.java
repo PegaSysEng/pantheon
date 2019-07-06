@@ -55,7 +55,6 @@ import org.apache.logging.log4j.Logger;
 public class TransactionPool implements BlockAddedObserver {
 
   private static final Logger LOG = getLogger();
-  public static final int DEFAULT_TX_MSG_KEEP_ALIVE = 60;
 
   private static final long SYNC_TOLERANCE = 100L;
   private static final String REMOTE = "remote";
@@ -204,12 +203,6 @@ public class TransactionPool implements BlockAddedObserver {
               transaction.getGasLimit(), chainHeadBlockHeader.getGasLimit()));
     }
 
-    final TransactionValidationParams validationParams =
-        new TransactionValidationParams.Builder()
-            .allowFutureNonce(true)
-            .checkOnchainPermissions(false)
-            .build();
-
     return protocolContext
         .getWorldStateArchive()
         .get(chainHeadBlockHeader.getStateRoot())
@@ -217,7 +210,8 @@ public class TransactionPool implements BlockAddedObserver {
             worldState -> {
               final Account senderAccount = worldState.get(transaction.getSender());
               return getTransactionValidator()
-                  .validateForSender(transaction, senderAccount, validationParams);
+                  .validateForSender(
+                      transaction, senderAccount, TransactionValidationParams.transactionPool());
             })
         .orElseGet(() -> ValidationResult.invalid(CHAIN_HEAD_WORLD_STATE_NOT_AVAILABLE));
   }

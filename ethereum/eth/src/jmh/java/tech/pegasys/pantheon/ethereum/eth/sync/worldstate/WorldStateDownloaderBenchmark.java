@@ -25,8 +25,8 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldStateStorage;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.WorldStateKeyValueStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -81,9 +81,9 @@ public class WorldStateDownloaderBenchmark {
     ethProtocolManager =
         EthProtocolManagerTestUtil.create(
             new EthScheduler(
-                syncConfig.downloaderParallelism(),
-                syncConfig.transactionsParallelism(),
-                syncConfig.computationParallelism(),
+                syncConfig.getDownloaderParallelism(),
+                syncConfig.getTransactionsParallelism(),
+                syncConfig.getComputationParallelism(),
                 metricsSystem));
 
     peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, blockHeader.getNumber());
@@ -91,7 +91,7 @@ public class WorldStateDownloaderBenchmark {
     final EthContext ethContext = ethProtocolManager.ethContext();
     storageProvider =
         RocksDbStorageProvider.create(
-            new RocksDbConfiguration.Builder().databaseDir(tempDir.resolve("database")).build(),
+            RocksDbConfiguration.builder().databaseDir(tempDir.resolve("database")).build(),
             metricsSystem);
     worldStateStorage = storageProvider.createWorldStateStorage();
 
@@ -118,7 +118,7 @@ public class WorldStateDownloaderBenchmark {
   private Hash createExistingWorldState() {
     // Setup existing state
     remoteKeyValueStorage = new InMemoryKeyValueStorage();
-    final WorldStateStorage storage = new KeyValueStorageWorldStateStorage(remoteKeyValueStorage);
+    final WorldStateStorage storage = new WorldStateKeyValueStorage(remoteKeyValueStorage);
     final WorldStateArchive worldStateArchive = new WorldStateArchive(storage);
     final MutableWorldState worldState = worldStateArchive.getMutable();
 

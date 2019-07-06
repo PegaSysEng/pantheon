@@ -24,7 +24,6 @@ plugins {
   id 'me.champeau.gradle.jmh' version '0.4.8' apply false
   id 'net.ltgt.errorprone' version '0.8.1'
   id 'net.researchgate.release' version '2.7.0'
-  id "com.palantir.docker" version "0.22.1"
 }
 
 group = 'tech.pegasys.pantheon'
@@ -57,13 +56,31 @@ def _strListCmdArg(name, defaultValue) {
   if (!project.hasProperty(name))
     return defaultValue
 
-  return ((String)project.property(name)).tokenize(',')
+  return ((String) project.property(name)).tokenize(',')
 }
 
 def _strListCmdArg(name) {
   return _strListCmdArg(name, null)
 }
 
+apply plugin: 'com.jfrog.bintray'
+
+def bintrayUser = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+def bintrayKey = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
+def bintrayPackage = bintray.pkg {
+  repo = 'pegasys-repo'
+  name = 'pantheon'
+  userOrg = 'consensys'
+  licenses = ['Apache-2.0']
+  websiteUrl = 'https://github.com/PegaSysEng/pantheon'
+  issueTrackerUrl = 'https://github.com/PegaSysEng/pantheon/issues'
+  vcsUrl = 'https://github.com/PegaSysEng/pantheon.git'
+
+  version {
+    name = project.version
+    released = new Date()
+  }
+}
 
 allprojects {
   apply plugin: 'java-library'
@@ -82,6 +99,16 @@ allprojects {
     }
   }
 
+  task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+  }
+
+  task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+  }
+
   sourceCompatibility = '1.8'
   targetCompatibility = '1.8'
 
@@ -93,7 +120,7 @@ allprojects {
       jcenter()
       mavenCentral()
       mavenLocal()
-      maven { url  "https://consensys.bintray.com/pegasys-repo" }
+      maven { url "https://consensys.bintray.com/pegasys-repo" }
     }
   }
 
@@ -249,6 +276,54 @@ task deploy() {}
 
 subprojects {
 
+  if (file('src/main/java').directory) {
+    apply plugin: 'com.jfrog.bintray'
+    apply plugin: 'maven-publish'
+
+    publishing {
+      publications {
+        mavenJava(MavenPublication) {
+          groupId "tech.pegasys.pantheon.internal"
+          version "${project.version}"
+          from components.java
+          artifact sourcesJar
+          artifact javadocJar
+          versionMapping {
+            usage('java-api') { fromResolutionOf('runtimeClasspath') }
+            usage('java-runtime') { fromResolutionResult() }
+          }
+          pom {
+            name = "Pantheon - ${project.name}"
+            url = 'http://github.com/PegaSysEng/pantheon'
+            licenses {
+              license {
+                name = 'The Apache License, Version 2.0'
+                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+              }
+            }
+            scm {
+              connection = 'scm:git:git://github.com/PegaSysEng/pantheon.git'
+              developerConnection = 'scm:git:ssh://github.com/PegaSysEng/pantheon.git'
+              url = 'https://github.com/PegaSysEng/pantheon'
+            }
+          }
+        }
+      }
+    }
+
+    bintray {
+      user = bintrayUser
+      key = bintrayKey
+
+      publications = ['mavenJava']
+      override = version.endsWith('SNAPSHOT')
+
+      publish = true
+
+      pkg = bintrayPackage
+    }
+  }
+
   tasks.withType(Test) {
     // If GRADLE_MAX_TEST_FORKS is not set, use half the available processors
     maxParallelForks = (System.getenv('GRADLE_MAX_TEST_FORKS') ?: (Runtime.runtime.availableProcessors().intdiv(2) ?: 1)).toInteger()
@@ -258,7 +333,6 @@ subprojects {
     options.fork = true
     options.incremental = true
   }
-  apply plugin: 'maven-publish'
 
   sourceSets {
     // test-support can be consumed as a library by other projects in their tests
@@ -286,7 +360,7 @@ subprojects {
     testSupportArtifacts
   }
 
-  task testSupportJar (type: Jar) {
+  task testSupportJar(type: Jar) {
     baseName = "${project.name}-support-test"
     from sourceSets.testSupport.output
   }
@@ -296,7 +370,7 @@ subprojects {
     integrationTestImplementation sourceSets.testSupport.output
   }
 
-  task integrationTest(type: Test, dependsOn:["compileTestJava"]){
+  task integrationTest(type: Test, dependsOn: ["compileTestJava"]) {
     group = "verification"
     description = "Runs the Pantheon integration tests"
 
@@ -343,7 +417,9 @@ applicationDefaultJvmArgs = [
 run {
   args project.hasProperty("pantheon.run.args") ? project.property("pantheon.run.args").toString().split("\\s+") : []
   doFirst {
-    applicationDefaultJvmArgs = applicationDefaultJvmArgs.collect{it.replace('PANTHEON_HOME', "$buildDir/pantheon")}
+    applicationDefaultJvmArgs = applicationDefaultJvmArgs.collect {
+      it.replace('PANTHEON_HOME', "$buildDir/pantheon")
+    }
   }
 }
 
@@ -404,6 +480,7 @@ distZip {
 // simple for use in docker
 tasks.register("dockerDistUntar") {
   dependsOn distTar
+  dependsOn distZip
   def dockerBuildDir = "build/docker-pantheon/"
   def distTarFile = distTar.outputs.files.singleFile
   def distTarFileName = distTar.outputs.files.singleFile.name.replace(".tar.gz", "")
@@ -412,21 +489,28 @@ tasks.register("dockerDistUntar") {
     new File(dockerBuildDir).mkdir()
     copy {
       from tarTree(distTarFile)
-      into (dockerBuildDir)
+      into(dockerBuildDir)
     }
     file("${dockerBuildDir}/${distTarFileName}").renameTo("${dockerBuildDir}/pantheon")
   }
 }
 
-docker {
-  def image_tag = "develop"
+task distDocker(type: Exec) {
   dependsOn dockerDistUntar
-  name "pegasyseng/pantheon-kubernetes:${image_tag}"
-  dockerfile file('kubernetes/Dockerfile')
-  files "build/docker-pantheon/"
-  buildArgs(['BUILD_DATE': buildTime(), 'VERSION': rootProject.version, 'VCS_REF': getCheckedOutGitCommitHash()])
-  pull true
-  noCache true
+  def image_tag = "develop"
+  def image="pegasyseng/pantheon-kubernetes:${image_tag}"
+  def dockerBuildDir = "build/docker-pantheon/"
+  workingDir "${dockerBuildDir}"
+
+  doFirst {
+    copy {
+      from file("${projectDir}/kubernetes/Dockerfile")
+      into(workingDir)
+    }
+  }
+
+  executable "sh"
+  args "-c", "docker build --build-arg BUILD_DATE=${buildTime()} --build-arg VERSION=${rootProject.version} --build-arg VCS_REF=${getCheckedOutGitCommitHash()} -t ${image} ."
 }
 
 task jacocoRootReport(type: org.gradle.testing.jacoco.tasks.JacocoReport) {
@@ -446,7 +530,7 @@ configurations { annotationProcessor }
 
 // Prevent errorprone-checks being dependent upon errorprone-checks!
 // However, ensure all subprojects comply with the custom rules.
-configure(subprojects.findAll {it.name != 'errorprone-checks'}) {
+configure(subprojects.findAll { it.name != 'errorprone-checks' }) {
   dependencies { annotationProcessor project(":errorprone-checks") }
 
   tasks.withType(JavaCompile) {
@@ -488,7 +572,7 @@ def getCheckedOutGitCommitHash() {
   def head = new File(gitFolder + "HEAD").text.split(":") // .git/HEAD
   def isCommit = head.length == 1 // e5a7c79edabbf7dd39888442df081b1c9d8e88fd
 
-  if(isCommit) return head[0].trim().take(takeFromHash) // e5a7c79edabb
+  if (isCommit) return head[0].trim().take(takeFromHash) // e5a7c79edabb
 
   def refHead = new File(gitFolder + head[1].trim()) // .git/refs/heads/master
   refHead.text.trim().take takeFromHash
@@ -496,8 +580,8 @@ def getCheckedOutGitCommitHash() {
 
 apply plugin: 'net.researchgate.release'
 
-task releaseIntegrationTest(type: Test){
-  for(TaskContainer taskList : subprojects.tasks){
+task releaseIntegrationTest(type: Test) {
+  for (TaskContainer taskList : subprojects.tasks) {
     def subProjectIntegrationTask = taskList.findByName('integrationTest')
 
     if (subProjectIntegrationTask != null) {
@@ -506,14 +590,33 @@ task releaseIntegrationTest(type: Test){
   }
 }
 
-task releaseReferenceTest(type: Test, dependsOn : [
+task releaseReferenceTest(type: Test, dependsOn: [
   ':ethereum:core:referenceTests',
   ':ethereum:rlp:referenceTests',
   ':ethereum:trie:referenceTests'
-]){
+]) {
 }
 
-task releaseAcceptanceTest(type: Test, dependsOn : ':acceptance-tests:acceptanceTest') {}
+task releaseAcceptanceTest(type: Test, dependsOn: ':acceptance-tests:acceptanceTest') {}
+
+tasks.register("verifyDistributions") {
+  dependsOn distTar
+  dependsOn distZip
+  def distTarFile = distTar.outputs.files.singleFile
+  def distZipFile = distZip.outputs.files.singleFile
+  def minDistributionSize = 20000000
+
+  // Sanity check the distributions by checking they are at least a reasonable size
+  doFirst {
+    if (distTarFile.length() < minDistributionSize) {
+      throw new GradleException("Distribution tar is suspiciously small: " + distTarFile.length() + " bytes")
+    }
+    if (distZipFile.length() < minDistributionSize) {
+      throw new GradleException("Distribution zip is suspiciously small: " + distZipFile.length() + " bytes")
+    }
+  }
+}
+
 
 release {
   preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
@@ -533,11 +636,9 @@ release {
   }
 }
 
-apply plugin: 'com.jfrog.bintray'
-
 bintray {
-  user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-  key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
+  user = bintrayUser
+  key = bintrayKey
 
   filesSpec {
     from distTar.destinationDir.path
@@ -546,23 +647,13 @@ bintray {
   }
 
   publish = true
+  override = version.endsWith('SNAPSHOT')
 
-  pkg {
-    repo = 'pegasys-repo'
-    name = 'pantheon'
-    userOrg = 'consensys'
-    licenses = ['Apache-2.0']
-    websiteUrl = 'https://github.com/PegaSysEng/pantheon'
-    issueTrackerUrl = 'https://github.com/PegaSysEng/pantheon/issues'
-    vcsUrl = 'https://github.com/PegaSysEng/pantheon.git'
-
-    version {
-      name = project.version
-      released  = new Date()
-    }
-  }
+  pkg = bintrayPackage
 }
 
+build.dependsOn verifyDistributions
+bintrayUpload.dependsOn verifyDistributions
 afterReleaseBuild.dependsOn bintrayUpload
 bintrayUpload.mustRunAfter(distTar)
 bintrayUpload.mustRunAfter(distZip)

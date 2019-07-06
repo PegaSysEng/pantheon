@@ -25,6 +25,8 @@ import tech.pegasys.pantheon.ethereum.vm.BlockHashLookup;
 import tech.pegasys.pantheon.ethereum.vm.OperationTracer;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
+import java.util.Optional;
+
 /** Processes transactions. */
 public interface TransactionProcessor {
 
@@ -95,6 +97,13 @@ public interface TransactionProcessor {
      * @return the validation result, with the reason for failure (if applicable.)
      */
     ValidationResult<TransactionInvalidReason> getValidationResult();
+
+    /**
+     * Returns the reason why a transaction was reverted (if applicable).
+     *
+     * @return the revert reason.
+     */
+    Optional<String> getRevertReason();
   }
 
   /**
@@ -107,9 +116,11 @@ public interface TransactionProcessor {
    * @param miningBeneficiary The address which is to receive the transaction fee
    * @param blockHashLookup The {@link BlockHashLookup} to use for BLOCKHASH operations
    * @param isPersistingState Whether the state will be modified by this process
-   * @param checkOnchainPermissions Whether a transaction permissioning check should check onchain
-   *     permissioning rules
+   * @param transactionValidationParams Validation parameters that will be used by the {@link
+   *     TransactionValidator}
    * @return the transaction result
+   * @see TransactionValidator
+   * @see TransactionValidationParams
    */
   default Result processTransaction(
       final Blockchain blockchain,
@@ -119,7 +130,7 @@ public interface TransactionProcessor {
       final Address miningBeneficiary,
       final BlockHashLookup blockHashLookup,
       final Boolean isPersistingState,
-      final Boolean checkOnchainPermissions) {
+      final TransactionValidationParams transactionValidationParams) {
     return processTransaction(
         blockchain,
         worldState,
@@ -129,7 +140,7 @@ public interface TransactionProcessor {
         NO_TRACING,
         blockHashLookup,
         isPersistingState,
-        checkOnchainPermissions);
+        transactionValidationParams);
   }
 
   /**
@@ -163,7 +174,7 @@ public interface TransactionProcessor {
         operationTracer,
         blockHashLookup,
         isPersistingState,
-        false);
+        new TransactionValidationParams.Builder().build());
   }
 
   Result processTransaction(
@@ -175,5 +186,5 @@ public interface TransactionProcessor {
       OperationTracer operationTracer,
       BlockHashLookup blockHashLookup,
       Boolean isPersistingState,
-      Boolean checkOnchainPermissions);
+      TransactionValidationParams transactionValidationParams);
 }

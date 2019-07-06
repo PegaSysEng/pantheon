@@ -26,7 +26,7 @@ import tech.pegasys.pantheon.ethereum.core.MessageFrameTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.ConstantinopleGasCalculator;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageWorldStateStorage;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.WorldStateKeyValueStorage;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.ethereum.vm.Words;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
@@ -44,7 +44,7 @@ public class ExtCodeHashOperationTest {
   private final Blockchain blockchain = mock(Blockchain.class);
 
   private final WorldStateArchive worldStateArchive =
-      new WorldStateArchive(new KeyValueStorageWorldStateStorage(new InMemoryKeyValueStorage()));
+      new WorldStateArchive(new WorldStateKeyValueStorage(new InMemoryKeyValueStorage()));
   private final WorldUpdater worldStateUpdater = worldStateArchive.getMutable().updater();
 
   private final ExtCodeHashOperation operation =
@@ -63,8 +63,14 @@ public class ExtCodeHashOperationTest {
 
   @Test
   public void shouldReturnHashOfEmptyDataWhenAccountExistsButDoesNotHaveCode() {
-    worldStateUpdater.getOrCreate(REQUESTED_ADDRESS);
+    worldStateUpdater.getOrCreate(REQUESTED_ADDRESS).setBalance(Wei.of(1));
     assertThat(executeOperation(REQUESTED_ADDRESS)).isEqualTo(Hash.EMPTY);
+  }
+
+  @Test
+  public void shouldReturnZeroWhenAccountExistsButIsEmpty() {
+    worldStateUpdater.getOrCreate(REQUESTED_ADDRESS);
+    assertThat(executeOperation(REQUESTED_ADDRESS)).isEqualTo(Bytes32.ZERO);
   }
 
   @Test

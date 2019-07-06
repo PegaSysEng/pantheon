@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.WorldState;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
+import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidationParams;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.worldstate.DebuggableMutableWorldState;
 import tech.pegasys.pantheon.testutil.JsonTestParameters;
@@ -80,7 +81,8 @@ public class GeneralStateReferenceTestTools {
       params.blacklistAll();
     }
     // Known incorrect test.
-    params.blacklist("RevertPrecompiledTouch-(EIP158|Byzantium)");
+    params.blacklist(
+        "RevertPrecompiledTouch(_storage)?-(EIP158|Byzantium|Constantinople|ConstantinopleFix)");
     // Gas integer value is too large to construct a valid transaction.
     params.blacklist("OverflowGasRequire");
     // Consumes a huge amount of memory
@@ -117,7 +119,7 @@ public class GeneralStateReferenceTestTools {
             blockHeader.getCoinbase(),
             new BlockHashLookup(blockHeader, blockchain),
             false,
-            false);
+            TransactionValidationParams.processingBlock());
     final Account coinbase = worldStateUpdater.getOrCreate(spec.blockHeader().getCoinbase());
     if (coinbase != null && coinbase.isEmpty() && shouldClearEmptyAccounts(spec.eip())) {
       worldStateUpdater.deleteAccount(coinbase.getAddress());

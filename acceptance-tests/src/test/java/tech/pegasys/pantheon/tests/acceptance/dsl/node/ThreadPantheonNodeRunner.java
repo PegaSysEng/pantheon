@@ -12,17 +12,17 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.node;
 
-import static tech.pegasys.pantheon.cli.NetworkName.DEV;
+import static tech.pegasys.pantheon.cli.config.NetworkName.DEV;
 
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
+import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
@@ -114,11 +114,11 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .privacyParameters(node.getPrivacyParameters())
               .nodePrivateKeyFile(KeyPairUtil.getDefaultKeyFile(node.homeDirectory()))
               .metricsSystem(noOpMetricsSystem)
-              .maxPendingTransactions(PendingTransactions.MAX_PENDING_TRANSACTIONS)
-              .pendingTransactionRetentionPeriod(PendingTransactions.DEFAULT_TX_RETENTION_HOURS)
-              .rocksDbConfiguration(new RocksDbConfiguration.Builder().databaseDir(tempDir).build())
-              .ethereumWireProtocolConfiguration(EthereumWireProtocolConfiguration.defaultConfig())
+              .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
+              .rocksDbConfiguration(RocksDbConfiguration.builder().databaseDir(tempDir).build())
+              .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
               .clock(Clock.systemUTC())
+              .isRevertReasonEnabled(node.isRevertReasonEnabled())
               .build();
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
@@ -146,6 +146,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .p2pAdvertisedHost(node.getHostName())
             .p2pListenPort(0)
             .maxPeers(25)
+            .networkingConfiguration(node.getNetworkingConfiguration())
             .jsonRpcConfiguration(node.jsonRpcConfiguration())
             .webSocketConfiguration(node.webSocketConfiguration())
             .dataDir(node.homeDirectory())
