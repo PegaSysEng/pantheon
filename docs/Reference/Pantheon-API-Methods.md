@@ -3785,7 +3785,7 @@ data using `eea_sendRawTransaction`.
 
 ### eea_getTransactionCount
 
-
+Returns the transaction count 
 
 ### eea_getTransactionReceipt
 
