@@ -32,6 +32,11 @@ For the first node to deploy the permissioning contracts:
 
 ## Add Ingress Contracts to Genesis File
 
+!!! tip UPDATE WORDING 
+    A permissioned network can have account and nodes permissioning enabled or only account or node permissioning. 
+    The following documentation describes starting a network with account and nodes permissioning enabled.  If using 
+    only one type of permissioning, leave those parts out. 
+
 Add the Ingress contracts to the genesis file for your network by copying them from [`genesis.json`](https://github.com/PegaSysEng/permissioning-smart-contracts/blob/master/genesis.json) 
 in the [`permissioning-smart-contracts` repository](https://github.com/PegaSysEng/permissioning-smart-contracts): 
    
@@ -61,7 +66,7 @@ in the [`permissioning-smart-contracts` repository](https://github.com/PegaSysEn
     
 ## Onchain Permissioning Command Line Options
    
-Start your Pantheon node including command line options: 
+All nodes participating in a permissioned network must include the command line options: 
 
 * [--permissions-accounts-contract-enabled](../../Reference/Pantheon-CLI-Syntax.md#permissions-accounts-contract-enabled)
 to enable onchain accounts permissioning
@@ -75,7 +80,7 @@ to enable onchain nodes permissioning
 * [--permissions-nodes-contract-address](../../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-contract-address)
 set to the address of the Node Ingress contract in the genesis file (`"0x0000000000000000000000000000000000009999"`)
       
-* [--rpc-http-enabled](../../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) to enable JSON-RPC
+* [--rpc-http-enabled](../../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled) to enable JSON-RPC. QUESTION: Only for nodes with admin access? 
 
 ## Set Environment Variables 
 
@@ -156,34 +161,15 @@ The migration logs the addresses of the Admin and Rules contracts.
     The first node (that is, the node that deployed the permissioning contracts) must add itself to the whitelist before 
     adding other nodes.
 
-## Update Nodes Whitelist 
+## Update Nodes Whitelist <UP TO HERE> 
 
 To add a node to the nodes whitelist: 
 
-1. In the _Whitelisted Nodes_ tab of the Permissioning Management Dapp, click the _Add Whitelisted Account_
-button. The _Add Whitelisted Account_ window is displayed. 
-
-1. Enter the account address in the _Account Address_ field and click the _Add Whitelisted Account_ button. 
-
-
-## Update Accounts Whitelists
-    
-To add or remove accounts or admin accounts: or nodes: 
-
-1. In the relevant tab, click the 
-
-1. Open https://permissioning-tools.pegasys.tech/
-
 1. Enter the [enode URL](../../Configuring-Pantheon/Node-Keys.md#enode-url) of the node to be added or removed. 
 
-1. Click the *Add Node* or *Remove Node* button. The truffle command is displayed.
+To remove a nodes from the nodes whitelist: 
 
-1. Click the *Copy to clipboard* button. 
-
-1. Paste the copied command into the Truffle Console. 
-
-   When the transaction is included in a block, the transaction receipt is displayed. 
-      
+1. Enter the [enode URL](../../Configuring-Pantheon/Node-Keys.md#enode-url) of the node to be added or removed. 
 
 !!! tip
     If you add a running node, the node does not attempt to reconnect to the bootnode and synchronize until 
@@ -191,8 +177,19 @@ To add or remove accounts or admin accounts: or nodes:
 
     If the node is added to the whitelist before starting the node, using `admin_addPeer` is not required because
     peer discovery is run on node startup. 
+    
+## Update Accounts Whitelists <NEED TO ADD ADMIN ACCOUNTS> 
 
-## Start Other Network Nodes 
+To add a whitelisted account or admin account: 
+
+1. In the _Whitelisted Accounts_ tab of the Permissioning Management Dapp, click the _Add Whitelisted Account_
+button. The _Add Whitelisted Account_ window is displayed. 
+
+1. Enter the account address in the _Account Address_ field and click the _Add Whitelisted Account_ button. 
+
+To remove an account from the accounts whitelist: 
+    
+## Start Other Network Nodes <UPDATE> 
 
 For participating nodes that are not going to add or remove nodes from the whitelist:
 
