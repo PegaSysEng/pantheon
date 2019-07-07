@@ -498,13 +498,13 @@ tasks.register("dockerDistUntar") {
 task distDocker(type: Exec) {
   dependsOn dockerDistUntar
   def image_tag = "develop"
-  def image="pegasyseng/pantheon-kubernetes:${image_tag}"
+  def image="pegasyseng/pantheon:${image_tag}"
   def dockerBuildDir = "build/docker-pantheon/"
   workingDir "${dockerBuildDir}"
 
   doFirst {
     copy {
-      from file("${projectDir}/kubernetes/Dockerfile")
+      from file("${projectDir}/docker/Dockerfile")
       into(workingDir)
     }
   }
