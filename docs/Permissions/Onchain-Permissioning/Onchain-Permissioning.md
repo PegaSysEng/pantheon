@@ -3,8 +3,8 @@ description: Onchain Permissioning
 
 # Onchain Permissioning 
 
-Onchain permissioning uses smart contracts to store and maintain the node and account whitelists. Using onchain permissioning
-enables all nodes to read the whitelists from one location.                                        
+Onchain permissioning uses smart contracts to store and maintain the node, account, and admin account whitelists. 
+Using onchain permissioning enables all nodes to read the whitelists from one location.                                        
 
 ## Permissioning Contracts
 
@@ -15,14 +15,14 @@ The permissioning smart contracts are provided in the [PegaSysEng/permissioning-
 
 * Node Rules - stores the node whitelist and node whitelist operations (for example, add and remove). 
 
-* Account Rules - stores the account whitelist and account whitelist operations (for example, add and remove). 
+* Account Rules - stores the accounts whitelist and account whitelist operations (for example, add and remove). 
 
 * Admin - stores the list of admin accounts and admin list operations (for example, add and remove) There is 
 one list of admin accounts for node and accounts.
 
 ## Permissioning Management Dapp
 
-The [Permissioning Management Dapp](https://github.com/PegaSysEng/permissioning-smart-contracts) is provided to view 
+The [Permissioning Management Dapp](Using-Onchain-Permissioning.md) is provided to view 
 and maintain the whitelists. 
 
 !!! tip 
@@ -33,11 +33,13 @@ and maintain the whitelists.
 
 Permissioning implements three whitelists: 
 
-* [Accounts] that can submit transactions to the network
+* [Accounts](Using-Onchain-Permissioning.md#update-accounts-or-admin-accounts-whitelists) can submit 
+transactions to the network
 
-* [Nodes] that can participate in the network 
+* [Nodes](Using-Onchain-Permissioning.md#update-nodes-whitelist) can participate in the network 
 
-* [Admin Accounts] that can update the Accounts and Nodes whitelists 
+* [Admin Accounts](Using-Onchain-Permissioning.md#update-accounts-or-admin-accounts-whitelists) 
+can update the accounts and nodes whitelists 
 
 ## Bootnodes
 

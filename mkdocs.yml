@@ -106,10 +106,12 @@ nav:
           - web3.js-eea Client Library: Privacy/Private-Transactions/eeajs.md
           - web3.js-eea Multinode Example: Privacy/Private-Transactions/eeajs-Multinode-example.md
         - Quickstart for Private Transactions: Privacy/Privacy-Quickstart.md
-    - Permissions:
+    - Permissioning:
         - Overview: Permissions/Permissioning-Overview.md
-        - Local Permissions: Permissions/Local-Permissioning.md
-        - Onchain Permissions: Permissions/Onchain-Permissioning.md
+        - Local Permissioning: Permissions/Local-Permissioning.md
+        - Onchain Permissioning:
+            - Overview: Permissions/Onchain-Permissioning/Onchain-Permissioning.md
+            - Using Onchain Permissions: Permissions/Onchain-Permissioning/Using-Onchain-Permissioning.md
     - Using Pantheon:
         - Transactions:
           - Creating and Sending Transactions: Using-Pantheon/Transactions/Transactions.md
