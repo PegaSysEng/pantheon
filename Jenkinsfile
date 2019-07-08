@@ -178,8 +178,8 @@ try {
                     }
                 }
             }
-        }, KubernetesDockerImage: {
-                def stage_name = 'Kubernetes Docker image node: '
+        }, DockerImage: {
+                def stage_name = 'Docker image node: '
                 def image = imageRepos + '/pantheon:' + imageTag
                 def docker_folder = 'docker'
                 def version_property_file = 'gradle.properties'

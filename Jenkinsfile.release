@@ -9,11 +9,11 @@ void tryAddKnownHost(String hostUrl){
 
 pipeline {
     agent {
-        docker { image 'pegasyseng/pantheon-build:0.0.5-jdk8' }
+        docker { image 'pegasyseng/pantheon-build:0.0.5-jdk11' }
     }
     parameters {
         string(name: 'BRANCH_NAME', defaultValue: 'master', description: '[MANDATORY] The name of the branch to create the release from')
-        string(name: 'RELEASE_VERSION', defaultValue: '', description: '[OPTIONAL] When empty: defaults to the current project version')
+        string(name: 'RELEASE_VERSION', defaultValue: '1.x', description: '[MANDATORY] The version you are deploying')
         string(name: 'NEXT_VERSION', defaultValue: '', description: '[OPTIONAL] When empty: defaults to next patch version after current project version')
     }
 
@@ -42,7 +42,7 @@ pipeline {
                                   releaseVersion = ''
                                   if( params.RELEASE_VERSION?.trim() ){
                                       releaseVersion = "-Prelease.releaseVersion=${params.RELEASE_VERSION}"
-                                 }
+                                  }
 
                                   nextVersion = ''
                                   if( params.NEXT_VERSION?.trim() ){
@@ -50,12 +50,68 @@ pipeline {
                                   }
                               }
 
-
-                            sh "./gradlew release -Prelease.useAutomaticVersion=true -Prelease.branch=${params.BRANCH_NAME} ${releaseVersion} ${nextVersion}"
+                                sh "./gradlew clean -x test"
+                              //sh "./gradlew release -Prelease.useAutomaticVersion=true -Prelease.branch=${params.BRANCH_NAME} ${releaseVersion} ${nextVersion}"
                         }
                     }
                 }
             }
         }
+        stage('Docker') {
+            steps {
+                script {
+
+                    def docker_folder = 'docker'
+                    def reports_folder = docker_folder + '/reports'
+                    def pantheon = "pegasyseng/pantheon-kubernetes:develop"
+                    def releaseVersion = "${params.RELEASE_VERSION.trim()}"
+
+                    def pattern = ~/^(\d+)\.(\d+)\.\d+.*$/
+                    def shortReleaseVersion = releaseVersion.replaceFirst(pattern) { _,major,minor -> "${major}.${minor}"}
+
+                    def additionalTags = [releaseVersion]
+
+                    stage(stage_name + 'Build image') {
+                        sh "echo Building docker image for release ${releaseVersion} >> ${shortReleaseVersion}"
+                        sh "./gradlew distDocker -x test -Prelease.releaseVersion=${releaseVersion} "
+                    }
+
+                    try {
+                        stage(stage_name + 'Test image') {
+                            sh "mkdir -p ${reports_folder}"
+                            sh "cd ${docker_folder} && bash test.sh ${pantheon}"
+                        }
+                    } finally {
+                        junit "${reports_folder}/*.xml"
+                        sh "rm -rf ${reports_folder}"
+                    }
+
+                    stage(stage_name + 'Push image') {
+
+                        def dockerImage = docker.image(pantheon)
+                        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-pegasysengci') {
+                            dockerImage.push()
+
+                            //push image with <releaseVersion> tag
+                            //dockerImage.push releaseVersion.trim()
+
+                            // if this is a stable release add extra docker image tags
+                            if (!releaseVersion.contains('-')) {
+                                additionalTags.addAll(['latest', shortReleaseVersion])
+                            }
+
+                            additionalTags.each { tag ->
+                                dockerImage.push tag.trim()
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        }
     }
 }
+
