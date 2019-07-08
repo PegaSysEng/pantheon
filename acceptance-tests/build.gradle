@@ -21,6 +21,7 @@ dependencies {
   testImplementation project(':consensus:ibft')
   testImplementation project(':crypto')
   testImplementation project(':enclave')
+  testImplementation project(':ethsigner')
   testImplementation project(':ethereum:blockcreation')
   testImplementation project(':ethereum:core')
   testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')

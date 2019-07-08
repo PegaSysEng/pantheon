@@ -26,6 +26,8 @@ jar {
 }
 
 dependencies {
+//  implementation files('../libs/file-based-0.1.2-SNAPSHOT-all.jar')
+  //  integration 'net.consensys:ethsigner'
   implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'com.google.guava:guava'
   implementation 'com.squareup.okhttp3:okhttp'
