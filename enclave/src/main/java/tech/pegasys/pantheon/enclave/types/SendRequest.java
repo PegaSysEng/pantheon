@@ -14,24 +14,13 @@ package tech.pegasys.pantheon.enclave.types;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-@JsonPropertyOrder({"payload", "from", "to"})
-public class SendRequest {
+public abstract class SendRequest {
   private byte[] payload;
   private String from;
-  private List<String> to;
 
-  public SendRequest(
-      @JsonProperty(value = "payload") final String payload,
-      @JsonProperty(value = "from") final String from,
-      @JsonProperty(value = "to") final List<String> to) {
+  public SendRequest(final String payload, final String from) {
     this.payload = payload.getBytes(UTF_8);
     this.from = from;
-    this.to = to;
   }
 
   public byte[] getPayload() {
@@ -40,9 +29,5 @@ public class SendRequest {
 
   public String getFrom() {
     return from;
-  }
-
-  public List<String> getTo() {
-    return to;
   }
 }
