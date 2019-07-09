@@ -1,4 +1,23 @@
 # Checkout code and build it
+
+## Prerequisites
+
+* Java 8+ to compile; earlier versions are not supported.
+* From Pantheon v1.2, Java 11 will be required. 
+
+
+## Quick-Start
+
+```sh
+git clone --recursive https://github.com/PegasysEng/pantheon
+cd pantheon
+./gradlew build  
+./gradlew integrationTest
+
+# get a list of gradle-tasks
+./gradlew tasks  
+```
+
 ## Checkout source code
 
 ```
