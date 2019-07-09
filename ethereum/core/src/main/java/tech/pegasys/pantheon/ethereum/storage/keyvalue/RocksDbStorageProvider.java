@@ -27,6 +27,10 @@ import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +38,9 @@ import org.apache.logging.log4j.Logger;
 public class RocksDbStorageProvider {
   public static long DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE = 5_000L;
   private static final Logger LOG = LogManager.getLogger();
+  public static final int CURRENT_VERSION = 1;
+  private static final List<StorageProviderFunction> PROVIDERS_BY_VERSION =
+      Arrays.asList(RocksDbStorageProvider::ofUnsegmented, RocksDbStorageProvider::ofSegmented);
 
   public static StorageProvider create(
       final RocksDbConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem)
@@ -46,34 +53,43 @@ public class RocksDbStorageProvider {
       final MetricsSystem metricsSystem,
       final long worldStatePreimageCacheSize)
       throws IOException {
-    if (rocksDbConfiguration.useColumns()) {
-      return createSegmentedProvider(
-          rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
-    } else {
-      return createUnsegmentedProvider(
-          rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
+
+    final Path databaseDir = rocksDbConfiguration.getDatabaseDir();
+    final boolean databaseExists =
+        Optional.ofNullable(databaseDir.toFile().list()).filter(x -> x.length > 0).isPresent();
+    final int databaseVersion =
+        databaseExists ? DatabaseMetadata.fromDirectory(databaseDir).getVersion() : CURRENT_VERSION;
+
+    Files.createDirectories(databaseDir);
+    new DatabaseMetadata(databaseVersion).writeToDirectory(databaseDir);
+
+    try {
+      return PROVIDERS_BY_VERSION
+          .get(databaseVersion)
+          .apply(rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
+    } catch (IndexOutOfBoundsException ioobe) {
+      throw new IllegalStateException(
+          String.format("Invalid database version %d", databaseVersion));
     }
   }
 
-  private static StorageProvider createUnsegmentedProvider(
+  private static StorageProvider ofUnsegmented(
       final RocksDbConfiguration rocksDbConfiguration,
       final MetricsSystem metricsSystem,
-      final long worldStatePreimageCacheSize)
-      throws IOException {
-    Files.createDirectories(rocksDbConfiguration.getDatabaseDir());
+      final long worldStatePreimageCacheSize) {
     final KeyValueStorage kv = RocksDbKeyValueStorage.create(rocksDbConfiguration, metricsSystem);
     final KeyValueStorage preimageKv =
         new LimitedInMemoryKeyValueStorage(worldStatePreimageCacheSize);
     return new KeyValueStorageProvider(kv, kv, preimageKv, kv, kv, kv);
   }
 
-  private static StorageProvider createSegmentedProvider(
+  private static StorageProvider ofSegmented(
       final RocksDbConfiguration rocksDbConfiguration,
       final MetricsSystem metricsSystem,
       final long worldStatePreimageCacheSize)
       throws IOException {
     LOG.info("Using RocksDB columns");
-    Files.createDirectories(rocksDbConfiguration.getDatabaseDir());
+
     final SegmentedKeyValueStorage<?> columnarStorage =
         ColumnarRocksDbKeyValueStorage.create(
             rocksDbConfiguration, asList(RocksDbSegment.values()), metricsSystem);
@@ -112,4 +128,12 @@ public class RocksDbStorageProvider {
       return id;
     }
   }
+}
+
+interface StorageProviderFunction {
+  StorageProvider apply(
+      final RocksDbConfiguration rocksDbConfiguration,
+      final MetricsSystem metricsSystem,
+      final long worldStatePreimageCacheSize)
+      throws IOException;
 }
