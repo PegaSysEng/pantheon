@@ -42,17 +42,6 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
   }
 
   @Override
-  public boolean containsKey(final BytesValue key) throws StorageException {
-    final Lock lock = rwLock.readLock();
-    lock.lock();
-    try {
-      return hashValueStore.containsKey(key);
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  @Override
   public Transaction startTransaction() {
     return new InMemoryTransaction();
   }
@@ -61,17 +50,6 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
   public long removeUnless(final Predicate<BytesValue> inUseCheck) {
     hashValueStore.keySet().removeIf(key -> !inUseCheck.test(key));
     return 0;
-  }
-
-  @Override
-  public void clear() {
-    final Lock lock = rwLock.writeLock();
-    lock.lock();
-    try {
-      hashValueStore.clear();
-    } finally {
-      lock.unlock();
-    }
   }
 
   public Set<BytesValue> keySet() {

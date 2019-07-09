@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class SegmentedKeyValueStorageAdapter<S> implements KeyValueStorage {
+
   private final S segmentHandle;
   private final SegmentedKeyValueStorage<S> storage;
 
@@ -32,11 +33,6 @@ public class SegmentedKeyValueStorageAdapter<S> implements KeyValueStorage {
   @Override
   public Optional<BytesValue> get(final BytesValue key) throws StorageException {
     return storage.get(segmentHandle, key);
-  }
-
-  @Override
-  public boolean containsKey(final BytesValue key) throws StorageException {
-    return storage.containsKey(segmentHandle, key);
   }
 
   @Override
@@ -68,11 +64,6 @@ public class SegmentedKeyValueStorageAdapter<S> implements KeyValueStorage {
   @Override
   public long removeUnless(final Predicate<BytesValue> inUseCheck) {
     return storage.removeUnless(segmentHandle, inUseCheck);
-  }
-
-  @Override
-  public void clear() {
-    storage.clear(segmentHandle);
   }
 
   @Override
