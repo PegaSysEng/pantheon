@@ -81,12 +81,14 @@ import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
+import tech.pegasys.pantheon.nat.NatMethod;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
+import tech.pegasys.pantheon.util.BlockExporter;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
@@ -150,6 +152,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private CommandLine commandLine;
 
   private final BlockImporter blockImporter;
+  private final BlockExporter blockExporter;
 
   final NetworkingOptions networkingOptions = NetworkingOptions.create();
   final SynchronizerOptions synchronizerOptions = SynchronizerOptions.create();
@@ -290,6 +293,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Port on which to listen for p2p communication (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer p2pPort = EnodeURL.DEFAULT_LISTENING_PORT;
+
+  @Option(
+      names = {"--nat-method"},
+      description =
+          "Specify the NAT circumvention method to be used, possible values are ${COMPLETION-CANDIDATES}."
+              + " NONE disables NAT functionality. (default: ${DEFAULT-VALUE})")
+  private final NatMethod natMethod = DEFAULT_NAT_METHOD;
 
   @Option(
       names = {"--network-id"},
@@ -553,6 +563,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isPrivacyEnabled = false;
 
   @Option(
+      names = {"--revert-reason-enabled"},
+      description =
+          "Enable passing the revert reason back through TransactionReceipts (default: ${DEFAULT-VALUE})")
+  private final Boolean isRevertReasonEnabled = false;
+
+  @Option(
       names = {"--privacy-url"},
       description = "The URL on which the enclave is running")
   private final URI privacyUrl = PrivacyParameters.DEFAULT_ENCLAVE_URL;
@@ -595,12 +611,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   public PantheonCommand(
       final Logger logger,
       final BlockImporter blockImporter,
+      final BlockExporter blockExporter,
       final RunnerBuilder runnerBuilder,
       final PantheonController.Builder controllerBuilderFactory,
       final PantheonPluginContextImpl pantheonPluginContext,
       final Map<String, String> environment) {
     this.logger = logger;
     this.blockImporter = blockImporter;
+    this.blockExporter = blockExporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilderFactory = controllerBuilderFactory;
     this.pantheonPluginContext = pantheonPluginContext;
@@ -645,7 +663,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private PantheonCommand addSubCommands(
       final AbstractParseResultHandler<List<Object>> resultHandler, final InputStream in) {
     commandLine.addSubcommand(
-        BlocksSubCommand.COMMAND_NAME, new BlocksSubCommand(blockImporter, resultHandler.out()));
+        BlocksSubCommand.COMMAND_NAME,
+        new BlocksSubCommand(blockImporter, blockExporter, resultHandler.out()));
     commandLine.addSubcommand(
         PublicKeySubCommand.COMMAND_NAME,
         new PublicKeySubCommand(resultHandler.out(), getKeyLoader()));
@@ -846,6 +865,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
+          .isRevertReasonEnabled(isRevertReasonEnabled)
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(this.commandLine, e.getMessage());
@@ -1142,6 +1162,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .vertx(Vertx.vertx(createVertxOptions(metricsSystem)))
             .pantheonController(controller)
             .p2pEnabled(p2pEnabled)
+            .natMethod(natMethod)
             .discovery(peerDiscoveryEnabled)
             .ethNetworkConfig(ethNetworkConfig)
             .p2pAdvertisedHost(p2pAdvertisedHost)
