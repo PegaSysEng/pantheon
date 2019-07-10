@@ -120,7 +120,7 @@ public class PrivateTransactionBuilder {
               PrivateTransaction.builder()
                       .nonce(nonce)
                       .gasPrice(Wei.of(1000))
-                      .gasLimit(63992)
+                      .gasLimit(23992)
                       .to(to)
                       .value(Wei.ZERO)
                       .payload(payload)
