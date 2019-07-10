@@ -38,11 +38,11 @@ public class MiningParameters {
   }
 
   public MiningParameters(
-          final Address coinbase,
-          final Integer minTransactionGasPrice,
-          final BytesValue extraData,
-          final Boolean enabled) {
-    this(coinbase,Wei.of(minTransactionGasPrice),extraData,enabled);
+      final Address coinbase,
+      final Integer minTransactionGasPrice,
+      final BytesValue extraData,
+      final Boolean enabled) {
+    this(coinbase, Wei.of(minTransactionGasPrice), extraData, enabled);
   }
 
   public Optional<Address> getCoinbase() {
