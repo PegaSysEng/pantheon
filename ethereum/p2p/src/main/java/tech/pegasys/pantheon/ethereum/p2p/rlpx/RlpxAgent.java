@@ -63,6 +63,7 @@ public class RlpxAgent {
   private final PeerConnectionEvents connectionEvents;
   private final Subscribers<ConnectCallback> connectSubscribers = Subscribers.create();
   private final ConnectionInitializer connectionInitializer;
+  private final boolean limitRemoteWireConnectionsEnabled;
   private final double fractionRemoteConnectionsAllowed;
 
   private final int maxPeers;
@@ -85,6 +86,7 @@ public class RlpxAgent {
       final int maxPeers,
       final PeerProperties peerProperties,
       final MetricsSystem metricsSystem,
+      final boolean limitRemoteWireConnectionsEnabled,
       final double fractionRemoteConnectionsAllowed) {
     this.maxPeers = maxPeers;
     this.peerProperties = peerProperties;
@@ -92,6 +94,7 @@ public class RlpxAgent {
     this.peerPermissions = peerPermissions;
     this.connectionEvents = connectionEvents;
     this.connectionInitializer = connectionInitializer;
+    this.limitRemoteWireConnectionsEnabled = limitRemoteWireConnectionsEnabled;
     this.fractionRemoteConnectionsAllowed = fractionRemoteConnectionsAllowed;
 
     // Setup metrics
@@ -334,9 +337,10 @@ public class RlpxAgent {
 
     // Disconnect if the fraction of wire connections initiated by peers is too high to protect
     // against eclipse attacks
-    if (!doTheFractionOfRemoteConnectionsAllowsNewOne()) {
+    if (limitRemoteWireConnectionsEnabled && !doTheFractionOfRemoteConnectionsAllowsNewOne()) {
       LOG.warn(
-          "Fraction of remotely initiated connection is too high, rejecting incoming connection.");
+          "Fraction of remotely initiated connection is too high, rejecting incoming connection. (max ratio allowed: {})",
+          fractionRemoteConnectionsAllowed);
       peerConnection.disconnect(DisconnectReason.SUBPROTOCOL_TRIGGERED);
       return;
     }
@@ -505,6 +509,7 @@ public class RlpxAgent {
           config.getMaxPeers(),
           peerProperties,
           metricsSystem,
+          config.isLimitRemoteWireConnectionsEnabled(),
           config.getFractionRemoteWireConnectionsAllowed());
     }
 

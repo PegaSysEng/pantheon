@@ -27,6 +27,7 @@ public class RlpxConfiguration {
   private String bindHost = "0.0.0.0";
   private int bindPort = 30303;
   private int maxPeers = 25;
+  private boolean limitRemoteWireConnectionsEnabled = false;
   private double fractionRemoteWireConnectionsAllowed = DEFAULT_FRACTION_REMOTE_CONNECTIONS_ALLOWED;
   private List<SubProtocol> supportedProtocols = Collections.emptyList();
 
@@ -81,6 +82,16 @@ public class RlpxConfiguration {
 
   public RlpxConfiguration setClientId(final String clientId) {
     this.clientId = clientId;
+    return this;
+  }
+
+  public boolean isLimitRemoteWireConnectionsEnabled() {
+    return limitRemoteWireConnectionsEnabled;
+  }
+
+  public RlpxConfiguration setLimitRemoteWireConnectionsEnabled(
+      final boolean limitRemoteWireConnectionsEnabled) {
+    this.limitRemoteWireConnectionsEnabled = limitRemoteWireConnectionsEnabled;
     return this;
   }
 

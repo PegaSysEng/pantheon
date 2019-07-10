@@ -57,7 +57,6 @@ public class PantheonFactoryConfigurationBuilder {
     // Check connections more frequently during acceptance tests to cut down on
     // intermittent failures due to the fact that we're running over a real network
     networkingConfiguration.setInitiateConnectionsFrequency(5);
-    networkingConfiguration.getRlpx().setFractionRemoteWireConnectionsAllowed(1.0);
   }
 
   public PantheonFactoryConfigurationBuilder name(final String name) {
@@ -195,6 +194,7 @@ public class PantheonFactoryConfigurationBuilder {
   }
 
   public PantheonFactoryConfiguration build() {
+    networkingConfiguration.getRlpx().setFractionRemoteWireConnectionsAllowed(1.0);
     return new PantheonFactoryConfiguration(
         name,
         miningParameters,

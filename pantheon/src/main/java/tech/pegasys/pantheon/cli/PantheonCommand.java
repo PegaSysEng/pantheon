@@ -238,6 +238,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
 
   @Option(
+      names = {"--limit-remote-wire-connections-enabled"},
+      description =
+          "Set to limit the fraction of wire connections initiated by peers. (default: ${DEFAULT-VALUE})")
+  private final Boolean isLimitRemoteWireConnectionsEnabled = false;
+
+  @Option(
       names = {"--fraction-remote-connections-allowed"},
       paramLabel = MANDATORY_DOUBLE_FORMAT_HELP,
       description =
@@ -789,7 +795,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--banned-node-id",
             "--banned-node-ids",
             "--fraction-remote-connections-allowed"));
-
     // Check that mining options are able to work or send an error
     checkOptionDependencies(
         logger,
@@ -1180,6 +1185,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .p2pAdvertisedHost(p2pAdvertisedHost)
             .p2pListenPort(p2pListenPort)
             .maxPeers(maxPeers)
+            .limitRemoteWireConnectionsEnabled(isLimitRemoteWireConnectionsEnabled)
             .fractionRemoteConnectionsAllowed(fractionRemoteConnectionsAllowed.getValue())
             .networkingConfiguration(networkingOptions.toDomainObject())
             .graphQLConfiguration(graphQLConfiguration)

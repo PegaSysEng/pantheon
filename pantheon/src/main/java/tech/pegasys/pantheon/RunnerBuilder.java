@@ -115,6 +115,7 @@ public class RunnerBuilder {
   private int p2pListenPort;
   private NatMethod natMethod = NatMethod.NONE;
   private int maxPeers;
+  private boolean limitRemoteWireConnectionsEnabled = false;
   private double fractionRemoteConnectionsAllowed;
   private EthNetworkConfig ethNetworkConfig;
 
@@ -175,6 +176,12 @@ public class RunnerBuilder {
 
   public RunnerBuilder maxPeers(final int maxPeers) {
     this.maxPeers = maxPeers;
+    return this;
+  }
+
+  public RunnerBuilder limitRemoteWireConnectionsEnabled(
+      final boolean limitRemoteWireConnectionsEnabled) {
+    this.limitRemoteWireConnectionsEnabled = limitRemoteWireConnectionsEnabled;
     return this;
   }
 

@@ -717,6 +717,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
     verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
+    verify(mockRunnerBuilder).limitRemoteWireConnectionsEnabled(eq(false));
     verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(eq(0.5));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(jsonRpcConfiguration));
     verify(mockRunnerBuilder).graphQLConfiguration(eq(graphQLConfiguration));
@@ -1240,7 +1241,9 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     final double fractionRemoteConnectionsAllowed = 0.12;
     parseCommand(
-        "--fraction-remote-connections-allowed", String.valueOf(fractionRemoteConnectionsAllowed));
+        "--limit-remote-wire-connections-enabled",
+        "--fraction-remote-connections-allowed",
+        String.valueOf(fractionRemoteConnectionsAllowed));
 
     verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(doubleArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
@@ -1254,7 +1257,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void fractionRemoteConnectionsAllowedWithInvalidFormatMustFail() {
 
-    parseCommand("--fraction-remote-connections-allowed", "not-a-fraction");
+    parseCommand(
+        "--limit-remote-wire-connections-enabled",
+        "--fraction-remote-connections-allowed",
+        "not-a-fraction");
     verifyZeroInteractions(mockRunnerBuilder);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
@@ -1265,7 +1271,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void fractionRemoteConnectionsAllowedWithOutOfRangeMustFail() {
 
-    parseCommand("--fraction-remote-connections-allowed", "1.5");
+    parseCommand(
+        "--limit-remote-wire-connections-enabled", "--fraction-remote-connections-allowed", "1.5");
     verifyZeroInteractions(mockRunnerBuilder);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())

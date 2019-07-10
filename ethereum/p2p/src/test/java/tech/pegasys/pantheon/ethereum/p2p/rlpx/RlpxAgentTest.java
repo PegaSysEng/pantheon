@@ -830,6 +830,7 @@ public class RlpxAgentTest {
   }
 
   private RlpxAgent agent() {
+    config.setLimitRemoteWireConnectionsEnabled(true);
     return RlpxAgent.builder()
         .keyPair(KEY_PAIR)
         .config(config)
