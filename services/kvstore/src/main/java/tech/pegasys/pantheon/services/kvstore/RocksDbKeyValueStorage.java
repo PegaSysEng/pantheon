@@ -117,6 +117,24 @@ public class RocksDbKeyValueStorage implements KeyValueStorage, Closeable {
   }
 
   @Override
+  public void clear() {
+    try (final RocksIterator rocksIterator = db.newIterator()) {
+      if (!rocksIterator.isValid()) {
+        return;
+      }
+      rocksIterator.seekToFirst();
+      final byte[] firstKey = rocksIterator.key();
+      rocksIterator.seekToLast();
+      if (!rocksIterator.isValid()) {
+        return;
+      }
+      db.deleteRange(firstKey, rocksIterator.key());
+    } catch (final RocksDBException e) {
+      throw new StorageException(e);
+    }
+  }
+
+  @Override
   public void close() {
     if (closed.compareAndSet(false, true)) {
       txOptions.close();

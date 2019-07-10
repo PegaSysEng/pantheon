@@ -36,7 +36,13 @@ public interface KeyValueStorage extends Closeable {
    */
   Transaction startTransaction() throws StorageException;
 
+  default boolean containsKey(final BytesValue key) throws StorageException {
+    return get(key).isPresent();
+  }
+
   long removeUnless(Predicate<BytesValue> inUseCheck);
+
+  void clear();
 
   class StorageException extends RuntimeException {
     public StorageException(final Throwable t) {

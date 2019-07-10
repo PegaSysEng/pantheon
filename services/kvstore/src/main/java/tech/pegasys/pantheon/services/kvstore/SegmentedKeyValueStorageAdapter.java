@@ -36,6 +36,11 @@ public class SegmentedKeyValueStorageAdapter<S> implements KeyValueStorage {
   }
 
   @Override
+  public boolean containsKey(final BytesValue key) throws StorageException {
+    return storage.containsKey(segmentHandle, key);
+  }
+
+  @Override
   public Transaction startTransaction() throws StorageException {
     final SegmentedKeyValueStorage.Transaction<S> transaction = storage.startTransaction();
     return new Transaction() {
@@ -64,6 +69,11 @@ public class SegmentedKeyValueStorageAdapter<S> implements KeyValueStorage {
   @Override
   public long removeUnless(final Predicate<BytesValue> inUseCheck) {
     return storage.removeUnless(segmentHandle, inUseCheck);
+  }
+
+  @Override
+  public void clear() {
+    storage.clear(segmentHandle);
   }
 
   @Override
