@@ -320,6 +320,27 @@ public class RlpxAgentTest {
   }
 
   @Test
+  public void connect_failsWhenFractionOfRemoteConnectionsTooHigh() {
+    startAgentWithMaxPeers(5);
+    // Connect 2 peers (locally initiated)
+    agent.connect(createPeer());
+    agent.connect(createPeer());
+    assertThat(agent.getConnectionCount()).isEqualTo(2);
+    // Connect 2 peers (remotely initiated)
+    connectionInitializer.simulateIncomingConnection(connection(createPeer()));
+    connectionInitializer.simulateIncomingConnection(connection(createPeer()));
+    assertThat(agent.getConnectionCount()).isEqualTo(4);
+
+    // Add remotely initiated connection, this one must be rejected because the fraction of remote
+    // connections is 0.5
+    final Peer remotelyInitiatedPeer = createPeer();
+    final MockPeerConnection incomingConnection = connection(remotelyInitiatedPeer);
+    connectionInitializer.simulateIncomingConnection(incomingConnection);
+    assertThat(incomingConnection.getDisconnectReason())
+        .contains(DisconnectReason.SUBPROTOCOL_TRIGGERED);
+  }
+
+  @Test
   public void connect_succeedsForExemptPeerWhenMaxPeersConnected()
       throws ExecutionException, InterruptedException {
     // Turn off autocomplete so that each connection is established (completed) after it has been

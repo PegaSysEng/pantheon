@@ -57,7 +57,7 @@ import org.apache.logging.log4j.Logger;
 
 public class RlpxAgent {
   private static final Logger LOG = LogManager.getLogger();
-  private static final Double DEFAULT_FRACTION_REMOTE_CONNECTIONS_ALLOWED = 1.0 / 5.0;
+  private static final Double DEFAULT_FRACTION_REMOTE_CONNECTIONS_ALLOWED = 0.5;
 
   private final LocalNode localNode;
   private final PeerRlpxPermissions peerPermissions;
