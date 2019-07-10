@@ -37,14 +37,6 @@ public class MiningParameters {
     this.enabled = enabled;
   }
 
-  public MiningParameters(
-      final Address coinbase,
-      final Integer minTransactionGasPrice,
-      final BytesValue extraData,
-      final Boolean enabled) {
-    this(coinbase, Wei.of(minTransactionGasPrice), extraData, enabled);
-  }
-
   public Optional<Address> getCoinbase() {
     return coinbase;
   }

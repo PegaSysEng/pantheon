@@ -58,6 +58,7 @@ import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
@@ -501,7 +502,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "Minimum price (in Wei) offered by a transaction for it to be included in a mined "
               + "block (default: ${DEFAULT-VALUE})",
       arity = "1")
-  private final Integer minTransactionGasPrice = DEFAULT_MIN_TRANSACTION_GAS_PRICE;
+  private final Wei minTransactionGasPrice = DEFAULT_MIN_TRANSACTION_GAS_PRICE;
 
   @Option(
       names = {"--miner-extra-data"},
@@ -663,6 +664,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(Level.class, Level::valueOf);
     commandLine.registerConverter(SyncMode.class, SyncMode::fromString);
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
+    commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
     final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
     metricCategoryConverter.addCategories(PantheonMetricCategory.class);

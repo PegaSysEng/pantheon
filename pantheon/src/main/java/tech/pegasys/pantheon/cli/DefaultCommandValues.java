@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.cli;
 
+import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -37,7 +38,7 @@ public interface DefaultCommandValues {
   String MANDATORY_MODE_FORMAT_HELP = "<MODE>";
   String MANDATORY_NETWORK_FORMAT_HELP = "<NETWORK>";
   String MANDATORY_NODE_ID_FORMAT_HELP = "<NODEID>";
-  Integer DEFAULT_MIN_TRANSACTION_GAS_PRICE = 1000;
+  Wei DEFAULT_MIN_TRANSACTION_GAS_PRICE = Wei.of(1000);
   BytesValue DEFAULT_EXTRA_DATA = BytesValue.EMPTY;
   long DEFAULT_MAX_REFRESH_DELAY = 3600000;
   long DEFAULT_MIN_REFRESH_DELAY = 1;
