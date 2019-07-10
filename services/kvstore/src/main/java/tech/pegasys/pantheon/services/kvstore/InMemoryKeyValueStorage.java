@@ -31,15 +31,18 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
   private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
   @Override
-  public Optional<BytesValue> get(final BytesValue key) {
-    final Lock lock = rwLock.readLock();
+  public void clear() {
+    final Lock lock = rwLock.writeLock();
     lock.lock();
     try {
-      return Optional.ofNullable(hashValueStore.get(key));
+      hashValueStore.clear();
     } finally {
       lock.unlock();
     }
   }
+
+  @Override
+  public void close() {}
 
   @Override
   public boolean containsKey(final BytesValue key) throws StorageException {
@@ -53,16 +56,11 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
   }
 
   @Override
-  public Transaction startTransaction() {
-    return new InMemoryTransaction();
-  }
-
-  @Override
-  public void clear() {
-    final Lock lock = rwLock.writeLock();
+  public Optional<BytesValue> get(final BytesValue key) {
+    final Lock lock = rwLock.readLock();
     lock.lock();
     try {
-      hashValueStore.clear();
+      return Optional.ofNullable(hashValueStore.get(key));
     } finally {
       lock.unlock();
     }
@@ -74,12 +72,14 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
     return 0;
   }
 
+  @Override
+  public Transaction startTransaction() {
+    return new InMemoryTransaction();
+  }
+
   public Set<BytesValue> keySet() {
     return Collections.unmodifiableSet(new HashSet<>(hashValueStore.keySet()));
   }
-
-  @Override
-  public void close() {}
 
   private class InMemoryTransaction extends AbstractTransaction {
 

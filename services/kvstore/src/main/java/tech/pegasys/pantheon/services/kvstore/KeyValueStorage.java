@@ -23,11 +23,19 @@ import java.util.function.Predicate;
 /** Service provided by pantheon to facilitate persistent data storage. */
 public interface KeyValueStorage extends Closeable {
 
+  void clear();
+
+  default boolean containsKey(final BytesValue key) throws StorageException {
+    return get(key).isPresent();
+  }
+
   /**
    * @param key Index into persistent data repository.
    * @return The value persisted at the key index.
    */
   Optional<BytesValue> get(BytesValue key) throws StorageException;
+
+  long removeUnless(Predicate<BytesValue> inUseCheck);
 
   /**
    * Begins a transaction. Returns a transaction object that can be updated and committed.
@@ -35,14 +43,6 @@ public interface KeyValueStorage extends Closeable {
    * @return An object representing the transaction.
    */
   Transaction startTransaction() throws StorageException;
-
-  default boolean containsKey(final BytesValue key) throws StorageException {
-    return get(key).isPresent();
-  }
-
-  long removeUnless(Predicate<BytesValue> inUseCheck);
-
-  void clear();
 
   class StorageException extends RuntimeException {
     public StorageException(final Throwable t) {

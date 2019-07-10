@@ -31,13 +31,28 @@ public class SegmentedKeyValueStorageAdapter<S> implements KeyValueStorage {
   }
 
   @Override
-  public Optional<BytesValue> get(final BytesValue key) throws StorageException {
-    return storage.get(segmentHandle, key);
+  public void clear() {
+    storage.clear(segmentHandle);
+  }
+
+  @Override
+  public void close() throws IOException {
+    storage.close();
   }
 
   @Override
   public boolean containsKey(final BytesValue key) throws StorageException {
     return storage.containsKey(segmentHandle, key);
+  }
+
+  @Override
+  public Optional<BytesValue> get(final BytesValue key) throws StorageException {
+    return storage.get(segmentHandle, key);
+  }
+
+  @Override
+  public long removeUnless(final Predicate<BytesValue> inUseCheck) {
+    return storage.removeUnless(segmentHandle, inUseCheck);
   }
 
   @Override
@@ -64,20 +79,5 @@ public class SegmentedKeyValueStorageAdapter<S> implements KeyValueStorage {
         transaction.rollback();
       }
     };
-  }
-
-  @Override
-  public long removeUnless(final Predicate<BytesValue> inUseCheck) {
-    return storage.removeUnless(segmentHandle, inUseCheck);
-  }
-
-  @Override
-  public void clear() {
-    storage.clear(segmentHandle);
-  }
-
-  @Override
-  public void close() throws IOException {
-    storage.close();
   }
 }
