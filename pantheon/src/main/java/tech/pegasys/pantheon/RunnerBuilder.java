@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon;
 
-import tech.pegasys.pantheon.cli.EthNetworkConfig;
+import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -82,6 +82,8 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
+import tech.pegasys.pantheon.nat.NatMethod;
+import tech.pegasys.pantheon.nat.upnp.UpnpNatManager;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;
@@ -104,17 +106,21 @@ public class RunnerBuilder {
 
   private Vertx vertx;
   private PantheonController<?> pantheonController;
+
+  private NetworkingConfiguration networkingConfiguration = NetworkingConfiguration.create();
+  private Collection<BytesValue> bannedNodeIds = new ArrayList<>();
   private boolean p2pEnabled = true;
   private boolean discovery;
-  private EthNetworkConfig ethNetworkConfig;
   private String p2pAdvertisedHost;
   private int p2pListenPort;
+  private NatMethod natMethod = NatMethod.NONE;
   private int maxPeers;
+  private EthNetworkConfig ethNetworkConfig;
+
   private JsonRpcConfiguration jsonRpcConfiguration;
   private GraphQLConfiguration graphQLConfiguration;
   private WebSocketConfiguration webSocketConfiguration;
   private Path dataDir;
-  private Collection<BytesValue> bannedNodeIds = new ArrayList<>();
   private MetricsConfiguration metricsConfiguration;
   private MetricsSystem metricsSystem;
   private Optional<PermissioningConfiguration> permissioningConfiguration = Optional.empty();
@@ -145,6 +151,12 @@ public class RunnerBuilder {
     return this;
   }
 
+  public RunnerBuilder networkingConfiguration(
+      final NetworkingConfiguration networkingConfiguration) {
+    this.networkingConfiguration = networkingConfiguration;
+    return this;
+  }
+
   public RunnerBuilder p2pAdvertisedHost(final String p2pAdvertisedHost) {
     this.p2pAdvertisedHost = p2pAdvertisedHost;
     return this;
@@ -152,6 +164,11 @@ public class RunnerBuilder {
 
   public RunnerBuilder p2pListenPort(final int p2pListenPort) {
     this.p2pListenPort = p2pListenPort;
+    return this;
+  }
+
+  public RunnerBuilder natMethod(final NatMethod natMethod) {
+    this.natMethod = natMethod;
     return this;
   }
 
@@ -248,10 +265,7 @@ public class RunnerBuilder {
             .setMaxPeers(maxPeers)
             .setSupportedProtocols(subProtocols)
             .setClientId(PantheonInfo.version());
-    final NetworkingConfiguration networkConfig =
-        new NetworkingConfiguration()
-            .setRlpx(rlpxConfiguration)
-            .setDiscovery(discoveryConfiguration);
+    networkingConfiguration.setRlpx(rlpxConfiguration).setDiscovery(discoveryConfiguration);
 
     final PeerPermissionsBlacklist bannedNodes = PeerPermissionsBlacklist.create();
     bannedNodeIds.forEach(bannedNodes::add);
@@ -275,16 +289,19 @@ public class RunnerBuilder {
             .map(nodePerms -> PeerPermissions.combine(nodePerms, bannedNodes))
             .orElse(bannedNodes);
 
+    final Optional<UpnpNatManager> natManager = buildNatManager(natMethod);
+
     NetworkBuilder inactiveNetwork = (caps) -> new NoopP2PNetwork();
     NetworkBuilder activeNetwork =
         (caps) ->
             DefaultP2PNetwork.builder()
                 .vertx(vertx)
                 .keyPair(keyPair)
-                .config(networkConfig)
+                .config(networkingConfiguration)
                 .peerPermissions(peerPermissions)
                 .metricsSystem(metricsSystem)
                 .supportedCapabilities(caps)
+                .natManager(natManager)
                 .build();
 
     final NetworkRunner networkRunner =
@@ -353,6 +370,7 @@ public class RunnerBuilder {
                   dataDir,
                   jsonRpcConfiguration,
                   metricsSystem,
+                  natManager,
                   jsonRpcMethods,
                   new HealthService(new LivenessCheck()),
                   new HealthService(new ReadinessCheck(peerNetwork, synchronizer))));
@@ -429,6 +447,7 @@ public class RunnerBuilder {
     return new Runner(
         vertx,
         networkRunner,
+        natManager,
         jsonRpcHttpService,
         graphQLHttpService,
         webSocketService,
@@ -453,6 +472,16 @@ public class RunnerBuilder {
                     localNodeId,
                     transactionSimulator,
                     metricsSystem));
+  }
+
+  private Optional<UpnpNatManager> buildNatManager(final NatMethod natMethod) {
+    switch (natMethod) {
+      case UPNP:
+        return Optional.of(new UpnpNatManager());
+      case NONE:
+      default:
+        return Optional.ofNullable(null);
+    }
   }
 
   private Optional<AccountPermissioningController> buildAccountPermissioningController(

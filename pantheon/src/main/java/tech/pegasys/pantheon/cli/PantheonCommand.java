@@ -16,9 +16,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static tech.pegasys.pantheon.cli.CommandLineUtils.checkOptionDependencies;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
-import static tech.pegasys.pantheon.cli.NetworkName.MAINNET;
+import static tech.pegasys.pantheon.cli.config.NetworkName.MAINNET;
+import static tech.pegasys.pantheon.cli.util.CommandLineUtils.checkOptionDependencies;
 import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration.DEFAULT_GRAPHQL_HTTP_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
@@ -31,14 +31,27 @@ import static tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration.DEFA
 import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.Runner;
 import tech.pegasys.pantheon.RunnerBuilder;
-import tech.pegasys.pantheon.cli.PublicKeySubCommand.KeyLoader;
+import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
+import tech.pegasys.pantheon.cli.config.NetworkName;
 import tech.pegasys.pantheon.cli.converter.MetricCategoryConverter;
 import tech.pegasys.pantheon.cli.converter.RpcApisConverter;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.cli.custom.RpcAuthFileValidator;
-import tech.pegasys.pantheon.cli.operator.OperatorSubCommand;
-import tech.pegasys.pantheon.cli.rlp.RLPSubCommand;
+import tech.pegasys.pantheon.cli.error.PantheonExceptionHandler;
+import tech.pegasys.pantheon.cli.options.EthProtocolOptions;
+import tech.pegasys.pantheon.cli.options.NetworkingOptions;
+import tech.pegasys.pantheon.cli.options.RocksDBOptions;
+import tech.pegasys.pantheon.cli.options.SynchronizerOptions;
+import tech.pegasys.pantheon.cli.options.TransactionPoolOptions;
+import tech.pegasys.pantheon.cli.subcommands.PasswordSubCommand;
+import tech.pegasys.pantheon.cli.subcommands.PublicKeySubCommand;
+import tech.pegasys.pantheon.cli.subcommands.PublicKeySubCommand.KeyLoader;
+import tech.pegasys.pantheon.cli.subcommands.blocks.BlocksSubCommand;
+import tech.pegasys.pantheon.cli.subcommands.operator.OperatorSubCommand;
+import tech.pegasys.pantheon.cli.subcommands.rlp.RLPSubCommand;
+import tech.pegasys.pantheon.cli.util.ConfigOptionSearchAndRunHandler;
+import tech.pegasys.pantheon.cli.util.VersionProvider;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
@@ -46,12 +59,9 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
@@ -71,12 +81,14 @@ import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
+import tech.pegasys.pantheon.nat.NatMethod;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
+import tech.pegasys.pantheon.util.BlockExporter;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
@@ -140,10 +152,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private CommandLine commandLine;
 
   private final BlockImporter blockImporter;
+  private final BlockExporter blockExporter;
 
-  private final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder;
-  private final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder;
-  private final RocksDbConfiguration.Builder rocksDbConfigurationBuilder;
+  final NetworkingOptions networkingOptions = NetworkingOptions.create();
+  final SynchronizerOptions synchronizerOptions = SynchronizerOptions.create();
+  final EthProtocolOptions ethProtocolOptions = EthProtocolOptions.create();
+  final RocksDBOptions rocksDBOptions = RocksDBOptions.create();
+  final TransactionPoolOptions transactionPoolOptions = TransactionPoolOptions.create();
   private final RunnerBuilder runnerBuilder;
   private final PantheonController.Builder controllerBuilderFactory;
   private final PantheonPluginContextImpl pantheonPluginContext;
@@ -278,6 +293,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Port on which to listen for p2p communication (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer p2pPort = EnodeURL.DEFAULT_LISTENING_PORT;
+
+  @Option(
+      names = {"--nat-method"},
+      description =
+          "Specify the NAT circumvention method to be used, possible values are ${COMPLETION-CANDIDATES}."
+              + " NONE disables NAT functionality. (default: ${DEFAULT-VALUE})")
+  private final NatMethod natMethod = DEFAULT_NAT_METHOD;
 
   @Option(
       names = {"--network-id"},
@@ -469,7 +491,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       paramLabel = "<LOG VERBOSITY LEVEL>",
       description =
           "Logging verbosity levels: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)")
-  private final Level logLevel = null;
+  private final Level logLevel = Level.INFO;
 
   @Option(
       names = {"--miner-enabled"},
@@ -541,6 +563,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isPrivacyEnabled = false;
 
   @Option(
+      names = {"--revert-reason-enabled"},
+      description =
+          "Enable passing the revert reason back through TransactionReceipts (default: ${DEFAULT-VALUE})")
+  private final Boolean isRevertReasonEnabled = false;
+
+  @Option(
       names = {"--privacy-url"},
       description = "The URL on which the enclave is running")
   private final URI privacyUrl = PrivacyParameters.DEFAULT_ENCLAVE_URL;
@@ -557,7 +585,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "Maximum number of pending transactions that will be kept in the transaction pool (default: ${DEFAULT-VALUE})",
       arity = "1")
-  private final Integer txPoolMaxSize = PendingTransactions.MAX_PENDING_TRANSACTIONS;
+  private final Integer txPoolMaxSize = TransactionPoolConfiguration.MAX_PENDING_TRANSACTIONS;
 
   @Option(
       names = {"--tx-pool-retention-hours"},
@@ -565,67 +593,34 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "Maximum retention period of pending transactions in hours (default: ${DEFAULT-VALUE})",
       arity = "1")
-  private final Integer pendingTxRetentionPeriod = PendingTransactions.DEFAULT_TX_RETENTION_HOURS;
+  private final Integer pendingTxRetentionPeriod =
+      TransactionPoolConfiguration.DEFAULT_TX_RETENTION_HOURS;
 
-  @Option(
-      names = {"--tx-pool-keep-alive-seconds"},
-      paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
-      description = "Keep alive of transactions in seconds (default: ${DEFAULT-VALUE})",
-      arity = "1")
-  private final Integer txMessageKeepAliveSeconds = TransactionPool.DEFAULT_TX_MSG_KEEP_ALIVE;
+  private EthNetworkConfig ethNetworkConfig;
+  private JsonRpcConfiguration jsonRpcConfiguration;
+  private GraphQLConfiguration graphQLConfiguration;
+  private WebSocketConfiguration webSocketConfiguration;
+  private MetricsConfiguration metricsConfiguration;
+  private Optional<PermissioningConfiguration> permissioningConfiguration;
+  private Collection<EnodeURL> staticNodes;
+  private PantheonController<?> pantheonController;
 
-  // Inner class so we can get to loggingLevel.
-  public class PantheonExceptionHandler
-      extends CommandLine.AbstractHandler<List<Object>, PantheonExceptionHandler>
-      implements CommandLine.IExceptionHandler2<List<Object>> {
-
-    @Override
-    public List<Object> handleParseException(final ParameterException ex, final String[] args) {
-      if (logLevel != null && Level.DEBUG.isMoreSpecificThan(logLevel)) {
-        ex.printStackTrace(err());
-      } else {
-        err().println(ex.getMessage());
-      }
-      if (!CommandLine.UnmatchedArgumentException.printSuggestions(ex, err())) {
-        ex.getCommandLine().usage(err(), ansi());
-      }
-      return returnResultOrExit(null);
-    }
-
-    @Override
-    public List<Object> handleExecutionException(
-        final ExecutionException ex, final CommandLine.ParseResult parseResult) {
-      return throwOrExit(ex);
-    }
-
-    @Override
-    protected PantheonExceptionHandler self() {
-      return this;
-    }
-  }
-
-  private final Supplier<PantheonExceptionHandler> exceptionHandlerSupplier =
-      Suppliers.memoize(PantheonExceptionHandler::new);
   private final Supplier<MetricsSystem> metricsSystem =
       Suppliers.memoize(() -> PrometheusMetricsSystem.init(metricsConfiguration()));
 
   public PantheonCommand(
       final Logger logger,
       final BlockImporter blockImporter,
+      final BlockExporter blockExporter,
       final RunnerBuilder runnerBuilder,
       final PantheonController.Builder controllerBuilderFactory,
-      final SynchronizerConfiguration.Builder synchronizerConfigurationBuilder,
-      final EthereumWireProtocolConfiguration.Builder ethereumWireConfigurationBuilder,
-      final RocksDbConfiguration.Builder rocksDbConfigurationBuilder,
       final PantheonPluginContextImpl pantheonPluginContext,
       final Map<String, String> environment) {
     this.logger = logger;
     this.blockImporter = blockImporter;
+    this.blockExporter = blockExporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilderFactory = controllerBuilderFactory;
-    this.synchronizerConfigurationBuilder = synchronizerConfigurationBuilder;
-    this.ethereumWireConfigurationBuilder = ethereumWireConfigurationBuilder;
-    this.rocksDbConfigurationBuilder = rocksDbConfigurationBuilder;
     this.pantheonPluginContext = pantheonPluginContext;
     this.environment = environment;
   }
@@ -637,19 +632,39 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final PantheonExceptionHandler exceptionHandler,
       final InputStream in,
       final String... args) {
+    commandLine = new CommandLine(this).setCaseInsensitiveEnumValuesAllowed(true);
+    handleStandaloneCommand()
+        .addSubCommands(resultHandler, in)
+        .registerConverters()
+        .handleUnstableOptions()
+        .preparePlugins()
+        .parse(resultHandler, exceptionHandler, args);
+  }
 
-    commandLine = new CommandLine(this);
+  @Override
+  public void run() {
+    try {
+      prepareLogging();
+      logger.info("Starting Pantheon version: {}", PantheonInfo.version());
+      checkOptions().configure().controller().startPlugins().startSynchronization();
+    } catch (final Exception e) {
+      throw new ParameterException(this.commandLine, e.getMessage(), e);
+    }
+  }
 
-    commandLine.setCaseInsensitiveEnumValuesAllowed(true);
-
+  private PantheonCommand handleStandaloneCommand() {
     standaloneCommands = new StandaloneCommand();
-
     if (isFullInstantiation()) {
       commandLine.addMixin("standaloneCommands", standaloneCommands);
     }
+    return this;
+  }
 
+  private PantheonCommand addSubCommands(
+      final AbstractParseResultHandler<List<Object>> resultHandler, final InputStream in) {
     commandLine.addSubcommand(
-        BlocksSubCommand.COMMAND_NAME, new BlocksSubCommand(blockImporter, resultHandler.out()));
+        BlocksSubCommand.COMMAND_NAME,
+        new BlocksSubCommand(blockImporter, blockExporter, resultHandler.out()));
     commandLine.addSubcommand(
         PublicKeySubCommand.COMMAND_NAME,
         new PublicKeySubCommand(resultHandler.out(), getKeyLoader()));
@@ -659,7 +674,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         RLPSubCommand.COMMAND_NAME, new RLPSubCommand(resultHandler.out(), in));
     commandLine.addSubcommand(
         OperatorSubCommand.COMMAND_NAME, new OperatorSubCommand(resultHandler.out()));
+    return this;
+  }
 
+  private PantheonCommand registerConverters() {
     commandLine.registerConverter(Address.class, Address::fromHexStringStrict);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
     commandLine.registerConverter(Level.class, Level::valueOf);
@@ -667,26 +685,41 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
-
     final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
     metricCategoryConverter.addCategories(PantheonMetricCategory.class);
     metricCategoryConverter.addCategories(StandardMetricCategory.class);
     commandLine.registerConverter(MetricCategory.class, metricCategoryConverter);
+    return this;
+  }
 
-    // Add performance options
+  private PantheonCommand handleUnstableOptions() {
+    // Add unstable options
     UnstableOptionsSubCommand.createUnstableOptions(
         commandLine,
         ImmutableMap.of(
+            "P2P Network",
+            networkingOptions,
             "Synchronizer",
-            synchronizerConfigurationBuilder,
+            synchronizerOptions,
             "RocksDB",
-            rocksDbConfigurationBuilder,
+            rocksDBOptions,
             "Ethereum Wire Protocol",
-            ethereumWireConfigurationBuilder));
+            ethProtocolOptions,
+            "TransactionPool",
+            transactionPoolOptions));
+    return this;
+  }
 
+  private PantheonCommand preparePlugins() {
     pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
     pantheonPluginContext.registerPlugins(pluginsDir());
+    return this;
+  }
 
+  private PantheonCommand parse(
+      final AbstractParseResultHandler<List<Object>> resultHandler,
+      final PantheonExceptionHandler exceptionHandler,
+      final String... args) {
     // Create a handler that will search for a config file option and use it for
     // default values
     // and eventually it will run regular parsing of the remaining options.
@@ -694,18 +727,44 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         new ConfigOptionSearchAndRunHandler(
             resultHandler, exceptionHandler, CONFIG_FILE_OPTION_NAME, environment, isDocker);
     commandLine.parseWithHandlers(configParsingHandler, exceptionHandler, args);
+    return this;
   }
 
-  @Override
-  public void run() {
+  private PantheonCommand startSynchronization() {
+    synchronize(
+        pantheonController,
+        p2pEnabled,
+        peerDiscoveryEnabled,
+        ethNetworkConfig,
+        maxPeers,
+        p2pHost,
+        p2pPort,
+        graphQLConfiguration,
+        jsonRpcConfiguration,
+        webSocketConfiguration,
+        metricsConfiguration,
+        permissioningConfiguration,
+        staticNodes);
+    return this;
+  }
+
+  private PantheonCommand startPlugins() {
+    pantheonPluginContext.addService(
+        PantheonEvents.class,
+        new PantheonEventsImpl((pantheonController.getProtocolManager().getBlockBroadcaster())));
+    pantheonPluginContext.startPlugins();
+    return this;
+  }
+
+  private void prepareLogging() {
     // set log level per CLI flags
     if (logLevel != null) {
       System.out.println("Setting logging level to " + logLevel.name());
       Configurator.setAllLevels("", logLevel);
     }
+  }
 
-    logger.info("Starting Pantheon version: {}", PantheonInfo.version());
-
+  private PantheonCommand checkOptions() {
     // Check that P2P options are able to work or send an error
     checkOptionDependencies(
         logger,
@@ -741,59 +800,32 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "Unable to mine without a valid coinbase. Either disable mining (remove --miner-enabled)"
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
     }
+    return this;
+  }
 
-    final EthNetworkConfig ethNetworkConfig = updateNetworkConfig(getNetwork());
-    try {
-      final JsonRpcConfiguration jsonRpcConfiguration = jsonRpcConfiguration();
-      final GraphQLConfiguration graphQLConfiguration = graphQLConfiguration();
-      final WebSocketConfiguration webSocketConfiguration = webSocketConfiguration();
-      final Optional<PermissioningConfiguration> permissioningConfiguration =
-          permissioningConfiguration();
+  private PantheonCommand configure() throws Exception {
+    ethNetworkConfig = updateNetworkConfig(getNetwork());
+    jsonRpcConfiguration = jsonRpcConfiguration();
+    graphQLConfiguration = graphQLConfiguration();
+    webSocketConfiguration = webSocketConfiguration();
+    permissioningConfiguration = permissioningConfiguration();
+    staticNodes = loadStaticNodes();
+    logger.info("Connecting to {} static nodes.", staticNodes.size());
+    logger.trace("Static Nodes = {}", staticNodes);
+    final List<URI> enodeURIs =
+        ethNetworkConfig.getBootNodes().stream().map(EnodeURL::toURI).collect(Collectors.toList());
+    permissioningConfiguration
+        .flatMap(PermissioningConfiguration::getLocalConfig)
+        .ifPresent(p -> ensureAllNodesAreInWhitelist(enodeURIs, p));
 
-      final Collection<EnodeURL> staticNodes = loadStaticNodes();
-      logger.info("Connecting to {} static nodes.", staticNodes.size());
-      logger.trace("Static Nodes = {}", staticNodes);
-
-      final List<URI> enodeURIs =
-          ethNetworkConfig.getBootNodes().stream()
-              .map(EnodeURL::toURI)
-              .collect(Collectors.toList());
-      permissioningConfiguration
-          .flatMap(PermissioningConfiguration::getLocalConfig)
-          .ifPresent(p -> ensureAllNodesAreInWhitelist(enodeURIs, p));
-
-      permissioningConfiguration
-          .flatMap(PermissioningConfiguration::getLocalConfig)
-          .ifPresent(
-              p ->
-                  ensureAllNodesAreInWhitelist(
-                      staticNodes.stream().map(EnodeURL::toURI).collect(Collectors.toList()), p));
-
-      final PantheonController<?> pantheonController = buildController();
-      final MetricsConfiguration metricsConfiguration = metricsConfiguration();
-
-      pantheonPluginContext.addService(
-          PantheonEvents.class,
-          new PantheonEventsImpl((pantheonController.getProtocolManager().getBlockBroadcaster())));
-      pantheonPluginContext.startPlugins();
-
-      synchronize(
-          pantheonController,
-          p2pEnabled,
-          peerDiscoveryEnabled,
-          ethNetworkConfig,
-          maxPeers,
-          p2pHost,
-          p2pPort,
-          graphQLConfiguration,
-          jsonRpcConfiguration,
-          webSocketConfiguration,
-          metricsConfiguration,
-          permissioningConfiguration,
-          staticNodes);
-    } catch (final Exception e) {
-      throw new ParameterException(this.commandLine, e.getMessage(), e);
-    }
+    permissioningConfiguration
+        .flatMap(PermissioningConfiguration::getLocalConfig)
+        .ifPresent(
+            p ->
+                ensureAllNodesAreInWhitelist(
+                    staticNodes.stream().map(EnodeURL::toURI).collect(Collectors.toList()), p));
+    metricsConfiguration = metricsConfiguration();
+    return this;
   }
 
   private NetworkName getNetwork() {
@@ -813,23 +845,27 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  PantheonController<?> buildController() {
+  private PantheonCommand controller() {
+    pantheonController = buildController();
+    return this;
+  }
+
+  public PantheonController<?> buildController() {
     try {
       return controllerBuilderFactory
           .fromEthNetworkConfig(updateNetworkConfig(getNetwork()))
           .synchronizerConfiguration(buildSyncConfig())
-          .ethereumWireProtocolConfiguration(ethereumWireConfigurationBuilder.build())
+          .ethProtocolConfiguration(ethProtocolOptions.toDomainObject())
           .rocksDbConfiguration(buildRocksDbConfiguration())
           .dataDirectory(dataDir())
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
-          .maxPendingTransactions(txPoolMaxSize)
-          .pendingTransactionRetentionPeriod(pendingTxRetentionPeriod)
-          .txMessageKeepAliveSeconds(txMessageKeepAliveSeconds)
+          .transactionPoolConfiguration(buildTransactionPoolConfiguration())
           .nodePrivateKeyFile(nodePrivateKeyFile())
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
+          .isRevertReasonEnabled(isRevertReasonEnabled)
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(this.commandLine, e.getMessage());
@@ -923,7 +959,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return webSocketConfiguration;
   }
 
-  MetricsConfiguration metricsConfiguration() {
+  public MetricsConfiguration metricsConfiguration() {
     if (isMetricsEnabled && isMetricsPushEnabled) {
       throw new ParameterException(
           this.commandLine,
@@ -1081,15 +1117,23 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private SynchronizerConfiguration buildSyncConfig() {
-    return synchronizerConfigurationBuilder
+    return synchronizerOptions
+        .toDomainObject()
         .syncMode(syncMode)
         .fastSyncMinimumPeerCount(fastSyncMinPeerCount)
-        .maxTrailingPeers(TrailingPeerRequirements.calculateMaxTrailingPeers(maxPeers))
         .build();
   }
 
   private RocksDbConfiguration buildRocksDbConfiguration() {
-    return rocksDbConfigurationBuilder.databaseDir(dataDir().resolve(DATABASE_PATH)).build();
+    return rocksDBOptions.toDomainObject().databaseDir(dataDir().resolve(DATABASE_PATH)).build();
+  }
+
+  private TransactionPoolConfiguration buildTransactionPoolConfiguration() {
+    return transactionPoolOptions
+        .toDomainObject()
+        .txPoolMaxSize(txPoolMaxSize)
+        .pendingTxRetentionPeriod(pendingTxRetentionPeriod)
+        .build();
   }
 
   // Blockchain synchronisation from peers.
@@ -1118,11 +1162,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .vertx(Vertx.vertx(createVertxOptions(metricsSystem)))
             .pantheonController(controller)
             .p2pEnabled(p2pEnabled)
+            .natMethod(natMethod)
             .discovery(peerDiscoveryEnabled)
             .ethNetworkConfig(ethNetworkConfig)
             .p2pAdvertisedHost(p2pAdvertisedHost)
             .p2pListenPort(p2pListenPort)
             .maxPeers(maxPeers)
+            .networkingConfiguration(networkingOptions.toDomainObject())
             .graphQLConfiguration(graphQLConfiguration)
             .jsonRpcConfiguration(jsonRpcConfiguration)
             .webSocketConfiguration(webSocketConfiguration)
@@ -1304,7 +1350,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  File nodePrivateKeyFile() {
+  public File nodePrivateKeyFile() {
     File nodePrivateKeyFile = null;
     if (isFullInstantiation()) {
       nodePrivateKeyFile = standaloneCommands.nodePrivateKeyFile;
@@ -1397,14 +1443,18 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return metricsSystem.get();
   }
 
-  public PantheonExceptionHandler exceptionHandler() {
-    return exceptionHandlerSupplier.get();
-  }
-
   private Set<EnodeURL> loadStaticNodes() throws IOException {
     final String staticNodesFilename = "static-nodes.json";
     final Path staticNodesPath = dataDir().resolve(staticNodesFilename);
 
     return StaticNodesParser.fromPath(staticNodesPath);
+  }
+
+  public PantheonExceptionHandler exceptionHandler() {
+    return new PantheonExceptionHandler(this::getLogLevel);
+  }
+
+  private Level getLogLevel() {
+    return logLevel;
   }
 }
