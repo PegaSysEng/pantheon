@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.cli;
 
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
+import tech.pegasys.pantheon.nat.NatMethod;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.File;
@@ -35,6 +36,7 @@ public interface DefaultCommandValues {
   String PANTHEON_HOME_PROPERTY_NAME = "pantheon.home";
   String DEFAULT_DATA_DIR_PATH = "./build/data";
   String MANDATORY_INTEGER_FORMAT_HELP = "<INTEGER>";
+  String MANDATORY_LONG_FORMAT_HELP = "<LONG>";
   String MANDATORY_MODE_FORMAT_HELP = "<MODE>";
   String MANDATORY_NETWORK_FORMAT_HELP = "<NETWORK>";
   String MANDATORY_NODE_ID_FORMAT_HELP = "<NODEID>";
@@ -57,6 +59,7 @@ public interface DefaultCommandValues {
   // Default should be FAST for the next release
   // but we use FULL for the moment as Fast is still in progress
   SyncMode DEFAULT_SYNC_MODE = SyncMode.FULL;
+  NatMethod DEFAULT_NAT_METHOD = NatMethod.NONE;
   int FAST_SYNC_MAX_WAIT_TIME = 0;
   int FAST_SYNC_MIN_PEER_COUNT = 5;
   int DEFAULT_MAX_PEERS = 25;
