@@ -25,8 +25,7 @@ public class PrivacyAcceptanceTestBase extends AcceptanceTestBase {
   @ClassRule public static final TemporaryFolder privacy = new TemporaryFolder();
 
   protected final EeaConditions eea;
-  protected final PrivateTransactions
-      privateTransactions;
+  protected final PrivateTransactions privateTransactions;
   protected final PrivateTransactionBuilder.Builder privateTransactionBuilder;
   protected final PrivateTransactionVerifier privateTransactionVerifier;
   protected final PrivacyPantheonNodeFactory privacyPantheon;
@@ -34,8 +33,7 @@ public class PrivacyAcceptanceTestBase extends AcceptanceTestBase {
   public PrivacyAcceptanceTestBase() {
     final EeaTransactions eeaTransactions = new EeaTransactions();
 
-    privateTransactions =
-        new PrivateTransactions();
+    privateTransactions = new PrivateTransactions();
     eea = new EeaConditions(eeaTransactions);
     privateTransactionBuilder = PrivateTransactionBuilder.builder();
     privateTransactionVerifier = new PrivateTransactionVerifier(eea, eeaTransactions);

@@ -24,11 +24,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.Quantity;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class EeaGetTransactionCount implements JsonRpcMethod {
-  private static final Logger LOG = LogManager.getLogger();
 
   private final JsonRpcParameter parameters;
   private final PrivateTransactionHandler privateTransactionHandler;
