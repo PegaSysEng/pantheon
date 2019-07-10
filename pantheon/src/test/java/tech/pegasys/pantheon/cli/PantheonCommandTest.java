@@ -671,7 +671,6 @@ public class PantheonCommandTest extends CommandTestAbstract {
       assertThat(optionSpec)
           .describedAs("Option '%s' should be a configurable option.", tomlKey)
           .isNotNull();
-      Class<?> type = optionSpec.type();
       // Verify TOML stores it by the appropriate type
       if (optionSpec.type().equals(Boolean.class)) {
         tomlResult.getBoolean(tomlKey);
