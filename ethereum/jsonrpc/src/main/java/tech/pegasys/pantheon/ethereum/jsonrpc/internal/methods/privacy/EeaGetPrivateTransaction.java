@@ -58,7 +58,11 @@ public class EeaGetPrivateTransaction implements JsonRpcMethod {
     final String enclaveKey = parameters.required(request.getParams(), 0, String.class);
     try {
       ReceiveResponse receiveResponse =
-          getReceiveResponseFromEnclave(enclaveKey, privacyParameters.getEnclavePublicKey());
+          getReceiveResponseFromEnclave(
+              Base64.getEncoder()
+                  .encodeToString(BytesValue.fromHexString(enclaveKey).extractArray()),
+              privacyParameters.getEnclavePublicKey());
+
       LOG.trace("Received transaction information from Enclave");
 
       final BytesValueRLPInput bytesValueRLPInput =
