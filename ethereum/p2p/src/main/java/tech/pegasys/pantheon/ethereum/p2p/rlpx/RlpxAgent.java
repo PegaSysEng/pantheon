@@ -57,7 +57,6 @@ import org.apache.logging.log4j.Logger;
 
 public class RlpxAgent {
   private static final Logger LOG = LogManager.getLogger();
-  private static final Double DEFAULT_FRACTION_REMOTE_CONNECTIONS_ALLOWED = 0.5;
 
   private final LocalNode localNode;
   private final PeerRlpxPermissions peerPermissions;
@@ -394,9 +393,12 @@ public class RlpxAgent {
                 .filter(RlpxConnection::isActive)
                 .filter(RlpxConnection::initiatedRemotely)
                 .count());
+    if (remotelyInitiatedConnectionsCount == 0) {
+      return true;
+    }
     final double fractionRemoteConnections =
         (double) remotelyInitiatedConnectionsCount / (double) getConnectionCount();
-    return !(fractionRemoteConnections >= fractionRemoteConnectionsAllowed);
+    return !(fractionRemoteConnections > fractionRemoteConnectionsAllowed);
   }
 
   private void enforceConnectionLimits() {
@@ -478,7 +480,6 @@ public class RlpxAgent {
     private ConnectionInitializer connectionInitializer;
     private PeerConnectionEvents connectionEvents;
     private MetricsSystem metricsSystem;
-    private double fractionRemoteConnectionsAllowed = DEFAULT_FRACTION_REMOTE_CONNECTIONS_ALLOWED;
 
     private Builder() {}
 
@@ -504,7 +505,7 @@ public class RlpxAgent {
           config.getMaxPeers(),
           peerProperties,
           metricsSystem,
-          fractionRemoteConnectionsAllowed);
+          config.getFractionRemoteWireConnectionsAllowed());
     }
 
     private void validate() {
@@ -561,14 +562,6 @@ public class RlpxAgent {
     public Builder metricsSystem(final MetricsSystem metricsSystem) {
       checkNotNull(metricsSystem);
       this.metricsSystem = metricsSystem;
-      return this;
-    }
-
-    public Builder fractionRemoteConnectionsAllowed(final double fractionRemoteConnectionsAllowed) {
-      checkState(
-          fractionRemoteConnectionsAllowed > 0.0,
-          "Fraction of remote connections allowed must be positive.");
-      this.fractionRemoteConnectionsAllowed = fractionRemoteConnectionsAllowed;
       return this;
     }
   }

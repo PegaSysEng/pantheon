@@ -115,6 +115,7 @@ public class RunnerBuilder {
   private int p2pListenPort;
   private NatMethod natMethod = NatMethod.NONE;
   private int maxPeers;
+  private double fractionRemoteConnectionsAllowed;
   private EthNetworkConfig ethNetworkConfig;
 
   private JsonRpcConfiguration jsonRpcConfiguration;
@@ -174,6 +175,12 @@ public class RunnerBuilder {
 
   public RunnerBuilder maxPeers(final int maxPeers) {
     this.maxPeers = maxPeers;
+    return this;
+  }
+
+  public RunnerBuilder fractionRemoteConnectionsAllowed(
+      final double fractionRemoteConnectionsAllowed) {
+    this.fractionRemoteConnectionsAllowed = fractionRemoteConnectionsAllowed;
     return this;
   }
 
@@ -264,7 +271,8 @@ public class RunnerBuilder {
             .setBindPort(p2pListenPort)
             .setMaxPeers(maxPeers)
             .setSupportedProtocols(subProtocols)
-            .setClientId(PantheonInfo.version());
+            .setClientId(PantheonInfo.version())
+            .setFractionRemoteWireConnectionsAllowed(fractionRemoteConnectionsAllowed);
     networkingConfiguration.setRlpx(rlpxConfiguration).setDiscovery(discoveryConfiguration);
 
     final PeerPermissionsBlacklist bannedNodes = PeerPermissionsBlacklist.create();

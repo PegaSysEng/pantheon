@@ -54,6 +54,7 @@ import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.nat.NatMethod;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.number.Fraction;
 
 import java.io.File;
 import java.io.IOException;
@@ -156,6 +157,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
     verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
+    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(eq(0.5));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(defaultJsonRpcConfiguration));
     verify(mockRunnerBuilder).graphQLConfiguration(eq(DEFAULT_GRAPH_QL_CONFIGURATION));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(defaultWebSocketConfiguration));
@@ -669,6 +671,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
       assertThat(optionSpec)
           .describedAs("Option '%s' should be a configurable option.", tomlKey)
           .isNotNull();
+      Class<?> type = optionSpec.type();
       // Verify TOML stores it by the appropriate type
       if (optionSpec.type().equals(Boolean.class)) {
         tomlResult.getBoolean(tomlKey);
@@ -676,6 +679,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
         tomlResult.getArray(tomlKey);
       } else if (Number.class.isAssignableFrom(optionSpec.type())) {
         tomlResult.getLong(tomlKey);
+      } else if (Fraction.class.isAssignableFrom(optionSpec.type())) {
+        tomlResult.getDouble(tomlKey);
       } else {
         tomlResult.getString(tomlKey);
       }
@@ -713,6 +718,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
     verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
+    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(eq(0.5));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(jsonRpcConfiguration));
     verify(mockRunnerBuilder).graphQLConfiguration(eq(graphQLConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
@@ -1012,13 +1018,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "false",
         "--max-peers",
         "42",
+        "--fraction-remote-connections-allowed",
+        "0.5",
         "--banned-node-id",
         String.join(",", nodes),
         "--banned-node-ids",
         String.join(",", nodes));
 
     verifyOptionsConstraintLoggerCall(
-        "--p2p-enabled", "--discovery-enabled", "--bootnodes", "--max-peers", "--banned-node-ids");
+        "--p2p-enabled",
+        "--discovery-enabled",
+        "--bootnodes",
+        "--max-peers",
+        "--banned-node-ids",
+        "--fraction-remote-connections-allowed");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1221,6 +1234,44 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void fractionRemoteConnectionsAllowedOptionMustBeUsed() {
+
+    final double fractionRemoteConnectionsAllowed = 0.12;
+    parseCommand(
+        "--fraction-remote-connections-allowed", String.valueOf(fractionRemoteConnectionsAllowed));
+
+    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(doubleArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(doubleArgumentCaptor.getValue()).isEqualTo(fractionRemoteConnectionsAllowed);
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void fractionRemoteConnectionsAllowedWithInvalidFormatMustFail() {
+
+    parseCommand("--fraction-remote-connections-allowed", "not-a-fraction");
+    verifyZeroInteractions(mockRunnerBuilder);
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains(
+            "Invalid value for option '--fraction-remote-connections-allowed': cannot convert 'not-a-fraction' to Fraction");
+  }
+
+  @Test
+  public void fractionRemoteConnectionsAllowedWithOutOfRangeMustFail() {
+
+    parseCommand("--fraction-remote-connections-allowed", "1.5");
+    verifyZeroInteractions(mockRunnerBuilder);
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains(
+            "Invalid value for option '--fraction-remote-connections-allowed': cannot convert '1.5' to Fraction");
   }
 
   @Test

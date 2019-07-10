@@ -321,15 +321,16 @@ public class RlpxAgentTest {
 
   @Test
   public void connect_failsWhenFractionOfRemoteConnectionsTooHigh() {
-    startAgentWithMaxPeers(5);
+    startAgentWithMaxPeers(6);
     // Connect 2 peers (locally initiated)
     agent.connect(createPeer());
     agent.connect(createPeer());
     assertThat(agent.getConnectionCount()).isEqualTo(2);
-    // Connect 2 peers (remotely initiated)
+    // Connect 3 peers (remotely initiated)
     connectionInitializer.simulateIncomingConnection(connection(createPeer()));
     connectionInitializer.simulateIncomingConnection(connection(createPeer()));
-    assertThat(agent.getConnectionCount()).isEqualTo(4);
+    connectionInitializer.simulateIncomingConnection(connection(createPeer()));
+    assertThat(agent.getConnectionCount()).isEqualTo(5);
 
     // Add remotely initiated connection, this one must be rejected because the fraction of remote
     // connections is 0.5

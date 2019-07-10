@@ -93,6 +93,7 @@ import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.number.Fraction;
 import tech.pegasys.pantheon.util.number.PositiveNumber;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -235,6 +236,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "Maximum P2P peer connections that can be established (default: ${DEFAULT-VALUE})")
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
+
+  @Option(
+      names = {"--fraction-remote-connections-allowed"},
+      paramLabel = MANDATORY_DOUBLE_FORMAT_HELP,
+      description =
+          "Maximum fraction of remotely initiated wire connections that can be established. Must be between 0.0 and 1.0. (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  private final Fraction fractionRemoteConnectionsAllowed =
+      Fraction.fromDouble(DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED);
 
   @Option(
       names = {"--banned-node-ids", "--banned-node-id"},
@@ -685,6 +695,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
+    commandLine.registerConverter(Fraction.class, Fraction::fromString);
     final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
     metricCategoryConverter.addCategories(PantheonMetricCategory.class);
     metricCategoryConverter.addCategories(StandardMetricCategory.class);
@@ -776,7 +787,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--discovery-enabled",
             "--max-peers",
             "--banned-node-id",
-            "--banned-node-ids"));
+            "--banned-node-ids",
+            "--fraction-remote-connections-allowed"));
 
     // Check that mining options are able to work or send an error
     checkOptionDependencies(
@@ -1168,6 +1180,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .p2pAdvertisedHost(p2pAdvertisedHost)
             .p2pListenPort(p2pListenPort)
             .maxPeers(maxPeers)
+            .fractionRemoteConnectionsAllowed(fractionRemoteConnectionsAllowed.getValue())
             .networkingConfiguration(networkingOptions.toDomainObject())
             .graphQLConfiguration(graphQLConfiguration)
             .jsonRpcConfiguration(jsonRpcConfiguration)
