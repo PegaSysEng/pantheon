@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.util.Base64;
 
 import org.apache.logging.log4j.Logger;
+import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 public class EeaGetPrivateTransaction implements JsonRpcMethod {
 
@@ -56,7 +57,7 @@ public class EeaGetPrivateTransaction implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    LOG.trace("Executing {}", RpcMethod.EEA_GET_TRANSACTION_RECEIPT.getMethodName());
+    LOG.trace("Executing {}", RpcMethod.EEA_GET_PRIVATE_TRANSACTION.getMethodName());
     final String enclaveKey = parameters.required(request.getParams(), 0, String.class);
     try {
       ReceiveResponse receiveResponse =
@@ -65,7 +66,7 @@ public class EeaGetPrivateTransaction implements JsonRpcMethod {
 
       final BytesValueRLPInput bytesValueRLPInput =
           new BytesValueRLPInput(
-              BytesValue.wrap(Base64.getDecoder().decode(receiveResponse.getPayload())), false);
+                  BytesValues.fromBase64(receiveResponse.getPayload()), false);
 
       final PrivateTransaction privateTransaction = PrivateTransaction.readFrom(bytesValueRLPInput);
       return new JsonRpcSuccessResponse(request.getId(), privateTransaction);
