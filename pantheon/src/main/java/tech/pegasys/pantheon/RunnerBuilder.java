@@ -279,6 +279,7 @@ public class RunnerBuilder {
             .setMaxPeers(maxPeers)
             .setSupportedProtocols(subProtocols)
             .setClientId(PantheonInfo.version())
+            .setLimitRemoteWireConnectionsEnabled(limitRemoteWireConnectionsEnabled)
             .setFractionRemoteWireConnectionsAllowed(fractionRemoteConnectionsAllowed);
     networkingConfiguration.setRlpx(rlpxConfiguration).setDiscovery(discoveryConfiguration);
 
