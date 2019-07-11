@@ -498,7 +498,7 @@ tasks.register("dockerDistUntar") {
 task distDocker(type: Exec) {
   dependsOn dockerDistUntar
   def dockerBuildVersion = project.hasProperty('release.releaseVersion') ? project.property('release.releaseVersion') : "${rootProject.version}"
-  def image="pegasyseng/pantheon-kubernetes:develop"
+  def image="pegasyseng/pantheon:develop"
   def dockerBuildDir = "build/docker-pantheon/"
   workingDir "${dockerBuildDir}"
 
