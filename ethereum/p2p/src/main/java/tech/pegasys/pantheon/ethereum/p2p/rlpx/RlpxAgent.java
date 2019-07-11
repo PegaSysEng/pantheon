@@ -402,7 +402,7 @@ public class RlpxAgent {
     }
     final double fractionRemoteConnections =
         (double) remotelyInitiatedConnectionsCount / (double) getConnectionCount();
-    return !(fractionRemoteConnections > fractionRemoteConnectionsAllowed);
+    return fractionRemoteConnections > fractionRemoteConnectionsAllowed;
   }
 
   private void enforceConnectionLimits() {
