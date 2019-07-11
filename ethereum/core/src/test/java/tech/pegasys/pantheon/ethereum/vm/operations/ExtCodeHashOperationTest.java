@@ -90,7 +90,7 @@ public class ExtCodeHashOperationTest {
   @Test
   public void shouldGetHashOfAccountCodeWhenCodeIsPresent() {
     final BytesValue code = BytesValue.fromHexString("0xabcdef");
-    MutableAccount account = worldStateUpdater.getOrCreate(REQUESTED_ADDRESS);
+    final MutableAccount account = worldStateUpdater.getOrCreate(REQUESTED_ADDRESS);
     account.setCode(code);
     account.setVersion(Account.DEFAULT_VERSION);
     assertThat(executeOperation(REQUESTED_ADDRESS)).isEqualTo(Hash.hash(code));
@@ -100,7 +100,7 @@ public class ExtCodeHashOperationTest {
   public void shouldZeroOutLeftMostBitsToGetAddress() {
     // If EXTCODEHASH of A is X, then EXTCODEHASH of A + 2**160 is X.
     final BytesValue code = BytesValue.fromHexString("0xabcdef");
-    MutableAccount account = worldStateUpdater.getOrCreate(REQUESTED_ADDRESS);
+    final MutableAccount account = worldStateUpdater.getOrCreate(REQUESTED_ADDRESS);
     account.setCode(code);
     account.setVersion(Account.DEFAULT_VERSION);
     final Bytes32 value =

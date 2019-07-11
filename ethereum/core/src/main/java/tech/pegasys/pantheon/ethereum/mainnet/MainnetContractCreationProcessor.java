@@ -43,6 +43,8 @@ public class MainnetContractCreationProcessor extends AbstractMessageProcessor {
 
   private final List<ContractValidationRule> contractValidationRules;
 
+  private final int accountVersion;
+
   public MainnetContractCreationProcessor(
       final GasCalculator gasCalculator,
       final EVM evm,
