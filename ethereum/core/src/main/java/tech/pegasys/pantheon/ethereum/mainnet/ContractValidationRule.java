@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 
+@FunctionalInterface
 public interface ContractValidationRule {
 
   boolean validate(MessageFrame frame);
