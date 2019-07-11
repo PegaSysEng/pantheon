@@ -390,7 +390,7 @@ public class RlpxAgent {
     enforceConnectionLimits();
   }
 
-  private boolean doTheFractionOfRemoteConnectionsAllowsNewOne() {
+  private boolean remoteConnectionExceedsLimit() {
     final int remotelyInitiatedConnectionsCount =
         Math.toIntExact(
             connectionsById.values().stream()
