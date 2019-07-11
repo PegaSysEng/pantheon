@@ -85,7 +85,6 @@ public class PrunerTest {
     final Block reorgCausingBlock = gen.block(options);
     receipts = gen.receipts(reorgCausingBlock);
     blockchain.appendBlock(reorgCausingBlock, receipts);
-    // after the reorg, the sweep should have been aborted, so the genesis block state should remain
     verify(markSweepPruner, never()).sweep();
   }
 }
