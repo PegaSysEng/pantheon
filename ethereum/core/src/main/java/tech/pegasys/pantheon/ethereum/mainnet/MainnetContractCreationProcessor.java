@@ -39,8 +39,6 @@ public class MainnetContractCreationProcessor extends AbstractMessageProcessor {
 
   private final long initialContractNonce;
 
-  private final int accountVersion;
-
   private final List<ContractValidationRule> contractValidationRules;
 
   private final int accountVersion;
