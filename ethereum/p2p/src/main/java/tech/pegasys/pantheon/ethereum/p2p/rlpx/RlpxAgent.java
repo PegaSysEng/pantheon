@@ -337,7 +337,7 @@ public class RlpxAgent {
 
     // Disconnect if the fraction of wire connections initiated by peers is too high to protect
     // against eclipse attacks
-    if (limitRemoteWireConnectionsEnabled && !doTheFractionOfRemoteConnectionsAllowsNewOne()) {
+    if (limitRemoteWireConnectionsEnabled && remoteConnectionExceedsLimit()) {
       LOG.warn(
           "Fraction of remotely initiated connection is too high, rejecting incoming connection. (max ratio allowed: {})",
           fractionRemoteConnectionsAllowed);
