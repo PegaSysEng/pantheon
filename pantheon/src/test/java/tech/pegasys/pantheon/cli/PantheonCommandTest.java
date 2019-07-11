@@ -680,6 +680,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
         tomlResult.getLong(tomlKey);
       } else if (Wei.class.isAssignableFrom(optionSpec.type())) {
         tomlResult.getLong(tomlKey);
+      } else if (Fraction.class.isAssignableFrom(optionSpec.type())) {
+        tomlResult.getDouble(tomlKey);
       } else {
         tomlResult.getString(tomlKey);
       }
