@@ -398,10 +398,10 @@ public class RlpxAgent {
                 .filter(RlpxConnection::initiatedRemotely)
                 .count());
     if (remotelyInitiatedConnectionsCount == 0) {
-      return true;
+      return false;
     }
     final double fractionRemoteConnections =
-        (double) remotelyInitiatedConnectionsCount / (double) getConnectionCount();
+        (double) remotelyInitiatedConnectionsCount + 1 / (double) maxPeers;
     return fractionRemoteConnections > fractionRemoteConnectionsAllowed;
   }
 
