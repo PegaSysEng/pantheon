@@ -270,7 +270,8 @@ public abstract class MainnetProtocolSpecs {
       final boolean enableRevertReason) {
     final int contractSizeLimit =
         configContractSizeLimit.orElse(SPURIOUS_DRAGON_CONTRACT_SIZE_LIMIT);
-    return constantinopleFixDefinition(chainId, configContractSizeLimit, configStackSizeLimit, enableRevertReason)
+    return constantinopleFixDefinition(
+            chainId, configContractSizeLimit, configStackSizeLimit, enableRevertReason)
         .contractCreationProcessorBuilder(
             (gasCalculator, evm) ->
                 new MainnetContractCreationProcessor(
