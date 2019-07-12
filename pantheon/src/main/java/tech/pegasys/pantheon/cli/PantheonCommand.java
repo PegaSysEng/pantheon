@@ -94,6 +94,7 @@ import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.number.Fraction;
+import tech.pegasys.pantheon.util.number.Percentage;
 import tech.pegasys.pantheon.util.number.PositiveNumber;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -249,8 +250,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "Maximum fraction of remotely initiated wire connections that can be established. Must be between 0.0 and 1.0. (default: ${DEFAULT-VALUE})",
       arity = "1")
-  private final Fraction fractionRemoteConnectionsAllowed =
-      Fraction.fromDouble(DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED);
+  private final Percentage remoteConnectionsPercentage =
+      Fraction.fromDouble(DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED).toPercentage();
 
   @Option(
       names = {"--banned-node-ids", "--banned-node-id"},
@@ -1186,7 +1187,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .p2pListenPort(p2pListenPort)
             .maxPeers(maxPeers)
             .limitRemoteWireConnectionsEnabled(isLimitRemoteWireConnectionsEnabled)
-            .fractionRemoteConnectionsAllowed(fractionRemoteConnectionsAllowed.getValue())
+            .fractionRemoteConnectionsAllowed(
+                Fraction.fromPercentage(remoteConnectionsPercentage).getValue())
             .networkingConfiguration(networkingOptions.toDomainObject())
             .graphQLConfiguration(graphQLConfiguration)
             .jsonRpcConfiguration(jsonRpcConfiguration)

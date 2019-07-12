@@ -25,6 +25,14 @@ public class Fraction {
     this.value = value;
   }
 
+  public static Fraction fromPercentage(final Percentage percentage) {
+    return fromDouble(percentage.getValueAsDouble() / 100.0);
+  }
+
+  public Percentage toPercentage() {
+    return Percentage.fromInt((int) (value * 100.0));
+  }
+
   /**
    * Parse a string representing a fraction.
    *
