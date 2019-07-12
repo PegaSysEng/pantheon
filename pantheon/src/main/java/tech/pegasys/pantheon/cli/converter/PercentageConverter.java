@@ -17,12 +17,12 @@ import tech.pegasys.pantheon.util.number.Percentage;
 
 import picocli.CommandLine;
 
-public class PercentageConverter implements CommandLine.ITypeConverter<Percentage> {
+public class PercentageConverter implements CommandLine.ITypeConverter<Integer> {
 
   @Override
-  public Percentage convert(final String value) throws PercentageConversionException {
+  public Integer convert(final String value) throws PercentageConversionException {
     try {
-      return Percentage.fromString(value);
+      return Percentage.fromString(value).getValue();
     } catch (NullPointerException | IllegalArgumentException e) {
       throw new PercentageConversionException(value);
     }

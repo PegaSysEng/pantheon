@@ -47,7 +47,7 @@ public class Percentage {
     return value;
   }
 
-  public double getValueAsDouble() {
+  public float getValueAsFloat() {
     return value;
   }
 

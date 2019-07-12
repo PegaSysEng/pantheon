@@ -22,14 +22,14 @@ public class FractionTest {
   @Test
   public void assertThatAFractionCanBeBuiltFromAValidDouble() {
     final double value = 0.12;
-    Fraction fraction = Fraction.fromDouble(value);
+    Fraction fraction = Fraction.fromFloat(value);
     assertThat(fraction).isNotNull();
     assertThat(fraction.getValue()).isEqualTo(value);
   }
 
   @Test
   public void assertThatAFractionCannotBeBuiltFromAnInvalidDouble() {
-    final Throwable thrown = catchThrowable(() -> Fraction.fromDouble(1.2));
+    final Throwable thrown = catchThrowable(() -> Fraction.fromFloat(1.2));
     assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
   }
 

@@ -17,12 +17,12 @@ import tech.pegasys.pantheon.util.number.Fraction;
 
 import picocli.CommandLine;
 
-public class FractionConverter implements CommandLine.ITypeConverter<Fraction> {
+public class FractionConverter implements CommandLine.ITypeConverter<Float> {
 
   @Override
-  public Fraction convert(final String value) throws FractionConversionException {
+  public Float convert(final String value) throws FractionConversionException {
     try {
-      return Fraction.fromString(value);
+      return Fraction.fromString(value).getValue();
     } catch (NullPointerException | IllegalArgumentException e) {
       throw new FractionConversionException(value);
     }

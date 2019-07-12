@@ -95,7 +95,6 @@ import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.number.Fraction;
-import tech.pegasys.pantheon.util.number.Percentage;
 import tech.pegasys.pantheon.util.number.PositiveNumber;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -252,8 +251,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           "Percentage of remote wire connections that can be established. Must be between 0 and 100 inclusive. (default: ${DEFAULT-VALUE})",
       arity = "1",
       converter = PercentageConverter.class)
-  private final Percentage remoteConnectionsPercentage =
-      Fraction.fromDouble(DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED).toPercentage();
+  private final Integer remoteConnectionsPercentage =
+      Fraction.fromFloat(DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED)
+          .toPercentage()
+          .getValue();
 
   @Option(
       names = {"--banned-node-ids", "--banned-node-id"},
