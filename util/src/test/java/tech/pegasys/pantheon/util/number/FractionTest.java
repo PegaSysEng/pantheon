@@ -21,7 +21,7 @@ public class FractionTest {
 
   @Test
   public void assertThatAFractionCanBeBuiltFromAValidDouble() {
-    final double value = 0.12;
+    final float value = 0.12f;
     Fraction fraction = Fraction.fromFloat(value);
     assertThat(fraction).isNotNull();
     assertThat(fraction.getValue()).isEqualTo(value);
@@ -29,13 +29,13 @@ public class FractionTest {
 
   @Test
   public void assertThatAFractionCannotBeBuiltFromAnInvalidDouble() {
-    final Throwable thrown = catchThrowable(() -> Fraction.fromFloat(1.2));
+    final Throwable thrown = catchThrowable(() -> Fraction.fromFloat(1.2f));
     assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
   public void assertThatAFractionCanBeBuiltFromAValidString() {
-    final double value = 0.12;
+    final float value = 0.12f;
     Fraction fraction = Fraction.fromString(String.valueOf(value));
     assertThat(fraction).isNotNull();
     assertThat(fraction.getValue()).isEqualTo(value);
@@ -51,6 +51,6 @@ public class FractionTest {
   public void assertThatAFractionCanBeBuiltFromAValidPercentage() {
     Fraction fraction = Fraction.fromPercentage(Percentage.fromInt(12));
     assertThat(fraction).isNotNull();
-    assertThat(fraction.getValue()).isEqualTo(0.12);
+    assertThat(fraction.getValue()).isEqualTo(0.12f);
   }
 }
