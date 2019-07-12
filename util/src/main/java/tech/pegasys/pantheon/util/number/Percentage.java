@@ -12,10 +12,10 @@
  */
 package tech.pegasys.pantheon.util.number;
 
-import java.util.Objects;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.Integer.parseInt;
+
+import java.util.Objects;
 
 public class Percentage {
 

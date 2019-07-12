@@ -239,16 +239,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
 
   @Option(
-      names = {"--limit-remote-wire-connections-enabled"},
+      names = {"--remote-connections-limit-enabled"},
       description =
           "Set to limit the fraction of wire connections initiated by peers. (default: ${DEFAULT-VALUE})")
   private final Boolean isLimitRemoteWireConnectionsEnabled = false;
 
   @Option(
-      names = {"--fraction-remote-connections-allowed"},
+      names = {"--remote-connections-percentage"},
       paramLabel = MANDATORY_DOUBLE_FORMAT_HELP,
       description =
-          "Maximum fraction of remotely initiated wire connections that can be established. Must be between 0.0 and 1.0. (default: ${DEFAULT-VALUE})",
+          "Percentage of remote wire connections that can be established. Must be between 0 and 100 inclusive. (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Percentage remoteConnectionsPercentage =
       Fraction.fromDouble(DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED).toPercentage();
@@ -702,7 +702,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
-    commandLine.registerConverter(Fraction.class, Fraction::fromString);
+    commandLine.registerConverter(Percentage.class, Percentage::fromString);
     final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
     metricCategoryConverter.addCategories(PantheonMetricCategory.class);
     metricCategoryConverter.addCategories(StandardMetricCategory.class);
@@ -795,7 +795,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--max-peers",
             "--banned-node-id",
             "--banned-node-ids",
-            "--fraction-remote-connections-allowed"));
+            "--remote-connections-percentage"));
     // Check that mining options are able to work or send an error
     checkOptionDependencies(
         logger,
