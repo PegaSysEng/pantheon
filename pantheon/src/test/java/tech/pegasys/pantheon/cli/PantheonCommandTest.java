@@ -1265,14 +1265,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void remoteConnectionsPercentageWithInvalidFormatMustFail() {
 
     parseCommand(
-        "--remote-connections-limit-enabled",
-        "--remote-connections-percentage",
-        "not-a-percentage");
+        "--remote-connections-limit-enabled", "--remote-connections-percentage", "invalid");
     verifyZeroInteractions(mockRunnerBuilder);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains(
-            "Invalid value for option '--remote-connections-percentage': cannot convert 'not-a-percentage' to Percentage");
+            "Invalid value for option '--remote-connections-percentage'",
+            "should be a number between 0 and 100 inclusive");
   }
 
   @Test
@@ -1283,7 +1282,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains(
-            "Invalid value for option '--remote-connections-percentage': cannot convert '150' to Percentage");
+            "Invalid value for option '--remote-connections-percentage'",
+            "should be a number between 0 and 100 inclusive");
   }
 
   @Test

@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
 import tech.pegasys.pantheon.cli.config.NetworkName;
 import tech.pegasys.pantheon.cli.converter.MetricCategoryConverter;
+import tech.pegasys.pantheon.cli.converter.PercentageConverter;
 import tech.pegasys.pantheon.cli.converter.RpcApisConverter;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
@@ -249,7 +250,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       paramLabel = MANDATORY_DOUBLE_FORMAT_HELP,
       description =
           "Percentage of remote wire connections that can be established. Must be between 0 and 100 inclusive. (default: ${DEFAULT-VALUE})",
-      arity = "1")
+      arity = "1",
+      converter = PercentageConverter.class)
   private final Percentage remoteConnectionsPercentage =
       Fraction.fromDouble(DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED).toPercentage();
 
@@ -702,7 +704,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
-    commandLine.registerConverter(Percentage.class, Percentage::fromString);
+
     final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
     metricCategoryConverter.addCategories(PantheonMetricCategory.class);
     metricCategoryConverter.addCategories(StandardMetricCategory.class);
