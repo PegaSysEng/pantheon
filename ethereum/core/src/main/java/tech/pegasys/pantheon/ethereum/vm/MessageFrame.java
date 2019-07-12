@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.vm;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -921,6 +922,7 @@ public class MessageFrame {
     }
 
     public Builder contractAccountVersion(final int contractAccountVersion) {
+      checkArgument(contractAccountVersion >= 0, "Contract account version cannot be negative");
       this.contractAccountVersion = contractAccountVersion;
       return this;
     }
