@@ -88,7 +88,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
 
   @Override
   public Gas gasRequirement(final BytesValue input) {
-    return Gas.of(0);
+    return Gas.of(40_000L); // Not sure
   }
 
   @Override
