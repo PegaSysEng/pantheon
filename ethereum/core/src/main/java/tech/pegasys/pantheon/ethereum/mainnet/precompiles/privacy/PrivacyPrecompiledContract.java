@@ -141,7 +141,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
     }
 
     if (messageFrame.isPersistingState()) {
-      LOG.debug(
+      LOG.trace(
           "Persisting private state {} for privacyGroup {}",
           disposablePrivateState.rootHash(),
           privacyGroupId);
