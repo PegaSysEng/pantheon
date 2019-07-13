@@ -13,16 +13,28 @@
 package tech.pegasys.pantheon.util.number;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static java.lang.Double.parseDouble;
+import static java.lang.Float.parseFloat;
 
 import java.util.Objects;
 
 public class Fraction {
 
-  private double value;
+  private float value;
 
-  private Fraction(final double value) {
+  private Fraction(final float value) {
     this.value = value;
+  }
+
+  public static Fraction fromPercentage(final int percentage) {
+    return fromFloat((float) percentage / 100.0f);
+  }
+
+  public static Fraction fromPercentage(final Percentage percentage) {
+    return fromFloat(percentage.getValueAsFloat() / 100.0f);
+  }
+
+  public Percentage toPercentage() {
+    return Percentage.fromInt((int) (value * 100.0f));
   }
 
   /**
@@ -35,15 +47,15 @@ public class Fraction {
    */
   public static Fraction fromString(final String str) {
     checkArgument(str != null);
-    return fromDouble(parseDouble(str));
+    return fromFloat(parseFloat(str));
   }
 
-  public static Fraction fromDouble(final double val) {
-    checkArgument(val > 0.0 && val <= 1.0);
+  public static Fraction fromFloat(final float val) {
+    checkArgument(val > 0.0f && val <= 1.0f);
     return new Fraction(val);
   }
 
-  public double getValue() {
+  public float getValue() {
     return value;
   }
 

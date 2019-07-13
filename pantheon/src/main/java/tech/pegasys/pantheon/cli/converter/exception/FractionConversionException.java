@@ -10,16 +10,13 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.p2p.peers;
+package tech.pegasys.pantheon.cli.converter.exception;
 
-public interface PeerProperties {
+import static java.lang.String.format;
 
-  /**
-   * If true, the given peer can connect or remain connected even if the max connection limit has
-   * been reached or exceeded.
-   *
-   * @param peer The peer to be checked.
-   * @return {@code true} if the peer should be allowed to connect regardless of max peer limits.
-   */
-  boolean ignoreMaxPeerLimits(final Peer peer);
+public final class FractionConversionException extends Exception {
+
+  public FractionConversionException(final String value) {
+    super(format("Invalid value: %s, should be a decimal between 0.0 and 1.0 inclusive.", value));
+  }
 }
