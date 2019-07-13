@@ -51,7 +51,6 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
     final String privacyGroupId = parameters.required(request.getParams(), 1, String.class);
 
     final long nonce = privateTransactionHandler.getSenderNonce(address, privacyGroupId);
-
     return new JsonRpcSuccessResponse(request.getId(), Quantity.create(nonce));
   }
 }

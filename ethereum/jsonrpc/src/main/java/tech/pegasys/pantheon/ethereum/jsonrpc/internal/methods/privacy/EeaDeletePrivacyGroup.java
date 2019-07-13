@@ -46,8 +46,8 @@ public class EeaDeletePrivacyGroup implements JsonRpcMethod {
   public JsonRpcResponse response(final JsonRpcRequest request) {
     LOG.trace("Executing {}", RpcMethod.EEA_DELETE_PRIVACY_GROUP.getMethodName());
 
-    final String from = parameters.required(request.getParams(), 0, String.class);
     final String privacyGroupId = parameters.required(request.getParams(), 1, String.class);
+    final String from = parameters.required(request.getParams(), 0, String.class);
 
     LOG.trace("Deleting a privacy group with privacyGroupId {} and from {}", privacyGroupId, from);
 
