@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
@@ -38,35 +39,57 @@ public class MainnetContractCreationProcessor extends AbstractMessageProcessor {
 
   private final long initialContractNonce;
 
-  private final int codeSizeLimit;
+  private final List<ContractValidationRule> contractValidationRules;
+
+  private final int accountVersion;
 
   public MainnetContractCreationProcessor(
       final GasCalculator gasCalculator,
       final EVM evm,
       final boolean requireCodeDepositToSucceed,
-      final int codeSizeLimit,
+      final List<ContractValidationRule> contractValidationRules,
       final long initialContractNonce,
-      final Collection<Address> forceCommitAddresses) {
+      final Collection<Address> forceCommitAddresses,
+      final int accountVersion) {
     super(evm, forceCommitAddresses);
     this.gasCalculator = gasCalculator;
     this.requireCodeDepositToSucceed = requireCodeDepositToSucceed;
-    this.codeSizeLimit = codeSizeLimit;
+    this.contractValidationRules = contractValidationRules;
     this.initialContractNonce = initialContractNonce;
+    this.accountVersion = accountVersion;
   }
 
   public MainnetContractCreationProcessor(
       final GasCalculator gasCalculator,
       final EVM evm,
       final boolean requireCodeDepositToSucceed,
-      final int codeSizeLimit,
+      final List<ContractValidationRule> contractValidationRules,
+      final long initialContractNonce,
+      final Collection<Address> forceCommitAddresses) {
+    this(
+        gasCalculator,
+        evm,
+        requireCodeDepositToSucceed,
+        contractValidationRules,
+        initialContractNonce,
+        forceCommitAddresses,
+        Account.DEFAULT_VERSION);
+  }
+
+  public MainnetContractCreationProcessor(
+      final GasCalculator gasCalculator,
+      final EVM evm,
+      final boolean requireCodeDepositToSucceed,
+      final List<ContractValidationRule> contractValidationRules,
       final long initialContractNonce) {
     this(
         gasCalculator,
         evm,
         requireCodeDepositToSucceed,
-        codeSizeLimit,
+        contractValidationRules,
         initialContractNonce,
-        ImmutableSet.of());
+        ImmutableSet.of(),
+        Account.DEFAULT_VERSION);
   }
 
   private static boolean accountExists(final Account account) {
@@ -118,25 +141,22 @@ public class MainnetContractCreationProcessor extends AbstractMessageProcessor {
         frame.setState(MessageFrame.State.COMPLETED_SUCCESS);
       }
     } else {
-      if (contractCode.size() > codeSizeLimit) {
-        LOG.trace(
-            "Contract creation error: code size {} exceeds code size limit {}",
-            contractCode.size(),
-            codeSizeLimit);
-        frame.setState(MessageFrame.State.EXCEPTIONAL_HALT);
-      } else {
+      if (contractValidationRules.stream().allMatch(rule -> rule.validate(frame))) {
         frame.decrementRemainingGas(depositFee);
 
         // Finalize contract creation, setting the contract code.
         final MutableAccount contract =
             frame.getWorldState().getOrCreate(frame.getContractAddress());
         contract.setCode(contractCode);
+        contract.setVersion(accountVersion);
         LOG.trace(
             "Successful creation of contract {} with code of size {} (Gas remaining: {})",
             frame.getContractAddress(),
             contractCode.size(),
             frame.getRemainingGas());
         frame.setState(MessageFrame.State.COMPLETED_SUCCESS);
+      } else {
+        frame.setState(MessageFrame.State.EXCEPTIONAL_HALT);
       }
     }
   }

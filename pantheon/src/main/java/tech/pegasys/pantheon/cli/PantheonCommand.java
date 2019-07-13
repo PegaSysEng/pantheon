@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
 import tech.pegasys.pantheon.cli.config.NetworkName;
 import tech.pegasys.pantheon.cli.converter.MetricCategoryConverter;
+import tech.pegasys.pantheon.cli.converter.PercentageConverter;
 import tech.pegasys.pantheon.cli.converter.RpcApisConverter;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
@@ -93,6 +94,7 @@ import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.number.Fraction;
 import tech.pegasys.pantheon.util.number.PositiveNumber;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -235,6 +237,24 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description =
           "Maximum P2P peer connections that can be established (default: ${DEFAULT-VALUE})")
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
+
+  @Option(
+      names = {"--remote-connections-limit-enabled"},
+      description =
+          "Set to limit the fraction of wire connections initiated by peers. (default: ${DEFAULT-VALUE})")
+  private final Boolean isLimitRemoteWireConnectionsEnabled = false;
+
+  @Option(
+      names = {"--remote-connections-percentage"},
+      paramLabel = MANDATORY_DOUBLE_FORMAT_HELP,
+      description =
+          "Percentage of remote wire connections that can be established. Must be between 0 and 100 inclusive. (default: ${DEFAULT-VALUE})",
+      arity = "1",
+      converter = PercentageConverter.class)
+  private final Integer remoteConnectionsPercentage =
+      Fraction.fromFloat(DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED)
+          .toPercentage()
+          .getValue();
 
   @Option(
       names = {"--banned-node-ids", "--banned-node-id"},
@@ -685,6 +705,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
+
     final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
     metricCategoryConverter.addCategories(PantheonMetricCategory.class);
     metricCategoryConverter.addCategories(StandardMetricCategory.class);
@@ -776,8 +797,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--discovery-enabled",
             "--max-peers",
             "--banned-node-id",
-            "--banned-node-ids"));
-
+            "--banned-node-ids",
+            "--remote-connections-percentage"));
     // Check that mining options are able to work or send an error
     checkOptionDependencies(
         logger,
@@ -1168,6 +1189,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .p2pAdvertisedHost(p2pAdvertisedHost)
             .p2pListenPort(p2pListenPort)
             .maxPeers(maxPeers)
+            .limitRemoteWireConnectionsEnabled(isLimitRemoteWireConnectionsEnabled)
+            .fractionRemoteConnectionsAllowed(
+                Fraction.fromPercentage(remoteConnectionsPercentage).getValue())
             .networkingConfiguration(networkingOptions.toDomainObject())
             .graphQLConfiguration(graphQLConfiguration)
             .jsonRpcConfiguration(jsonRpcConfiguration)

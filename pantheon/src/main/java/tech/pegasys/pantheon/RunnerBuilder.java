@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
@@ -67,13 +66,11 @@ import tech.pegasys.pantheon.ethereum.p2p.permissions.PeerPermissionsBlacklist;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.SubProtocol;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodePermissioningControllerFactory;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.TransactionSmartContractPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioningController;
+import tech.pegasys.pantheon.ethereum.permissioning.account.AccountPermissioningControllerFactory;
 import tech.pegasys.pantheon.ethereum.permissioning.node.InsufficientPeersPermissioningProvider;
 import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.node.PeerPermissionsAdapter;
@@ -115,6 +112,8 @@ public class RunnerBuilder {
   private int p2pListenPort;
   private NatMethod natMethod = NatMethod.NONE;
   private int maxPeers;
+  private boolean limitRemoteWireConnectionsEnabled = false;
+  private double fractionRemoteConnectionsAllowed;
   private EthNetworkConfig ethNetworkConfig;
 
   private JsonRpcConfiguration jsonRpcConfiguration;
@@ -174,6 +173,18 @@ public class RunnerBuilder {
 
   public RunnerBuilder maxPeers(final int maxPeers) {
     this.maxPeers = maxPeers;
+    return this;
+  }
+
+  public RunnerBuilder limitRemoteWireConnectionsEnabled(
+      final boolean limitRemoteWireConnectionsEnabled) {
+    this.limitRemoteWireConnectionsEnabled = limitRemoteWireConnectionsEnabled;
+    return this;
+  }
+
+  public RunnerBuilder fractionRemoteConnectionsAllowed(
+      final double fractionRemoteConnectionsAllowed) {
+    this.fractionRemoteConnectionsAllowed = fractionRemoteConnectionsAllowed;
     return this;
   }
 
@@ -264,7 +275,9 @@ public class RunnerBuilder {
             .setBindPort(p2pListenPort)
             .setMaxPeers(maxPeers)
             .setSupportedProtocols(subProtocols)
-            .setClientId(PantheonInfo.version());
+            .setClientId(PantheonInfo.version())
+            .setLimitRemoteWireConnectionsEnabled(limitRemoteWireConnectionsEnabled)
+            .setFractionRemoteWireConnectionsAllowed(fractionRemoteConnectionsAllowed);
     networkingConfiguration.setRlpx(rlpxConfiguration).setDiscovery(discoveryConfiguration);
 
     final PeerPermissionsBlacklist bannedNodes = PeerPermissionsBlacklist.create();
@@ -462,16 +475,23 @@ public class RunnerBuilder {
       final TransactionSimulator transactionSimulator,
       final BytesValue localNodeId) {
     final Collection<EnodeURL> fixedNodes = getFixedNodes(bootnodesAsEnodeURLs, staticNodes);
-    return permissioningConfiguration.map(
-        config ->
-            new NodePermissioningControllerFactory()
-                .create(
-                    config,
-                    synchronizer,
-                    fixedNodes,
-                    localNodeId,
-                    transactionSimulator,
-                    metricsSystem));
+
+    if (permissioningConfiguration.isPresent()) {
+      final PermissioningConfiguration configuration = this.permissioningConfiguration.get();
+      final NodePermissioningController nodePermissioningController =
+          new NodePermissioningControllerFactory()
+              .create(
+                  configuration,
+                  synchronizer,
+                  fixedNodes,
+                  localNodeId,
+                  transactionSimulator,
+                  metricsSystem);
+
+      return Optional.of(nodePermissioningController);
+    } else {
+      return Optional.empty();
+    }
   }
 
   private Optional<UpnpNatManager> buildNatManager(final NatMethod natMethod) {
@@ -489,55 +509,21 @@ public class RunnerBuilder {
       final PantheonController<?> pantheonController,
       final TransactionSimulator transactionSimulator) {
 
-    Optional<AccountLocalConfigPermissioningController> accountLocalConfigPermissioningController =
-        Optional.empty();
-    Optional<TransactionSmartContractPermissioningController>
-        transactionSmartContractPermissioningController = Optional.empty();
-    Optional<AccountPermissioningController> accountPermissioningController = Optional.empty();
-
     if (permissioningConfiguration.isPresent()) {
-      final PermissioningConfiguration config = permissioningConfiguration.get();
-      if (config.getLocalConfig().isPresent()) {
-        final LocalPermissioningConfiguration localPermissioningConfiguration =
-            config.getLocalConfig().get();
+      Optional<AccountPermissioningController> accountPermissioningController =
+          AccountPermissioningControllerFactory.create(
+              permissioningConfiguration.get(), transactionSimulator, metricsSystem);
 
-        if (localPermissioningConfiguration.isAccountWhitelistEnabled()) {
-          accountLocalConfigPermissioningController =
-              Optional.of(
-                  new AccountLocalConfigPermissioningController(
-                      localPermissioningConfiguration, metricsSystem));
-        }
-      }
+      accountPermissioningController.ifPresent(
+          permissioningController ->
+              pantheonController
+                  .getProtocolSchedule()
+                  .setTransactionFilter(permissioningController::isPermitted));
 
-      if (config.getSmartContractConfig().isPresent()) {
-        final SmartContractPermissioningConfiguration smartContractPermissioningConfiguration =
-            config.getSmartContractConfig().get();
-
-        if (smartContractPermissioningConfiguration.isSmartContractAccountWhitelistEnabled()) {
-          final Address accountSmartContractAddress =
-              smartContractPermissioningConfiguration.getAccountSmartContractAddress();
-
-          transactionSmartContractPermissioningController =
-              Optional.of(
-                  new TransactionSmartContractPermissioningController(
-                      accountSmartContractAddress, transactionSimulator, metricsSystem));
-        }
-      }
-
-      if (accountLocalConfigPermissioningController.isPresent()
-          || transactionSmartContractPermissioningController.isPresent()) {
-        final AccountPermissioningController controller =
-            new AccountPermissioningController(
-                accountLocalConfigPermissioningController,
-                transactionSmartContractPermissioningController);
-
-        pantheonController.getProtocolSchedule().setTransactionFilter(controller::isPermitted);
-
-        accountPermissioningController = Optional.of(controller);
-      }
+      return accountPermissioningController;
+    } else {
+      return Optional.empty();
     }
-
-    return accountPermissioningController;
   }
 
   @VisibleForTesting
