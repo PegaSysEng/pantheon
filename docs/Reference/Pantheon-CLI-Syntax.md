@@ -109,7 +109,7 @@ PANTHEON_CONFIG_FILE=/home/me/me_node/config.toml
 
 The path to the [TOML configuration file](../Configuring-Pantheon/Using-Configuration-File.md).
 The default is `none`.
-    
+        
 ### data-path
 
 ```bash tab="Syntax"
@@ -128,7 +128,8 @@ PANTHEON_DATA_PATH=/home/me/me_node
 data-path="/home/me/me_node"
 ```
 
-The path to the Pantheon data directory. The default is the directory in which Pantheon is installed.
+The path to the Pantheon data directory. The default is the directory in which Pantheon is installed
+or `/opt/pantheon/database` if using the [Pantheon Docker image](../Getting-Started/Run-Docker-Image.md).
 
 ### discovery-enabled
 
@@ -237,9 +238,6 @@ Host for GraphQL HTTP to listen on.
 The default is 127.0.0.1.
 
 To allow remote connections, set to `0.0.0.0`
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
     
 ### graphql-http-port
 
@@ -263,9 +261,6 @@ graphql-http-port="6175"
 
 Specifies GraphQL HTTP listening port (TCP).
 The default is 8547. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
 ### host-whitelist
 
@@ -677,7 +672,7 @@ node-private-key-file="/home/me/me_node/myPrivateKey"
 ```
 
 `<FILE>` is the path of the private key file of the node.
-The default is the key file in the data directory.
+The default is the key file in the [data directory](#data-path).
 If no key file exists, a key file containing the generated private key is created;
 otherwise, the existing key file specifies the node private key.
 
@@ -728,9 +723,6 @@ p2p-host="0.0.0.0"
 Specifies the host on which P2P listens.
 The default is 127.0.0.1.
 
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
-
 ### p2p-port
 
 ```bash tab="Syntax"
@@ -753,9 +745,6 @@ p2p-port="1789"
 
 Specifies the P2P listening ports (UDP and TCP).
 The default is 30303. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
 ### nat-method
 
@@ -1134,9 +1123,6 @@ To allow remote connections, set to `0.0.0.0`
     Setting the host to 0.0.0.0 exposes the RPC connection on your node to any remote connection. In a 
     production environment, ensure you are using a firewall to avoid exposing your node to the internet. 
 
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
-
 ### rpc-http-port
 
 ```bash tab="Syntax"
@@ -1158,9 +1144,6 @@ rpc-http-port="3435"
 
 Specifies HTTP JSON-RPC listening port (TCP).
 The default is 8545. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md). 
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
 ### rpc-ws-api
 
@@ -1273,9 +1256,6 @@ Host for Websocket WS-RPC to listen on.
 The default is 127.0.0.1.
 
 To allow remote connections, set to `0.0.0.0`
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
     
 ### rpc-ws-port
 
@@ -1298,9 +1278,6 @@ rpc-ws-port="6174"
 
 Specifies Websockets JSON-RPC listening port (TCP).
 The default is 8546. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
 ### tx-pool-max-size
 
