@@ -3,10 +3,10 @@ description: Configuring UPnP with Pantheon
 
 # UPnP
 
-Enable UPnP to quickly allow inbound peer connections without manual router configuration. UPnP is used 
+Enable UPnP to quickly allow inbound peer connections without manual router configuration. Use UPnP 
 in home or small office environments where a wireless router or modem provides NAT isolation. 
 
-UPnP provides automatic detection that a node is running in a UPnP environment and port forwarding. 
+UPnP automatically detects that a node is running in a UPnP environment and provides port forwarding. 
 
 !!! tip 
     UPnP support is often disabled by default in networking firmware. If disabled by default, explicitly
@@ -21,7 +21,7 @@ Use the [`--nat-method`](../../Reference/Pantheon-CLI-Syntax.md#nat-method) comm
 
 When UPnP is enabled: 
 
-* Enode advertised to other nodes during discovery is the external IP address and port. 
+* [Enode](../Node-Keys.md#enode-url) advertised to other nodes during discovery is the external IP address and port. 
 * External address and port are returned by the [`admin_NodeInfo`](../../Reference/Pantheon-API-Methods.md#admin_nodeinfo)
   JSON-RPC API method for the `enode` and `listenAddr` properties. 
   

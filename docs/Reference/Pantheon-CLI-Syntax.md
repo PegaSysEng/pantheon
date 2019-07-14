@@ -608,15 +608,15 @@ The default is 1000.
 ```
 
 ```bash tab="Command Line"
---nat-method=UPNP
+--nat-method=upnp
 ```
 
 ```bash tab="Example Configuration File"
-nat-method="UPNP"
+nat-method="upnp"
 ```
 
 Specifies the method for handling [NAT environments](../Configuring-Pantheon/Networking/Using-UPnP.md). 
-Options are `UPNP` and `NONE`. The default is `NONE` (that is, NAT functionality is disabled).
+Options are `upnp` and `none`. The default is `none` (that is, NAT functionality is disabled).
 
 ### network
 
