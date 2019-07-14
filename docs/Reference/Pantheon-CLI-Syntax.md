@@ -601,6 +601,23 @@ min-gas-price=1337
 The minimum price that a transaction offers for it to be included in a mined block.
 The default is 1000.
 
+### nat-method
+
+```bash tab="Syntax"
+--nat-method=<METHOD>
+```
+
+```bash tab="Command Line"
+--nat-method=UPNP
+```
+
+```bash tab="Example Configuration File"
+nat-method="UPNP"
+```
+
+Specifies the method for handling [NAT environments](../Configuring-Pantheon/Networking/Using-UPnP.md). 
+Options are `UPNP` and `NONE`. The default is `NONE` (that is, NAT functionality is disabled).
+
 ### network
 
 ```bash tab="Syntax"
@@ -769,27 +786,6 @@ The default is 30303. Ports must be [exposed appropriately](../Configuring-Panth
 
 !!!note
     This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
-
-### nat-method
-
-```bash tab="Syntax"
---nat-method=UPNP
-```
-
-```bash tab="Example Configuration File"
-nat-method="UPNP"
-```
-
-Specify the method for handling NAT environments. Options are: `UPNP` and `NONE`.
-The default is `NONE`, which disables NAT functionality.
-
-!!!tip
-    `UPNP` works well with a typical home or small office environment where a wireless router or modem provides NAT isolation. This should provide
-    automatic detection and port-forwarding. UPnP support is often disabled by default in networking equipment firmware, however, any may need to be
-    explicitly enabled.
-
-!!!note
-    Option `UPNP` may introduce delays during node startup, especially on networks where no UPnP gateway device can be found.
 
 ### permissions-accounts-config-file-enabled
 
