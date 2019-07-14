@@ -1015,10 +1015,15 @@ REVERT_REASON_ENABLED=true
 ```
 
 ```bash tab="Configuration File"
-revert-reason-enabled=false
+revert-reason-enabled=true
 ```
 
-Enables passing the revert reason back through the transaction receipts. Default is `false`. 
+Enables including the [revert reason](../Using-Pantheon/Transactions/Revert-Reason.md) in the transaction 
+receipt. Default is `false`. 
+
+!!! caution 
+    Enabling revert reason may use a significant amount of memory. We do not recommend enabling revert
+    reason when connected to the Ethereum mainnet. 
 
 ### rpc-http-api
 
