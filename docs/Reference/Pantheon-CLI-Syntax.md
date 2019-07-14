@@ -1000,6 +1000,26 @@ privacy-url="http://127.0.0.1:8888"
 
 URL on which the [Orion node](../Privacy/Configuring-Privacy.md#4-create-orion-configuration-files) is running.    
 
+### revert-reason-enabled
+
+```bash tab="Syntax"
+--revert-reason-enabled[=<true|false>]
+```
+
+```bash tab="Command Line"
+--revert-reason-enabled=true
+```
+
+```bash tab="Environment Variable"
+REVERT_REASON_ENABLED=true
+```
+
+```bash tab="Configuration File"
+revert-reason-enabled=false
+```
+
+Enables passing the revert reason back through the transaction receipts. Default is `false`. 
+
 ### rpc-http-api
 
 ```bash tab="Syntax"
