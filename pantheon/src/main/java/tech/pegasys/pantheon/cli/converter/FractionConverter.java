@@ -10,17 +10,21 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.p2p.peers;
+package tech.pegasys.pantheon.cli.converter;
 
-public class DefaultPeerProperties implements PeerProperties {
-  final MaintainedPeers maintainedPeers;
+import tech.pegasys.pantheon.cli.converter.exception.FractionConversionException;
+import tech.pegasys.pantheon.util.number.Fraction;
 
-  public DefaultPeerProperties(final MaintainedPeers maintainedPeers) {
-    this.maintainedPeers = maintainedPeers;
-  }
+import picocli.CommandLine;
+
+public class FractionConverter implements CommandLine.ITypeConverter<Float> {
 
   @Override
-  public boolean ignoreMaxPeerLimits(final Peer peer) {
-    return maintainedPeers.contains(peer);
+  public Float convert(final String value) throws FractionConversionException {
+    try {
+      return Fraction.fromString(value).getValue();
+    } catch (NullPointerException | IllegalArgumentException e) {
+      throw new FractionConversionException(value);
+    }
   }
 }
