@@ -27,6 +27,8 @@ banned-node-id=["0x6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec
 p2p-host="1.2.3.4"
 p2p-port=1234
 max-peers=42
+remote-connections-limit-enabled=false
+remote-connections-percentage=50
 host-whitelist=["all"]
 
 # chain
@@ -76,7 +78,7 @@ metrics-push-prometheus-job="pantheon-everything"
 miner-enabled=false
 miner-coinbase="0x0000000000000000000000000000000000000002"
 miner-extra-data="0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C2021"
-min-gas-price="1"
+min-gas-price=1
 
 # Permissioning
 permissions-nodes-config-file-enabled=false

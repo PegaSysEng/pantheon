@@ -54,6 +54,8 @@ import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.nat.NatMethod;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.number.Fraction;
+import tech.pegasys.pantheon.util.number.Percentage;
 
 import java.io.File;
 import java.io.IOException;
@@ -156,6 +158,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
     verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
+    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(eq(0.5));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(defaultJsonRpcConfiguration));
     verify(mockRunnerBuilder).graphQLConfiguration(eq(DEFAULT_GRAPH_QL_CONFIGURATION));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(defaultWebSocketConfiguration));
@@ -676,6 +679,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
         tomlResult.getArray(tomlKey);
       } else if (Number.class.isAssignableFrom(optionSpec.type())) {
         tomlResult.getLong(tomlKey);
+      } else if (Wei.class.isAssignableFrom(optionSpec.type())) {
+        tomlResult.getLong(tomlKey);
+      } else if (Fraction.class.isAssignableFrom(optionSpec.type())) {
+        tomlResult.getDouble(tomlKey);
+      } else if (Percentage.class.isAssignableFrom(optionSpec.type())) {
+        tomlResult.getLong(tomlKey);
       } else {
         tomlResult.getString(tomlKey);
       }
@@ -713,6 +722,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
     verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
+    verify(mockRunnerBuilder).limitRemoteWireConnectionsEnabled(eq(false));
+    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(eq(0.5));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(jsonRpcConfiguration));
     verify(mockRunnerBuilder).graphQLConfiguration(eq(graphQLConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
@@ -1012,13 +1023,20 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "false",
         "--max-peers",
         "42",
+        "--remote-connections-percentage",
+        "50",
         "--banned-node-id",
         String.join(",", nodes),
         "--banned-node-ids",
         String.join(",", nodes));
 
     verifyOptionsConstraintLoggerCall(
-        "--p2p-enabled", "--discovery-enabled", "--bootnodes", "--max-peers", "--banned-node-ids");
+        "--p2p-enabled",
+        "--discovery-enabled",
+        "--bootnodes",
+        "--max-peers",
+        "--banned-node-ids",
+        "--remote-connections-percentage");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1221,6 +1239,51 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void remoteConnectionsPercentageOptionMustBeUsed() {
+
+    final int remoteConnectionsPercentage = 12;
+    parseCommand(
+        "--remote-connections-limit-enabled",
+        "--remote-connections-percentage",
+        String.valueOf(remoteConnectionsPercentage));
+
+    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(doubleArgumentCaptor.capture());
+    verify(mockRunnerBuilder).build();
+
+    assertThat(doubleArgumentCaptor.getValue())
+        .isEqualTo(
+            Fraction.fromPercentage(Percentage.fromInt(remoteConnectionsPercentage)).getValue());
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void remoteConnectionsPercentageWithInvalidFormatMustFail() {
+
+    parseCommand(
+        "--remote-connections-limit-enabled", "--remote-connections-percentage", "invalid");
+    verifyZeroInteractions(mockRunnerBuilder);
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains(
+            "Invalid value for option '--remote-connections-percentage'",
+            "should be a number between 0 and 100 inclusive");
+  }
+
+  @Test
+  public void remoteConnectionsPercentageWithOutOfRangeMustFail() {
+
+    parseCommand("--remote-connections-limit-enabled", "--remote-connections-percentage", "150");
+    verifyZeroInteractions(mockRunnerBuilder);
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString())
+        .contains(
+            "Invalid value for option '--remote-connections-percentage'",
+            "should be a number between 0 and 100 inclusive");
   }
 
   @Test

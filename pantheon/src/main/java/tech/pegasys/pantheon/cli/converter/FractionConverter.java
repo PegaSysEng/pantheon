@@ -10,16 +10,21 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.p2p.peers;
+package tech.pegasys.pantheon.cli.converter;
 
-public interface PeerProperties {
+import tech.pegasys.pantheon.cli.converter.exception.FractionConversionException;
+import tech.pegasys.pantheon.util.number.Fraction;
 
-  /**
-   * If true, the given peer can connect or remain connected even if the max connection limit has
-   * been reached or exceeded.
-   *
-   * @param peer The peer to be checked.
-   * @return {@code true} if the peer should be allowed to connect regardless of max peer limits.
-   */
-  boolean ignoreMaxPeerLimits(final Peer peer);
+import picocli.CommandLine;
+
+public class FractionConverter implements CommandLine.ITypeConverter<Float> {
+
+  @Override
+  public Float convert(final String value) throws FractionConversionException {
+    try {
+      return Fraction.fromString(value).getValue();
+    } catch (NullPointerException | IllegalArgumentException e) {
+      throw new FractionConversionException(value);
+    }
+  }
 }

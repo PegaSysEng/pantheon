@@ -10,17 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.p2p.peers;
+package tech.pegasys.pantheon.ethereum.mainnet;
 
-public class DefaultPeerProperties implements PeerProperties {
-  final MaintainedPeers maintainedPeers;
+import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 
-  public DefaultPeerProperties(final MaintainedPeers maintainedPeers) {
-    this.maintainedPeers = maintainedPeers;
-  }
+@FunctionalInterface
+public interface ContractValidationRule {
 
-  @Override
-  public boolean ignoreMaxPeerLimits(final Peer peer) {
-    return maintainedPeers.contains(peer);
-  }
+  boolean validate(MessageFrame frame);
 }
