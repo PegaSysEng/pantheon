@@ -109,9 +109,6 @@ PANTHEON_CONFIG_FILE=/home/me/me_node/config.toml
 
 The path to the [TOML configuration file](../Configuring-Pantheon/Using-Configuration-File.md).
 The default is `none`.
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-configuration-file) or in a [configuration file](../Configuring-Pantheon/Using-Configuration-File.md).
     
 ### data-path
 
@@ -132,9 +129,6 @@ data-path="/home/me/me_node"
 ```
 
 The path to the Pantheon data directory. The default is the directory in which Pantheon is installed.
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#data-directory). 
 
 ### discovery-enabled
 
@@ -181,10 +175,6 @@ The path to the genesis file.
 
 !!!important
     The [`--genesis-file`](#genesis-file) and [`--network`](#network) option can't be used at the same time.
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-genesis-file). 
-
 
 ### graphql-http-cors-origins
 
@@ -694,9 +684,6 @@ otherwise, the existing key file specifies the node private key.
 !!!attention
     The private key is not encrypted.
 
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md). 
-
 ### p2p-enabled
 
 ```bash tab="Syntax"
@@ -836,9 +823,6 @@ Default is the `permissions_config.toml` file in the [data directory](#data-path
     `--permissions-accounts-config-file` and [`--permissions-nodes-config-file`](#permissions-nodes-config-file)
     can use the same file. 
 
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#permissions-configuration-file).
-
 ### permissions-nodes-config-file-enabled
 
 ```bash tab="Syntax"
@@ -883,9 +867,6 @@ Default is the `permissions_config.toml` file in the [data directory](#data-path
 !!! tip
     `--permissions-nodes-config-file` and [`--permissions-accounts-config-file`](#permissions-accounts-config-file)
     can use the same file. 
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#permissions-configuration-file).
 
 ### permissions-nodes-contract-address
 
@@ -977,9 +958,6 @@ privacy-public-key-file="Orion/nodeKey.pub"
 
 Path to the [public key of the Orion node](../Privacy/Privacy-Overview.md#pantheon-and-orion-keys).     
 
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#privacy-public-key-file).
-
 ### privacy-url
 
 ```bash tab="Syntax"
@@ -1046,9 +1024,6 @@ rpc-http-authentication-credentials-file="/home/me/me_node/auth.toml"
 ```
 
 [Credentials file](../Pantheon-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../Pantheon-API/Authentication.md). 
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files).
 
 ### rpc-http-authentication-enabled
 
@@ -1233,9 +1208,6 @@ rpc-ws-authentication-credentials-file="/home/me/me_node/auth.toml"
 ```
 
 [Credentials file](../Pantheon-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../Pantheon-API/Authentication.md).
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files). 
 
 ### rpc-ws-authentication-enabled
 
