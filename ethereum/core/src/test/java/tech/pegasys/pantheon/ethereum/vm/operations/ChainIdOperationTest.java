@@ -52,10 +52,11 @@ public class ChainIdOperationTest {
   }
 
   @Test
-  public void shouldReturnChanId() {
+  public void shouldReturnChainId() {
     final ArgumentCaptor<Bytes32> arg = ArgumentCaptor.forClass(Bytes32.class);
     operation.execute(messageFrame);
     Mockito.verify(messageFrame).pushStackItem(arg.capture());
+    Mockito.verifyNoMoreInteractions(messageFrame);
     assertThat(arg.getValue()).isEqualByComparingTo(chainId);
   }
 
