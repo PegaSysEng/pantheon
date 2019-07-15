@@ -27,6 +27,7 @@ import net.consensys.cava.toml.TomlParseResult;
 import picocli.CommandLine;
 import picocli.CommandLine.IDefaultValueProvider;
 import picocli.CommandLine.Model.ArgSpec;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.ParameterException;
 
@@ -145,7 +146,7 @@ public class TomlConfigFileDefaultProvider implements IDefaultValueProvider {
   }
 
   private void checkUnknownOptions(final TomlParseResult result) {
-    final CommandLine.Model.CommandSpec commandSpec = commandLine.getCommandSpec();
+    final CommandSpec commandSpec = commandLine.getCommandSpec();
 
     final Set<String> unknownOptionsList =
         result.keySet().stream()
