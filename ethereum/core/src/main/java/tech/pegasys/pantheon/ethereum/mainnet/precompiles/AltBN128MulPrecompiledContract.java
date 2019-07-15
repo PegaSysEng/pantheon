@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.crypto.altbn128.AltBn128Point;
 import tech.pegasys.pantheon.crypto.altbn128.Fq;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
@@ -30,13 +29,24 @@ public class AltBN128MulPrecompiledContract extends AbstractPrecompiledContract 
       new BigInteger(
           "115792089237316195423570985008687907853269984665640564039457584007913129639935");
 
-  public AltBN128MulPrecompiledContract(final GasCalculator gasCalculator) {
-    super("AltBn128Mul", gasCalculator);
+  private final Gas gasCost;
+
+  private AltBN128MulPrecompiledContract(final Gas gasCost) {
+    super("AltBN128Mul", null);
+    this.gasCost = gasCost;
+  }
+
+  public static AltBN128MulPrecompiledContract byzantium() {
+    return new AltBN128MulPrecompiledContract(Gas.of(40_000));
+  }
+
+  public static AltBN128MulPrecompiledContract istanbul() {
+    return new AltBN128MulPrecompiledContract(Gas.of(8_000));
   }
 
   @Override
   public Gas gasRequirement(final BytesValue input) {
-    return Gas.of(40_000L);
+    return gasCost;
   }
 
   @Override

@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
+import static tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSpecs.ISTANBUL_ACCOUNT_VERSION;
+
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.mainnet.precompiles.AltBN128AddPrecompiledContract;
@@ -58,14 +60,10 @@ public abstract class MainnetPrecompiledContractRegistries {
         Address.MODEXP,
         accountVersion,
         new BigIntegerModularExponentiationPrecompiledContract(gasCalculator));
+    registry.put(Address.ALTBN128_ADD, accountVersion, AltBN128AddPrecompiledContract.byzantium());
+    registry.put(Address.ALTBN128_MUL, accountVersion, AltBN128MulPrecompiledContract.byzantium());
     registry.put(
-        Address.ALTBN128_ADD, accountVersion, new AltBN128AddPrecompiledContract(gasCalculator));
-    registry.put(
-        Address.ALTBN128_MUL, accountVersion, new AltBN128MulPrecompiledContract(gasCalculator));
-    registry.put(
-        Address.ALTBN128_PAIRING,
-        accountVersion,
-        new AltBN128PairingPrecompiledContract(gasCalculator));
+        Address.ALTBN128_PAIRING, accountVersion, AltBN128PairingPrecompiledContract.byzantium());
   }
 
   public static PrecompileContractRegistry byzantium(
@@ -81,7 +79,17 @@ public abstract class MainnetPrecompiledContractRegistries {
     final PrecompileContractRegistry registry = new PrecompileContractRegistry();
     populateForByzantium(
         registry, precompiledContractConfiguration.getGasCalculator(), Account.DEFAULT_VERSION);
-    populateForByzantium(registry, precompiledContractConfiguration.getGasCalculator(), 1);
+    populateForByzantium(
+        registry, precompiledContractConfiguration.getGasCalculator(), ISTANBUL_ACCOUNT_VERSION);
+    registry.put(
+        Address.ALTBN128_ADD, ISTANBUL_ACCOUNT_VERSION, AltBN128AddPrecompiledContract.istanbul());
+    registry.put(
+        Address.ALTBN128_MUL, ISTANBUL_ACCOUNT_VERSION, AltBN128MulPrecompiledContract.istanbul());
+    registry.put(
+        Address.ALTBN128_PAIRING,
+        ISTANBUL_ACCOUNT_VERSION,
+        AltBN128PairingPrecompiledContract.istanbul());
+
     return registry;
   }
 

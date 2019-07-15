@@ -20,7 +20,6 @@ import tech.pegasys.pantheon.crypto.altbn128.Fq12;
 import tech.pegasys.pantheon.crypto.altbn128.Fq2;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -41,14 +40,27 @@ public class AltBN128PairingPrecompiledContract extends AbstractPrecompiledContr
       BytesValue.fromHexString(
           "0x0000000000000000000000000000000000000000000000000000000000000001");
 
-  public AltBN128PairingPrecompiledContract(final GasCalculator gasCalculator) {
-    super("AltBN128Pairing", gasCalculator);
+  private final Gas pairingGasCost;
+  private final Gas baseGasCost;
+
+  private AltBN128PairingPrecompiledContract(final Gas pairingGasCost, final Gas baseGasCost) {
+    super("AltBN128Pairing", null);
+    this.pairingGasCost = pairingGasCost;
+    this.baseGasCost = baseGasCost;
+  }
+
+  public static AltBN128PairingPrecompiledContract byzantium() {
+    return new AltBN128PairingPrecompiledContract(Gas.of(80_000), Gas.of(100_000));
+  }
+
+  public static AltBN128PairingPrecompiledContract istanbul() {
+    return new AltBN128PairingPrecompiledContract(Gas.of(34_000), Gas.of(45_000));
   }
 
   @Override
   public Gas gasRequirement(final BytesValue input) {
     final int parameters = input.size() / PARAMETER_LENGTH;
-    return Gas.of(80_000L).times(Gas.of(parameters)).plus(Gas.of(100_000L));
+    return pairingGasCost.times(parameters).plus(baseGasCost);
   }
 
   @Override
