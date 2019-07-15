@@ -60,10 +60,18 @@ public abstract class MainnetPrecompiledContractRegistries {
         Address.MODEXP,
         accountVersion,
         new BigIntegerModularExponentiationPrecompiledContract(gasCalculator));
-    registry.put(Address.ALTBN128_ADD, accountVersion, AltBN128AddPrecompiledContract.byzantium());
-    registry.put(Address.ALTBN128_MUL, accountVersion, AltBN128MulPrecompiledContract.byzantium());
     registry.put(
-        Address.ALTBN128_PAIRING, accountVersion, AltBN128PairingPrecompiledContract.byzantium());
+        Address.ALTBN128_ADD,
+        accountVersion,
+        AltBN128AddPrecompiledContract.byzantium(gasCalculator));
+    registry.put(
+        Address.ALTBN128_MUL,
+        accountVersion,
+        AltBN128MulPrecompiledContract.byzantium(gasCalculator));
+    registry.put(
+        Address.ALTBN128_PAIRING,
+        accountVersion,
+        AltBN128PairingPrecompiledContract.byzantium(gasCalculator));
   }
 
   public static PrecompileContractRegistry byzantium(
@@ -82,13 +90,20 @@ public abstract class MainnetPrecompiledContractRegistries {
     populateForByzantium(
         registry, precompiledContractConfiguration.getGasCalculator(), ISTANBUL_ACCOUNT_VERSION);
     registry.put(
-        Address.ALTBN128_ADD, ISTANBUL_ACCOUNT_VERSION, AltBN128AddPrecompiledContract.istanbul());
+        Address.ALTBN128_ADD,
+        ISTANBUL_ACCOUNT_VERSION,
+        AltBN128AddPrecompiledContract.istanbul(
+            precompiledContractConfiguration.getGasCalculator()));
     registry.put(
-        Address.ALTBN128_MUL, ISTANBUL_ACCOUNT_VERSION, AltBN128MulPrecompiledContract.istanbul());
+        Address.ALTBN128_MUL,
+        ISTANBUL_ACCOUNT_VERSION,
+        AltBN128MulPrecompiledContract.istanbul(
+            precompiledContractConfiguration.getGasCalculator()));
     registry.put(
         Address.ALTBN128_PAIRING,
         ISTANBUL_ACCOUNT_VERSION,
-        AltBN128PairingPrecompiledContract.istanbul());
+        AltBN128PairingPrecompiledContract.istanbul(
+            precompiledContractConfiguration.getGasCalculator()));
 
     return registry;
   }

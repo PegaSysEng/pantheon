@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.mainnet.precompiles;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.ethereum.core.Gas;
+import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
@@ -28,10 +29,12 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class AltBN128PairingPrecompiledContractTest {
 
   @Mock MessageFrame messageFrame;
+  @Mock GasCalculator gasCalculator;
+
   private final AltBN128PairingPrecompiledContract byzantiumContract =
-      AltBN128PairingPrecompiledContract.byzantium();
+      AltBN128PairingPrecompiledContract.byzantium(gasCalculator);
   private final AltBN128PairingPrecompiledContract istanbulContract =
-      AltBN128PairingPrecompiledContract.istanbul();
+      AltBN128PairingPrecompiledContract.istanbul(gasCalculator);
 
   @Test
   public void compute_validPoints() {
