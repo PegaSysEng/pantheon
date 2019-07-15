@@ -38,8 +38,8 @@ have a default. Add the relevant command line options to your Pantheon command l
 
 The [`--data-path`](../Reference/Pantheon-CLI-Syntax.md#data-path) default is now `/opt/pantheon/database`. 
 
-The [`--node-private-key-file`](../Reference/Pantheon-CLI-Syntax.md#node-private-key-file) argument is 
-now `/opt/pantheon/database`. 
+The [`--node-private-key-file`](../Reference/Pantheon-CLI-Syntax.md#node-private-key-file) default is 
+now `/opt/pantheon/database/key`. 
 
 The host and port options continue to default to the previously set values. 
 
