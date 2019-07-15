@@ -112,7 +112,6 @@ public class Pruner {
     } catch (final Throwable t) {
       LOG.error("Pruning failed", t);
       state.set(State.IDLE);
-      System.exit(1);
     }
   }
 
