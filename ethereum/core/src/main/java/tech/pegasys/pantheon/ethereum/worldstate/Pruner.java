@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -39,19 +40,14 @@ public class Pruner {
   private long transientForkThreshold;
 
   public Pruner(
-      final MarkSweepPruner pruningStrategy,
-      final Blockchain blockchain,
+          final MarkSweepPruner pruningStrategy,
+          final Blockchain blockchain,
+          final ExecutorService executor,
       final long retentionPeriodInBlocks,
-      final long transientForkThreshold) {
+          final long transientForkThreshold) {
     this.pruningStrategy = pruningStrategy;
     this.blockchain = blockchain;
-    this.executor =
-        Executors.newSingleThreadExecutor(
-            new ThreadFactoryBuilder()
-                .setDaemon(true)
-                .setPriority(Thread.MIN_PRIORITY)
-                .setNameFormat("StatePruning-%d")
-                .build());
+    this.executor = executor;
     this.retentionPeriodInBlocks = retentionPeriodInBlocks;
     this.transientForkThreshold = transientForkThreshold;
   }

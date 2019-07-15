@@ -53,7 +53,7 @@ public class PrunerTest {
             metricsSystem);
 
     // start pruner so it can start handling block added events
-    final Pruner pruner = new Pruner(markSweepPruner, blockchain, 0, 0);
+    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);
     pruner.start();
 
     /*

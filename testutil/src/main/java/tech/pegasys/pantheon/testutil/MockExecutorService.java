@@ -10,9 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.eth.manager;
-
-import static org.mockito.Mockito.spy;
+package tech.pegasys.pantheon.testutil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +24,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+
+import org.mockito.Mockito;
 
 public class MockExecutorService implements ExecutorService {
 
@@ -146,7 +146,7 @@ public class MockExecutorService implements ExecutorService {
     private boolean isPending = true;
 
     private ExecutorTask(final Callable<T> taskRunner) {
-      this.future = spy(new CompletableFuture<>());
+      this.future = Mockito.spy(new CompletableFuture<>());
       this.taskRunner = taskRunner;
     }
 

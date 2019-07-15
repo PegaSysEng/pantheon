@@ -58,7 +58,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.OptionalLong;
+import java.util.concurrent.Executors;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -208,9 +210,22 @@ public abstract class PantheonControllerBuilder<C> {
                 storageProvider.createPruningStorage(),
                 metricsSystem),
             protocolContext.getBlockchain(),
+            Executors.newSingleThreadExecutor(
+                new ThreadFactoryBuilder()
+                    .setDaemon(true)
+                    .setPriority(Thread.MIN_PRIORITY)
+                    .setNameFormat("StatePruning-%d")
+                    .build()),
             1000,
             10);
-    addShutdownAction(pruner::stop);
+    addShutdownAction(
+        () -> {
+          try {
+            pruner.stop();
+          } catch (InterruptedException ie) {
+            throw new RuntimeException(ie);
+          }
+        });
 
     final boolean fastSyncEnabled = syncConfig.getSyncMode().equals(SyncMode.FAST);
     ethProtocolManager = createEthProtocolManager(protocolContext, fastSyncEnabled);
