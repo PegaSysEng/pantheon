@@ -158,8 +158,7 @@ public class TomlConfigFileDefaultProvider implements IDefaultValueProvider {
           unknownOptionsList.stream().collect(Collectors.joining(", "));
       throw new ParameterException(
           commandLine,
-          String.format(
-              "Unknown %s in TOML configuration file: %s", options, csvUnknownOptions));
+          String.format("Unknown %s in TOML configuration file: %s", options, csvUnknownOptions));
     }
   }
 }
