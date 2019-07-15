@@ -69,9 +69,7 @@ public class Pruner {
     }
     final BlockHeader header = event.getBlock().getHeader();
     if (state.compareAndSet(State.IDLE, State.TRANSIENT_FORK_OUTLIVING)) {
-      pruningStrategy
-          .prepare(); // implications for calling prepare here when blocks can come from multiple
-      // threads?
+      pruningStrategy.prepare();
       markBlockNumber = header.getNumber();
     } else if (header.getNumber() > markBlockNumber + transientForkThreshold
         && state.compareAndSet(State.TRANSIENT_FORK_OUTLIVING, State.MARKING)) {

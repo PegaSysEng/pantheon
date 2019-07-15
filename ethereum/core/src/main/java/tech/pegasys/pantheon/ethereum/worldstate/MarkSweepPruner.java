@@ -44,7 +44,7 @@ public class MarkSweepPruner {
   private final Counter markOperationCounter;
   private final Counter sweepOperationCounter;
   private final Counter sweptNodesCounter;
-  private long nodeAddedListenerId;
+  private volatile long nodeAddedListenerId;
   private final ReentrantLock markLock = new ReentrantLock(true);
   private final Set<BytesValue> pendingMarks = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
