@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import net.consensys.cava.toml.Toml;
@@ -125,10 +126,12 @@ public class TomlConfigFileDefaultProvider implements IDefaultValueProvider {
               result.errors().stream()
                   .map(TomlParseError::toString)
                   .collect(Collectors.joining("%n"));
-          ;
+
           throw new ParameterException(
-              commandLine, String.format("Invalid TOML configuration : %s", errors));
+              commandLine, String.format("Invalid TOML configuration: %s", errors));
         }
+
+        checkUnknownOptions(result);
 
         this.result = result;
 
@@ -139,5 +142,24 @@ public class TomlConfigFileDefaultProvider implements IDefaultValueProvider {
     }
 
     checkConfigurationValidity();
+  }
+
+  private void checkUnknownOptions(final TomlParseResult result) {
+    final CommandLine.Model.CommandSpec commandSpec = commandLine.getCommandSpec();
+
+    final Set<String> unknownOptionsList =
+        result.keySet().stream()
+            .filter(option -> !commandSpec.optionsMap().containsKey("--" + option))
+            .collect(Collectors.toSet());
+
+    if (!unknownOptionsList.isEmpty()) {
+      final String options = unknownOptionsList.size() > 1 ? "options" : "option";
+      final String csvUnknownOptions =
+          unknownOptionsList.stream().collect(Collectors.joining(", "));
+      throw new ParameterException(
+          commandLine,
+          String.format(
+              "Unknown %s in TOML configuration file: %s", options, csvUnknownOptions));
+    }
   }
 }
