@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -59,8 +60,8 @@ public class Pruner {
     blockchain.observeBlockAdded((event, blockchain) -> handleNewBlock(event));
   }
 
-  public void stop() {
-    executor.shutdownNow();
+  public void stop() throws InterruptedException {
+    executor.awaitTermination(30, TimeUnit.SECONDS);
   }
 
   private void handleNewBlock(final BlockAddedEvent event) {
