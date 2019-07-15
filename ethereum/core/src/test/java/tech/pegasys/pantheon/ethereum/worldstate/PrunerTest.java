@@ -16,6 +16,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
@@ -31,6 +33,7 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.Mock;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PrunerTest {
 
   private final NoOpMetricsSystem metricsSystem = new NoOpMetricsSystem();
@@ -41,7 +44,6 @@ public class PrunerTest {
 
   @Test
   public void abortsPruningWhenFullyMarkedBlockNoLongerOnCanonicalChain() {
-    markSweepPruner = mock(MarkSweepPruner.class);
     final Block genesisBlock = gen.genesisBlock();
     final DefaultMutableBlockchain blockchain =
         new DefaultMutableBlockchain(
