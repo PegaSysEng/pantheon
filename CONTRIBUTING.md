@@ -287,5 +287,5 @@ in this guide.
 [Pantheon documentation]: https://docs.pantheon.pegasys.tech/
 [Debugging documentation]: https://docs.pantheon.pegasys.tech/en/stable/Using-Pantheon/Debugging/
 [CLA.md]: /CLA.md
-[Code Reviews]: /docs/community/code-reviews.md
+[Code Reviews]: /docs/development/code-reviews.md
 [MkDocs]: https://www.mkdocs.org/
