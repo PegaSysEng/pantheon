@@ -13,18 +13,19 @@
 package tech.pegasys.pantheon.enclave;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
 import tech.pegasys.pantheon.enclave.types.CreatePrivacyGroupRequest;
 import tech.pegasys.pantheon.enclave.types.DeletePrivacyGroupRequest;
+import tech.pegasys.pantheon.enclave.types.FindPrivacyGroupRequest;
+import tech.pegasys.pantheon.enclave.types.FindPrivacyGroupResponse;
 import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
-import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendRequestLegacy;
 import tech.pegasys.pantheon.enclave.types.SendRequestPantheon;
 import tech.pegasys.pantheon.enclave.types.SendResponse;
@@ -34,8 +35,8 @@ import java.net.URI;
 import java.util.List;
 
 import com.google.common.collect.Lists;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -49,8 +50,8 @@ public class EnclaveTest {
 
   private static OrionTestHarness testHarness;
 
-  @BeforeClass
-  public static void setUpOnce() throws Exception {
+  @Before
+  public void setUpOnce() throws Exception {
     folder.create();
 
     testHarness =
@@ -60,8 +61,8 @@ public class EnclaveTest {
     enclave = new Enclave(testHarness.clientUrl());
   }
 
-  @AfterClass
-  public static void tearDownOnce() {
+  @After
+  public void tearDownOnce() {
     testHarness.getOrion().stop();
   }
 
@@ -72,68 +73,103 @@ public class EnclaveTest {
 
   @Test
   public void testSendAndReceive() throws Exception {
-    List<String> publicKeys = testHarness.getPublicKeys();
+    final List<String> publicKeys = testHarness.getPublicKeys();
 
-    SendRequest sc =
-        new SendRequestLegacy(PAYLOAD, publicKeys.get(0), Lists.newArrayList(publicKeys.get(0)));
-    SendResponse sr = enclave.send(sc);
-
-    ReceiveRequest rc = new ReceiveRequest(sr.getKey(), publicKeys.get(0));
-    ReceiveResponse rr = enclave.receive(rc);
-
-    assertEquals(PAYLOAD, new String(rr.getPayload(), UTF_8));
-    assertNotNull(rr.getPrivacyGroupId());
+    final SendResponse sr =
+        enclave.send(
+            new SendRequestLegacy(
+                PAYLOAD, publicKeys.get(0), Lists.newArrayList(publicKeys.get(0))));
+    final ReceiveResponse rr = enclave.receive(new ReceiveRequest(sr.getKey(), publicKeys.get(0)));
+    assertThat(rr).isNotNull();
+    assertThat(new String(rr.getPayload(), UTF_8)).isEqualTo(PAYLOAD);
+    assertThat(rr.getPrivacyGroupId()).isNotNull();
   }
 
   @Test
   public void testSendWithPrivacyGroupAndReceive() throws Exception {
-    List<String> publicKeys = testHarness.getPublicKeys();
+    final List<String> publicKeys = testHarness.getPublicKeys();
 
-    CreatePrivacyGroupRequest privacyGroupRequest =
+    final CreatePrivacyGroupRequest privacyGroupRequest =
         new CreatePrivacyGroupRequest(publicKeys.toArray(new String[0]), publicKeys.get(0), "", "");
 
-    PrivacyGroup privacyGroupResponse = enclave.createPrivacyGroup(privacyGroupRequest);
+    final PrivacyGroup privacyGroupResponse = enclave.createPrivacyGroup(privacyGroupRequest);
 
-    SendRequest sc =
-        new SendRequestPantheon(
-            PAYLOAD, publicKeys.get(0), privacyGroupResponse.getPrivacyGroupId());
-    SendResponse sr = enclave.send(sc);
-
-    ReceiveRequest rc = new ReceiveRequest(sr.getKey(), publicKeys.get(0));
-    ReceiveResponse rr = enclave.receive(rc);
-
-    assertEquals(PAYLOAD, new String(rr.getPayload(), UTF_8));
-    assertNotNull(rr.getPrivacyGroupId());
+    final SendResponse sr =
+        enclave.send(
+            new SendRequestPantheon(
+                PAYLOAD, publicKeys.get(0), privacyGroupResponse.getPrivacyGroupId()));
+    final ReceiveResponse rr = enclave.receive(new ReceiveRequest(sr.getKey(), publicKeys.get(0)));
+    assertThat(rr).isNotNull();
+    assertThat(new String(rr.getPayload(), UTF_8)).isEqualTo(PAYLOAD);
+    assertThat(rr.getPrivacyGroupId()).isNotNull();
   }
 
   @Test
   public void testCreateAndDeletePrivacyGroup() throws Exception {
+    final List<String> publicKeys = testHarness.getPublicKeys();
+    final String name = "testName";
+    final String description = "testDesc";
+    final CreatePrivacyGroupRequest privacyGroupRequest =
+        new CreatePrivacyGroupRequest(
+            publicKeys.toArray(new String[0]), publicKeys.get(0), name, description);
+
+    final PrivacyGroup privacyGroupResponse = enclave.createPrivacyGroup(privacyGroupRequest);
+
+    assertThat(privacyGroupResponse.getPrivacyGroupId()).isNotNull();
+    assertThat(privacyGroupResponse.getName()).isEqualTo(name);
+    assertThat(privacyGroupResponse.getDescription()).isEqualTo(description);
+    assertThat(privacyGroupResponse.getType()).isEqualByComparingTo(PrivacyGroup.Type.PANTHEON);
+
+    final String response =
+        enclave.deletePrivacyGroup(
+            new DeletePrivacyGroupRequest(
+                privacyGroupResponse.getPrivacyGroupId(), publicKeys.get(0)));
+
+    assertThat(privacyGroupResponse.getPrivacyGroupId()).isEqualTo(response);
+  }
+
+  @Test
+  public void testCreateFindDeleteFindPrivacyGroup() throws Exception {
     List<String> publicKeys = testHarness.getPublicKeys();
-    String name = "testName";
-    String description = "testDesc";
+    String name = "name";
+    String description = "desc";
     CreatePrivacyGroupRequest privacyGroupRequest =
         new CreatePrivacyGroupRequest(
             publicKeys.toArray(new String[0]), publicKeys.get(0), name, description);
 
     PrivacyGroup privacyGroupResponse = enclave.createPrivacyGroup(privacyGroupRequest);
 
-    assertNotNull(privacyGroupResponse.getPrivacyGroupId());
-    assertEquals(name, privacyGroupResponse.getName());
-    assertEquals(description, privacyGroupResponse.getDescription());
-    assertEquals(PrivacyGroup.Type.PANTHEON, privacyGroupResponse.getType());
+    assertThat(privacyGroupResponse.getPrivacyGroupId()).isNotNull();
+    assertThat(privacyGroupResponse.getName()).isEqualTo(name);
+    assertThat(privacyGroupResponse.getDescription()).isEqualTo(description);
+    assertThat(privacyGroupResponse.getType()).isEqualTo(PrivacyGroup.Type.PANTHEON);
+
+    FindPrivacyGroupRequest findPrivacyGroupRequest =
+        new FindPrivacyGroupRequest(publicKeys.toArray(new String[0]));
+    FindPrivacyGroupResponse[] findPrivacyGroupResponse =
+        enclave.findPrivacyGroup(findPrivacyGroupRequest);
+
+    assertThat(findPrivacyGroupResponse.length).isEqualTo(1);
+    assertThat(findPrivacyGroupResponse[0].privacyGroupId())
+        .isEqualTo(privacyGroupResponse.getPrivacyGroupId());
 
     DeletePrivacyGroupRequest deletePrivacyGroupRequest =
         new DeletePrivacyGroupRequest(privacyGroupResponse.getPrivacyGroupId(), publicKeys.get(0));
 
     String response = enclave.deletePrivacyGroup(deletePrivacyGroupRequest);
 
-    assertEquals(response, privacyGroupResponse.getPrivacyGroupId());
+    assertThat(privacyGroupResponse.getPrivacyGroupId()).isEqualTo(response);
+
+    findPrivacyGroupRequest = new FindPrivacyGroupRequest(publicKeys.toArray(new String[0]));
+    findPrivacyGroupResponse = enclave.findPrivacyGroup(findPrivacyGroupRequest);
+
+    assertThat(findPrivacyGroupResponse.length).isEqualTo(0);
   }
 
-  @Test(expected = IOException.class)
-  public void whenUpCheckFailsThrows() throws IOException {
-    Enclave broken = new Enclave(URI.create("http://null"));
-
-    broken.upCheck();
+  @Test
+  public void whenUpCheckFailsThrows() {
+    final Throwable thrown = catchThrowable(() -> new Enclave(URI.create("http://null")).upCheck());
+    assertThat(thrown).isInstanceOf(IOException.class);
+    assertThat(thrown).hasMessageContaining("Failed to perform upcheck");
   }
 }
