@@ -35,6 +35,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import picocli.CommandLine;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Model.OptionSpec;
 import picocli.CommandLine.ParameterException;
 
@@ -42,7 +43,7 @@ import picocli.CommandLine.ParameterException;
 public class TomlConfigFileDefaultProviderTest {
   @Mock CommandLine mockCommandLine;
 
-  @Mock CommandLine.Model.CommandSpec mockCommandSpec;
+  @Mock CommandSpec mockCommandSpec;
 
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
