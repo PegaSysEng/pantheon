@@ -2675,11 +2675,12 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assumeTrue(isFullInstantiation());
 
     final URL configFile = this.getClass().getResource("/complete_config.toml");
-    // update genesis file path and add an invalid option
+    // update genesis file path, "similar" valid option and add invalid options
     final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
     final String updatedConfig =
         Resources.toString(configFile, UTF_8)
                 .replace("/opt/pantheon/genesis.json", escapeTomlString(genesisFile.toString()))
+                .replace("rpc-http-api", "rpc-http-apis")
             + System.lineSeparator()
             + "invalid_option=true"
             + System.lineSeparator()
