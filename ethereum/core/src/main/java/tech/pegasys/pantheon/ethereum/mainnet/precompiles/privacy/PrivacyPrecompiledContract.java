@@ -87,7 +87,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
 
   @Override
   public Gas gasRequirement(final BytesValue input) {
-    return Gas.of(0);
+    return Gas.of(40_000L); // Not sure
   }
 
   @Override
@@ -140,7 +140,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
     }
 
     if (messageFrame.isPersistingState()) {
-      LOG.debug(
+      LOG.trace(
           "Persisting private state {} for privacyGroup {}",
           disposablePrivateState.rootHash(),
           privacyGroupId);
