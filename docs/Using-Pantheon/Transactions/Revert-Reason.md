@@ -14,7 +14,7 @@ information about the error is passed back to the caller.
     contract VendingMachine {
         function buy(uint amount) public payable {
             if (amount > msg.value / 2 ether)
-                revert("Not enough Ether provided.");
+                revert("Not enough Ether provided");
             // Alternative way to do it:
             require(
                 amount <= msg.value / 2 ether,
@@ -45,8 +45,31 @@ When revert reason is enabled, the revert reason is included in the transaction 
     transaction when importing the block. That is, the revert reason is not available if using fast sync. 
 
 !!! example 
-    QUESTION WITH DROPBEAR FOR EXAMPLE
+    ```
+    { 
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+         "blockHash": "0xe7212a92cfb9b06addc80dec2a0dfae9ea94fd344efeb157c41e12994fcad60a",
+         "blockNumber": "0x50",
+         "contractAddress": null,
+         "cumulativeGasUsed": "0x5208",
+         "from": "0x627306090abab3a6e1400e9345bc60c78a8bef57",
+         "gasUsed": "0x5208",
+         "logs": [],
+         "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+         "status": "0x1",
+         "to": "0xf17f52151ebef6c7334fad080c5704d77216b732",
+         "transactionHash": "0xc00e97af59c6f88de163306935f7682af1a34c67245e414537d02e422815efc3",
+         "transactionIndex": "0x0",
+         "revertReason":"Not enough Ether provided"
+       }
+    }
+    ```
     
-NOT SUPPORTED BY WEB3J/WEB3JS -> QUESTION WITH DROPBEAR
+## Dapp support 
 
+Client libraries (eg, web3j) do not support extracting the revert reason from the transaction receipt. 
+To extract the revert reason your Dapp must interact directly with Pantheon using a custom JSON -> Object 
+converter. 
 

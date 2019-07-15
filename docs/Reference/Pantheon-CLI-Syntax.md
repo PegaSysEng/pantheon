@@ -1416,7 +1416,6 @@ Show the help message and exit.
 ```bash tab="Environment Variable"
 PANTHEON_LOGGING=DEBUG
 ```
-
 ```bash tab="Example Configration File"
 logging="DEBUG"
 ```
