@@ -45,6 +45,8 @@ public class DefaultSynchronizer<C> implements Synchronizer {
 
   private static final Logger LOG = LogManager.getLogger();
 
+  private static final boolean PRUNING_ENABLED = false;
+  private final Pruner pruner;
   private final SyncState syncState;
   private final AtomicBoolean running = new AtomicBoolean(false);
   private final Subscribers<SyncStatusListener> syncStatusListeners = Subscribers.create();
@@ -64,6 +66,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
       final Path dataDirectory,
       final Clock clock,
       final MetricsSystem metricsSystem) {
+    this.pruner = pruner;
     this.syncState = syncState;
 
     ChainHeadTracker.trackChainHeadForPeers(
@@ -166,8 +169,9 @@ public class DefaultSynchronizer<C> implements Synchronizer {
 
   private void startFullSync() {
     fullSyncDownloader.start();
-    // TODO: enable when pruning cli implemented
-    // pruner.start();
+    if (PRUNING_ENABLED) {
+      pruner.start();
+    }
   }
 
   @Override
