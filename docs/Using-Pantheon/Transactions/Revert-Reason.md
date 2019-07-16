@@ -3,9 +3,9 @@ description: Including revert reason in transactions
 
 # Revert Reason 
 
-In contracts, the [`revert`](https://solidity.readthedocs.io/en/v0.5.10/control-structures.html#revert) function 
+In smart contracts, the [`revert`](https://solidity.readthedocs.io/en/v0.5.10/control-structures.html#revert) operation 
 triggers an exception to flag an error and revert the current call. An optional string message containing 
-information about the error is passed back to the caller.
+information about the error is passed back to the client from the EVM.
 
 !!! example
     ```sol
@@ -32,11 +32,11 @@ to include the revert reason in the transaction receipt in Pantheon.
 
 !!! caution 
     Enabling revert reason may use a significant amount of memory. We do not recommend enabling revert
-    reason when connected to the Ethereum mainnet. 
+    reason when connected to public Ethereum networks. 
 
 ## Where is the Revert Reason Included 
 
-When revert reason is enabled, the revert reason is included in the transaction receipt and returned by 
+When revert reason is enabled, the revert reason is included in the transaction receipt returned by 
 [`eth_getTransactionReceipt`](../../Reference/Pantheon-API-Methods.md#eth_gettransactionreceipt). 
 
 !!! important 

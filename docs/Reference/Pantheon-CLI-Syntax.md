@@ -1023,7 +1023,7 @@ receipt. Default is `false`.
 
 !!! caution 
     Enabling revert reason may use a significant amount of memory. We do not recommend enabling revert
-    reason when connected to the Ethereum mainnet. 
+    reason when connected to public Ethereum networks. 
 
 ### rpc-http-api
 
