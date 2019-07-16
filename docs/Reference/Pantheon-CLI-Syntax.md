@@ -1421,7 +1421,7 @@ logging="DEBUG"
 ```
 
 Sets the logging verbosity.
-Log levels are `OFF`, `FATAL`, `WARN`, `INFO`, `DEBUG`, `TRACE`, `ALL`.
+Log levels are `OFF`, `FATAL`, `ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE`, `ALL`.
 Default is `INFO`.
 
 ### version

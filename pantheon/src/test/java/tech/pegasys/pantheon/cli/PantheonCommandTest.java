@@ -158,7 +158,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
     verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
-    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(eq(0.5));
+    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(eq(0.6f));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(defaultJsonRpcConfiguration));
     verify(mockRunnerBuilder).graphQLConfiguration(eq(DEFAULT_GRAPH_QL_CONFIGURATION));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(defaultWebSocketConfiguration));
@@ -232,7 +232,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--config-file", tempConfigFile.toString());
 
     final String expectedOutputStart =
-        "Invalid TOML configuration : Unexpected '.', expected a-z, A-Z, 0-9, ', \", a table key, "
+        "Invalid TOML configuration: Unexpected '.', expected a-z, A-Z, 0-9, ', \", a table key, "
             + "a newline, or end-of-input (line 1, column 1)";
     assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
     assertThat(commandOutput.toString()).isEmpty();
@@ -264,7 +264,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
     parseCommand("--config-file", tempConfigFile.toString());
 
     final String expectedOutputStart =
-        "Invalid TOML configuration : Unexpected '=', expected ', \", ''', \"\"\", a number, "
+        "Invalid TOML configuration: Unexpected '=', expected ', \", ''', \"\"\", a number, "
             + "a boolean, a date/time, an array, or a table (line 1, column 8)";
     assertThat(commandErrorOutput.toString()).startsWith(expectedOutputStart);
     assertThat(commandOutput.toString()).isEmpty();
@@ -722,8 +722,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockRunnerBuilder).p2pAdvertisedHost(eq("127.0.0.1"));
     verify(mockRunnerBuilder).p2pListenPort(eq(30303));
     verify(mockRunnerBuilder).maxPeers(eq(25));
-    verify(mockRunnerBuilder).limitRemoteWireConnectionsEnabled(eq(false));
-    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(eq(0.5));
+    verify(mockRunnerBuilder).limitRemoteWireConnectionsEnabled(eq(true));
+    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(eq(0.6f));
     verify(mockRunnerBuilder).jsonRpcConfiguration(eq(jsonRpcConfiguration));
     verify(mockRunnerBuilder).graphQLConfiguration(eq(graphQLConfiguration));
     verify(mockRunnerBuilder).webSocketConfiguration(eq(webSocketConfiguration));
@@ -1023,7 +1023,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "false",
         "--max-peers",
         "42",
-        "--remote-connections-percentage",
+        "--max-remote-connections-percentage",
         "50",
         "--banned-node-id",
         String.join(",", nodes),
@@ -1036,7 +1036,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
         "--bootnodes",
         "--max-peers",
         "--banned-node-ids",
-        "--remote-connections-percentage");
+        "--max-remote-connections-percentage");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -1247,13 +1247,13 @@ public class PantheonCommandTest extends CommandTestAbstract {
     final int remoteConnectionsPercentage = 12;
     parseCommand(
         "--remote-connections-limit-enabled",
-        "--remote-connections-percentage",
+        "--max-remote-connections-percentage",
         String.valueOf(remoteConnectionsPercentage));
 
-    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(doubleArgumentCaptor.capture());
+    verify(mockRunnerBuilder).fractionRemoteConnectionsAllowed(floatCaptor.capture());
     verify(mockRunnerBuilder).build();
 
-    assertThat(doubleArgumentCaptor.getValue())
+    assertThat(floatCaptor.getValue())
         .isEqualTo(
             Fraction.fromPercentage(Percentage.fromInt(remoteConnectionsPercentage)).getValue());
 
@@ -1265,24 +1265,25 @@ public class PantheonCommandTest extends CommandTestAbstract {
   public void remoteConnectionsPercentageWithInvalidFormatMustFail() {
 
     parseCommand(
-        "--remote-connections-limit-enabled", "--remote-connections-percentage", "invalid");
+        "--remote-connections-limit-enabled", "--max-remote-connections-percentage", "invalid");
     verifyZeroInteractions(mockRunnerBuilder);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains(
-            "Invalid value for option '--remote-connections-percentage'",
+            "Invalid value for option '--max-remote-connections-percentage'",
             "should be a number between 0 and 100 inclusive");
   }
 
   @Test
   public void remoteConnectionsPercentageWithOutOfRangeMustFail() {
 
-    parseCommand("--remote-connections-limit-enabled", "--remote-connections-percentage", "150");
+    parseCommand(
+        "--remote-connections-limit-enabled", "--max-remote-connections-percentage", "150");
     verifyZeroInteractions(mockRunnerBuilder);
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString())
         .contains(
-            "Invalid value for option '--remote-connections-percentage'",
+            "Invalid value for option '--max-remote-connections-percentage'",
             "should be a number between 0 and 100 inclusive");
   }
 
@@ -2668,5 +2669,30 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString())
         .contains(
             "Invalid value for option '--Xincoming-tx-messages-keep-alive-seconds': 'acbd' is not an int");
+  }
+
+  @Test
+  public void tomlThatHasInvalidOptions() throws IOException {
+    assumeTrue(isFullInstantiation());
+
+    final URL configFile = this.getClass().getResource("/complete_config.toml");
+    // update genesis file path, "similar" valid option and add invalid options
+    final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
+    final String updatedConfig =
+        Resources.toString(configFile, UTF_8)
+                .replace("/opt/pantheon/genesis.json", escapeTomlString(genesisFile.toString()))
+                .replace("rpc-http-api", "rpc-http-apis")
+            + System.lineSeparator()
+            + "invalid_option=true"
+            + System.lineSeparator()
+            + "invalid_option2=true";
+
+    final Path toml = createTempFile("toml", updatedConfig.getBytes(UTF_8));
+
+    // Parse it.
+    parseCommand("--config-file", toml.toString());
+
+    assertThat(commandErrorOutput.toString())
+        .contains("Unknown options in TOML configuration file: invalid_option, invalid_option2");
   }
 }
