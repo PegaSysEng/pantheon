@@ -63,7 +63,7 @@ docker run -p 8546:8546 pegasyseng/pantheon:latest --miner-enabled --miner-coinb
 
 To run a node on Rinkeby: 
 ```bash
-docker run -p 30303:30303 pegasyseng/pantheon:latest --network=rinkeby --data-path=/mynode/data 
+docker run -p 30303:30303 --mount type=bind,source=/<myvolume/pantheon/rinkeby>,target=/opt/pantheon/database pegasyseng/pantheon:latest --network=rinkeby
 ```
 
 ### Run a Node on Ethereum Mainnet 
