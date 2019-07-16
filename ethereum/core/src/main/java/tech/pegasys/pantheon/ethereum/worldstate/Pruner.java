@@ -48,7 +48,7 @@ public class Pruner {
     if (!(transientForkThreshold >= 0 && retentionPeriodInBlocks >= transientForkThreshold)) {
       throw new IllegalArgumentException(
           String.format(
-              "Expected transientForkThreshold >= 0 and retentionPeriodInBlocks >= transientForkThreshold. transientForkThreshold={}, retentionPeriodInBlocks={}",
+              "Expected transientForkThreshold >= 0 and retentionPeriodInBlocks >= transientForkThreshold. transientForkThreshold=%d, retentionPeriodInBlocks=%d",
               transientForkThreshold,
               retentionPeriodInBlocks));
     }
