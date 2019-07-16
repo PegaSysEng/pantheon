@@ -145,7 +145,7 @@ The command line specifies the same options as for Node-1 with different ports a
 [`--bootnodes`](../Reference/Pantheon-CLI-Syntax.md#bootnodes) option specifies the enode URL for Node-1.
 
 !!!note
-    When running Pantheon from the [Docker image](../../Getting-Started/Run-Docker-Image.md), [expose ports](../../Getting-Started/Run-Docker-Image.md#exposing-ports).
+    When running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md), [expose ports](../Getting-Started/Run-Docker-Image.md#exposing-ports).
 
 ### 8. Start Pantheon Node-3
 
