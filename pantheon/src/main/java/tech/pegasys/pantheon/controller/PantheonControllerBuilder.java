@@ -216,8 +216,8 @@ public abstract class PantheonControllerBuilder<C> {
                     .setPriority(Thread.MIN_PRIORITY)
                     .setNameFormat("StatePruning-%d")
                     .build()),
-            1000,
-            10);
+            10,
+            1000);
     addShutdownAction(
         () -> {
           try {

@@ -40,8 +40,8 @@ public class Pruner {
       final MarkSweepPruner pruningStrategy,
       final Blockchain blockchain,
       final ExecutorService executor,
-      final long retentionPeriodInBlocks,
-      final long transientForkThreshold) {
+      final long transientForkThreshold,
+      final long retentionPeriodInBlocks) {
     this.pruningStrategy = pruningStrategy;
     this.blockchain = blockchain;
     this.executor = executor;
