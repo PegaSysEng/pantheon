@@ -12,12 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.worldstate;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
 import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
@@ -27,11 +25,14 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
+import tech.pegasys.pantheon.testutil.MockExecutorService;
 
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PrunerTest {
@@ -41,16 +42,37 @@ public class PrunerTest {
   private final BlockDataGenerator gen = new BlockDataGenerator();
 
   @Mock private MarkSweepPruner markSweepPruner;
+  private final MockExecutorService mockExecutorService = new MockExecutorService();
+
+  @Test
+  public void shouldMarkCorrectBlockAndSweep() {
+    final Block genesisBlock = gen.genesisBlock();
+    final BlockchainStorage blockchainStorage =
+        new KeyValueStoragePrefixedKeyBlockchainStorage(
+            new InMemoryKeyValueStorage(), new MainnetBlockHeaderFunctions());
+    final DefaultMutableBlockchain blockchain =
+        new DefaultMutableBlockchain(genesisBlock, blockchainStorage, metricsSystem);
+
+    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);
+    pruner.start();
+
+    BlockOptions options =
+        new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+    final Block canonicalHead = gen.block(options);
+    List<TransactionReceipt> receipts = gen.receipts(canonicalHead);
+    blockchain.appendBlock(canonicalHead, receipts);
+    verify(markSweepPruner).mark(canonicalHead.getHeader().getStateRoot());
+    verify(markSweepPruner).sweep();
+  }
 
   @Test
   public void abortsPruningWhenFullyMarkedBlockNoLongerOnCanonicalChain() {
     final Block genesisBlock = gen.genesisBlock();
+    final BlockchainStorage blockchainStorage =
+        new KeyValueStoragePrefixedKeyBlockchainStorage(
+            new InMemoryKeyValueStorage(), new MainnetBlockHeaderFunctions());
     final DefaultMutableBlockchain blockchain =
-        new DefaultMutableBlockchain(
-            genesisBlock,
-            new KeyValueStoragePrefixedKeyBlockchainStorage(
-                new InMemoryKeyValueStorage(), new MainnetBlockHeaderFunctions()),
-            metricsSystem);
+        new DefaultMutableBlockchain(genesisBlock, blockchainStorage, metricsSystem);
 
     // start pruner so it can start handling block added events
     final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);

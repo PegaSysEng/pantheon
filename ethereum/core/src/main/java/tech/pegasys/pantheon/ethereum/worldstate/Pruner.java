@@ -17,13 +17,10 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,11 +37,11 @@ public class Pruner {
   private long transientForkThreshold;
 
   public Pruner(
-          final MarkSweepPruner pruningStrategy,
-          final Blockchain blockchain,
-          final ExecutorService executor,
+      final MarkSweepPruner pruningStrategy,
+      final Blockchain blockchain,
+      final ExecutorService executor,
       final long retentionPeriodInBlocks,
-          final long transientForkThreshold) {
+      final long transientForkThreshold) {
     this.pruningStrategy = pruningStrategy;
     this.blockchain = blockchain;
     this.executor = executor;
@@ -64,15 +61,20 @@ public class Pruner {
     if (!event.isNewCanonicalHead()) {
       return;
     }
-    final BlockHeader header = event.getBlock().getHeader();
+
+    final long blockNumber = event.getBlock().getHeader().getNumber();
     if (state.compareAndSet(State.IDLE, State.TRANSIENT_FORK_OUTLIVING)) {
       pruningStrategy.prepare();
-      markBlockNumber = header.getNumber();
-    } else if (header.getNumber() > markBlockNumber + transientForkThreshold
+      markBlockNumber = blockNumber;
+    }
+
+    if (blockNumber >= markBlockNumber + transientForkThreshold
         && state.compareAndSet(State.TRANSIENT_FORK_OUTLIVING, State.MARKING)) {
       markedBlockHeader = blockchain.getBlockHeader(markBlockNumber).get();
       mark(markedBlockHeader);
-    } else if (header.getNumber() > markBlockNumber + retentionPeriodInBlocks
+    }
+
+    if (blockNumber >= markBlockNumber + retentionPeriodInBlocks
         && blockchain.blockIsOnCanonicalChain(markedBlockHeader.getHash())
         && state.compareAndSet(State.MARKING_COMPLETE, State.SWEEPING)) {
       sweep();
