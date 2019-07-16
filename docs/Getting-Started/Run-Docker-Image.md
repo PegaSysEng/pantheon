@@ -56,7 +56,7 @@ docker run -p <localportJSON-RPC>:8545 -p <localportWS>:8546 -p <localportP2P>:3
 
 To run a node that mines blocks at a rate suitable for testing purposes with WebSockets enabled: 
 ```bash
-docker run -p 8546:8546 pegasyseng/pantheon:latest --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --data-path=/mynode/data --rpc-ws-enabled --network=dev
+docker run -p 8546:8546 --mount type=bind,source=/<myvolume/pantheon/testnode>,target=/opt/pantheon/database pegasyseng/pantheon:latest --miner-enabled --miner-coinbase fe3b557e8fb62b89f4916b721be55ceb828dbd73 --rpc-ws-enabled --network=dev
 ```
 
 ### Run a Node on Rinkeby Testnet 
