@@ -70,7 +70,7 @@ docker run -p 30303:30303 --mount type=bind,source=/<myvolume/pantheon/rinkeby>,
 
 To run a node on Ethereum mainnet with the HTTP JSON-RPC service enabled: 
 ```bash
-docker run -p 8545:8545 -p 30303:30303 pegasyseng/pantheon:latest --rpc-http-enabled --data-path=/mynode/data 
+docker run -p 8545:8545 --mount type=bind,source=/<myvolume/pantheon/rinkeby>,target=/opt/pantheon/database  -p 30303:30303 pegasyseng/pantheon:latest --rpc-http-enabled
 ```
 
 ## Stopping Pantheon and Cleaning up Resources
