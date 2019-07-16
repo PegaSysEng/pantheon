@@ -64,7 +64,7 @@ public abstract class AbstractKeyValueStorageTest {
   }
 
   @Test
-  public void mayContainKey() throws Exception {
+  public void containsKey() throws Exception {
     final KeyValueStorage store = createStore();
     final BytesValue key = BytesValue.fromHexString("ABCD");
 
