@@ -81,7 +81,8 @@ public class EeaGetPrivateTransactionTest {
           .privateFrom(BytesValues.fromBase64("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="))
           .restriction(Restriction.RESTRICTED);
 
-  private final String enclaveKey = "93Ky7lXwFkMc7+ckoFgUMku5bpr9tz4zhmWmk9RlNng=";
+  private final String enclaveKey =
+      BytesValues.fromBase64("93Ky7lXwFkMc7+ckoFgUMku5bpr9tz4zhmWmk9RlNng=").toString();
 
   private final JsonRpcParameter parameters = new JsonRpcParameter();
   private final Enclave enclave = mock(Enclave.class);

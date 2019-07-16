@@ -13,8 +13,7 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.methods;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
@@ -31,10 +30,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaGetPrivateTransaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.privacy.PrivateTransactionLegacyResult;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.privacy.Restriction;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -73,7 +74,7 @@ public class EeaGetPrivateTransactionIntegrationTest {
 
   @Test
   public void testUpCheck() throws IOException {
-    assertTrue(enclave.upCheck());
+    assertThat(enclave.upCheck()).isTrue();
   }
 
   private final Address sender =
@@ -125,21 +126,23 @@ public class EeaGetPrivateTransactionIntegrationTest {
     final BytesValueRLPOutput bvrlp = new BytesValueRLPOutput();
     privateTransaction.writeTo(bvrlp);
 
-    SendRequest sendRequest =
+    final SendRequest sendRequest =
         new SendRequestLegacy(
             Base64.getEncoder().encodeToString(bvrlp.encoded().extractArray()),
             "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=",
             Lists.newArrayList("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="));
-    SendResponse sendResponse = enclave.send(sendRequest);
+    final SendResponse sendResponse = enclave.send(sendRequest);
 
-    String hexKey = BytesValue.wrap(Base64.getDecoder().decode(sendResponse.getKey())).toString();
+    final String hexKey = BytesValues.fromBase64(sendResponse.getKey()).toString();
     final Object[] params = new Object[] {hexKey};
     final JsonRpcRequest request = new JsonRpcRequest("1", "eea_getPrivateTransaction", params);
 
     final JsonRpcSuccessResponse response =
         (JsonRpcSuccessResponse) eeaGetPrivateTransaction.response(request);
-    final PrivateTransaction result = (PrivateTransaction) response.getResult();
+    final PrivateTransactionLegacyResult result =
+        (PrivateTransactionLegacyResult) response.getResult();
 
-    assertEquals(privateTransaction, result);
+    assertThat(new PrivateTransactionLegacyResult(privateTransaction))
+        .isEqualToComparingFieldByField(result);
   }
 }
