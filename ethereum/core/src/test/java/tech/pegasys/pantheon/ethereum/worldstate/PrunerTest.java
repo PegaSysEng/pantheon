@@ -12,9 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.worldstate;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
 import tech.pegasys.pantheon.ethereum.chain.DefaultMutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
@@ -146,5 +149,16 @@ public class PrunerTest {
     receipts = gen.receipts(reorgCausingBlock);
     blockchain.appendBlock(reorgCausingBlock, receipts);
     verify(markSweepPruner, never()).sweep();
+  }
+
+  @Test
+  public void shouldThrowIllegalArgumentExceptionCorrectly() {
+    final Blockchain mockchain = mock(Blockchain.class);
+    assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, -1, -2))
+        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, 0, -1))
+        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, 1, 0))
+        .isInstanceOf(IllegalArgumentException.class);
   }
 }

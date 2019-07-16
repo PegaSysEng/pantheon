@@ -45,6 +45,13 @@ public class Pruner {
     this.pruningStrategy = pruningStrategy;
     this.blockchain = blockchain;
     this.executor = executor;
+    if (!(transientForkThreshold >= 0 && retentionPeriodInBlocks >= transientForkThreshold)) {
+      throw new IllegalArgumentException(
+          String.format(
+              "Expected transientForkThreshold >= 0 and retentionPeriodInBlocks >= transientForkThreshold. transientForkThreshold={}, retentionPeriodInBlocks={}",
+              transientForkThreshold,
+              retentionPeriodInBlocks));
+    }
     this.retentionPeriodInBlocks = retentionPeriodInBlocks;
     this.transientForkThreshold = transientForkThreshold;
   }
