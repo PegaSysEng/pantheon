@@ -84,12 +84,15 @@ public class PrunerTest {
     List<TransactionReceipt> receipts = gen.receipts(newBlock);
     blockchain.appendBlock(newBlock, receipts);
     final Hash markBlockStateRootHash = newBlock.getHeader().getStateRoot();
+    verify(markSweepPruner, never()).mark(markBlockStateRootHash);
+    verify(markSweepPruner, never()).sweep();
 
     options = options.setBlockNumber(2L).setParentHash(newBlock.getHash());
     newBlock = gen.block(options);
     receipts = gen.receipts(newBlock);
     blockchain.appendBlock(newBlock, receipts);
     verify(markSweepPruner).mark(markBlockStateRootHash);
+    verify(markSweepPruner, never()).sweep();
 
     options = options.setBlockNumber(3L).setParentHash(newBlock.getHash());
     newBlock = gen.block(options);
