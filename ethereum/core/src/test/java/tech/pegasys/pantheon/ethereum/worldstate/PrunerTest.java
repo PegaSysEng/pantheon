@@ -114,7 +114,7 @@ public class PrunerTest {
         new DefaultMutableBlockchain(genesisBlock, blockchainStorage, metricsSystem);
 
     // start pruner so it can start handling block added events
-    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);
+    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 1);
     pruner.start();
 
     /*
@@ -148,6 +148,7 @@ public class PrunerTest {
     final Block reorgCausingBlock = gen.block(options);
     receipts = gen.receipts(reorgCausingBlock);
     blockchain.appendBlock(reorgCausingBlock, receipts);
+    verify(markSweepPruner).mark(canonicalHead.getHeader().getStateRoot());
     verify(markSweepPruner, never()).sweep();
   }
 
