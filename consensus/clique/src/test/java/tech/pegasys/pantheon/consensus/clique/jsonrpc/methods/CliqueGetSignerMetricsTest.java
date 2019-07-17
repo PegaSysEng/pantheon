@@ -14,7 +14,9 @@ package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
 import tech.pegasys.pantheon.consensus.clique.TestHelpers;
@@ -105,7 +107,8 @@ public class CliqueGetSignerMetricsTest {
     verify(blockchainQueries, new Times(2)).headBlockNumber();
 
     signerMetricResultList.forEach(
-        signerMetricResult -> assertThat((List) response.getResult()).contains(signerMetricResult));
+        signerMetricResult ->
+            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
   }
 
   @Test
@@ -130,7 +133,8 @@ public class CliqueGetSignerMetricsTest {
     verify(blockchainQueries, never()).headBlockNumber();
 
     signerMetricResultList.forEach(
-        signerMetricResult -> assertThat((List) response.getResult()).contains(signerMetricResult));
+        signerMetricResult ->
+            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
   }
 
   @Test
@@ -156,7 +160,8 @@ public class CliqueGetSignerMetricsTest {
     verify(blockchainQueries).headBlockNumber();
 
     signerMetricResultList.forEach(
-        signerMetricResult -> assertThat((List) response.getResult()).contains(signerMetricResult));
+        signerMetricResult ->
+            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
   }
 
   @Test
@@ -182,7 +187,8 @@ public class CliqueGetSignerMetricsTest {
     verify(blockchainQueries).headBlockNumber();
 
     signerMetricResultList.forEach(
-        signerMetricResult -> assertThat((List) response.getResult()).contains(signerMetricResult));
+        signerMetricResult ->
+            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
   }
 
   @Test
@@ -206,7 +212,8 @@ public class CliqueGetSignerMetricsTest {
     verify(blockchainQueries, never()).headBlockNumber();
 
     signerMetricResultList.forEach(
-        signerMetricResult -> assertThat((List) response.getResult()).contains(signerMetricResult));
+        signerMetricResult ->
+            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
   }
 
   private JsonRpcRequest requestWithParams(final Object... params) {
