@@ -32,9 +32,13 @@ public class SignerMetricResult {
 
   @Override
   public boolean equals(final Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    SignerMetricResult that = (SignerMetricResult) o;
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    final SignerMetricResult that = (SignerMetricResult) o;
     return proposedBlockCount == that.proposedBlockCount
         && lastProposedBlockNumber == that.lastProposedBlockNumber
         && Objects.equals(address, that.address);
@@ -51,13 +55,13 @@ public class SignerMetricResult {
   }
 
   @JsonGetter(value = "proposedBlockCount")
-  public long getProposedBlockCount() {
-    return proposedBlockCount;
+  public String getProposedBlockCount() {
+    return Quantity.create(proposedBlockCount);
   }
 
   @JsonGetter(value = "lastProposedBlockNumber")
-  public long getLastProposedBlockNumber() {
-    return lastProposedBlockNumber;
+  public String getLastProposedBlockNumber() {
+    return Quantity.create(lastProposedBlockNumber);
   }
 
   public void incrementeNbBlock() {

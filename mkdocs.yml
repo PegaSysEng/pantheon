@@ -85,7 +85,6 @@ nav:
         - Contracts in Genesis: Configuring-Pantheon/Contracts-in-Genesis.md
         - Node Keys: Configuring-Pantheon/Node-Keys.md
         - Accounts for Testing: Configuring-Pantheon/Accounts-for-Testing.md
-        - Logging: Configuring-Pantheon/Logging.md
         - Passing JVM Options: Configuring-Pantheon/Passing-JVM-Options.md
     - Networking:
       - Bootnodes: Configuring-Pantheon/Networking/Bootnodes.md
@@ -114,6 +113,8 @@ nav:
         - Transactions:
           - Creating and Sending Transactions: Using-Pantheon/Transactions/Transactions.md
           - Transaction Pool: Using-Pantheon/Transactions/Transaction-Pool.md
+          - Vadidating Transactions: Using-Pantheon/Transactions/Transaction-Validation.md
+          - Including Revert Reason: Using-Pantheon/Transactions/Revert-Reason.md
         - Using Truffle with Pantheon: Using-Pantheon/Truffle.md
         - Events and Logs:
           - Overview: Using-Pantheon/Events-and-Logs.md
@@ -121,6 +122,7 @@ nav:
         - Using Wallets for Account Management: Using-Pantheon/Account-Management.md
         - Mining: Using-Pantheon/Mining.md
     - Monitoring:
+        - Logging: Monitoring/Logging.md
         - Monitoring Performance: Monitoring/Monitoring-Performance.md
         - Monitoring Network:
           - Alethio Overview: Monitoring/Alethio/Overview.md
@@ -128,6 +130,7 @@ nav:
           - Alethio EthStats Lite Network Monitor: Monitoring/Alethio/Lite-Network-Monitor.md
     - Deploying Pantheon:
         - High Availability: Deploying-Pantheon/High-Availability.md
+        - Migrating Docker Image: Deploying-Pantheon/Migration-Docker.md
     - Troubleshooting:
         - Troubleshooting: Troubleshooting/Troubleshooting.md
     - Reference:

@@ -58,66 +58,71 @@ public abstract class AbstractGetSignerMetricsMethod {
     final long fromBlockNumber = getFromBlockNumber(startBlockParameter);
     final long toBlockNumber = getEndBlockNumber(endBlockParameter);
 
-    if (isValidParameters(fromBlockNumber, toBlockNumber)) {
-
-      final Map<Address, SignerMetricResult> proposersMap = new HashMap<>();
-      final long lastBlockIndex = toBlockNumber - 1;
-
-      // go through each block (startBlock is inclusive and endBlock is exclusive)
-      LongStream.range(fromBlockNumber, toBlockNumber)
-          .forEach(
-              currentIndex -> {
-                Optional<BlockHeader> blockHeaderByNumber =
-                    blockchainQueries.getBlockHeaderByNumber(currentIndex);
-
-                // Get the number of blocks from each proposer in a given block range.
-                blockHeaderByNumber.ifPresent(
-                    header -> {
-                      final Address proposerAddress = blockInterface.getProposerOfBlock(header);
-                      SignerMetricResult signerMetric =
-                          proposersMap.computeIfAbsent(proposerAddress, SignerMetricResult::new);
-                      signerMetric.incrementeNbBlock();
-                      // Add the block number of the last block proposed by each validator
-                      signerMetric.setLastProposedBlockNumber(currentIndex);
-
-                      // Get All validators present in the last block of the range even
-                      // if they didn’t propose a block
-                      if (currentIndex == lastBlockIndex) {
-                        blockInterface
-                            .validatorsInBlock(header)
-                            .forEach(
-                                address ->
-                                    proposersMap.computeIfAbsent(
-                                        proposerAddress, SignerMetricResult::new));
-                      }
-                    });
-              });
-
-      return new JsonRpcSuccessResponse(request.getId(), new ArrayList<>(proposersMap.values()));
-    } else {
+    if (!isValidParameters(fromBlockNumber, toBlockNumber)) {
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
     }
+
+    final Map<Address, SignerMetricResult> proposersMap = new HashMap<>();
+    final long lastBlockIndex = toBlockNumber - 1;
+
+    // go through each block (startBlock is inclusive and endBlock is exclusive)
+    LongStream.range(fromBlockNumber, toBlockNumber)
+        .forEach(
+            currentIndex -> {
+              final Optional<BlockHeader> blockHeaderByNumber =
+                  blockchainQueries.getBlockHeaderByNumber(currentIndex);
+
+              // Get the number of blocks from each proposer in a given block range.
+              blockHeaderByNumber.ifPresent(
+                  header -> {
+                    final Address proposerAddress = blockInterface.getProposerOfBlock(header);
+                    final SignerMetricResult signerMetric =
+                        proposersMap.computeIfAbsent(proposerAddress, SignerMetricResult::new);
+                    signerMetric.incrementeNbBlock();
+                    // Add the block number of the last block proposed by each validator
+                    signerMetric.setLastProposedBlockNumber(currentIndex);
+
+                    // Get All validators present in the last block of the range even
+                    // if they didn't propose a block
+                    if (currentIndex == lastBlockIndex) {
+                      blockInterface
+                          .validatorsInBlock(header)
+                          .forEach(
+                              address ->
+                                  proposersMap.computeIfAbsent(
+                                      proposerAddress, SignerMetricResult::new));
+                    }
+                  });
+            });
+
+    return new JsonRpcSuccessResponse(request.getId(), new ArrayList<>(proposersMap.values()));
   }
 
   private long getFromBlockNumber(final Optional<BlockParameter> startBlockParameter) {
     return startBlockParameter
-        .map(
-            blockParameter ->
-                blockParameter
-                    .getNumber()
-                    .orElse(blockchainQueries.headBlockNumber() - DEFAULT_RANGE_BLOCK))
+        .map(this::resolveBlockNumber)
         .orElseGet(() -> blockchainQueries.headBlockNumber() - DEFAULT_RANGE_BLOCK);
   }
 
   private long getEndBlockNumber(final Optional<BlockParameter> endBlockParameter) {
     return endBlockParameter
-        .map(
-            blockParameter ->
-                blockParameter.getNumber().orElse(blockchainQueries.headBlockNumber()))
+        .map(this::resolveBlockNumber)
         .orElseGet(blockchainQueries::headBlockNumber);
   }
 
   private boolean isValidParameters(final long startBlock, final long endBlock) {
     return startBlock < endBlock;
+  }
+
+  private long resolveBlockNumber(final BlockParameter param) {
+    if (param.getNumber().isPresent()) {
+      return param.getNumber().getAsLong();
+    } else if (param.isEarliest()) {
+      return BlockHeader.GENESIS_BLOCK_NUMBER;
+    } else if (param.isLatest() || param.isPending()) {
+      return blockchainQueries.headBlockNumber();
+    } else {
+      throw new IllegalStateException("Unknown block parameter type.");
+    }
   }
 }

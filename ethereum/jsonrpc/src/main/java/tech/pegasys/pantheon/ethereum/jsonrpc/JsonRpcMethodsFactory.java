@@ -65,6 +65,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthNewFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthNewPendingTransactionFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthProtocolVersion;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSendRawTransaction;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSendTransaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthSyncing;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.EthUninstallFilter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
@@ -91,6 +92,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.Per
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveNodesFromWhitelist;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaCreatePrivacyGroup;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaDeletePrivacyGroup;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaFindPrivacyGroup;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaGetPrivacyPrecompileAddress;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaGetPrivateTransaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.EeaGetTransactionCount;
@@ -234,6 +236,7 @@ public class JsonRpcMethodsFactory {
           new EthSyncing(synchronizer),
           new EthGetStorageAt(blockchainQueries, parameter),
           new EthSendRawTransaction(transactionPool, parameter),
+          new EthSendTransaction(),
           new EthEstimateGas(
               blockchainQueries,
               new TransactionSimulator(
@@ -331,6 +334,7 @@ public class JsonRpcMethodsFactory {
           new EeaGetPrivateTransaction(enclave, parameter, privacyParameters),
           new EeaCreatePrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
           new EeaDeletePrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
+          new EeaFindPrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
           new EeaGetPrivacyPrecompileAddress(privacyParameters));
     }
     return enabledMethods;
