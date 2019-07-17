@@ -71,4 +71,17 @@ public class SignerMetricResult {
   public void setLastProposedBlockNumber(final long lastProposedBlockNumber) {
     this.lastProposedBlockNumber = lastProposedBlockNumber;
   }
+
+  @Override
+  public String toString() {
+    return "SignerMetricResult{"
+        + "address='"
+        + address
+        + '\''
+        + ", proposedBlockCount="
+        + proposedBlockCount
+        + ", lastProposedBlockNumber="
+        + lastProposedBlockNumber
+        + '}';
+  }
 }

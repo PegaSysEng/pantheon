@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -43,7 +44,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.internal.verification.Times;
 
 public class CliqueGetSignerMetricsTest {
 
@@ -109,11 +109,11 @@ public class CliqueGetSignerMetricsTest {
     LongStream.range(startBlock, endBlock)
         .forEach(value -> verify(blockchainQueries).getBlockHeaderByNumber(value));
 
-    verify(blockchainQueries, new Times(2)).headBlockNumber();
+    verify(blockchainQueries, atLeast(2)).headBlockNumber();
 
     signerMetricResultList.forEach(
         signerMetricResult ->
-            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
+            assertThat(response.getResult().toString()).contains(signerMetricResult.toString()));
   }
 
   @Test
@@ -139,7 +139,7 @@ public class CliqueGetSignerMetricsTest {
 
     signerMetricResultList.forEach(
         signerMetricResult ->
-            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
+            assertThat(response.getResult().toString()).contains(signerMetricResult.toString()));
   }
 
   @Test
@@ -166,7 +166,7 @@ public class CliqueGetSignerMetricsTest {
 
     signerMetricResultList.forEach(
         signerMetricResult ->
-            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
+            assertThat(response.getResult().toString()).contains(signerMetricResult.toString()));
   }
 
   @Test
@@ -193,7 +193,7 @@ public class CliqueGetSignerMetricsTest {
 
     signerMetricResultList.forEach(
         signerMetricResult ->
-            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
+            assertThat(response.getResult().toString()).contains(signerMetricResult.toString()));
   }
 
   @Test
@@ -218,14 +218,14 @@ public class CliqueGetSignerMetricsTest {
 
     signerMetricResultList.forEach(
         signerMetricResult ->
-            assertThat(singletonList(response.getResult())).contains(signerMetricResult));
+            assertThat(response.getResult().toString()).contains(signerMetricResult.toString()));
   }
 
   private JsonRpcRequest requestWithParams(final Object... params) {
     return new JsonRpcRequest(JSON_RPC_VERSION, CLIQUE_METHOD, params);
   }
 
-  private SignerMetricResult generateBlock(long number) {
+  private SignerMetricResult generateBlock(final long number) {
     final SECP256K1.KeyPair proposerKeyPair = SECP256K1.KeyPair.generate();
     final Address proposerAddressBlock = Util.publicKeyToAddress(proposerKeyPair.getPublicKey());
 
