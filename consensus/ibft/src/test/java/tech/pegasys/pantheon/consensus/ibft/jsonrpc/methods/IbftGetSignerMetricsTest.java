@@ -103,6 +103,7 @@ public class IbftGetSignerMetricsTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void getSignerMetricsWhenNoParams() {
 
     final long startBlock = 1L;
@@ -124,6 +125,7 @@ public class IbftGetSignerMetricsTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void getSignerMetrics() {
 
     final long startBlock = 1L;
@@ -156,6 +158,7 @@ public class IbftGetSignerMetricsTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void getSignerMetricsWithLatest() {
 
     final long startBlock = 1L;
@@ -177,6 +180,7 @@ public class IbftGetSignerMetricsTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void getSignerMetricsWithPending() {
 
     final long startBlock = 1L;
@@ -198,6 +202,7 @@ public class IbftGetSignerMetricsTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void getSignerMetricsWithEarliest() {
 
     final long startBlock = 0L;
