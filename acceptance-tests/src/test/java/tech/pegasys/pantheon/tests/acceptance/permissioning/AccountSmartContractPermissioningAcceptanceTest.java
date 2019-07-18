@@ -18,6 +18,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
+
 public class AccountSmartContractPermissioningAcceptanceTest
     extends AccountSmartContractPermissioningAcceptanceTestBase {
 
@@ -27,7 +29,7 @@ public class AccountSmartContractPermissioningAcceptanceTest
 
   @Before
   public void setUp() {
-    node = permissionedNode("node1");
+    node = permissionedNode("node1", Collections.emptyList());
     permissionedCluster.start(node);
 
     allowedSender = accounts.createAccount("authorized-account");
