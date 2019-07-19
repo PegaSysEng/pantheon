@@ -3771,6 +3771,14 @@ None
     The `EEA` API methods are not enabled by default for JSON-RPC. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
     or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `EEA` API methods.
 
+### eea_getTransactionCount
+
+Returns the transaction count 
+
+
+!!! important 
+     
+
 ### eea_sendRawTransaction
 
 Creates a private transaction from a signed transaction, generates the transaction hash and submits it 
@@ -3815,10 +3823,6 @@ data using `eea_sendRawTransaction`.
       "result": "0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331"
     }
     ```
-
-### eea_getTransactionCount
-
-Returns the transaction count 
 
 ### eea_getTransactionReceipt
 
