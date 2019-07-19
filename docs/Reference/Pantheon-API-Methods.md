@@ -3771,6 +3771,14 @@ None
     The `EEA` API methods are not enabled by default for JSON-RPC. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
     or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `EEA` API methods.
 
+### eea_getPrivateTransaction
+
+Returns the private transaction if you are a participant; otherwise, null. 
+
+**Parameters** 
+
+`data` - Input from the public transaction (CHECK THIS). 
+
 ### eea_sendRawTransaction
 
 Creates a private transaction from a signed transaction, generates the transaction hash and submits it 
