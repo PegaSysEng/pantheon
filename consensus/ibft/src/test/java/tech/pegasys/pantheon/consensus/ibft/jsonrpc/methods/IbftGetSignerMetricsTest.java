@@ -51,8 +51,7 @@ import org.junit.rules.ExpectedException;
 
 public class IbftGetSignerMetricsTest {
 
-  private static final int NB_KEY_PAIRS = 3;
-  private static final SECP256K1.KeyPair[] KEY_PAIRS = new SECP256K1.KeyPair[NB_KEY_PAIRS];
+  private static final SECP256K1.KeyPair[] KEY_PAIRS = new SECP256K1.KeyPair[3];
 
   private final JsonRpcParameter jsonRpcParameter = new JsonRpcParameter();
   private final String IBFT_METHOD = "ibft_getSignerMetrics";
@@ -66,7 +65,7 @@ public class IbftGetSignerMetricsTest {
 
   @BeforeClass
   public static void beforeClass() {
-    IntStream.range(0, NB_KEY_PAIRS)
+    IntStream.range(0, KEY_PAIRS.length)
         .forEach(value -> KEY_PAIRS[value] = SECP256K1.KeyPair.generate());
   }
 
@@ -111,7 +110,7 @@ public class IbftGetSignerMetricsTest {
 
     when(blockchainQueries.headBlockNumber()).thenReturn(endBlock);
 
-    List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
+    final List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
 
     LongStream.range(startBlock, endBlock)
         .forEach(value -> signerMetricResultList.add(generateBlock(value)));
@@ -133,16 +132,16 @@ public class IbftGetSignerMetricsTest {
 
     when(blockchainQueries.headBlockNumber()).thenReturn(endBlock);
 
-    List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
+    final List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
 
     // sign a first block with keypairs number 1
-    SignerMetricResult signerMetricResultFirstKeyPairs = generateBlock(startBlock);
+    final SignerMetricResult signerMetricResultFirstKeyPairs = generateBlock(startBlock);
     signerMetricResultList.add(signerMetricResultFirstKeyPairs);
     // sign a second block with keypairs number 2
-    SignerMetricResult signerMetricResultSecondKeyPairs = generateBlock(startBlock + 1);
+    final SignerMetricResult signerMetricResultSecondKeyPairs = generateBlock(startBlock + 1);
     signerMetricResultList.add(signerMetricResultSecondKeyPairs);
     // sign a third block with keypairs number 3
-    SignerMetricResult signerMetricResultThirdKeyPairs = generateBlock(startBlock + 2);
+    final SignerMetricResult signerMetricResultThirdKeyPairs = generateBlock(startBlock + 2);
     signerMetricResultList.add(signerMetricResultThirdKeyPairs);
     // sign the last block with the keypairs number 1
     generateBlock(startBlock + 3);
@@ -164,7 +163,7 @@ public class IbftGetSignerMetricsTest {
     final long startBlock = 1L;
     final long endBlock = 3L;
 
-    List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
+    final List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
 
     when(blockchainQueries.headBlockNumber()).thenReturn(endBlock);
 
@@ -186,7 +185,7 @@ public class IbftGetSignerMetricsTest {
     final long startBlock = 1L;
     final long endBlock = 3L;
 
-    List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
+    final List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
 
     when(blockchainQueries.headBlockNumber()).thenReturn(endBlock);
 
@@ -208,7 +207,7 @@ public class IbftGetSignerMetricsTest {
     final long startBlock = 0L;
     final long endBlock = 3L;
 
-    List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
+    final List<SignerMetricResult> signerMetricResultList = new ArrayList<>();
 
     LongStream.range(startBlock, endBlock)
         .forEach(value -> signerMetricResultList.add(generateBlock(value)));
@@ -254,12 +253,12 @@ public class IbftGetSignerMetricsTest {
 
     builder.extraData(ibftExtraData.encode());
 
-    BlockHeader blockHeader = builder.buildHeader();
+    final BlockHeader blockHeader = builder.buildHeader();
 
     when(blockchainQueries.getBlockHeaderByNumber(number)).thenReturn(Optional.of(blockHeader));
     when(ibftBlockInterface.getProposerOfBlock(blockHeader)).thenReturn(proposerAddressBlock);
 
-    SignerMetricResult signerMetricResult = new SignerMetricResult(proposerAddressBlock);
+    final SignerMetricResult signerMetricResult = new SignerMetricResult(proposerAddressBlock);
     signerMetricResult.incrementeNbBlock();
     signerMetricResult.setLastProposedBlockNumber(number);
 
