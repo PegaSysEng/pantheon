@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -39,6 +40,7 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -68,6 +70,23 @@ public class EeaSendRawTransactionTest {
           + "3153476f3dac4b6f32625671442b6e4e6c4e594c354545377933"
           + "49644f6e766966746a69697a706a52742b4854754642733d8a72"
           + "657374726963746564";
+
+  private static final String VALID_PRIVATE_TRANSACTION_RLP_PRIVACY_GROUP =
+      "0xf8ac800182520894095e7baea6a6c7c4c2dfeb977efac326af552d87"
+          + "80801ba048b55bfa915ac795c431978d8a6a992b628d557da5ff"
+          + "759b307d495a36649353a01fffd310ac743f371de3b9f7f9cb56"
+          + "c0b28ad43601b4ab949f53faa07bd2c804a0035695b4cc4b0941"
+          + "e60551d7a19cf30603db5bfc23e5ac43a56f57f25f75486aa00f"
+          + "200e885ff29e973e2576b6600181d1b0a2b5294e30d9be4a1981"
+          + "ffb33a0b8c8a72657374726963746564";
+
+  private static final String VALID_PRIVATE_TRANSACTION_RLP_PRIVACY_GROUP_NO_PRIVATE_FROM =
+      "0xf88b800182520894095e7baea6a6c7c4c2dfeb977efac326af55"
+          + "2d8780801ba048b55bfa915ac795c431978d8a6a992b628d55"
+          + "7da5ff759b307d495a36649353a01fffd310ac743f371de3b9"
+          + "f7f9cb56c0b28ad43601b4ab949f53faa07bd2c804a00f200e"
+          + "885ff29e973e2576b6600181d1b0a2b5294e30d9be4a1981ff"
+          + "b33a0b8c8a72657374726963746564";
 
   private static final Transaction PUBLIC_TRANSACTION =
       new Transaction(
@@ -100,8 +119,14 @@ public class EeaSendRawTransactionTest {
 
   @Mock private BlockchainQueries blockchainQueries;
 
+  @Mock private PendingTransactions pendingTransactions;
+
   @Before
   public void before() {
+    when(transactionPool.getPendingTransactions()).thenReturn(pendingTransactions);
+    when(privateTxHandler.getEnclaveKey())
+        .thenReturn("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=");
+
     method =
         new EeaSendRawTransaction(blockchainQueries, privateTxHandler, transactionPool, parameter);
   }
@@ -182,7 +207,7 @@ public class EeaSendRawTransactionTest {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
     when(privateTxHandler.sendToOrion(any(PrivateTransaction.class))).thenReturn(MOCK_ORION_KEY);
-    when(privateTxHandler.getPrivacyGroup(any(String.class), any(BytesValue.class)))
+    when(privateTxHandler.getPrivacyGroup(any(String.class), any(PrivateTransaction.class)))
         .thenReturn(MOCK_PRIVACY_GROUP);
     when(privateTxHandler.validatePrivateTransaction(
             any(PrivateTransaction.class), any(String.class)))
@@ -192,7 +217,6 @@ public class EeaSendRawTransactionTest {
         .thenReturn(PUBLIC_TRANSACTION);
     when(transactionPool.addLocalTransaction(any(Transaction.class)))
         .thenReturn(ValidationResult.valid());
-
     final JsonRpcRequest request =
         new JsonRpcRequest(
             "2.0", "eea_sendRawTransaction", new String[] {VALID_PRIVATE_TRANSACTION_RLP});
@@ -205,7 +229,85 @@ public class EeaSendRawTransactionTest {
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
     verify(privateTxHandler).sendToOrion(any(PrivateTransaction.class));
-    verify(privateTxHandler).getPrivacyGroup(any(String.class), any(BytesValue.class));
+    verify(privateTxHandler).getPrivacyGroup(any(String.class), any(PrivateTransaction.class));
+    verify(privateTxHandler)
+        .validatePrivateTransaction(any(PrivateTransaction.class), any(String.class));
+    verify(privateTxHandler)
+        .createPrivacyMarkerTransaction(
+            any(String.class), any(PrivateTransaction.class), any(Long.class));
+    verify(transactionPool).addLocalTransaction(any(Transaction.class));
+  }
+
+  @Test
+  public void validTransactionPrivacyGroupIsSentToTransactionPool() throws Exception {
+    when(parameter.required(any(Object[].class), anyInt(), any()))
+        .thenReturn(VALID_PRIVATE_TRANSACTION_RLP_PRIVACY_GROUP);
+    when(privateTxHandler.sendToOrion(any(PrivateTransaction.class))).thenReturn(MOCK_ORION_KEY);
+    when(privateTxHandler.getPrivacyGroup(any(String.class), any(PrivateTransaction.class)))
+        .thenReturn(MOCK_PRIVACY_GROUP);
+    when(privateTxHandler.validatePrivateTransaction(
+            any(PrivateTransaction.class), any(String.class)))
+        .thenReturn(ValidationResult.valid());
+    when(privateTxHandler.createPrivacyMarkerTransaction(
+            any(String.class), any(PrivateTransaction.class), any(Long.class)))
+        .thenReturn(PUBLIC_TRANSACTION);
+    when(transactionPool.addLocalTransaction(any(Transaction.class)))
+        .thenReturn(ValidationResult.valid());
+
+    final JsonRpcRequest request =
+        new JsonRpcRequest(
+            "2.0",
+            "eea_sendRawTransaction",
+            new String[] {VALID_PRIVATE_TRANSACTION_RLP_PRIVACY_GROUP});
+
+    final JsonRpcResponse expectedResponse =
+        new JsonRpcSuccessResponse(
+            request.getId(), "0x221e930a2c18d91fca4d509eaa3512f3e01fef266f660e32473de67474b36c15");
+
+    final JsonRpcResponse actualResponse = method.response(request);
+
+    assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+    verify(privateTxHandler).sendToOrion(any(PrivateTransaction.class));
+    verify(privateTxHandler).getPrivacyGroup(any(String.class), any(PrivateTransaction.class));
+    verify(privateTxHandler)
+        .validatePrivateTransaction(any(PrivateTransaction.class), any(String.class));
+    verify(privateTxHandler)
+        .createPrivacyMarkerTransaction(
+            any(String.class), any(PrivateTransaction.class), any(Long.class));
+    verify(transactionPool).addLocalTransaction(any(Transaction.class));
+  }
+
+  @Test
+  public void validTransactionPrivacyGroupNoPrivateFromIsSentToTransactionPool() throws Exception {
+    when(parameter.required(any(Object[].class), anyInt(), any()))
+        .thenReturn(VALID_PRIVATE_TRANSACTION_RLP_PRIVACY_GROUP_NO_PRIVATE_FROM);
+    when(privateTxHandler.sendToOrion(any(PrivateTransaction.class))).thenReturn(MOCK_ORION_KEY);
+    when(privateTxHandler.getPrivacyGroup(any(String.class), any(PrivateTransaction.class)))
+        .thenReturn(MOCK_PRIVACY_GROUP);
+    when(privateTxHandler.validatePrivateTransaction(
+            any(PrivateTransaction.class), any(String.class)))
+        .thenReturn(ValidationResult.valid());
+    when(privateTxHandler.createPrivacyMarkerTransaction(
+            any(String.class), any(PrivateTransaction.class), any(Long.class)))
+        .thenReturn(PUBLIC_TRANSACTION);
+    when(transactionPool.addLocalTransaction(any(Transaction.class)))
+        .thenReturn(ValidationResult.valid());
+
+    final JsonRpcRequest request =
+        new JsonRpcRequest(
+            "2.0",
+            "eea_sendRawTransaction",
+            new String[] {VALID_PRIVATE_TRANSACTION_RLP_PRIVACY_GROUP_NO_PRIVATE_FROM});
+
+    final JsonRpcResponse expectedResponse =
+        new JsonRpcSuccessResponse(
+            request.getId(), "0x221e930a2c18d91fca4d509eaa3512f3e01fef266f660e32473de67474b36c15");
+
+    final JsonRpcResponse actualResponse = method.response(request);
+
+    assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+    verify(privateTxHandler).sendToOrion(any(PrivateTransaction.class));
+    verify(privateTxHandler).getPrivacyGroup(any(String.class), any(PrivateTransaction.class));
     verify(privateTxHandler)
         .validatePrivateTransaction(any(PrivateTransaction.class), any(String.class));
     verify(privateTxHandler)
@@ -283,7 +385,7 @@ public class EeaSendRawTransactionTest {
     when(parameter.required(any(Object[].class), anyInt(), any()))
         .thenReturn(VALID_PRIVATE_TRANSACTION_RLP);
     when(privateTxHandler.sendToOrion(any(PrivateTransaction.class))).thenReturn(MOCK_ORION_KEY);
-    when(privateTxHandler.getPrivacyGroup(any(String.class), any(BytesValue.class)))
+    when(privateTxHandler.getPrivacyGroup(any(String.class), any(PrivateTransaction.class)))
         .thenReturn(MOCK_PRIVACY_GROUP);
     when(privateTxHandler.validatePrivateTransaction(
             any(PrivateTransaction.class), any(String.class)))
@@ -293,7 +395,6 @@ public class EeaSendRawTransactionTest {
         .thenReturn(PUBLIC_TRANSACTION);
     when(transactionPool.addLocalTransaction(any(Transaction.class)))
         .thenReturn(ValidationResult.invalid(transactionInvalidReason));
-
     final JsonRpcRequest request =
         new JsonRpcRequest(
             "2.0", "eea_sendRawTransaction", new String[] {VALID_PRIVATE_TRANSACTION_RLP});
@@ -305,13 +406,20 @@ public class EeaSendRawTransactionTest {
 
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
     verify(privateTxHandler).sendToOrion(any(PrivateTransaction.class));
-    verify(privateTxHandler).getPrivacyGroup(any(String.class), any(BytesValue.class));
+    verify(privateTxHandler).getPrivacyGroup(any(String.class), any(PrivateTransaction.class));
     verify(privateTxHandler)
         .validatePrivateTransaction(any(PrivateTransaction.class), any(String.class));
     verify(privateTxHandler)
         .createPrivacyMarkerTransaction(
             any(String.class), any(PrivateTransaction.class), any(Long.class));
     verify(transactionPool).addLocalTransaction(any(Transaction.class));
+  }
+
+  @Test
+  public void nextNonceUsesTxPool() {
+    Address address = PUBLIC_TRANSACTION.getSender();
+    when(pendingTransactions.getNextNonceForSender(address)).thenReturn(OptionalLong.of(123));
+    assertThat(method.getNonce(address)).isEqualTo(123);
   }
 
   @Test

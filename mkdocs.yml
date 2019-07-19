@@ -20,7 +20,7 @@ copyright: Pantheon and its documentation are licensed under Apache 2.0 license 
 #extra project info and template customisation
 extra:
   versions:
-    pantheon_stable: &pantheon_stable_version 1.1.1
+    pantheon_stable: &pantheon_stable_version 1.1.4
     quickstart: *pantheon_stable_version
   latest_version_warning:
     url_contains: /latest/
@@ -85,12 +85,12 @@ nav:
         - Contracts in Genesis: Configuring-Pantheon/Contracts-in-Genesis.md
         - Node Keys: Configuring-Pantheon/Node-Keys.md
         - Accounts for Testing: Configuring-Pantheon/Accounts-for-Testing.md
-        - Logging: Configuring-Pantheon/Logging.md
         - Passing JVM Options: Configuring-Pantheon/Passing-JVM-Options.md
     - Networking:
       - Bootnodes: Configuring-Pantheon/Networking/Bootnodes.md
       - Configuring Ports: Configuring-Pantheon/Networking/Configuring-Ports.md
       - Managing Peers: Configuring-Pantheon/Networking/Managing-Peers.md
+      - Using UPnP: Configuring-Pantheon/Networking/Using-UPnP.md
     - Consensus Protocols:
       - Pantheon Consensus Protocols: Consensus-Protocols/Overview-Consensus.md
       - Comparing PoA Consensus Protocols: Consensus-Protocols/Comparing-PoA.md
@@ -114,6 +114,8 @@ nav:
         - Transactions:
           - Creating and Sending Transactions: Using-Pantheon/Transactions/Transactions.md
           - Transaction Pool: Using-Pantheon/Transactions/Transaction-Pool.md
+          - Vadidating Transactions: Using-Pantheon/Transactions/Transaction-Validation.md
+          - Including Revert Reason: Using-Pantheon/Transactions/Revert-Reason.md
         - Using Truffle with Pantheon: Using-Pantheon/Truffle.md
         - Events and Logs:
           - Overview: Using-Pantheon/Events-and-Logs.md
@@ -121,6 +123,7 @@ nav:
         - Using Wallets for Account Management: Using-Pantheon/Account-Management.md
         - Mining: Using-Pantheon/Mining.md
     - Monitoring:
+        - Logging: Monitoring/Logging.md
         - Monitoring Performance: Monitoring/Monitoring-Performance.md
         - Monitoring Network:
           - Alethio Overview: Monitoring/Alethio/Overview.md
@@ -128,6 +131,7 @@ nav:
           - Alethio EthStats Lite Network Monitor: Monitoring/Alethio/Lite-Network-Monitor.md
     - Deploying Pantheon:
         - High Availability: Deploying-Pantheon/High-Availability.md
+        - Migrating Docker Image: Deploying-Pantheon/Migration-Docker.md
     - Troubleshooting:
         - Troubleshooting: Troubleshooting/Troubleshooting.md
     - Reference:

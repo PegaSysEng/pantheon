@@ -30,8 +30,7 @@ import java.util.stream.Stream;
 
 public class EthPeers {
   public static final Comparator<EthPeer> TOTAL_DIFFICULTY =
-      Comparator.comparing(
-          ((final EthPeer p) -> p.chainState().getBestBlock().getTotalDifficulty()));
+      Comparator.comparing(((final EthPeer p) -> p.chainState().getEstimatedTotalDifficulty()));
 
   public static final Comparator<EthPeer> CHAIN_HEIGHT =
       Comparator.comparing(((final EthPeer p) -> p.chainState().getEstimatedHeight()));
@@ -125,6 +124,10 @@ public class EthPeers {
 
   public Optional<EthPeer> bestPeer() {
     return streamAvailablePeers().max(BEST_CHAIN);
+  }
+
+  public Optional<EthPeer> bestPeerWithHeightEstimate() {
+    return streamAvailablePeers().filter(p -> p.chainState().hasEstimatedHeight()).max(BEST_CHAIN);
   }
 
   @FunctionalInterface

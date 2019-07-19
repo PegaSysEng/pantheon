@@ -46,6 +46,35 @@ Adds a [static node](../Configuring-Pantheon/Networking/Managing-Peers.md#static
       "result": true
     }
     ```
+    
+### admin_changeLogLevel
+
+Change the log level without restarting Pantheon. 
+
+**Parameters**
+
+`level` - [Log level](Pantheon-CLI-Syntax.md#logging)
+
+**Returns**
+
+`result` : `Success` if the log level has changed; otherwise `error`. 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"admin_changeLogLevel","params":["DEBUG"], "id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"admin_changeLogLevel","params":["DEBUG"], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+     "jsonrpc": "2.0",
+     "id": 1,
+     "result": "Success"
+    }
+    ```
 
 ### admin_nodeInfo
 
@@ -71,6 +100,8 @@ Properties of the node object are:
 
 !!! note
     If the node is running locally, the host of the `enode` and `listenAddr` are displayed as `[::]` in the result. 
+    If [UPnP](../Configuring-Pantheon/Networking/Using-UPnP.md) is enabled, the external address is 
+    displayed for the `enode` and `listenAddr`. 
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -207,7 +238,6 @@ Removes a [static node](../Configuring-Pantheon/Networking/Managing-Peers.md#sta
       "result": true
     }
     ```
-
 
 ## Web3 Methods
 
@@ -2151,6 +2181,9 @@ Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `n
 ### eth_getTransactionReceipt
 
 Returns the receipt of a transaction by transaction hash. Receipts for pending transactions are not available.
+
+If [revert reason](../Using-Pantheon/Transactions/Revert-Reason.md) is enabled, includes available revert 
+reasons in the response. 
 
 **Parameters**
 

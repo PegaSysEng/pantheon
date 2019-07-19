@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 
 public enum PantheonMetricCategory implements MetricCategory {
   BLOCKCHAIN("blockchain"),
+  ETHEREUM("ethereum", false),
   EXECUTORS("executors"),
   NETWORK("network"),
   PEERS("peers"),
@@ -63,7 +64,7 @@ public enum PantheonMetricCategory implements MetricCategory {
   }
 
   @Override
-  public Optional<String> getAppliationPrefix() {
+  public Optional<String> getApplicationPrefix() {
     return pantheonSpecific ? PANTHEON_PREFIX : Optional.empty();
   }
 }

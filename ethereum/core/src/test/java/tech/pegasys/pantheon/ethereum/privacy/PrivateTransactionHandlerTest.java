@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -20,6 +19,7 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INCORRECT_PRIVATE_NONCE;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.PRIVATE_NONCE_TOO_LOW;
 
+import tech.pegasys.orion.testutil.OrionKeyUtils;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.enclave.Enclave;
@@ -37,12 +37,12 @@ import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionIn
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,15 +52,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PrivateTransactionHandlerTest {
 
-  private static final String TRANSACTION_KEY = "My Transaction Key";
+  private static final String TRANSACTION_KEY = "93Ky7lXwFkMc7+ckoFgUMku5bpr9tz4zhmWmk9RlNng=";
   private static final KeyPair KEY_PAIR =
       KeyPair.create(
           SECP256K1.PrivateKey.create(
               new BigInteger(
                   "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63", 16)));
 
-  PrivateTransactionHandler privateTransactionHandler;
-  PrivateTransactionHandler brokenPrivateTransactionHandler;
+  private PrivateTransactionHandler privateTransactionHandler;
+  private PrivateTransactionHandler brokenPrivateTransactionHandler;
+  private PrivateTransactionValidator privateTransactionValidator;
 
   private static final Transaction PUBLIC_TRANSACTION =
       Transaction.builder()
@@ -69,7 +70,7 @@ public class PrivateTransactionHandlerTest {
           .gasLimit(3000000)
           .to(Address.fromHexString("0x627306090abab3a6e1400e9345bc60c78a8bef57"))
           .value(Wei.ZERO)
-          .payload(BytesValue.wrap(TRANSACTION_KEY.getBytes(Charsets.UTF_8)))
+          .payload(BytesValues.fromBase64(TRANSACTION_KEY))
           .sender(Address.fromHexString("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"))
           .chainId(BigInteger.valueOf(2018))
           .signAndBuild(KEY_PAIR);
@@ -89,6 +90,12 @@ public class PrivateTransactionHandlerTest {
     return mockEnclave;
   }
 
+  PrivateTransactionValidator mockPrivateTransactionValidator() {
+    PrivateTransactionValidator validator = mock(PrivateTransactionValidator.class);
+    when(validator.validate(any(), any())).thenReturn(ValidationResult.valid());
+    return validator;
+  }
+
   @Before
   public void setUp() throws Exception {
     PrivateStateStorage privateStateStorage = mock(PrivateStateStorage.class);
@@ -102,31 +109,37 @@ public class PrivateTransactionHandlerTest {
     when(worldStateArchive.getMutable(any(Hash.class))).thenReturn(Optional.of(mutableWorldState));
     when(mutableWorldState.get(any(Address.class))).thenReturn(account);
 
+    privateTransactionValidator = mockPrivateTransactionValidator();
+
     privateTransactionHandler =
         new PrivateTransactionHandler(
             mockEnclave(),
             Address.DEFAULT_PRIVACY,
             KEY_PAIR,
+            OrionKeyUtils.loadKey("orion_key_0.pub"),
             privateStateStorage,
-            worldStateArchive);
+            worldStateArchive,
+            privateTransactionValidator);
     brokenPrivateTransactionHandler =
         new PrivateTransactionHandler(
             brokenMockEnclave(),
             Address.DEFAULT_PRIVACY,
             KEY_PAIR,
+            OrionKeyUtils.loadKey("orion_key_0.pub"),
             privateStateStorage,
-            worldStateArchive);
+            worldStateArchive,
+            privateTransactionValidator);
   }
 
   @Test
-  public void validTransactionThroughHandler() throws Exception {
+  public void validLegacyTransactionThroughHandler() throws Exception {
 
-    final PrivateTransaction transaction = buildPrivateTransaction(1);
+    final PrivateTransaction transaction = buildLegacyPrivateTransaction(1);
 
     final String enclaveKey = privateTransactionHandler.sendToOrion(transaction);
 
     final String privacyGroupId =
-        privateTransactionHandler.getPrivacyGroup(enclaveKey, transaction.getPrivateFrom());
+        privateTransactionHandler.getPrivacyGroup(enclaveKey, transaction);
 
     final ValidationResult<TransactionInvalidReason> validationResult =
         privateTransactionHandler.validatePrivateTransaction(transaction, privacyGroupId);
@@ -142,18 +155,42 @@ public class PrivateTransactionHandlerTest {
     assertThat(markerTransaction.getValue()).isEqualTo(PUBLIC_TRANSACTION.getValue());
   }
 
+  @Test
+  public void validPantheonTransactionThroughHandler() throws Exception {
+
+    final PrivateTransaction transaction = buildPantheonPrivateTransaction(1);
+
+    final String enclaveKey = privateTransactionHandler.sendToOrion(transaction);
+
+    final ValidationResult<TransactionInvalidReason> validationResult =
+        privateTransactionHandler.validatePrivateTransaction(
+            transaction, transaction.getPrivacyGroupId().get().toString());
+
+    final Transaction markerTransaction =
+        privateTransactionHandler.createPrivacyMarkerTransaction(enclaveKey, transaction, 0L);
+
+    assertThat(validationResult).isEqualTo(ValidationResult.valid());
+    assertThat(markerTransaction.contractAddress()).isEqualTo(PUBLIC_TRANSACTION.contractAddress());
+    assertThat(markerTransaction.getPayload()).isEqualTo(PUBLIC_TRANSACTION.getPayload());
+    assertThat(markerTransaction.getNonce()).isEqualTo(PUBLIC_TRANSACTION.getNonce());
+    assertThat(markerTransaction.getSender()).isEqualTo(PUBLIC_TRANSACTION.getSender());
+    assertThat(markerTransaction.getValue()).isEqualTo(PUBLIC_TRANSACTION.getValue());
+  }
+
   @Test(expected = IOException.class)
   public void enclaveIsDownWhileHandling() throws Exception {
-    brokenPrivateTransactionHandler.sendToOrion(buildPrivateTransaction());
+    brokenPrivateTransactionHandler.sendToOrion(buildLegacyPrivateTransaction());
   }
 
   @Test
   public void nonceTooLowError() throws Exception {
-    final PrivateTransaction transaction = buildPrivateTransaction(0);
+    when(privateTransactionValidator.validate(any(), any()))
+        .thenReturn(ValidationResult.invalid(PRIVATE_NONCE_TOO_LOW));
 
+    final PrivateTransaction transaction = buildLegacyPrivateTransaction(0);
     final String enclaveKey = privateTransactionHandler.sendToOrion(transaction);
     final String privacyGroupId =
-        privateTransactionHandler.getPrivacyGroup(enclaveKey, transaction.getPrivateFrom());
+        privateTransactionHandler.getPrivacyGroup(enclaveKey, transaction);
     final ValidationResult<TransactionInvalidReason> validationResult =
         privateTransactionHandler.validatePrivateTransaction(transaction, privacyGroupId);
     assertThat(validationResult).isEqualTo(ValidationResult.invalid(PRIVATE_NONCE_TOO_LOW));
@@ -161,21 +198,42 @@ public class PrivateTransactionHandlerTest {
 
   @Test
   public void incorrectNonceError() throws Exception {
-    final PrivateTransaction transaction = buildPrivateTransaction(2);
+    when(privateTransactionValidator.validate(any(), any()))
+        .thenReturn(ValidationResult.invalid(INCORRECT_PRIVATE_NONCE));
+
+    final PrivateTransaction transaction = buildLegacyPrivateTransaction(2);
 
     final String enclaveKey = privateTransactionHandler.sendToOrion(transaction);
     final String privacyGroupId =
-        privateTransactionHandler.getPrivacyGroup(enclaveKey, transaction.getPrivateFrom());
+        privateTransactionHandler.getPrivacyGroup(enclaveKey, transaction);
     final ValidationResult<TransactionInvalidReason> validationResult =
         privateTransactionHandler.validatePrivateTransaction(transaction, privacyGroupId);
     assertThat(validationResult).isEqualTo(ValidationResult.invalid(INCORRECT_PRIVATE_NONCE));
   }
 
-  private static PrivateTransaction buildPrivateTransaction() {
-    return buildPrivateTransaction(0);
+  private static PrivateTransaction buildLegacyPrivateTransaction() {
+    return buildLegacyPrivateTransaction(0);
   }
 
-  private static PrivateTransaction buildPrivateTransaction(final long nonce) {
+  private static PrivateTransaction buildLegacyPrivateTransaction(final long nonce) {
+    return buildPrivateTransaction(nonce)
+        .privateFrom(BytesValues.fromBase64("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="))
+        .privateFor(
+            Lists.newArrayList(
+                BytesValues.fromBase64("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="),
+                BytesValues.fromBase64("Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs=")))
+        .signAndBuild(KEY_PAIR);
+  }
+
+  private static PrivateTransaction buildPantheonPrivateTransaction(final long nonce) {
+
+    return buildPrivateTransaction(nonce)
+        .privateFrom(BytesValues.fromBase64("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="))
+        .privacyGroupId(BytesValues.fromBase64("DyAOiF/ynpc+JXa2YAGB0bCitSlOMNm+ShmB/7M6C4w="))
+        .signAndBuild(KEY_PAIR);
+  }
+
+  private static PrivateTransaction.Builder buildPrivateTransaction(final long nonce) {
     return PrivateTransaction.builder()
         .nonce(nonce)
         .gasPrice(Wei.of(1000))
@@ -185,13 +243,6 @@ public class PrivateTransactionHandlerTest {
         .payload(BytesValue.fromHexString("0x"))
         .sender(Address.fromHexString("0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"))
         .chainId(BigInteger.valueOf(2018))
-        .privateFrom(
-            BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8)))
-        .privateFor(
-            Lists.newArrayList(
-                BytesValue.wrap("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=".getBytes(UTF_8)),
-                BytesValue.wrap("Ko2bVqD+nNlNYL5EE7y3IdOnviftjiizpjRt+HTuFBs=".getBytes(UTF_8))))
-        .restriction(Restriction.RESTRICTED)
-        .signAndBuild(KEY_PAIR);
+        .restriction(Restriction.RESTRICTED);
   }
 }
