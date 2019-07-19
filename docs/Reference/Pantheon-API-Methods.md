@@ -3773,12 +3773,35 @@ None
 
 ### eea_getTransactionCount
 
-Returns the transaction count 
+Returns the private transaction count for specified account and privacy group. 
 
+**Parameters** 
 
-!!! important 
+`data` - Account address
+
+`data` - Privacy group ID 
+
+**Returns** 
+
+`quantity` - Integer representing the number of private transactions sent from the address to the specified privacy group.
+
+!!! example 
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_getTransactionCount","params":["0xfe3b557e8fb62b89f4916b721be55ceb828dbd73", "kAbelwaVW7okoEn1+okO+AbA4Hhz/7DaCOWVQz9nx5M="], "id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"eea_getTransactionCount","params":["0xfe3b557e8fb62b89f4916b721be55ceb828dbd73", "kAbelwaVW7okoEn1+okO+AbA4Hhz/7DaCOWVQz9nx5M="], "id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": "0x1"
+    }
+    ```  
      
-
 ### eea_sendRawTransaction
 
 Creates a private transaction from a signed transaction, generates the transaction hash and submits it 
