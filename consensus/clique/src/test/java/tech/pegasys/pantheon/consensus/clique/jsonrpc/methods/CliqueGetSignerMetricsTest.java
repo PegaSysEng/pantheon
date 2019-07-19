@@ -12,43 +12,37 @@
  */
 package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
-import tech.pegasys.pantheon.consensus.clique.TestHelpers;
-import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.SignerMetricResult;
-import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 public class CliqueGetSignerMetricsTest {
 
-  private static final SECP256K1.KeyPair[] KEY_PAIRS = new SECP256K1.KeyPair[3];
+  private static final Address[] VALIDATORS = {
+    Address.fromHexString("0x1"), Address.fromHexString("0x2"), Address.fromHexString("0x3"),
+  };
 
   private final JsonRpcParameter jsonRpcParameter = new JsonRpcParameter();
   private final String CLIQUE_METHOD = "clique_getSignerMetrics";
@@ -59,12 +53,6 @@ public class CliqueGetSignerMetricsTest {
   private CliqueBlockInterface cliqueBlockInterface;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
-
-  @BeforeClass
-  public static void beforeClass() {
-    IntStream.range(0, KEY_PAIRS.length)
-        .forEach(value -> KEY_PAIRS[value] = SECP256K1.KeyPair.generate());
-  }
 
   @Before
   public void setup() {
@@ -223,25 +211,9 @@ public class CliqueGetSignerMetricsTest {
 
   private SignerMetricResult generateBlock(final long number) {
 
-    final SECP256K1.KeyPair proposerKeyPair = KEY_PAIRS[(int) (number % KEY_PAIRS.length)];
+    final Address proposerAddressBlock = VALIDATORS[(int) (number % VALIDATORS.length)];
 
-    final Address proposerAddressBlock = Util.publicKeyToAddress(proposerKeyPair.getPublicKey());
-
-    final BlockHeaderTestFixture builder = new BlockHeaderTestFixture();
-
-    builder.number(number);
-    builder.gasLimit(5000);
-    builder.timestamp(6000 * number);
-    builder.mixHash(
-        Hash.fromHexString("0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365"));
-    builder.ommersHash(Hash.EMPTY_LIST_HASH);
-    builder.nonce(0);
-    builder.difficulty(UInt256.ONE);
-    builder.coinbase(Util.publicKeyToAddress(proposerKeyPair.getPublicKey()));
-
-    final BlockHeader header =
-        TestHelpers.createCliqueSignedBlockHeader(
-            builder, proposerKeyPair, singletonList(proposerAddressBlock));
+    final BlockHeader header = new BlockHeaderTestFixture().number(number).buildHeader();
 
     when(blockchainQueries.getBlockHeaderByNumber(number)).thenReturn(Optional.of(header));
     when(cliqueBlockInterface.getProposerOfBlock(header)).thenReturn(proposerAddressBlock);
