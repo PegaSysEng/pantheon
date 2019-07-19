@@ -74,6 +74,12 @@ public class EventEmitterHarness {
         receivers);
   }
 
+  public void deployWithPrivacyGroup(
+      final String contractName, final String sender, String mPrivacyGroupId) {
+
+    deployWithPrivacyGroup(contractName, "Test", 0, sender, mPrivacyGroupId);
+  }
+
   public void deploy(
       final String contractName,
       final EeaCondition forParticipants,
@@ -172,6 +178,37 @@ public class EventEmitterHarness {
     verifyForParticipants(forParticipants, transactionHash, sender, receivers);
 
     verifyForNonParticipants(forNonParticipants, transactionHash, sender, receivers);
+  }
+
+  private void deployWithPrivacyGroup(
+      final String contractAddress,
+      final String contractName,
+      final long nonce,
+      final String sender,
+      final String privacyGroupId) {
+
+    final String deployContract =
+        privateTransactionBuilder
+            .nonce(nonce)
+            .from(privacyNet.getNode(sender).getAddress())
+            .to(null)
+            .privateFrom(
+                BytesValues.fromBase64(privacyNet.getEnclave(sender).getPublicKeys().get(0)))
+            .privacyGroupId(BytesValues.fromBase64(privacyGroupId))
+            .keyPair(privacyNet.getNode(sender).keyPair())
+            .build(PrivateTransactionBuilder.TransactionType.CREATE_CONTRACT);
+    final String transactionHash =
+        privacyNet
+            .getNode(sender)
+            .execute(privateTransactions.deployPrivateSmartContract(deployContract));
+
+    waitForTransactionToBeMined(transactionHash);
+
+    //    verifyForParticipants(forParticipants, transactionHash, sender, receivers);
+    //
+    //    verifyForNonParticipants(forNonParticipants, transactionHash, sender, receivers);
+
+    contracts.put(contractName, contractAddress);
   }
 
   private void deploy(

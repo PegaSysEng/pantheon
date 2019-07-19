@@ -68,6 +68,7 @@ public class PrivateTransactionBuilder {
     Address from;
     Address to;
     BytesValue privateFrom;
+    BytesValue privacyGroupId;
     List<BytesValue> privateFor = new ArrayList<>();
     SECP256K1.KeyPair keyPair;
 
@@ -88,6 +89,11 @@ public class PrivateTransactionBuilder {
 
     public Builder privateFrom(final BytesValue privateFrom) {
       this.privateFrom = privateFrom;
+      return this;
+    }
+
+    public Builder privacyGroupId(final BytesValue privacyGroupId) {
+      this.privacyGroupId = privacyGroupId;
       return this;
     }
 
@@ -128,6 +134,8 @@ public class PrivateTransactionBuilder {
                       .chainId(BigInteger.valueOf(2018))
                       .privateFrom(privateFrom)
                       .privateFor(privateFor)
+                      .privacyGroupId(privacyGroupId)
+                      .ensureWellFormed()
                       .restriction(Restriction.RESTRICTED)
                       .signAndBuild(keyPair)
                   ::writeTo)

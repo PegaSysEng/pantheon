@@ -32,6 +32,7 @@ public class EeaSendRawTransactionTransaction implements Transaction<String> {
   @Override
   public String execute(final NodeRequests node) {
     try {
+
       EthSendTransaction response = node.eea().eeaSendRawTransaction(transactionData).send();
       assertThat(response.getTransactionHash()).isNotNull();
       return response.getTransactionHash();

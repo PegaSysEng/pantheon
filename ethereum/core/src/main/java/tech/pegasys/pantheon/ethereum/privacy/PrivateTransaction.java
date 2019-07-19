@@ -383,6 +383,7 @@ public class PrivateTransaction {
    * @param out the output to write the transaction to
    */
   public void writeTo(final RLPOutput out) {
+
     out.startList();
 
     out.writeLongScalar(getNonce());
@@ -660,6 +661,13 @@ public class PrivateTransaction {
 
     public Builder restriction(final Restriction restriction) {
       this.restriction = restriction;
+      return this;
+    }
+
+    public Builder ensureWellFormed() {
+      if (this.privacyGroupId.isPresent() && this.privateFor.isPresent()) {
+        this.privateFor = Optional.empty();
+      }
       return this;
     }
 
