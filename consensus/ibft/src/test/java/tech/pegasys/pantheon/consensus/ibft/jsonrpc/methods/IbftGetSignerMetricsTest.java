@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.consensus.ibft.IbftBlockInterface;
+import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
@@ -50,15 +50,15 @@ public class IbftGetSignerMetricsTest {
   private IbftGetSignerMetrics method;
 
   private BlockchainQueries blockchainQueries;
-  private IbftBlockInterface ibftBlockInterface;
+  private BlockInterface blockInterface;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setup() {
     blockchainQueries = mock(BlockchainQueries.class);
-    ibftBlockInterface = mock(IbftBlockInterface.class);
-    method = new IbftGetSignerMetrics(ibftBlockInterface, blockchainQueries, jsonRpcParameter);
+    blockInterface = mock(BlockInterface.class);
+    method = new IbftGetSignerMetrics(blockInterface, blockchainQueries, jsonRpcParameter);
   }
 
   @Test
@@ -215,7 +215,7 @@ public class IbftGetSignerMetricsTest {
     final BlockHeader header = new BlockHeaderTestFixture().number(number).buildHeader();
 
     when(blockchainQueries.getBlockHeaderByNumber(number)).thenReturn(Optional.of(header));
-    when(ibftBlockInterface.getProposerOfBlock(header)).thenReturn(proposerAddressBlock);
+    when(blockInterface.getProposerOfBlock(header)).thenReturn(proposerAddressBlock);
 
     final SignerMetricResult signerMetricResult = new SignerMetricResult(proposerAddressBlock);
     signerMetricResult.incrementeNbBlock();

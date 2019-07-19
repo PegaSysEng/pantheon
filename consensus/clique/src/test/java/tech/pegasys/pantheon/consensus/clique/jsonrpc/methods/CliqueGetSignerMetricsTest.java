@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
+import tech.pegasys.pantheon.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
@@ -50,15 +50,15 @@ public class CliqueGetSignerMetricsTest {
   private CliqueGetSignerMetrics method;
 
   private BlockchainQueries blockchainQueries;
-  private CliqueBlockInterface cliqueBlockInterface;
+  private BlockInterface blockInterface;
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setup() {
     blockchainQueries = mock(BlockchainQueries.class);
-    cliqueBlockInterface = mock(CliqueBlockInterface.class);
-    method = new CliqueGetSignerMetrics(cliqueBlockInterface, blockchainQueries, jsonRpcParameter);
+    blockInterface = mock(BlockInterface.class);
+    method = new CliqueGetSignerMetrics(blockInterface, blockchainQueries, jsonRpcParameter);
   }
 
   @Test
@@ -216,7 +216,7 @@ public class CliqueGetSignerMetricsTest {
     final BlockHeader header = new BlockHeaderTestFixture().number(number).buildHeader();
 
     when(blockchainQueries.getBlockHeaderByNumber(number)).thenReturn(Optional.of(header));
-    when(cliqueBlockInterface.getProposerOfBlock(header)).thenReturn(proposerAddressBlock);
+    when(blockInterface.getProposerOfBlock(header)).thenReturn(proposerAddressBlock);
 
     final SignerMetricResult signerMetricResult = new SignerMetricResult(proposerAddressBlock);
     signerMetricResult.incrementeNbBlock();
