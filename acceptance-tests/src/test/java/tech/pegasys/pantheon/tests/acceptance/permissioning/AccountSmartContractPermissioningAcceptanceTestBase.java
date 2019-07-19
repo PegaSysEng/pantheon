@@ -54,7 +54,8 @@ class AccountSmartContractPermissioningAcceptanceTestBase extends AcceptanceTest
   }
 
   protected Node permissionedNode(final String name, final List<String> accountsPermittedInConfig) {
-    PermissionedNodeBuilder permissionedNodeBuilder = this.permissionedNodeBuilder
+    PermissionedNodeBuilder permissionedNodeBuilder =
+        this.permissionedNodeBuilder
             .name(name)
             .genesisFile(GENESIS_FILE)
             .accountsContractEnabled(CONTRACT_ADDRESS);

@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.permissioning;
 
-import org.junit.Before;
-import org.junit.Test;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTransaction;
@@ -21,76 +19,102 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.account.TransferTr
 import java.math.BigInteger;
 import java.util.Arrays;
 
-public class AccountLocalAndOnChainPermissioningAcceptanceTest extends
-        AccountSmartContractPermissioningAcceptanceTestBase {
+import org.junit.Before;
+import org.junit.Test;
 
-    private Account senderC;
+public class AccountLocalAndOnChainPermissioningAcceptanceTest
+    extends AccountSmartContractPermissioningAcceptanceTestBase {
 
-    @Before
-    public void setUp() {
-        senderC = accounts.createAccount("Account-C");
-    }
+  private Account senderC;
 
-    @Test
-    public void testAccountCannotSendTxWhenNotOnLocalWhiteList() {
-        //OnChain whitelist: Primary, Secondary, C
-        //Local whitelist: Primary, Secondary
+  @Before
+  public void setUp() {
+    senderC = accounts.createAccount("Account-C");
+  }
 
-        final Node node = permissionedNode("node1",
-                Arrays.asList(accounts.getPrimaryBenefactor().getAddress(),
-                        accounts.getSecondaryBenefactor().getAddress()));
-        permissionedCluster.start(node);
+  @Test
+  public void testAccountCannotSendTxWhenNotOnLocalWhiteList() {
+    // OnChain whitelist: Primary, Secondary, C
+    // Local whitelist: Primary, Secondary
 
-        // ensure SenderC has got some ether available
-        node.execute(accountTransactions.createTransfer(senderC, 10));
-        node.verify(senderC.balanceEquals(10));
+    final Node node =
+        permissionedNode(
+            "node1",
+            Arrays.asList(
+                accounts.getPrimaryBenefactor().getAddress(),
+                accounts.getSecondaryBenefactor().getAddress()));
+    permissionedCluster.start(node);
 
-        //add accounts to onChain Whitelist
-        node.execute(allowAccount(accounts.getPrimaryBenefactor()));
-        node.verify(accountIsAllowed(accounts.getPrimaryBenefactor()));
+    // ensure SenderC has got some ether available
+    node.execute(accountTransactions.createTransfer(senderC, 10));
+    node.verify(senderC.balanceEquals(10));
 
-        node.execute(allowAccount(accounts.getSecondaryBenefactor()));
-        node.verify(accountIsAllowed(accounts.getSecondaryBenefactor()));
+    // add accounts to onChain Whitelist
+    node.execute(allowAccount(accounts.getPrimaryBenefactor()));
+    node.verify(accountIsAllowed(accounts.getPrimaryBenefactor()));
 
-        node.execute(allowAccount(senderC));
-        node.verify(accountIsAllowed(senderC));
+    node.execute(allowAccount(accounts.getSecondaryBenefactor()));
+    node.verify(accountIsAllowed(accounts.getSecondaryBenefactor()));
 
-        //sender C should not be able to send Tx
-        verifyTransferForbidden(node, senderC, accounts.getSecondaryBenefactor());
-    }
+    node.execute(allowAccount(senderC));
+    node.verify(accountIsAllowed(senderC));
 
-    @Test
-    public void testAccountCannotSendTxWhenNotOnOnChainWhiteList() {
-        //OnChain Whitelist: Primary, Secondary
-        //Local Whitelist: Primary, Secondary, C
-        final Node node = permissionedNode("node1",
-                Arrays.asList(accounts.getPrimaryBenefactor().getAddress(),
-                        accounts.getSecondaryBenefactor().getAddress(),
-                        senderC.getAddress()));
-        permissionedCluster.start(node);
+    // sender C should not be able to send Tx
+    verifyTransferForbidden(node, senderC, accounts.getSecondaryBenefactor());
+  }
 
-        // ensure SenderC has got some ether available
-        node.execute(accountTransactions.createTransfer(senderC, 10));
-        node.verify(senderC.balanceEquals(10));
+  @Test
+  public void testAccountCannotSendTxWhenNotOnOnChainWhiteList() {
+    // OnChain Whitelist: Primary, Secondary, Receiver
+    // Local Whitelist: Primary, Secondary, C, Receiver
 
-        //add accounts to onChain Whitelist
-        node.execute(allowAccount(accounts.getPrimaryBenefactor()));
-        node.verify(accountIsAllowed(accounts.getPrimaryBenefactor()));
+    final Account receiverAccount = accounts.createAccount("Rec-A");
 
-        node.execute(allowAccount(accounts.getSecondaryBenefactor()));
-        node.verify(accountIsAllowed(accounts.getSecondaryBenefactor()));
+    final Node node =
+        permissionedNode(
+            "node1",
+            Arrays.asList(
+                accounts.getPrimaryBenefactor().getAddress(),
+                accounts.getSecondaryBenefactor().getAddress(),
+                senderC.getAddress(),
+                receiverAccount.getAddress()));
+    permissionedCluster.start(node);
 
-        //sender C should not be able to send Tx
-        verifyTransferForbidden(node, senderC, accounts.getSecondaryBenefactor());
-    }
+    // ensure SenderC has got some ether available
+    node.execute(accountTransactions.createTransfer(senderC, 10));
+    node.verify(senderC.balanceEquals(10));
 
-    private void verifyTransferForbidden(final Node node, final Account sender, final Account beneficiary) {
-        BigInteger nonce = node.execute(ethTransactions.getTransactionCount(sender.getAddress()));
-        TransferTransaction transfer =
-                accountTransactions.createTransfer(sender, beneficiary, 1, nonce);
-        node.verify(
-                eth.sendRawTransactionExceptional(
-                        transfer.signedTransactionData(),
-                        "Sender account not authorized to send transactions"));
-    }
+    // add accounts to onChain Whitelist
+    node.execute(allowAccount(accounts.getPrimaryBenefactor()));
+    node.verify(accountIsAllowed(accounts.getPrimaryBenefactor()));
+
+    node.execute(allowAccount(accounts.getSecondaryBenefactor()));
+    node.verify(accountIsAllowed(accounts.getSecondaryBenefactor()));
+
+    node.execute(allowAccount(receiverAccount));
+    node.verify(accountIsAllowed(receiverAccount));
+
+    // verify senderC is forbidden because it is not on OnChain whitelist
+    node.verify(accountIsForbidden(senderC));
+
+    // sender C should not be able to send Tx as well
+    node.execute(accountTransactions.createTransfer(senderC, receiverAccount, 1));
+    node.verify(receiverAccount.balanceDoesNotChange(0));
+
+    // final check, other account should be able to send tx
+    node.execute(
+        accountTransactions.createTransfer(accounts.getPrimaryBenefactor(), receiverAccount, 5));
+    node.verify(receiverAccount.balanceEquals(5));
+  }
+
+  private void verifyTransferForbidden(
+      final Node node, final Account sender, final Account beneficiary) {
+    BigInteger nonce = node.execute(ethTransactions.getTransactionCount(sender.getAddress()));
+    TransferTransaction transfer =
+        accountTransactions.createTransfer(sender, beneficiary, 1, nonce);
+    node.verify(
+        eth.sendRawTransactionExceptional(
+            transfer.signedTransactionData(),
+            "Sender account not authorized to send transactions"));
+  }
 }

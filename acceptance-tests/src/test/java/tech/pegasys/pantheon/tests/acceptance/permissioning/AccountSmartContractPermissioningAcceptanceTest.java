@@ -15,10 +15,10 @@ package tech.pegasys.pantheon.tests.acceptance.permissioning;
 import tech.pegasys.pantheon.tests.acceptance.dsl.account.Account;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 
+import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Collections;
 
 public class AccountSmartContractPermissioningAcceptanceTest
     extends AccountSmartContractPermissioningAcceptanceTestBase {
