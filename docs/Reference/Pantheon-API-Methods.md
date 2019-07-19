@@ -3838,7 +3838,7 @@ Privacy group ID
 ### eea_findPrivacyGroup
 
 Returns a list of privacy groups that contain exactly the listed members. For example, if the listed members 
-to find a privacy group for are A and B, a privacy group containing A, B, and C is not returned. 
+are A and B, a privacy group containing A, B, and C is not returned. 
 
 **Parameters** 
 
