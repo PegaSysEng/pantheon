@@ -11,18 +11,18 @@ Using onchain permissioning enables all nodes to read the whitelists from one so
 The permissioning smart contracts are provided in the [PegaSysEng/permissioning-smart-contracts](https://github.com/PegaSysEng/permissioning-smart-contracts) repository: 
 
 * Ingress contracts for nodes and accounts - proxy contracts that defer the permissioning logic to the 
-Node and Account rules contracts. The Ingress contracts are deployed to static addresses. 
+Node Rules and Account Rules contracts. The Ingress contracts are deployed to static addresses. 
 
 * Node Rules - stores the node whitelist and node whitelist operations (for example, add and remove). 
 
 * Account Rules - stores the accounts whitelist and account whitelist operations (for example, add and remove). 
 
-* Admin - stores the list of admin accounts and admin list operations (for example, add and remove) There is 
+* Admin - stores the list of admin accounts and admin list operations (for example, add and remove). There is 
 one list of admin accounts for node and accounts.
 
 ## Permissioning Management Dapp
 
-The [Permissioning Management Dapp](Using-Onchain-Permissioning.md) is provided to view 
+The [Permissioning Management Dapp](Getting-Started-Onchain-Permissioning.md) is provided to view 
 and maintain the whitelists. 
 
 !!! tip 
@@ -33,21 +33,19 @@ and maintain the whitelists.
 
 Permissioning implements three whitelists: 
 
-* [Accounts](Using-Onchain-Permissioning.md#update-accounts-or-admin-accounts-whitelists) can submit 
+* [Accounts](Getting-Started-Onchain-Permissioning.md#update-accounts-or-admin-accounts-whitelists) can submit 
 transactions to the network
 
-* [Nodes](Using-Onchain-Permissioning.md#update-nodes-whitelist) can participate in the network 
+* [Nodes](Getting-Started-Onchain-Permissioning.md#update-nodes-whitelist) can participate in the network 
 
-* [Admin Accounts](Using-Onchain-Permissioning.md#update-accounts-or-admin-accounts-whitelists) 
+* [Admins](Getting-Started-Onchain-Permissioning.md#update-accounts-or-admin-accounts-whitelists) are accounts that
 can update the accounts and nodes whitelists 
 
 ## Bootnodes
 
 When a node is added to the network, it connects to the bootnodes until it synchronizes to the chain head regardless of
-node permissions. Once in sync, the permissioning rules are applied and connections to bootnodes are dropped if not permitted by node 
-permissions.  
+node permissions. Once in sync, the permissioning rules in the Account Rules and Node Rules smart contracts are applied.  
 
-If a sychronized node loses all peer connections (that is, it has 0 peers), it reconnects to the bootnodes regardless of node 
-permissions. When the node has connected to 1 or more non-bootnodes, connections to bootnodes are dropped if not permitted by node 
-permissions.   
+If a sychronized node loses all peer connections (that is, it has 0 peers), it reconnects to the bootnodes to 
+rediscover peers.  
 

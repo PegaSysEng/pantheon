@@ -111,7 +111,7 @@ nav:
         - Local Permissioning: Permissions/Local-Permissioning.md
         - Onchain Permissioning:
             - Overview: Permissions/Onchain-Permissioning/Onchain-Permissioning.md
-            - Using Onchain Permissions: Permissions/Onchain-Permissioning/Using-Onchain-Permissioning.md
+            - Getting Started with Onchain Permissioning: Permissions/Onchain-Permissioning/Getting-Started-Onchain-Permissioning.md
     - Using Pantheon:
         - Transactions:
           - Creating and Sending Transactions: Using-Pantheon/Transactions/Transactions.md

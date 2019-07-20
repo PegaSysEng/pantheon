@@ -17,7 +17,7 @@ description: Pantheon resources including blog posts, webinars, and meetup recor
 
 ## Webinars 
 
-[Permissioning in Blockcahin: A Technical Look at Benefits and Best Practices](https://pegasys.wistia.com/medias/3px9eo2sf5)
+[Permissioning in Blockchain: A Technical Look at Benefits and Best Practices](https://pegasys.wistia.com/medias/3px9eo2sf5)
 
 [Privacy in Pantheon: How PegaSys Redefined Blockchain for Enterprises](https://www.youtube.com/watch?v=8l7SSZLyFL8)
 

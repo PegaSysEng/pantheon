@@ -836,7 +836,7 @@ PANTHEON_PERMISSIONS_ACCOUNTS_CONTRACT_ADDRESS=xyz
 permissions-accounts-contract-address=xyz
 ```
 
-Specifies the contract address for [onchain accounts permissioning](../Permissions/Onchain-Permissioning/Onchain-Permissioning.md).
+Specifies the contract address for [onchain account permissioning](../Permissions/Onchain-Permissioning/Onchain-Permissioning.md).
 
 ### permissions-accounts-contract-enabled
 
@@ -856,8 +856,7 @@ PANTHEON_PERMISSIONS_ACCOUNTS_CONTRACT_ENABLED=true
 permissions-accounts-contract-enabled=true
 ```
 
-Enables contract-based [onchain accounts permissioning](../Permissions/Onchain-Permissioning/Onchain-Permissioning.md). Default is `false`.
-
+Enables contract-based [onchain account permissioning](../Permissions/Onchain-Permissioning/Onchain-Permissioning.md). Default is `false`.
 
 ### permissions-nodes-config-file-enabled
 

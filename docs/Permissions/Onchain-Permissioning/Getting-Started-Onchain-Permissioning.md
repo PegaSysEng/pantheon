@@ -1,36 +1,32 @@
 description: Setting up and using onchain Permissioning
 <!--- END of page meta data -->
 
-# Using Onchain Permissioning 
+# Getting Started with Onchain Permissioning 
+ 
+The following steps describe bootstrapping a permissioned network using a Pantheon node and a development server
+for the Permissioning Mangament Dapp both run locally. 
 
 To start a network with onchain permissioning: 
 
 1. [Install pre-requisites](#pre-requisites) 
 1. [Add the ingress contracts to the genesis file](#add-ingress-contracts-to-genesis-file) 
-1. For the first node: 
-    1. [Set environment variables](#set-environment-variables) 
-    2. [Start node with onchain permissioning and the JSON-RPC HTTP service enabled](#onchain-permissioning-command-line-options) 
-    3. [Clone the permissioning contracts repository and install dependencies](#clone-contracts-and-install-dependencies) 
-    4. [Deploy the permissioning contracts](#deploy-contracts) 
-    5. [Start the Permissioning Management Dapp](#start-the-permissioning-management-dapp) 
-    6. [Add the first node to the nodes whitelist](#update-nodes-whitelist)
-    7. Add subsequent [nodes](#update-nodes-whitelist) and [accounts](#update-accounts-whitelists) to the whitelists 
-
-1. Start subsequent nodes with [onchain permssioning enabled](#onchain-permissioning-command-line-options).  
-If nodes are going to maintain whitelists, also enable the [JSON-RPC HTTP service](#onchain-permissioning-command-line-options). 
-1. For nodes that are going to maintain whitelists (that is, nodes with an admin account): 
-    1. [Clone the permissioning contracts repository and install dependencies](#clone-contracts-and-install-dependencies)
-    2. [Start the Permissioning Management Dapp](#start-the-permissioning-management-dapp)
+1. [Set environment variables](#set-environment-variables)
+1. [Start first node with onchain permissioning and the JSON-RPC HTTP service enabled](#onchain-permissioning-command-line-options) 
+1. [Clone the permissioning contracts repository and install dependencies](#clone-contracts-and-install-dependencies) 
+1. [Deploy the permissioning contracts](#deploy-contracts) 
+1. [Start the development server for the Permissioning Management Dapp](#start-the-permissioning-management-dapp) 
+1. [Add the first node to the nodes whitelist](#update-nodes-whitelist)
+1. Add subsequent [nodes](#update-nodes-whitelist) and [accounts](#update-accounts-whitelists) to the whitelists   
 
 ## Pre-requisites 
 
-For the first node and nodes with an admin account: 
+For the development server to run the dapp: 
 
-* [NodeJS](https://nodejs.org/en/) v8.9.4 or later QUESTION: confirm 
+* [NodeJS](https://nodejs.org/en/) v10.16.0 or later 
 * [Yarn](https://yarnpkg.com/en/) v1.15 or later
 * Browser with [MetaMask installed](https://metamask.io/)
 
-For the first node only: 
+To deploy the permissioning contracts: 
 
 * [Truffle](https://truffleframework.com/docs/truffle/getting-started/installation)
 
@@ -69,21 +65,23 @@ in the [`permissioning-smart-contracts` repository](https://github.com/PegaSysEn
 
 ## Set Environment Variables 
 
-For the first node (that is, the node that will deploy the contracts), create the following environment variables 
-and set to the specified values: 
+Create the following environment variables and set to the specified values: 
 
-* `PANTHEON_NODE_PERM_ACCOUNT` - address of account used to interact with the permissioning contracts. 
+* `PANTHEON_NODE_PERM_ACCOUNT` - account to deploy the permissioning contracts and become the first admin account. 
 
-* `PANTHEON_NODE_PERM_KEY` - private key of the account used to interact with the permissioning contracts.
+* `PANTHEON_NODE_PERM_KEY` - private key of the account to deploy the permissioning contracts.
 
 * `ACCOUNT_INGRESS_CONTRACT_ADDRESS` - address of the Account Ingress contract in the genesis file.  
 
 * `NODE_INGRESS_CONTRACT_ADDRESS` - address of the Node Ingress contract in the genesis file.  
 
 * `PANTHEON_NODE_PERM_ENDPOINT` - required only if your node is not using the default JSON-RPC host and port (`http://127.0.0.1:8545`). 
-Set to JSON-RPC host and port. 
+Set to JSON-RPC host and port. When bootstrapping the network, the specified node is used to deploy the contracts and is the first node
+in the network. 
 
-!!! note
+!!! important 
+    The account specified must be a miner (PoW networks) or validator (PoA networks).
+    
     If your network is not a [free gas network](../../Configuring-Pantheon/FreeGas.md), the account used to 
     interact with the permissioning contracts must have a balance. 
 
@@ -102,10 +100,7 @@ set to the address of the Account Ingress contract in the genesis file (`"0x0000
 to enable onchain nodes permissioning
 
 * [--permissions-nodes-contract-address](../../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-contract-address)
-set to the address of the Node Ingress contract in the genesis file (`"0x0000000000000000000000000000000000009999"`)
-      
-For nodes using the Permissioning Management Dapp to maintain whitelists, the [--rpc-http-enabled](../../Reference/Pantheon-CLI-Syntax.md#rpc-http-enabled)
-option must be specified to enable the JSON-RPC HTTP service.  
+set to the address of the Node Ingress contract in the genesis file (`"0x0000000000000000000000000000000000009999"`)  
 
 ## Clone Contracts and Install Dependencies 
 
@@ -122,12 +117,7 @@ option must be specified to enable the JSON-RPC HTTP service.
     ```
 
 ## Deploy Contracts 
-
-!!! important 
-    Only the first node deploys the admin and rules contracts. Subsequent nodes do not migrate the contracts. 
     
-    The node deploying the admin and rules contracts must be a miner (PoW networks) or validator (PoA networks). 
-
 In the `permissioning-smart-contracts` directory, deploy the Admin and Rules contracts: 
 
 ```bash
@@ -140,9 +130,9 @@ The migration logs the addresses of the Admin and Rules contracts.
 !!! important 
     The account that deploys the contracts is automatically an [admin account](#update-accounts-or-admin-accounts-whitelists). 
 
-## Start the Permissioning Management Dapp
+## Start the Development Server for the Permissioning Management Dapp
 
-1. In the `permissioning-smart-contracts` directory: 
+1. In the `permissioning-smart-contracts` directory, start the web server serving the Dapp: 
 
     ```bash
     yarn start
@@ -152,7 +142,7 @@ The migration logs the addresses of the Admin and Rules contracts.
 
 1. Ensure MetaMask is connected to your local node (by default `http://localhost:8545`). 
 
-    A MeteMask notification is displayed requesting permission for Pantheon Permissioning to 
+    A MetaMask notification is displayed requesting permission for Pantheon Permissioning to 
    connect to your account. 
 
 1. Click the _Connect_ button. 
@@ -163,8 +153,7 @@ The migration logs the addresses of the Admin and Rules contracts.
 !!! note  
     Only [admin accounts](#update-accounts-or-admin-accounts-whitelists) can add or remove nodes from the whitelist. 
 
-    The first node (that is, the node that deployed the permissioning contracts) must add itself to the whitelist before 
-    adding other nodes.
+    The first node must add itself to the whitelist before adding other nodes.
 
 ## Update Nodes Whitelist  
 
@@ -190,18 +179,22 @@ A trash can is displayed.
     If the node is added to the whitelist before starting the node, using `admin_addPeer` is not required because
     peer discovery is run on node startup. 
     
-## Update Accounts or Admin Accounts Whitelists 
+## Update Accounts Whitelists 
 
-To add an account to the accounts whitelist or as an admin account: 
+To add an account to the accounts whitelist: 
 
-1. In the _Whitelisted Accounts_ or _Admin Accounts_ tab of the Permissioning Management Dapp, click the _Add Whitelisted Account_
-or _Add Admin Account_ button. The add account window is displayed. 
+1. In the _Whitelisted Accounts_ tab of the Permissioning Management Dapp, click the _Add Whitelisted Account_
+ button. The add account window is displayed. 
 
-1. Enter the account address in the _Account Address_ field and click the _Add Whitelisted Account_ or _Add Admin Account_ button. 
+1. Enter the account address in the _Account Address_ field and click the _Add Whitelisted Account_ button. 
 
-To remove an account from the accounts whitelist or as an admin account: 
+To remove an account from the accounts whitelist: 
 
-1. In the _Whitelisted Accounts_ or _Admin Accounts_ tab of the Permissioning Management Dapp, hover over the 
+1. In the _Whitelisted Accounts_ tab of the Permissioning Management Dapp, hover over the 
 row of the account to be removed. A trash can is displayed. 
 
 1. Click on the trash can.     
+
+## Update Admins 
+
+Admins accounts are added or removed in the same way as accounts except on the _Admin Accounts_ tab.  
