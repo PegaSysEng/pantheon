@@ -3779,7 +3779,8 @@ using [`eth_getTransactionByHash`](#eth_gettransactionbyhash) with the transacti
 
 **Parameters** 
 
-`data` - Value of `input` from the public transaction
+`data` - Value of `input` from the [public transaction object](Pantheon-API-Objects.md#transaction-object). `input`
+is a pointer to the transaction location in [Orion](https://docs.orion.pegasys.tech/en/stable/).
 
 **Returns**  
 
