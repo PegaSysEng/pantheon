@@ -3837,7 +3837,7 @@ Privacy group ID
 
 ### eea_findPrivacyGroup
 
-Returns a list of privacy groups that contain exactly the listed members. For example, if the listed members 
+Returns a list of privacy groups containing only the listed members. For example, if the listed members 
 are A and B, a privacy group containing A, B, and C is not returned. 
 
 **Parameters** 
@@ -3846,7 +3846,7 @@ are A and B, a privacy group containing A, B, and C is not returned.
 
 **Returns** 
 
-Privacy groups that contain exactly the specified members. 
+Privacy groups containing only the specified members. 
 
 !!! example
     ```bash tab="curl HTTP request"
