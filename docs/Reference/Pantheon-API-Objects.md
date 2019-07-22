@@ -136,7 +136,7 @@ Returned by [eth_getTransactionByHash](Pantheon-API-Methods.md#eth_gettransactio
 | **gas**              | Quantity            | Gas provided by the sender.                                                            |
 | **gasPrice**         | Quantity            | Gas price provided by the sender in Wei.                                               |
 | **hash**             | Data, 32&nbsp;bytes | Hash of the transaction.                                                               |
-| **input**            | Data                | Data sent with the transaction. For private transactions it is a pointer to the transaction location in [Orion](https://docs.orion.pegasys.tech/en/stable/).                                                       |
+| **input**            | Data                | Data sent with the transaction to create or invoke a contract. For [private transactions](../Privacy/Explanation/Privacy-Overview.md) it is a pointer to the transaction location in [Orion](https://docs.orion.pegasys.tech/en/stable/).                                                       |
 | **nonce**            | Quantity            | Number of transactions made by the sender before this one.                             |
 | **to**               | Data, 20&nbsp;bytes | Address of the receiver. `null` if a contract creation transaction.                    |
 | **transactionIndex** | Quantity, Integer   | Index position of transaction in the block. `null` when transaction is pending.        |
