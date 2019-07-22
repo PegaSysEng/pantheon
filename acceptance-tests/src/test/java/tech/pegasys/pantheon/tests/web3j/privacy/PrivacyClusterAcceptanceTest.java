@@ -134,7 +134,7 @@ public class PrivacyClusterAcceptanceTest extends PrivacyAcceptanceTestBase {
   @Test
   public void node1CanDeployWithPrivacyGroupId() {
     eventEmitterHarness.deployWithPrivacyGroup(
-        CONTRACT_NAME, "Alice", privacyGroup.getPrivacyGroupId());
+        CONTRACT_NAME, "Alice", privacyGroup.getPrivacyGroupId(), "Alice", "Bob", "Charlie");
   }
 
   @Test

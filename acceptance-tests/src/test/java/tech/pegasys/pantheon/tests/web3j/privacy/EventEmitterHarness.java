@@ -25,10 +25,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransac
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class EventEmitterHarness {
@@ -74,10 +71,8 @@ public class EventEmitterHarness {
         receivers);
   }
 
-  public void deployWithPrivacyGroup(
-      final String contractName, final String sender, String mPrivacyGroupId) {
-
-    deployWithPrivacyGroup(contractName, "Test", 0, sender, mPrivacyGroupId);
+  public void deployWithPrivacyGroup(final String contractName, final String sender, String mPrivacyGroupId, final String... groupMembers) {
+    deployWithPrivacyGroup(contractName, "Test", nextNonce(sender, BytesValues.fromBase64(mPrivacyGroupId)), sender, mPrivacyGroupId, groupMembers);
   }
 
   public void deploy(
@@ -185,7 +180,9 @@ public class EventEmitterHarness {
       final String contractName,
       final long nonce,
       final String sender,
-      final String privacyGroupId) {
+      final String privacyGroupId,
+      final String... groupMembers
+      ) {
 
     final String deployContract =
         privateTransactionBuilder
@@ -204,7 +201,9 @@ public class EventEmitterHarness {
 
     waitForTransactionToBeMined(transactionHash);
 
-    //    verifyForParticipants(forParticipants, transactionHash, sender, receivers);
+    System.out.println(Arrays.toString(groupMembers));
+
+    verifyForParticipants(privateTransactionVerifier.validPrivateTransactionReceipt(), transactionHash, sender, groupMembers);
     //
     //    verifyForNonParticipants(forNonParticipants, transactionHash, sender, receivers);
 
@@ -282,9 +281,10 @@ public class EventEmitterHarness {
       final String transactionHash,
       final String fromNodeName,
       final String[] toNodeNames) {
+
     verifyForParticipant(condition, transactionHash, fromNodeName);
     Arrays.stream(toNodeNames)
-        .forEach(node -> verifyForParticipant(condition, transactionHash, fromNodeName));
+        .forEach(node -> verifyForParticipant(condition, transactionHash, node));
   }
 
   private void verifyForParticipant(
