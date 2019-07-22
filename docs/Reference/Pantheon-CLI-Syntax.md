@@ -304,7 +304,7 @@ PANTHEON_MAX_PEERS=42
 max-peers=42
 ```
 
-Specifies the maximum P2P peer connections that can be established.
+Specifies the maximum P2P connections that can be established.
 The default is 25.
 
 ### metrics-category
@@ -646,7 +646,7 @@ Possible values are :
     
 !!!important
     The [`--network`](#network) and [`--genesis-file`](#genesis-file) option cannot be used at the same time.
-
+    
 ### network-id
 
 ```bash tab="Syntax"
@@ -932,7 +932,7 @@ PANTHEON_PRIVACY_ENABLED=false
 privacy-enabled=false
 ```
 
-Set to enable [private transactions](../Privacy/Privacy-Overview.md). 
+Set to enable [private transactions](../Privacy/Explanation/Privacy-Overview.md). 
 The default is false.  
 
 ### privacy-precompiled-address
@@ -941,7 +941,7 @@ The default is false.
 --privacy-precompiled-address=<privacyPrecompiledAddress>
 ```
 
-Address to which the [privacy pre-compiled contract](../Privacy/Private-Transaction-Processing.md) is mapped.
+Address to which the [privacy pre-compiled contract](../Privacy/Explanation/Private-Transaction-Processing.md) is mapped.
 The default is 126.     
     
 ### privacy-public-key-file
@@ -962,7 +962,7 @@ PANTHEON_PRIVACY_PUBLIC_KEY_FILE=Orion/nodeKey.pub
 privacy-public-key-file="Orion/nodeKey.pub"
 ```
 
-Path to the [public key of the Orion node](../Privacy/Privacy-Overview.md#pantheon-and-orion-keys).     
+Path to the [public key of the Orion node](../Privacy/Explanation/Privacy-Overview.md#pantheon-and-orion-keys).     
 
 ### privacy-url
 
@@ -982,7 +982,7 @@ PANTHEON_PRIVACY_URL=http://127.0.0.1:8888
 privacy-url="http://127.0.0.1:8888"
 ```
 
-URL on which the [Orion node](../Privacy/Configuring-Privacy.md#4-create-orion-configuration-files) is running.    
+URL on which the [Orion node](../Privacy/Tutorials/Configuring-Privacy.md#4-create-orion-configuration-files) is running.    
 
 ### revert-reason-enabled
 
@@ -1008,6 +1008,55 @@ receipt. Default is `false`.
 !!! caution 
     Enabling revert reason may use a significant amount of memory. We do not recommend enabling revert
     reason when connected to public Ethereum networks. 
+
+### remote-connections-limit-enabled
+
+```bash tab="Syntax"
+--remote-connections-limit-enabled[=<true|false>]
+```
+
+```bash tab="Command Line"
+--remote-connections-limit-enabled=false
+```
+
+```bash tab="Environment Variable"
+PANTHEON_REMOTE_CONNECTIONS_LIMIT_ENABLED=false
+```
+
+```bash tab="Configuration File"
+remote-connections-limit-enabled=false
+```
+
+Specify to limit the percentage of remote P2P connections initiated by peers. Default is true. 
+
+!!! tip
+    In private networks with a level of trust between peers, disabling the remote connection limits 
+    may increase the speed at which nodes can join the network.
+
+!!! important
+    To prevent eclipse attacks, ensure the remote connections limit is enabled when connecting to 
+    any public network and especially when using [fast sync](#fast-sync-options). 
+
+### remote-connections-max-percentage
+
+```bash tab="Syntax"
+--remote-connections-max-percentage=<DOUBLE>
+```
+
+```bash tab="Command Line"
+--remote-connections-max-percentage=25
+```
+
+```bash tab="Environment Variable"
+PANTHEON_REMOTE_CONNECTIONS_MAX_PERCENTAGE=25
+```
+
+```bash tab="Configuration File"
+remote-connections-max-percentage=25
+```
+
+Percentage of remote P2P connections that can be established with the node. Must be between 0 and 100 inclusive.
+Default is 60. 
 
 ### rpc-http-api
 
