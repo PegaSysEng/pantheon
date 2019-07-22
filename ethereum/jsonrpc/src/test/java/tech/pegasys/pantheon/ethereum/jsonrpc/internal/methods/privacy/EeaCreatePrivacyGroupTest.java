@@ -47,11 +47,11 @@ public class EeaCreatePrivacyGroupTest {
         new PrivacyGroup(privacyGroupId, PrivacyGroup.Type.PANTHEON, name, description, addresses);
     when(enclave.createPrivacyGroup(any())).thenReturn(privacyGroup);
 
-    final EeaCreatePrivacyGroup eeaCreatePrivacyGroup =
-        new EeaCreatePrivacyGroup(enclave, parameters);
+    final PrivCreatePrivacyGroup eeaCreatePrivacyGroup =
+        new PrivCreatePrivacyGroup(enclave, parameters);
 
     Object[] params = new Object[] {from, name, description, addresses};
-    final JsonRpcRequest request = new JsonRpcRequest("1", "eea_createPrivacyGroup", params);
+    final JsonRpcRequest request = new JsonRpcRequest("1", "priv_createPrivacyGroup", params);
 
     final JsonRpcSuccessResponse response =
         (JsonRpcSuccessResponse) eeaCreatePrivacyGroup.response(request);

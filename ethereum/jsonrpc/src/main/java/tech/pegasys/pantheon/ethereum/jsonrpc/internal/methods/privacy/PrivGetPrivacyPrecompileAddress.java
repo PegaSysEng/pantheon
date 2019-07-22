@@ -21,19 +21,19 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
-public class EeaGetPrivacyPrecompileAddress implements JsonRpcMethod {
+public class PrivGetPrivacyPrecompileAddress implements JsonRpcMethod {
 
   private final Integer privacyAddress;
   private final Boolean privacyEnabled;
 
-  public EeaGetPrivacyPrecompileAddress(final PrivacyParameters privacyParameters) {
+  public PrivGetPrivacyPrecompileAddress(final PrivacyParameters privacyParameters) {
     privacyAddress = privacyParameters.getPrivacyAddress();
     privacyEnabled = privacyParameters.isEnabled();
   }
 
   @Override
   public String getName() {
-    return RpcMethod.EEA_GET_PRIVACY_PRECOMPILE_ADDRESS.getMethodName();
+    return RpcMethod.PRIV_GET_PRIVACY_PRECOMPILE_ADDRESS.getMethodName();
   }
 
   @Override
