@@ -15,7 +15,7 @@ Create and send private transactions using:
     
 ## Methods for Private Transactions
 
-A private transaction creates a [Privacy Marker Transaction](../Private-Transaction-Processing.md) in addition to the private transaction itself. 
+A private transaction creates a [Privacy Marker Transaction](../Explanation/Private-Transaction-Processing.md) in addition to the private transaction itself. 
 Use [`eth_getTransactionReceipt`](../../Reference/Pantheon-API-Methods.md#eth_gettransactionreceipt) to 
 get the transaction receipt for the Privacy Maker Transaction and [`eea_getTransactionReceipt`](../../Reference/Pantheon-API-Methods.md#eea_gettransactionreceipt) 
 to get the transaction receipt for the private transaction. 
@@ -25,7 +25,7 @@ get the Privacy Marker Transaction with the transaction hash returned when submi
 Use [`eea_getPrivateTransacton`](../../Reference/Pantheon-API-Methods.md#eea_getprivatetransaction) 
 to get the private transaction with the `input` value from the Privacy Marker Transaction. 
 
-Separate private states are maintained for each [privacy group](../Privacy-Overview.md#privacy-groups) so 
+Separate private states are maintained for each [privacy group](../Explanation/Privacy-Overview.md#privacy-groups) so 
 the account nonce for an account is specific to the privacy group. That is, the nonce for account A for
 privacy group ABC is different to the account nonce for account A for privacy group AB. Use 
 [`eea_getTransactionCount`](../../Reference/Pantheon-API-Methods.md#eea_gettransactioncount) to get 
