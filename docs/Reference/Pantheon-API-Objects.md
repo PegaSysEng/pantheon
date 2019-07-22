@@ -65,6 +65,27 @@ Returned by [eth_getFilterChanges](Pantheon-API-Methods.md#eth_getfilterchanges)
 | **data**             | Data                              | Non-indexed arguments of log.                                                                                                                                                                                       |
 | **topics**           | Array of Data, 32&nbsp;bytes each | [Event signature hash](../Using-Pantheon/Events-and-Logs.md#event-signature-hash) and 0 to 3 [indexed log arguments](../Using-Pantheon/Events-and-Logs.md#event-parameters).  |
 
+## Private Transaction Object
+
+Returned by [eea_getPrivateTransaction](Pantheon-API-Methods.md#eea_getprivatetransaction).
+
+| Key                  | Type                | Value                                                                                  |
+|----------------------|:-------------------:|----------------------------------------------------------------------------------------|
+| **from**             | Data, 20&nbsp;bytes | Address of the sender.                                                                 |
+| **gas**              | Quantity            | Gas provided by the sender.                                                            |
+| **gasPrice**         | Quantity            | Gas price provided by the sender in Wei.                                               |
+| **hash**             | Data, 32&nbsp;bytes | Hash of the transaction.                                                               |
+| **input**            | Data                | |
+| **nonce**            | Quantity            | Number of transactions made by the sender before this one.                             |
+| **to**               | Data, 20&nbsp;bytes | Address of the receiver. `null` if a contract creation transaction.                    |
+| **transactionIndex** | Quantity, Integer   | Index position of transaction in the block. `null` when transaction is pending.        |
+| **value**            | Quantity            | `null`                                                              |
+| **v**                | Quantity            | ECDSA Recovery ID                                                                      |
+| **r**                | Data, 32&nbsp;bytes | ECDSA signature r                                                                      |
+| **s**                | Data, 32&nbsp;bytes | ECDSA signature s                                                                      |
+| **privateFrom**      | 
+| **privateFor** 
+
 ## Range Object
 
 Returned by [debug_storageRangeAt](Pantheon-API-Methods.md#debug_storagerangeat).
