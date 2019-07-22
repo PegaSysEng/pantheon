@@ -77,14 +77,14 @@ Returned by [eea_getPrivateTransaction](Pantheon-API-Methods.md#eea_getprivatetr
 | **hash**             | Data, 32&nbsp;bytes               | Hash of the transaction.                                                        |
 | **input**            | Data                              | Data to create or invoke contract.                                                                                 |
 | **nonce**            | Quantity                          | Number of transactions made by the sender to the privacy group before this one.                      |
-| **to**               | Data, 20&nbsp;bytes               | Address of the receiver. `null` if a contract creation transaction.             |
+| **to**               | Data, 20&nbsp;bytes               | `null` if a contract creation transaction; otherwise, contract address             |
 | **value**            | Quantity                          | `null` because private transactions cannot transfer Ether                                                                          |
 | **v**                | Quantity                          | ECDSA Recovery ID                                                               |
 | **r**                | Data, 32&nbsp;bytes               | ECDSA signature r                                                               |
 | **s**                | Data, 32&nbsp;bytes               | ECDSA signature s                                                               |
-| **privateFrom**      | Data, 32&nbsp;bytes               | Orion public key of sender                                                      |
-| **privateFor**       | Array of Data, 32&nbsp;bytes each | Orion public keys of recipients                                                 |
-| **restriction**      | String                            | Must be `restricted` 
+| **privateFrom**      | Data, 32&nbsp;bytes               | [Orion](https://docs.orion.pegasys.tech/en/stable/) public key of sender                                                      |
+| **privateFor**       | Array of Data, 32&nbsp;bytes each | [Orion](https://docs.orion.pegasys.tech/en/stable/) public keys of recipients                                                 |
+| **restriction**      | String                            | Must be [`restricted`](../Privacy/Explanation/Privacy-Overview.md#private-transaction-attributes) 
  
 ## Range Object
 

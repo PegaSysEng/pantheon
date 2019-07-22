@@ -3784,7 +3784,7 @@ is a pointer to the transaction location in [Orion](https://docs.orion.pegasys.t
 
 **Returns**  
 
-Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `null` if not a participant in the private transaction. 
+Object - [Private transaction object](Pantheon-API-Objects.md#private-transaction-object), or `null` if not a participant in the private transaction. 
 
 !!! example
     ```bash tab="curl HTTP request"
