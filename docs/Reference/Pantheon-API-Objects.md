@@ -69,23 +69,23 @@ Returned by [eth_getFilterChanges](Pantheon-API-Methods.md#eth_getfilterchanges)
 
 Returned by [eea_getPrivateTransaction](Pantheon-API-Methods.md#eea_getprivatetransaction).
 
-| Key                  | Type                | Value                                                                                  |
-|----------------------|:-------------------:|----------------------------------------------------------------------------------------|
-| **from**             | Data, 20&nbsp;bytes | Address of the sender.                                                                 |
-| **gas**              | Quantity            | Gas provided by the sender.                                                            |
-| **gasPrice**         | Quantity            | Gas price provided by the sender in Wei.                                               |
-| **hash**             | Data, 32&nbsp;bytes | Hash of the transaction.                                                               |
-| **input**            | Data                | |
-| **nonce**            | Quantity            | Number of transactions made by the sender before this one.                             |
-| **to**               | Data, 20&nbsp;bytes | Address of the receiver. `null` if a contract creation transaction.                    |
-| **transactionIndex** | Quantity, Integer   | Index position of transaction in the block. `null` when transaction is pending.        |
-| **value**            | Quantity            | `null`                                                              |
-| **v**                | Quantity            | ECDSA Recovery ID                                                                      |
-| **r**                | Data, 32&nbsp;bytes | ECDSA signature r                                                                      |
-| **s**                | Data, 32&nbsp;bytes | ECDSA signature s                                                                      |
-| **privateFrom**      | 
-| **privateFor** 
-
+| Key                  | Type                              | Value                                                                           |
+|----------------------|-:-:-------------------------------|---------------------------------------------------------------------------------|
+| **from**             | Data, 20&nbsp;bytes               | Address of the sender.                                                          |
+| **gas**              | Quantity                          | Gas provided by the sender.                                                     |
+| **gasPrice**         | Quantity                          | Gas price provided by the sender in Wei.                                        |
+| **hash**             | Data, 32&nbsp;bytes               | Hash of the transaction.                                                        |
+| **input**            | Data                              | Data to create or invoke contract.                                                                                 |
+| **nonce**            | Quantity                          | Number of transactions made by the sender to the privacy group before this one.                      |
+| **to**               | Data, 20&nbsp;bytes               | Address of the receiver. `null` if a contract creation transaction.             |
+| **value**            | Quantity                          | `null` because private transactions cannot transfer Ether                                                                          |
+| **v**                | Quantity                          | ECDSA Recovery ID                                                               |
+| **r**                | Data, 32&nbsp;bytes               | ECDSA signature r                                                               |
+| **s**                | Data, 32&nbsp;bytes               | ECDSA signature s                                                               |
+| **privateFrom**      | Data, 32&nbsp;bytes               | Orion public key of sender                                                      |
+| **privateFor**       | Array of Data, 32&nbsp;bytes each | Orion public keys of recipients                                                 |
+| **restriction**      | String                            | Must be `restricted` 
+ 
 ## Range Object
 
 Returned by [debug_storageRangeAt](Pantheon-API-Methods.md#debug_storagerangeat).
