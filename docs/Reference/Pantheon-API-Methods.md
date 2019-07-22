@@ -100,6 +100,8 @@ Properties of the node object are:
 
 !!! note
     If the node is running locally, the host of the `enode` and `listenAddr` are displayed as `[::]` in the result. 
+    If [UPnP](../Configuring-Pantheon/Networking/Using-UPnP.md) is enabled, the external address is 
+    displayed for the `enode` and `listenAddr`. 
 
 !!! example
     ```bash tab="curl HTTP request"
@@ -3887,8 +3889,12 @@ To avoid exposing your private key, create signed transactions offline and send 
 data using `eea_sendRawTransaction`.
 
 !!! important
-    For production systems using private transactions, we recommend using a consensus mechanism with 
-    transaction finality. For example, [IBFT 2.0](../Consensus-Protocols/IBFT.md). 
+    For production systems requiring private transactions, we recommend using a network 
+    with a consensus mechanism supporting transaction finality. For example, [IBFT 2.0](../Consensus-Protocols/IBFT.md). 
+    
+    Pantheon does not implement [`eea_sendTransaction`](../Using-Pantheon/Account-Management.md). 
+        
+    [EthSigner](https://docs.ethsigner.pegasys.tech/en/latest/) provides transaction signing and implements [`eea_sendTransaction`](https://docs.ethsigner.pegasys.tech/en/latest/Using-EthSigner/Using-EthSigner/#eea_sendtransaction).
 
 **Parameters**
 
