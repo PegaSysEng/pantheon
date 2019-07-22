@@ -3795,7 +3795,7 @@ Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `n
     {"jsonrpc":"2.0","method":"eea_getPrivateTransaction","params":["0xd2274e3da9ac7f7fcec531adeefdc205688e85544ccf515c4de73b0540c9b818"], "id":1}
     ```
     
-    ```json tab="JSON result"
+    ```bash tab="json tab="JSON result"
     {
         "jsonrpc": "2.0",
         "id": 1,
@@ -3820,6 +3820,114 @@ Object - [Transaction object](Pantheon-API-Objects.md#transaction-object), or `n
     }
     ```
 
+
+### eea_createPrivacyGroup 
+
+Creates a privacy group containing the specified members. Members are specified by their Orion public key. 
+
+**Parameters** 
+
+`data` - Orion public key of privacy group creator 
+
+`string` - Privacy group name. Optional. 
+
+`string` - Privacy group description. Optional. 
+
+`array of data` - Array of members specified by Orion public keys 
+
+**Returns** 
+
+Privacy group ID 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_createPrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "Group A", "Description Group A", ["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=","g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"eea_createPrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "Group A", "Description Group A", ["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=","g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": "ewuTVoc5nlvWMwTFdRRK/wvV0dcyQo/Pauvx5bNEbTk="
+    }
+    ``` 
+
+### eea_deletePrivacyGroup
+
+Deletes the specified privacy group. 
+
+**Parameters** 
+
+`data` - Orion public key of privacy group deleter 
+
+`data` - Privacy group ID 
+
+**Returns** 
+
+Privacy group ID 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_deletePrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "ewuTVoc5nlvWMwTFdRRK/wvV0dcyQo/Pauvx5bNEbTk="],"id":1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"eea_deletePrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "ewuTVoc5nlvWMwTFdRRK/wvV0dcyQo/Pauvx5bNEbTk="],"id":1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc": "2.0",
+      "id": 53,
+      "result": "ewuTVoc5nlvWMwTFdRRK/wvV0dcyQo/Pauvx5bNEbTk="
+    }
+    ```
+
+### eea_findPrivacyGroup
+
+Returns a list of privacy groups containing only the listed members. For example, if the listed members 
+are A and B, a privacy group containing A, B, and C is not returned. 
+
+**Parameters** 
+
+`array of data` - Members specified by Orion public keys 
+
+**Returns** 
+
+Privacy groups containing only the specified members. 
+
+!!! example
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc": "2.0","method": "eea_findPrivacyGroup","params": [["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id": 1}' http://127.0.0.1:8545
+    ```
+    
+    ```bash tab="wscat WS request"
+    {"jsonrpc": "2.0","method": "eea_findPrivacyGroup","params": [["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id": 1}
+    ```
+    
+    ```json tab="JSON result"
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": [
+         {
+           "privacyGroupId": "GpK3ErNO0xF27T0sevgkJ3+4qk9Z+E3HtXYxcKIBKX8=",
+           "name": "Group B",
+           "description": "Description of Group B",
+           "type": "PANTHEON",
+           "members": [
+             "negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=",
+             "g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="
+           ]
+         }
+      ]
+    }
+    ```
+
 ### eea_sendRawTransaction
 
 Creates a private transaction from a signed transaction, generates the transaction hash and submits it 
@@ -3833,6 +3941,10 @@ data using `eea_sendRawTransaction`.
 !!! important
     For production systems requiring private transactions, we recommend using a network 
     with a consensus mechanism supporting transaction finality. For example, [IBFT 2.0](../Consensus-Protocols/IBFT.md). 
+    
+    Pantheon does not implement [`eea_sendTransaction`](../Using-Pantheon/Account-Management.md). 
+        
+    [EthSigner](https://docs.ethsigner.pegasys.tech/en/latest/) provides transaction signing and implements [`eea_sendTransaction`](https://docs.ethsigner.pegasys.tech/en/latest/Using-EthSigner/Using-EthSigner/#eea_sendtransaction).
 
 **Parameters**
 
