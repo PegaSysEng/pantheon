@@ -10,22 +10,20 @@ The system requirements for Pantheon depend on a number of factors:
 * Network size if connecting to a private network 
 * Number and complexity of queries being performed by node 
 
-## CPU Requirements for Syncing to Ethereum Mainnet
+## Determining System Requirements  
 
-Syncing to the Ethereum mainnet using a t3.xlarge takes about 15 hours.  The sync to mainnet can be completed with 
-a t3.large but takes longer.  
+To determine system requirements, monitor CPU and disk space requirements using [Prometheus](https://docs.pantheon.pegasys.tech/en/stable/Monitoring/Monitoring-Performance/#monitor-node-performance-using-prometheus). 
+A sample [Grafana dashboard](https://grafana.com/grafana/dashboards/10273) is provided for Pantheon. 
 
 !!! tip
-    Once the initial sync has been completed, the instance size can be reduced. 
+    CPU requirements are highest when syncing to the network and reduce once the node is synchronized to the chain head. 
 
 ## RAM 
 
-When connected to a public Ethereum network, 8GB of RAM is required.
+When connected to the Ethereum mainnet, 8GB of RAM is required.
 
 When connected to a private network, 4GB of RAM is required. 
 
 ## Disk Space 
 
-Syncing to the Ethereum mainnet requires 1.5 TB to 2 TB for a full sync. 
-
-Disk space requirements for private network depend on the network size.  A small test network  might require 200 MB.
+Syncing to the Ethereum mainnet requires 3TB for a full sync. 
