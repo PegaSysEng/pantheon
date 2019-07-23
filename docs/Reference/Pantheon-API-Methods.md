@@ -3875,6 +3875,9 @@ Privacy groups containing only the specified members.
 
 Returns the private transaction count for specified account and privacy group. 
 
+!!! important 
+    If sending a large number of private transactions, calculate the private transaction nonce outside Pantheon. 
+
 **Parameters** 
 
 `data` - Account address
