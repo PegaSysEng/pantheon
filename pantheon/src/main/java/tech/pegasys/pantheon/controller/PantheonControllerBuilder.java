@@ -210,12 +210,13 @@ public abstract class PantheonControllerBuilder<C> {
                 storageProvider.createPruningStorage(),
                 metricsSystem),
             protocolContext.getBlockchain(),
-            Executors.newSingleThreadExecutor(
-                new ThreadFactoryBuilder()
-                    .setDaemon(true)
-                    .setPriority(Thread.MIN_PRIORITY)
-                    .setNameFormat("StatePruning-%d")
-                    .build()),
+            () ->
+                Executors.newSingleThreadExecutor(
+                    new ThreadFactoryBuilder()
+                        .setDaemon(true)
+                        .setPriority(Thread.MIN_PRIORITY)
+                        .setNameFormat("StatePruning-%d")
+                        .build()),
             10,
             1000);
     addShutdownAction(
