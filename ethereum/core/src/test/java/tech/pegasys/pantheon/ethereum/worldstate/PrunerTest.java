@@ -49,7 +49,7 @@ public class PrunerTest {
   private final ExecutorServiceBuilder mockExecutorServiceBuilder = MockExecutorService::new;
 
   @Test
-  public void shouldMarkCorrectBlockAndSweep() {
+  public void shouldMarkCorrectBlockAndSweep() throws InterruptedException {
     final Block genesisBlock = gen.genesisBlock();
     final BlockchainStorage blockchainStorage =
         new KeyValueStoragePrefixedKeyBlockchainStorage(
@@ -67,10 +67,12 @@ public class PrunerTest {
     blockchain.appendBlock(newBlock, receipts);
     verify(markSweepPruner).mark(newBlock.getHeader().getStateRoot());
     verify(markSweepPruner).sweep();
+    pruner.stop();
   }
 
   @Test
-  public void shouldOnlySweepAfterTransientForkPeriodAndRetentionPeriodEnds() {
+  public void shouldOnlySweepAfterTransientForkPeriodAndRetentionPeriodEnds()
+      throws InterruptedException {
     final Block genesisBlock = gen.genesisBlock();
     final BlockchainStorage blockchainStorage =
         new KeyValueStoragePrefixedKeyBlockchainStorage(
@@ -102,10 +104,12 @@ public class PrunerTest {
     receipts = gen.receipts(newBlock);
     blockchain.appendBlock(newBlock, receipts);
     verify(markSweepPruner).sweep();
+    pruner.stop();
   }
 
   @Test
-  public void abortsPruningWhenFullyMarkedBlockNoLongerOnCanonicalChain() {
+  public void abortsPruningWhenFullyMarkedBlockNoLongerOnCanonicalChain()
+      throws InterruptedException {
     final Block genesisBlock = gen.genesisBlock();
     final BlockchainStorage blockchainStorage =
         new KeyValueStoragePrefixedKeyBlockchainStorage(
@@ -150,6 +154,7 @@ public class PrunerTest {
     blockchain.appendBlock(reorgCausingBlock, receipts);
     verify(markSweepPruner).mark(canonicalHead.getHeader().getStateRoot());
     verify(markSweepPruner, never()).sweep();
+    pruner.stop();
   }
 
   @Test
