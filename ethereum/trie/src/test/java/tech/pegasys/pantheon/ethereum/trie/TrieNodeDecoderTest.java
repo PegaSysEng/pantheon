@@ -36,8 +36,7 @@ public class TrieNodeDecoderTest {
 
     // Build a small trie
     MerklePatriciaTrie<BytesValue, BytesValue> trie =
-        new StoredMerklePatriciaTrie<>(
-            storage::get, Function.identity(), Function.identity(), false);
+        new StoredMerklePatriciaTrie<>(storage::get, Function.identity(), Function.identity());
     trie.put(BytesValue.fromHexString("0x100000"), BytesValue.of(1));
     trie.put(BytesValue.fromHexString("0x200000"), BytesValue.of(2));
     trie.put(BytesValue.fromHexString("0x300000"), BytesValue.of(3));
@@ -81,8 +80,7 @@ public class TrieNodeDecoderTest {
 
     // Build a small trie
     MerklePatriciaTrie<BytesValue, BytesValue> trie =
-        new StoredMerklePatriciaTrie<>(
-            storage::get, Function.identity(), Function.identity(), false);
+        new StoredMerklePatriciaTrie<>(storage::get, Function.identity(), Function.identity());
     trie.put(BytesValue.fromHexString("0x100000"), BytesValue.of(1));
     trie.put(BytesValue.fromHexString("0x200000"), BytesValue.of(2));
     trie.put(BytesValue.fromHexString("0x300000"), BytesValue.of(3));
@@ -155,8 +153,7 @@ public class TrieNodeDecoderTest {
 
     // Build a small trie
     MerklePatriciaTrie<BytesValue, BytesValue> trie =
-        new StoredMerklePatriciaTrie<>(
-            fullStorage::get, Function.identity(), Function.identity(), false);
+        new StoredMerklePatriciaTrie<>(fullStorage::get, Function.identity(), Function.identity());
     final Random random = new Random(1);
     for (int i = 0; i < 30; i++) {
       byte[] key = new byte[4];
@@ -198,8 +195,7 @@ public class TrieNodeDecoderTest {
     final InMemoryKeyValueStorage storage = new InMemoryKeyValueStorage();
 
     MerklePatriciaTrie<BytesValue, BytesValue> trie =
-        new StoredMerklePatriciaTrie<>(
-            storage::get, Function.identity(), Function.identity(), false);
+        new StoredMerklePatriciaTrie<>(storage::get, Function.identity(), Function.identity());
     trie.put(BytesValue.fromHexString("0x100000"), BytesValue.of(1));
 
     // Save nodes to storage

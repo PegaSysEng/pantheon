@@ -41,9 +41,7 @@ public class StoredMerklePatriciaTrieTest {
     valueSerializer =
         value -> (value != null) ? BytesValue.wrap(value.getBytes(Charset.forName("UTF-8"))) : null;
     valueDeserializer = bytes -> new String(bytes.getArrayUnsafe(), Charset.forName("UTF-8"));
-    trie =
-        new StoredMerklePatriciaTrie<>(
-            merkleStorage::get, valueSerializer, valueDeserializer, false);
+    trie = new StoredMerklePatriciaTrie<>(merkleStorage::get, valueSerializer, valueDeserializer);
   }
 
   @Test
@@ -380,7 +378,7 @@ public class StoredMerklePatriciaTrieTest {
     final KeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
     final MerkleStorage merkleStorage = new KeyValueMerkleStorage(keyValueStorage);
     final StoredMerklePatriciaTrie<BytesValue, BytesValue> trie =
-        new StoredMerklePatriciaTrie<>(merkleStorage::get, b -> b, b -> b, false);
+        new StoredMerklePatriciaTrie<>(merkleStorage::get, b -> b, b -> b);
 
     // Both of these can be inlined in its parent branch and the branch
     // itself can be inlined into its parent extension.
@@ -402,7 +400,7 @@ public class StoredMerklePatriciaTrieTest {
     final KeyValueStorage keyValueStorage = new InMemoryKeyValueStorage();
     final MerkleStorage merkleStorage = new KeyValueMerkleStorage(keyValueStorage);
     final StoredMerklePatriciaTrie<BytesValue, BytesValue> trie =
-        new StoredMerklePatriciaTrie<>(merkleStorage::get, b -> b, b -> b, false);
+        new StoredMerklePatriciaTrie<>(merkleStorage::get, b -> b, b -> b);
 
     // Both of these can be inlined in its parent branch.
     trie.put(BytesValue.fromHexString("0x0400"), BytesValue.of(1));

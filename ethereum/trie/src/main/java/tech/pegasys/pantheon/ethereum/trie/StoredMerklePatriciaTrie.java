@@ -41,13 +41,11 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
    * @param nodeLoader The {@link NodeLoader} to retrieve node data from.
    * @param valueSerializer A function for serializing values to bytes.
    * @param valueDeserializer A function for deserializing values from bytes.
-   * @param singleUseNodes whether nodes should unload data after being visited
    */
   public StoredMerklePatriciaTrie(
       final NodeLoader nodeLoader,
       final Function<V, BytesValue> valueSerializer,
-      final Function<BytesValue, V> valueDeserializer,
-      final boolean singleUseNodes) {
+      final Function<BytesValue, V> valueDeserializer) {
     this(nodeLoader, MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH, valueSerializer, valueDeserializer);
   }
 
