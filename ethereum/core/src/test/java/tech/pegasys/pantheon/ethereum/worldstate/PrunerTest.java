@@ -153,7 +153,7 @@ public class PrunerTest {
   }
 
   @Test
-  public void shouldThrowIllegalArgumentExceptionCorrectly() {
+  public void shouldRejectInvalidArguments() {
     final Blockchain mockchain = mock(Blockchain.class);
     assertThatThrownBy(
             () -> new Pruner(markSweepPruner, mockchain, mockExecutorServiceBuilder, -1, -2))
