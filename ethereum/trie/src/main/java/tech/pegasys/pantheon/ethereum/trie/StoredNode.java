@@ -108,6 +108,7 @@ class StoredNode<V> implements Node<V> {
     return loaded;
   }
 
+  @Override
   public void unload() {
     loaded = null;
   }
