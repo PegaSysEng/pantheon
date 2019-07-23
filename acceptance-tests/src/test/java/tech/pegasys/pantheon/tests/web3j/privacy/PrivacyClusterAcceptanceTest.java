@@ -14,17 +14,12 @@ package tech.pegasys.pantheon.tests.web3j.privacy;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.types.CreatePrivacyGroupRequest;
-import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyNet;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder.TransactionType;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-
-import java.util.List;
 
 import com.google.common.collect.Lists;
 import org.junit.After;
@@ -36,7 +31,6 @@ public class PrivacyClusterAcceptanceTest extends PrivacyAcceptanceTestBase {
 
   private EventEmitterHarness eventEmitterHarness;
   private PrivacyNet privacyNet;
-  private PrivacyGroup privacyGroup;
 
   @Before
   public void setUp() throws Exception {
@@ -46,24 +40,7 @@ public class PrivacyClusterAcceptanceTest extends PrivacyAcceptanceTestBase {
             .addMinerNode("Bob")
             .addMinerNode("Charlie")
             .build();
-
     privacyNet.startPrivacyNet();
-
-    Enclave enclave =
-        new Enclave(privacyNet.getNode("Alice").getPrivacyParameters().getEnclaveUri());
-    String[] addresses =
-        privacyNet.getNodes().values().stream()
-            .map(privacyNode -> privacyNode.orion.getPublicKeys())
-            .flatMap(List::stream)
-            .toArray(String[]::new);
-    this.privacyGroup =
-        enclave.createPrivacyGroup(
-            new CreatePrivacyGroupRequest(
-                addresses,
-                privacyNet.getNode("Alice").orion.getPublicKeys().get(0),
-                "testName",
-                "testDesc"));
-
     eventEmitterHarness =
         new EventEmitterHarness(
             privateTransactionBuilder,
@@ -129,12 +106,6 @@ public class PrivacyClusterAcceptanceTest extends PrivacyAcceptanceTestBase {
 
     eventEmitterHarness.deploy(secondContract, "Alice", "Bob");
     eventEmitterHarness.store(secondContract, "Bob", "Alice");
-  }
-
-  @Test
-  public void node1CanDeployWithPrivacyGroupId() {
-    eventEmitterHarness.deployWithPrivacyGroup(
-        CONTRACT_NAME, "Alice", privacyGroup.getPrivacyGroupId(), "Alice", "Bob", "Charlie");
   }
 
   @Test

@@ -71,8 +71,18 @@ public class EventEmitterHarness {
         receivers);
   }
 
-  public void deployWithPrivacyGroup(final String contractName, final String sender, String mPrivacyGroupId, final String... groupMembers) {
-    deployWithPrivacyGroup(contractName, "Test", nextNonce(sender, BytesValues.fromBase64(mPrivacyGroupId)), sender, mPrivacyGroupId, groupMembers);
+  public void deployWithPrivacyGroup(
+      final String contractName,
+      final String sender,
+      String mPrivacyGroupId,
+      final String... groupMembers) {
+    deployWithPrivacyGroup(
+        contractName,
+        "Test",
+        nextNonce(sender, BytesValues.fromBase64(mPrivacyGroupId)),
+        sender,
+        mPrivacyGroupId,
+        groupMembers);
   }
 
   public void deploy(
@@ -181,8 +191,7 @@ public class EventEmitterHarness {
       final long nonce,
       final String sender,
       final String privacyGroupId,
-      final String... groupMembers
-      ) {
+      final String... groupMembers) {
 
     final String deployContract =
         privateTransactionBuilder
@@ -203,7 +212,11 @@ public class EventEmitterHarness {
 
     System.out.println(Arrays.toString(groupMembers));
 
-    verifyForParticipants(privateTransactionVerifier.validPrivateTransactionReceipt(), transactionHash, sender, groupMembers);
+    verifyForParticipants(
+        privateTransactionVerifier.validPrivateTransactionReceipt(),
+        transactionHash,
+        sender,
+        groupMembers);
     //
     //    verifyForNonParticipants(forNonParticipants, transactionHash, sender, receivers);
 
