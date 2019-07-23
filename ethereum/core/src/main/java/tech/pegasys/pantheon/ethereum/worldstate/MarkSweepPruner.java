@@ -116,8 +116,7 @@ public class MarkSweepPruner {
         worldStateStorage::getAccountStateTrieNode,
         rootHash,
         Function.identity(),
-        Function.identity(),
-        true);
+        Function.identity());
   }
 
   private MerklePatriciaTrie<Bytes32, BytesValue> createStorageTrie(final Bytes32 rootHash) {
@@ -125,8 +124,7 @@ public class MarkSweepPruner {
         worldStateStorage::getAccountStorageTrieNode,
         rootHash,
         Function.identity(),
-        Function.identity(),
-        true);
+        Function.identity());
   }
 
   private void processAccountState(final BytesValue value) {

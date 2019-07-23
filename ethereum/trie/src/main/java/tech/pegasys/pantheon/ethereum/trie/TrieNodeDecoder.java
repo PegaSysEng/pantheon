@@ -30,8 +30,7 @@ import com.google.common.collect.Streams;
 
 public class TrieNodeDecoder {
   private static final StoredNodeFactory<BytesValue> emptyNodeFactory =
-      new StoredNodeFactory<>(
-          (h) -> Optional.empty(), Function.identity(), Function.identity(), false);
+      new StoredNodeFactory<>((h) -> Optional.empty(), Function.identity(), Function.identity());
 
   // Hide constructor for static utility class
   private TrieNodeDecoder() {}
@@ -117,7 +116,7 @@ public class TrieNodeDecoder {
     BreadthFirstIterator(final NodeLoader nodeLoader, final Bytes32 rootHash, final int maxDepth) {
       this.maxDepth = maxDepth;
       this.nodeFactory =
-          new StoredNodeFactory<>(nodeLoader, Function.identity(), Function.identity(), false);
+          new StoredNodeFactory<>(nodeLoader, Function.identity(), Function.identity());
 
       nodeLoader.getNode(rootHash).map(TrieNodeDecoder::decode).ifPresent(currentNodes::add);
     }

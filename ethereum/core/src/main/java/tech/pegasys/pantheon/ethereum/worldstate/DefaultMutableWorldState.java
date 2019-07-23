@@ -73,12 +73,12 @@ public class DefaultMutableWorldState implements MutableWorldState {
 
   private MerklePatriciaTrie<Bytes32, BytesValue> newAccountStateTrie(final Bytes32 rootHash) {
     return new StoredMerklePatriciaTrie<>(
-        worldStateStorage::getAccountStateTrieNode, rootHash, b -> b, b -> b, false);
+        worldStateStorage::getAccountStateTrieNode, rootHash, b -> b, b -> b);
   }
 
   private MerklePatriciaTrie<Bytes32, BytesValue> newAccountStorageTrie(final Bytes32 rootHash) {
     return new StoredMerklePatriciaTrie<>(
-        worldStateStorage::getAccountStorageTrieNode, rootHash, b -> b, b -> b, false);
+        worldStateStorage::getAccountStorageTrieNode, rootHash, b -> b, b -> b);
   }
 
   @Override

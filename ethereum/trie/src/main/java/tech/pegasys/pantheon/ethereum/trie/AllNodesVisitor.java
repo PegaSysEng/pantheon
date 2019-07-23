@@ -18,21 +18,21 @@ public class AllNodesVisitor<V> implements NodeVisitor<V> {
 
   private final Consumer<Node<V>> handler;
 
-  public AllNodesVisitor(final Consumer<Node<V>> handler) {
+  AllNodesVisitor(final Consumer<Node<V>> handler) {
     this.handler = handler;
   }
 
   @Override
   public void visit(final ExtensionNode<V> extensionNode) {
     handler.accept(extensionNode);
-    extensionNode.getChild().accept(this);
+    acceptAndUnload(extensionNode.getChild());
   }
 
   @Override
   public void visit(final BranchNode<V> branchNode) {
     handler.accept(branchNode);
     for (byte i = 0; i < BranchNode.RADIX; i++) {
-      branchNode.child(i).accept(this);
+      acceptAndUnload(branchNode.child(i));
     }
   }
 
@@ -43,4 +43,9 @@ public class AllNodesVisitor<V> implements NodeVisitor<V> {
 
   @Override
   public void visit(final NullNode<V> nullNode) {}
+
+  private void acceptAndUnload(final Node<V> storedNode) {
+    storedNode.accept(this);
+    storedNode.unload();
+  }
 }

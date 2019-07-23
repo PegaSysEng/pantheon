@@ -534,8 +534,7 @@ public class WorldStateDownloaderTest {
                 remoteStorage::getNodeData,
                 remoteWorldState.rootHash(),
                 Function.identity(),
-                Function.identity(),
-                true)
+                Function.identity())
             .entriesFrom(Bytes32.ZERO, 5).values().stream()
                 .map(RLP::input)
                 .map(StateTrieAccountValue::readFrom)

@@ -32,7 +32,6 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
   private final GetVisitor<V> getVisitor = new GetVisitor<>();
   private final RemoveVisitor<V> removeVisitor = new RemoveVisitor<>();
   private final StoredNodeFactory<V> nodeFactory;
-  private final boolean singleUseNodes;
 
   private Node<V> root;
 
@@ -49,12 +48,7 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
       final Function<V, BytesValue> valueSerializer,
       final Function<BytesValue, V> valueDeserializer,
       final boolean singleUseNodes) {
-    this(
-        nodeLoader,
-        MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH,
-        valueSerializer,
-        valueDeserializer,
-        singleUseNodes);
+    this(nodeLoader, MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH, valueSerializer, valueDeserializer);
   }
 
   /**
@@ -65,21 +59,17 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
    *     storage}.
    * @param valueSerializer A function for serializing values to bytes.
    * @param valueDeserializer A function for deserializing values from bytes.
-   * @param singleUseNodes whether nodes should unload data after being visited
    */
   public StoredMerklePatriciaTrie(
       final NodeLoader nodeLoader,
       final Bytes32 rootHash,
       final Function<V, BytesValue> valueSerializer,
-      final Function<BytesValue, V> valueDeserializer,
-      final boolean singleUseNodes) {
-    this.singleUseNodes = singleUseNodes;
-    this.nodeFactory =
-        new StoredNodeFactory<>(nodeLoader, valueSerializer, valueDeserializer, singleUseNodes);
+      final Function<BytesValue, V> valueDeserializer) {
+    this.nodeFactory = new StoredNodeFactory<>(nodeLoader, valueSerializer, valueDeserializer);
     this.root =
         rootHash.equals(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH)
             ? NullNode.instance()
-            : new StoredNode<>(nodeFactory, rootHash, singleUseNodes);
+            : new StoredNode<>(nodeFactory, rootHash);
   }
 
   @Override
@@ -114,7 +104,7 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
     this.root =
         rootHash.equals(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH)
             ? NullNode.instance()
-            : new StoredNode<>(nodeFactory, rootHash, singleUseNodes);
+            : new StoredNode<>(nodeFactory, rootHash);
   }
 
   @Override

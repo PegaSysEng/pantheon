@@ -33,17 +33,14 @@ class StoredNodeFactory<V> implements NodeFactory<V> {
   private final NodeLoader nodeLoader;
   private final Function<V, BytesValue> valueSerializer;
   private final Function<BytesValue, V> valueDeserializer;
-  private final boolean singleUseNodes;
 
   StoredNodeFactory(
       final NodeLoader nodeLoader,
       final Function<V, BytesValue> valueSerializer,
-      final Function<BytesValue, V> valueDeserializer,
-      final boolean singleUseNodes) {
+      final Function<BytesValue, V> valueDeserializer) {
     this.nodeLoader = nodeLoader;
     this.valueSerializer = valueSerializer;
     this.valueDeserializer = valueDeserializer;
-    this.singleUseNodes = singleUseNodes;
   }
 
   @Override
@@ -159,7 +156,7 @@ class StoredNodeFactory<V> implements NodeFactory<V> {
       return new ExtensionNode<>(path, childNode, this);
     } else {
       final Bytes32 childHash = childRlp.readBytes32();
-      final StoredNode<V> childNode = new StoredNode<>(this, childHash, singleUseNodes);
+      final StoredNode<V> childNode = new StoredNode<>(this, childHash);
       return new ExtensionNode<>(path, childNode, this);
     }
   }
@@ -176,7 +173,7 @@ class StoredNodeFactory<V> implements NodeFactory<V> {
         children.add(child);
       } else {
         final Bytes32 childHash = nodeRLPs.readBytes32();
-        children.add(new StoredNode<>(this, childHash, singleUseNodes));
+        children.add(new StoredNode<>(this, childHash));
       }
     }
 
