@@ -331,7 +331,11 @@ public class JsonRpcMethodsFactory {
           new EeaSendRawTransaction(
               blockchainQueries, privateTransactionHandler, transactionPool, parameter),
           new EeaGetTransactionCount(parameter, privateTransactionHandler),
-          new EeaGetPrivateTransaction(enclave, parameter, privacyParameters),
+          new EeaGetPrivateTransaction(enclave, parameter, privacyParameters));
+    }
+    if (rpcApis.contains(RpcApis.PRIV)) {
+      addMethods(
+          enabledMethods,
           new PrivCreatePrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
           new PrivDeletePrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
           new PrivFindPrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
