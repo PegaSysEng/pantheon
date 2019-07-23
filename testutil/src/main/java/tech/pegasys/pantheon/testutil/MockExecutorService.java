@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.testutil;
 
+import static org.mockito.Mockito.spy;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,8 +26,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-
-import org.mockito.Mockito;
 
 public class MockExecutorService implements ExecutorService {
 
@@ -146,7 +146,7 @@ public class MockExecutorService implements ExecutorService {
     private boolean isPending = true;
 
     private ExecutorTask(final Callable<T> taskRunner) {
-      this.future = Mockito.spy(new CompletableFuture<>());
+      this.future = spy(new CompletableFuture<>());
       this.taskRunner = taskRunner;
     }
 
