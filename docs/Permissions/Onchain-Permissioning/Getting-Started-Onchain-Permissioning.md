@@ -3,8 +3,8 @@ description: Setting up and using onchain Permissioning
 
 # Getting Started with Onchain Permissioning 
  
-The following steps describe bootstrapping a permissioned network using a Pantheon node and a development server
-for the Permissioning Mangament Dapp both run locally. 
+The following steps describe bootstrapping a local permissioned network using a Pantheon node and a 
+development server to run the Permissioning Management Dapp. 
 
 To start a network with onchain permissioning: 
 
@@ -197,4 +197,4 @@ row of the account to be removed. A trash can is displayed.
 
 ## Update Admins 
 
-Admins accounts are added or removed in the same way as accounts except on the _Admin Accounts_ tab.  
+Admins are added or removed in the same way as accounts except in the _Admin Accounts_ tab.  

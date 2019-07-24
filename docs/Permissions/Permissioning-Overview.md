@@ -16,10 +16,10 @@ A permissioned network allows only specified nodes and accounts to participate b
 
 ## Local 
 
-[Local permissioning](Local-Permissioning.md) are specified at the node level. Each node in the network has a [permissions configuration file](Local-Permissioning.md#permissions-configuration-file).
+[Local permissioning](Local-Permissioning.md) is specified at the node level. Each node in the network has a [permissions configuration file](Local-Permissioning.md#permissions-configuration-file).
 Updates to local permissioning must be made to the configuration file for each node. 
 
 ## Onchain 
 
 [Onchain permissioning](Onchain-Permissioning/Onchain-Permissioning.md) is specified in a smart contract on the network. Specifying permissioning onchain
-enables all nodes to read and update permissioning in one location. 
+enables all nodes to read and update permissioning configuration from one location. 

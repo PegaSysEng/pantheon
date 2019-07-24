@@ -3,14 +3,14 @@ description: Onchain Permissioning
 
 # Onchain Permissioning 
 
-Onchain permissioning uses smart contracts to store and maintain the node, account, and admin account whitelists. 
-Using onchain permissioning enables all nodes to read the whitelists from one source.                                        
+Onchain permissioning uses smart contracts to store and maintain the node, account, and admin whitelists. 
+Using onchain permissioning enables all nodes to read the whitelists from a single source, the blockchain.                                        
 
 ## Permissioning Contracts
 
 The permissioning smart contracts are provided in the [PegaSysEng/permissioning-smart-contracts](https://github.com/PegaSysEng/permissioning-smart-contracts) repository: 
 
-* Ingress contracts for nodes and accounts - proxy contracts that defer the permissioning logic to the 
+* Ingress contracts for nodes and accounts - proxy contracts defined in the genesis file that defer the permissioning logic to the 
 Node Rules and Account Rules contracts. The Ingress contracts are deployed to static addresses. 
 
 * Node Rules - stores the node whitelist and node whitelist operations (for example, add and remove). 
