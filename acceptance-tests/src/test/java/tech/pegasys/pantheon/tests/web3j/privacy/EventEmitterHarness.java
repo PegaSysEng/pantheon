@@ -210,15 +210,11 @@ public class EventEmitterHarness {
 
     waitForTransactionToBeMined(transactionHash);
 
-    System.out.println(Arrays.toString(groupMembers));
-
     verifyForParticipants(
         privateTransactionVerifier.validPrivateTransactionReceipt(),
         transactionHash,
         sender,
         groupMembers);
-    //
-    //    verifyForNonParticipants(forNonParticipants, transactionHash, sender, receivers);
 
     contracts.put(contractName, contractAddress);
   }

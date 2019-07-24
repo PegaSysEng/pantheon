@@ -27,11 +27,10 @@ public class PrivacyGroupIdAcceptanceTest extends PrivacyAcceptanceTestBase {
   private static final String CONTRACT_NAME = "Event Emmiter";
   private EventEmitterHarness eventEmitterHarness;
   private PrivacyGroup privacyGroup;
-  private PrivacyNet privacyNet;
 
   @Before
   public void setUp() throws Exception {
-    privacyNet =
+    PrivacyNet privacyNet =
         PrivacyNet.builder(privacy, privacyPantheon, cluster, false)
             .addMinerNode("Alice")
             .addMinerNode("Bob")
