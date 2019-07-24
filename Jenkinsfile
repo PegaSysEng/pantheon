@@ -16,7 +16,7 @@ if (env.BRANCH_NAME == "master") {
     properties([
         buildDiscarder(
             logRotator(
-                numToKeepStr: '10', artifactNumToKeepStr: '3'
+                numToKeepStr: '10'
             )
         )
     ])
