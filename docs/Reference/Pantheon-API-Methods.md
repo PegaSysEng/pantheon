@@ -3773,8 +3773,8 @@ None
 
 ### eea_getPrivateTransaction
 
-Returns the private transaction if you are a participant; otherwise, null. Get the public transaction 
-using [`eth_getTransactionByHash`](#eth_gettransactionbyhash) with the transaction hash returned by 
+Returns the private transaction if you are a participant; otherwise, null. To get the public transaction, 
+use [`eth_getTransactionByHash`](#eth_gettransactionbyhash) with the transaction hash returned by 
 [`eea_sendRawTransaction`](#eea_sendrawtransaction) or [`eea_sendTransction`](https://docs.ethsigner.pegasys.tech/en/latest/Using-EthSigner/Using-EthSigner/#eea_sendtransaction). 
 
 **Parameters** 
