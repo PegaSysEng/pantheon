@@ -32,7 +32,7 @@ public class MockPacketDataFactory {
     final Packet packet = mock(Packet.class);
 
     final NeighborsPacketData packetData =
-        NeighborsPacketData.create(Arrays.asList(neighbors), TestClock.fixedNow());
+        NeighborsPacketData.create(Arrays.asList(neighbors), TestClock.fixed());
 
     when(packet.getPacketData(any())).thenReturn(Optional.of(packetData));
     final BytesValue id = from.getId();
@@ -47,7 +47,7 @@ public class MockPacketDataFactory {
     final Packet packet = mock(Packet.class);
 
     final PongPacketData pongPacketData =
-        PongPacketData.create(from.getEndpoint(), pingHash, TestClock.fixedNow());
+        PongPacketData.create(from.getEndpoint(), pingHash, TestClock.fixed());
     when(packet.getPacketData(any())).thenReturn(Optional.of(pongPacketData));
     final BytesValue id = from.getId();
     when(packet.getNodeId()).thenReturn(id);
@@ -64,7 +64,7 @@ public class MockPacketDataFactory {
             "0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f40");
 
     final FindNeighborsPacketData packetData =
-        FindNeighborsPacketData.create(target, TestClock.fixedNow());
+        FindNeighborsPacketData.create(target, TestClock.fixed());
     when(packet.getPacketData(any())).thenReturn(Optional.of(packetData));
     final BytesValue id = from.getId();
     when(packet.getNodeId()).thenReturn(id);

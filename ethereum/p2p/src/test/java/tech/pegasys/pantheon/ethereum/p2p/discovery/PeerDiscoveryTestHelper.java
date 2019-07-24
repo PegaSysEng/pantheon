@@ -83,7 +83,7 @@ public class PeerDiscoveryTestHelper {
         PingPacketData.create(
             fromAgent.getAdvertisedPeer().get().getEndpoint(),
             toAgent.getAdvertisedPeer().get().getEndpoint(),
-            TestClock.fixedNow()),
+            TestClock.fixed()),
         fromAgent.getKeyPair());
   }
 
@@ -125,7 +125,7 @@ public class PeerDiscoveryTestHelper {
    * @return a list of discovery agents.
    */
   public MockPeerDiscoveryAgent startDiscoveryAgent(final List<DiscoveryPeer> bootstrapPeers) {
-    return startDiscoveryAgent(bootstrapPeers, TestClock.fixedNow());
+    return startDiscoveryAgent(bootstrapPeers, TestClock.fixed());
   }
 
   /**
@@ -203,7 +203,7 @@ public class PeerDiscoveryTestHelper {
     private List<EnodeURL> bootnodes = Collections.emptyList();
     private boolean active = true;
     private PeerPermissions peerPermissions = PeerPermissions.noop();
-    private Clock clock = TestClock.fixedNow();
+    private Clock clock = TestClock.fixed();
 
     private AgentBuilder(
         final Map<BytesValue, MockPeerDiscoveryAgent> agents,

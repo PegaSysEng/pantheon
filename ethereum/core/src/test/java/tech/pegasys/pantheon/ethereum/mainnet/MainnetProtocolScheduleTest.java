@@ -26,7 +26,7 @@ public class MainnetProtocolScheduleTest {
 
   @Test
   public void shouldReturnDefaultProtocolSpecsWhenCustomNumbersAreNotUsed() {
-    final ProtocolSchedule<Void> sched = MainnetProtocolSchedule.create(TestClock.fixedNow());
+    final ProtocolSchedule<Void> sched = MainnetProtocolSchedule.create(TestClock.fixed());
     Assertions.assertThat(sched.getByBlockNumber(1L).getName()).isEqualTo("Frontier");
     Assertions.assertThat(sched.getByBlockNumber(1_150_000L).getName()).isEqualTo("Homestead");
     Assertions.assertThat(sched.getByBlockNumber(1_920_000L).getName())
@@ -51,7 +51,7 @@ public class MainnetProtocolScheduleTest {
     final JsonObject json = new JsonObject("{}");
     final ProtocolSchedule<Void> sched =
         MainnetProtocolSchedule.fromConfig(
-            GenesisConfigFile.fromConfig(json).getConfigOptions(), TestClock.fixedNow());
+            GenesisConfigFile.fromConfig(json).getConfigOptions(), TestClock.fixed());
     Assertions.assertThat(sched.getByBlockNumber(1L).getName()).isEqualTo("Frontier");
     Assertions.assertThat(sched.getByBlockNumber(Long.MAX_VALUE).getName()).isEqualTo("Frontier");
   }
@@ -63,7 +63,7 @@ public class MainnetProtocolScheduleTest {
             "{\"config\": {\"homesteadBlock\": 2, \"daoForkBlock\": 3, \"eip150Block\": 14, \"eip158Block\": 15, \"byzantiumBlock\": 16, \"constantinopleBlock\": 18, \"constantinopleFixBlock\": 19, \"chainId\":1234}}");
     final ProtocolSchedule<Void> sched =
         MainnetProtocolSchedule.fromConfig(
-            GenesisConfigFile.fromConfig(json).getConfigOptions(), TestClock.fixedNow());
+            GenesisConfigFile.fromConfig(json).getConfigOptions(), TestClock.fixed());
     Assertions.assertThat(sched.getByBlockNumber(1).getName()).isEqualTo("Frontier");
     Assertions.assertThat(sched.getByBlockNumber(2).getName()).isEqualTo("Homestead");
     Assertions.assertThat(sched.getByBlockNumber(3).getName()).isEqualTo("DaoRecoveryInit");
@@ -87,7 +87,7 @@ public class MainnetProtocolScheduleTest {
         .isThrownBy(
             () ->
                 MainnetProtocolSchedule.fromConfig(
-                    GenesisConfigFile.fromConfig(json).getConfigOptions(), TestClock.fixedNow()));
+                    GenesisConfigFile.fromConfig(json).getConfigOptions(), TestClock.fixed()));
   }
 
   @Test
@@ -98,7 +98,7 @@ public class MainnetProtocolScheduleTest {
                     Resources.toString(
                         this.getClass().getResource("/ropsten.json"), StandardCharsets.UTF_8))
                 .getConfigOptions(),
-            TestClock.fixedNow());
+            TestClock.fixed());
     Assertions.assertThat(sched.getByBlockNumber(0).getName()).isEqualTo("TangerineWhistle");
     Assertions.assertThat(sched.getByBlockNumber(1).getName()).isEqualTo("TangerineWhistle");
     Assertions.assertThat(sched.getByBlockNumber(10).getName()).isEqualTo("SpuriousDragon");

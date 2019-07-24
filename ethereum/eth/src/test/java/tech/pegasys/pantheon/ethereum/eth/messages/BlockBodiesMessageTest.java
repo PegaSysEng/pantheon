@@ -67,9 +67,7 @@ public final class BlockBodiesMessageTest {
         message
             .bodies(
                 FixedDifficultyProtocolSchedule.create(
-                    GenesisConfigFile.development().getConfigOptions(),
-                    false,
-                    TestClock.fixedNow()))
+                    GenesisConfigFile.development().getConfigOptions(), false, TestClock.fixed()))
             .iterator();
     for (int i = 0; i < 50; ++i) {
       Assertions.assertThat(readBodies.next()).isEqualTo(bodies.get(i));

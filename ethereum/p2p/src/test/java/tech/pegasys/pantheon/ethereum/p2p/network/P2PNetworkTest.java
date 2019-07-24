@@ -327,7 +327,7 @@ public class P2PNetworkTest {
         .config(config)
         .keyPair(KeyPair.generate())
         .metricsSystem(new NoOpMetricsSystem())
-        .clock(TestClock.fixedNow())
+        .clock(TestClock.fixed())
         .supportedCapabilities(Arrays.asList(Capability.create("eth", 63)));
   }
 }

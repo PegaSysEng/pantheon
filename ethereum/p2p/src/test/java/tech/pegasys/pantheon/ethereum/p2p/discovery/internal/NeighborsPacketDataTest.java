@@ -30,11 +30,11 @@ public class NeighborsPacketDataTest {
 
   @Test
   public void serializeDeserialize() {
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
     final List<DiscoveryPeer> peers =
         Arrays.asList(DiscoveryPeer.fromEnode(enode()), DiscoveryPeer.fromEnode(enode()));
 
-    final NeighborsPacketData packet = NeighborsPacketData.create(peers, TestClock.fixedNow());
+    final NeighborsPacketData packet = NeighborsPacketData.create(peers, TestClock.fixed());
     final BytesValue serialized = RLP.encode(packet::writeTo);
     final NeighborsPacketData deserialized = NeighborsPacketData.readFrom(RLP.input(serialized));
 
@@ -44,7 +44,7 @@ public class NeighborsPacketDataTest {
 
   @Test
   public void readFrom() {
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
     final List<DiscoveryPeer> peers =
         Arrays.asList(DiscoveryPeer.fromEnode(enode()), DiscoveryPeer.fromEnode(enode()));
 
@@ -62,7 +62,7 @@ public class NeighborsPacketDataTest {
 
   @Test
   public void readFrom_extraFields() {
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
     final List<DiscoveryPeer> peers =
         Arrays.asList(DiscoveryPeer.fromEnode(enode()), DiscoveryPeer.fromEnode(enode()));
 

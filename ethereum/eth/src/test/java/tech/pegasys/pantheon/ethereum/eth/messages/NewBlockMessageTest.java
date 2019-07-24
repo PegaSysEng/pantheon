@@ -29,7 +29,7 @@ import org.junit.Test;
 
 public class NewBlockMessageTest {
   private static final ProtocolSchedule<Void> protocolSchedule =
-      MainnetProtocolSchedule.create(TestClock.fixedNow());
+      MainnetProtocolSchedule.create(TestClock.fixed());
 
   @Test
   public void roundTripNewBlockMessage() {

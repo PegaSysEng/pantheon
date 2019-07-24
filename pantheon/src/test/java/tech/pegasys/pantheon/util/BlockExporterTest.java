@@ -64,7 +64,7 @@ public final class BlockExporterTest {
             .metricsSystem(new NoOpMetricsSystem())
             .privacyParameters(PrivacyParameters.DEFAULT)
             .dataDirectory(dataDir)
-            .clock(TestClock.fixedNow())
+            .clock(TestClock.fixed())
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
             .build();
     blockImporter.importBlockchain(source, targetController);

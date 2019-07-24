@@ -70,8 +70,7 @@ public class OperatorSubCommandTest extends CommandTestAbstract {
 
   @Before
   public void init() throws IOException {
-    tmpOutputDirectoryPath =
-        createTempDirectory(format("output-%d", TestClock.fixedNow().millis()));
+    tmpOutputDirectoryPath = createTempDirectory(format("output-%d", TestClock.fixed().millis()));
   }
 
   @Test

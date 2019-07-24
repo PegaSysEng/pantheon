@@ -56,7 +56,7 @@ public class DaoForkPeerValidatorTest {
     PeerValidator validator =
         new DaoForkPeerValidator(
             ethProtocolManager.ethContext(),
-            MainnetProtocolSchedule.create(TestClock.fixedNow()),
+            MainnetProtocolSchedule.create(TestClock.fixed()),
             new NoOpMetricsSystem(),
             daoBlockNumber,
             0);
@@ -88,7 +88,7 @@ public class DaoForkPeerValidatorTest {
     PeerValidator validator =
         new DaoForkPeerValidator(
             ethProtocolManager.ethContext(),
-            MainnetProtocolSchedule.create(TestClock.fixedNow()),
+            MainnetProtocolSchedule.create(TestClock.fixed()),
             new NoOpMetricsSystem(),
             daoBlockNumber,
             0);
@@ -116,7 +116,7 @@ public class DaoForkPeerValidatorTest {
     PeerValidator validator =
         new DaoForkPeerValidator(
             ethProtocolManager.ethContext(),
-            MainnetProtocolSchedule.create(TestClock.fixedNow()),
+            MainnetProtocolSchedule.create(TestClock.fixed()),
             new NoOpMetricsSystem(),
             daoBlockNumber,
             0);
@@ -145,7 +145,7 @@ public class DaoForkPeerValidatorTest {
     PeerValidator validator =
         new DaoForkPeerValidator(
             ethProtocolManager.ethContext(),
-            MainnetProtocolSchedule.create(TestClock.fixedNow()),
+            MainnetProtocolSchedule.create(TestClock.fixed()),
             new NoOpMetricsSystem(),
             daoBlockNumber,
             0);
@@ -184,7 +184,7 @@ public class DaoForkPeerValidatorTest {
     PeerValidator validator =
         new DaoForkPeerValidator(
             ethProtocolManager.ethContext(),
-            MainnetProtocolSchedule.create(TestClock.fixedNow()),
+            MainnetProtocolSchedule.create(TestClock.fixed()),
             new NoOpMetricsSystem(),
             daoBlockNumber,
             buffer);

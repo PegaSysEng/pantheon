@@ -25,11 +25,11 @@ import org.junit.Test;
 public class FindNeighborsPacketDataTest {
   @Test
   public void serializeDeserialize() {
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
     final BytesValue target = Peer.randomId();
 
     final FindNeighborsPacketData packet =
-        FindNeighborsPacketData.create(target, TestClock.fixedNow());
+        FindNeighborsPacketData.create(target, TestClock.fixed());
     final BytesValue serialized = RLP.encode(packet::writeTo);
     final FindNeighborsPacketData deserialized =
         FindNeighborsPacketData.readFrom(RLP.input(serialized));
@@ -40,7 +40,7 @@ public class FindNeighborsPacketDataTest {
 
   @Test
   public void readFrom() {
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
     final BytesValue target = Peer.randomId();
 
     BytesValueRLPOutput out = new BytesValueRLPOutput();
@@ -58,7 +58,7 @@ public class FindNeighborsPacketDataTest {
 
   @Test
   public void readFrom_withExtraFields() {
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
     final BytesValue target = Peer.randomId();
 
     BytesValueRLPOutput out = new BytesValueRLPOutput();

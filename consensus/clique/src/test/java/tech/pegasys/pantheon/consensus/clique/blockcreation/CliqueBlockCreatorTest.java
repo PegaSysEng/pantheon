@@ -79,7 +79,7 @@ public class CliqueBlockCreatorTest {
             GenesisConfigFile.DEFAULT.getConfigOptions(),
             proposerKeyPair,
             false,
-            TestClock.fixedNow());
+            TestClock.fixed());
 
     final Address otherAddress = Util.publicKeyToAddress(otherKeyPair.getPublicKey());
     validatorList.add(otherAddress);

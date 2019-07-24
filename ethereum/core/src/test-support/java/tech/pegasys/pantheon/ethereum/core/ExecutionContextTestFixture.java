@@ -64,7 +64,7 @@ public class ExecutionContextTestFixture {
   }
 
   public static ExecutionContextTestFixture create() {
-    return new Builder().clock(TestClock.fixedNow()).build();
+    return new Builder().clock(TestClock.fixed()).build();
   }
 
   public static Builder builder() {

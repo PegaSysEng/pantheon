@@ -972,7 +972,7 @@ public class RlpxAgentTest {
         .peerPrivileges(peerPrivileges)
         .localNode(localNode)
         .metricsSystem(metrics)
-        .clock(TestClock.fixedNow())
+        .clock(TestClock.fixed())
         .connectionInitializer(connectionInitializer)
         .connectionEvents(peerConnectionEvents)
         .build();

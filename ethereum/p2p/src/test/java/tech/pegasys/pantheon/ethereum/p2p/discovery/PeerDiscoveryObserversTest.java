@@ -103,7 +103,7 @@ public class PeerDiscoveryObserversTest {
 
     // Create a discovery agent (which we'll assert on), using the above two peers as bootstrap
     // peers.
-    final MockPeerDiscoveryAgent agent = helper.createDiscoveryAgent(peers2, TestClock.fixedNow());
+    final MockPeerDiscoveryAgent agent = helper.createDiscoveryAgent(peers2, TestClock.fixed());
     // A queue for storing peer bonded events.
     final List<PeerBondedEvent> events = new ArrayList<>(10);
     agent.observePeerBondedEvents(events::add);

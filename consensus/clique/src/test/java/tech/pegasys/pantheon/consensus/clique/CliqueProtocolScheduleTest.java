@@ -42,7 +42,7 @@ public class CliqueProtocolScheduleTest {
 
     final GenesisConfigOptions config = GenesisConfigFile.fromConfig(jsonInput).getConfigOptions();
     final ProtocolSchedule<CliqueContext> protocolSchedule =
-        CliqueProtocolSchedule.create(config, NODE_KEYS, false, TestClock.fixedNow());
+        CliqueProtocolSchedule.create(config, NODE_KEYS, false, TestClock.fixed());
 
     final ProtocolSpec<CliqueContext> homesteadSpec = protocolSchedule.getByBlockNumber(1);
     final ProtocolSpec<CliqueContext> tangerineWhistleSpec = protocolSchedule.getByBlockNumber(2);
@@ -58,10 +58,7 @@ public class CliqueProtocolScheduleTest {
   public void parametersAlignWithMainnetWithAdjustments() {
     final ProtocolSpec<CliqueContext> homestead =
         CliqueProtocolSchedule.create(
-                GenesisConfigFile.DEFAULT.getConfigOptions(),
-                NODE_KEYS,
-                false,
-                TestClock.fixedNow())
+                GenesisConfigFile.DEFAULT.getConfigOptions(), NODE_KEYS, false, TestClock.fixed())
             .getByBlockNumber(0);
 
     assertThat(homestead.getName()).isEqualTo("Frontier");

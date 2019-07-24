@@ -30,7 +30,7 @@ public final class MainnetBlockHeaderValidatorTest {
   public void validHeaderFrontier() throws Exception {
     final BlockHeaderValidator<Void> headerValidator =
         MainnetBlockHeaderValidator.create(
-            MainnetDifficultyCalculators.FRONTIER, TestClock.fixedNow());
+            MainnetDifficultyCalculators.FRONTIER, TestClock.fixed());
     assertThat(
             headerValidator.validateHeader(
                 ValidationTestUtils.readHeader(300006),
@@ -44,7 +44,7 @@ public final class MainnetBlockHeaderValidatorTest {
   public void validHeaderHomestead() throws Exception {
     final BlockHeaderValidator<Void> headerValidator =
         MainnetBlockHeaderValidator.create(
-            MainnetDifficultyCalculators.HOMESTEAD, TestClock.fixedNow());
+            MainnetDifficultyCalculators.HOMESTEAD, TestClock.fixed());
     assertThat(
             headerValidator.validateHeader(
                 ValidationTestUtils.readHeader(1200001),
@@ -58,7 +58,7 @@ public final class MainnetBlockHeaderValidatorTest {
   public void invalidParentHash() throws Exception {
     final BlockHeaderValidator<Void> headerValidator =
         MainnetBlockHeaderValidator.create(
-            MainnetDifficultyCalculators.HOMESTEAD, TestClock.fixedNow());
+            MainnetDifficultyCalculators.HOMESTEAD, TestClock.fixed());
     assertThat(
             headerValidator.validateHeader(
                 ValidationTestUtils.readHeader(1200001),
@@ -72,7 +72,7 @@ public final class MainnetBlockHeaderValidatorTest {
   public void validHeaderByzantium() throws Exception {
     final BlockHeaderValidator<Void> headerValidator =
         MainnetBlockHeaderValidator.create(
-            MainnetDifficultyCalculators.BYZANTIUM, TestClock.fixedNow());
+            MainnetDifficultyCalculators.BYZANTIUM, TestClock.fixed());
     assertThat(
             headerValidator.validateHeader(
                 ValidationTestUtils.readHeader(4400001),

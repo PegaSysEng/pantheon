@@ -59,7 +59,7 @@ public final class BlockHeadersMessageTest {
     final List<BlockHeader> readHeaders =
         message.getHeaders(
             FixedDifficultyProtocolSchedule.create(
-                GenesisConfigFile.development().getConfigOptions(), false, TestClock.fixedNow()));
+                GenesisConfigFile.development().getConfigOptions(), false, TestClock.fixed()));
 
     for (int i = 0; i < 50; ++i) {
       Assertions.assertThat(readHeaders.get(i)).isEqualTo(headers.get(i));

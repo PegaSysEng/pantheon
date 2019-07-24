@@ -28,11 +28,11 @@ public class PingPacketDataTest {
 
   @Test
   public void serializeDeserialize() {
-    final long currentTime = TestClock.fixedNow().millis();
+    final long currentTime = TestClock.fixed().millis();
 
     final Endpoint from = new Endpoint("127.0.0.1", 30303, OptionalInt.of(30303));
     final Endpoint to = new Endpoint("127.0.0.2", 30303, OptionalInt.empty());
-    final PingPacketData packet = PingPacketData.create(from, to, TestClock.fixedNow());
+    final PingPacketData packet = PingPacketData.create(from, to, TestClock.fixed());
     final BytesValue serialized = RLP.encode(packet::writeTo);
     final PingPacketData deserialized = PingPacketData.readFrom(RLP.input(serialized));
 
@@ -46,7 +46,7 @@ public class PingPacketDataTest {
     final int version = 4;
     final Endpoint from = new Endpoint("127.0.0.1", 30303, OptionalInt.of(30303));
     final Endpoint to = new Endpoint("127.0.0.2", 30303, OptionalInt.empty());
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
 
     final BytesValueRLPOutput out = new BytesValueRLPOutput();
     out.startList();
@@ -69,7 +69,7 @@ public class PingPacketDataTest {
     final int version = 4;
     final Endpoint from = new Endpoint("127.0.0.1", 30303, OptionalInt.of(30303));
     final Endpoint to = new Endpoint("127.0.0.2", 30303, OptionalInt.empty());
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
 
     final BytesValueRLPOutput out = new BytesValueRLPOutput();
     out.startList();
@@ -94,7 +94,7 @@ public class PingPacketDataTest {
     final int version = 99;
     final Endpoint from = new Endpoint("127.0.0.1", 30303, OptionalInt.of(30303));
     final Endpoint to = new Endpoint("127.0.0.2", 30303, OptionalInt.empty());
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
 
     final BytesValueRLPOutput out = new BytesValueRLPOutput();
     out.startList();

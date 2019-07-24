@@ -128,7 +128,7 @@ public class JsonRpcHttpServiceLoginTest {
                     peerDiscoveryMock,
                     blockchainQueries,
                     synchronizer,
-                    MainnetProtocolSchedule.fromConfig(genesisConfigOptions, TestClock.fixedNow()),
+                    MainnetProtocolSchedule.fromConfig(genesisConfigOptions, TestClock.fixed()),
                     mock(FilterManager.class),
                     mock(TransactionPool.class),
                     mock(EthHashMiningCoordinator.class),

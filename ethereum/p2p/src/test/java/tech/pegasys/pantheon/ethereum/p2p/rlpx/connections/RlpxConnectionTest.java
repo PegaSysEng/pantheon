@@ -34,7 +34,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
 
     assertThat(conn.getPeer()).isEqualTo(peer);
   }
@@ -44,7 +44,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
     future.complete(peerConnection(peer));
 
     assertThat(conn.getPeer()).isEqualTo(peer);
@@ -55,7 +55,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final PeerConnection peerConnection = peerConnection(peer);
     final RlpxConnection conn =
-        RlpxConnection.inboundConnection(peerConnection, TestClock.fixedNow().millis());
+        RlpxConnection.inboundConnection(peerConnection, TestClock.fixed().millis());
 
     assertThat(conn.getPeer()).isEqualTo(peer);
   }
@@ -65,7 +65,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
 
     final DisconnectReason reason = DisconnectReason.REQUESTED;
     conn.disconnect(reason);
@@ -85,7 +85,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
     final PeerConnection peerConnection = peerConnection(peer);
     future.complete(peerConnection);
 
@@ -102,7 +102,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
     future.completeExceptionally(new IllegalStateException("whoops"));
 
     assertThat(conn.isFailedOrDisconnected()).isTrue();
@@ -116,7 +116,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final PeerConnection peerConnection = peerConnection(peer);
     final RlpxConnection conn =
-        RlpxConnection.inboundConnection(peerConnection, TestClock.fixedNow().millis());
+        RlpxConnection.inboundConnection(peerConnection, TestClock.fixed().millis());
 
     assertThat(conn.isFailedOrDisconnected()).isFalse();
     final DisconnectReason reason = DisconnectReason.REQUESTED;
@@ -132,7 +132,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
 
     assertThatThrownBy(conn::getPeerConnection)
         .isInstanceOf(ConnectionNotEstablishedException.class);
@@ -143,7 +143,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
     final PeerConnection peerConnection = peerConnection(peer);
     future.complete(peerConnection);
 
@@ -155,7 +155,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
     future.completeExceptionally(new IllegalStateException("whoops"));
 
     assertThatThrownBy(conn::getPeerConnection)
@@ -167,7 +167,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
     final PeerConnection peerConnection = peerConnection(peer);
     future.complete(peerConnection);
     conn.disconnect(DisconnectReason.REQUESTED);
@@ -180,7 +180,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final PeerConnection peerConnection = peerConnection(peer);
     final RlpxConnection conn =
-        RlpxConnection.inboundConnection(peerConnection, TestClock.fixedNow().millis());
+        RlpxConnection.inboundConnection(peerConnection, TestClock.fixed().millis());
 
     assertThat(conn.getPeerConnection()).isEqualTo(peerConnection);
   }
@@ -190,7 +190,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final PeerConnection peerConnection = peerConnection(peer);
     final RlpxConnection conn =
-        RlpxConnection.inboundConnection(peerConnection, TestClock.fixedNow().millis());
+        RlpxConnection.inboundConnection(peerConnection, TestClock.fixed().millis());
     conn.disconnect(DisconnectReason.REQUESTED);
 
     assertThat(conn.getPeerConnection()).isEqualTo(peerConnection);
@@ -201,7 +201,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
 
     assertThat(conn.initiatedRemotely()).isFalse();
     assertThat(conn.isActive()).isFalse();
@@ -214,7 +214,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
     final PeerConnection peerConnection = peerConnection(peer);
     future.complete(peerConnection);
 
@@ -229,7 +229,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
     future.completeExceptionally(new IllegalStateException("whoops"));
 
     assertThat(conn.initiatedRemotely()).isFalse();
@@ -243,7 +243,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final CompletableFuture<PeerConnection> future = new CompletableFuture<>();
     final RlpxConnection conn =
-        RlpxConnection.outboundConnection(peer, future, TestClock.fixedNow().millis());
+        RlpxConnection.outboundConnection(peer, future, TestClock.fixed().millis());
     final PeerConnection peerConnection = peerConnection(peer);
     future.complete(peerConnection);
     conn.disconnect(DisconnectReason.UNKNOWN);
@@ -259,7 +259,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final PeerConnection peerConnection = peerConnection(peer);
     final RlpxConnection conn =
-        RlpxConnection.inboundConnection(peerConnection, TestClock.fixedNow().millis());
+        RlpxConnection.inboundConnection(peerConnection, TestClock.fixed().millis());
 
     assertThat(conn.initiatedRemotely()).isTrue();
     assertThat(conn.isActive()).isTrue();
@@ -272,7 +272,7 @@ public class RlpxConnectionTest {
     final Peer peer = createPeer();
     final PeerConnection peerConnection = peerConnection(peer);
     final RlpxConnection conn =
-        RlpxConnection.inboundConnection(peerConnection, TestClock.fixedNow().millis());
+        RlpxConnection.inboundConnection(peerConnection, TestClock.fixed().millis());
     conn.disconnect(DisconnectReason.UNKNOWN);
 
     assertThat(conn.initiatedRemotely()).isTrue();

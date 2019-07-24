@@ -158,7 +158,7 @@ public class NetworkingServiceLifecycleTest {
         .keyPair(keyPair)
         .config(config)
         .metricsSystem(new NoOpMetricsSystem())
-        .clock(TestClock.fixedNow())
+        .clock(TestClock.fixed())
         .supportedCapabilities(Arrays.asList(Capability.create("eth", 63)));
   }
 }

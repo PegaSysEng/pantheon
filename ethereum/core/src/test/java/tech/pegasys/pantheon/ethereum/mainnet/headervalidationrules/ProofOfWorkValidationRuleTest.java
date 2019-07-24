@@ -111,7 +111,7 @@ public class ProofOfWorkValidationRuleTest {
 
   private BlockHeaderFunctions mainnetBlockHashFunction() {
     final ProtocolSchedule<Void> protocolSchedule =
-        MainnetProtocolSchedule.create(TestClock.fixedNow());
+        MainnetProtocolSchedule.create(TestClock.fixed());
     return ScheduleBasedBlockHeaderFunctions.create(protocolSchedule);
   }
 }

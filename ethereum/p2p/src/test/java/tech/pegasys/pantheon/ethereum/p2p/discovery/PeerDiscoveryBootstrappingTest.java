@@ -54,7 +54,7 @@ public class PeerDiscoveryBootstrappingTest {
 
     final PingPacketData pingData = pingPacket.getPacketData(PingPacketData.class).get();
     assertThat(pingData.getExpiration())
-        .isGreaterThanOrEqualTo(TestClock.fixedNow().millis() / 1000 - 10000);
+        .isGreaterThanOrEqualTo(TestClock.fixed().millis() / 1000 - 10000);
     assertThat(pingData.getFrom()).isEqualTo(agent.getAdvertisedPeer().get().getEndpoint());
     assertThat(pingData.getTo()).isEqualTo(testAgent.getAdvertisedPeer().get().getEndpoint());
   }
@@ -101,7 +101,7 @@ public class PeerDiscoveryBootstrappingTest {
         // Assert on the content of the packet data.
         final PingPacketData ping = packet.getPacketData(PingPacketData.class).get();
         assertThat(ping.getExpiration())
-            .isGreaterThanOrEqualTo(TestClock.fixedNow().millis() / 1000 - 10000);
+            .isGreaterThanOrEqualTo(TestClock.fixed().millis() / 1000 - 10000);
         assertThat(ping.getTo()).isEqualTo(bootstrapAgent.getAdvertisedPeer().get().getEndpoint());
       }
     }

@@ -69,7 +69,7 @@ public class PeerDiscoveryBondingTest {
     // we haven't bonded.
     final MockPeerDiscoveryAgent otherNode = helper.startDiscoveryAgent();
     final FindNeighborsPacketData data =
-        FindNeighborsPacketData.create(otherNode.getId(), TestClock.fixedNow());
+        FindNeighborsPacketData.create(otherNode.getId(), TestClock.fixed());
     final Packet packet = Packet.create(PacketType.FIND_NEIGHBORS, data, otherNode.getKeyPair());
     helper.sendMessageBetweenAgents(otherNode, agent, packet);
 

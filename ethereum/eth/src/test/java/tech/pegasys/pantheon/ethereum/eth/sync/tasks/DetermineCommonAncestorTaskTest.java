@@ -60,7 +60,7 @@ import org.junit.Test;
 public class DetermineCommonAncestorTaskTest {
 
   private final ProtocolSchedule<?> protocolSchedule =
-      MainnetProtocolSchedule.create(TestClock.fixedNow());
+      MainnetProtocolSchedule.create(TestClock.fixed());
   private final BlockDataGenerator blockDataGenerator = new BlockDataGenerator();
   private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
   private final int defaultHeaderRequestSize = 10;

@@ -69,7 +69,7 @@ public class PeerDiscoveryTimestampsTest {
     testClock.stepMillis(1_000);
     final PingPacketData ping =
         PingPacketData.create(
-            peers.get(1).getEndpoint(), peers.get(0).getEndpoint(), TestClock.fixedNow());
+            peers.get(1).getEndpoint(), peers.get(0).getEndpoint(), TestClock.fixed());
     final Packet packet = Packet.create(PacketType.PING, ping, keypairs.get(1));
 
     controller.onMessage(packet, peers.get(1));

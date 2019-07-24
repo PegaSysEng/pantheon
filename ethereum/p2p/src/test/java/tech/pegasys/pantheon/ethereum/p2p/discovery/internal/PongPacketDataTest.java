@@ -29,11 +29,11 @@ public class PongPacketDataTest {
 
   @Test
   public void serializeDeserialize() {
-    final long currentTime = TestClock.fixedNow().millis();
+    final long currentTime = TestClock.fixed().millis();
     final Endpoint to = new Endpoint("127.0.0.2", 30303, OptionalInt.empty());
     final Bytes32 hash = Bytes32.fromHexStringLenient("0x1234");
 
-    final PongPacketData packet = PongPacketData.create(to, hash, TestClock.fixedNow());
+    final PongPacketData packet = PongPacketData.create(to, hash, TestClock.fixed());
     final BytesValue serialized = RLP.encode(packet::writeTo);
     final PongPacketData deserialized = PongPacketData.readFrom(RLP.input(serialized));
 
@@ -44,7 +44,7 @@ public class PongPacketDataTest {
 
   @Test
   public void readFrom() {
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
     final Endpoint to = new Endpoint("127.0.0.2", 30303, OptionalInt.empty());
     final Bytes32 hash = Bytes32.fromHexStringLenient("0x1234");
 
@@ -64,7 +64,7 @@ public class PongPacketDataTest {
 
   @Test
   public void readFrom_withExtraFields() {
-    final long time = TestClock.fixedNow().millis();
+    final long time = TestClock.fixed().millis();
     final Endpoint to = new Endpoint("127.0.0.2", 30303, OptionalInt.empty());
     final Bytes32 hash = Bytes32.fromHexStringLenient("0x1234");
 

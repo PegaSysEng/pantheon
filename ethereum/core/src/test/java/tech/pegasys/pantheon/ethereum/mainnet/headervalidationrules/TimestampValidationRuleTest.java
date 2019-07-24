@@ -26,7 +26,7 @@ public class TimestampValidationRuleTest {
   @Test
   public void headerTimestampSufficientlyFarIntoFutureVadidatesSuccessfully() {
     final TimestampBoundedByFutureParameter uut00 =
-        new TimestampBoundedByFutureParameter(0, TestClock.fixedNow());
+        new TimestampBoundedByFutureParameter(0, TestClock.fixed());
     final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
@@ -51,7 +51,7 @@ public class TimestampValidationRuleTest {
   @Test
   public void headerTimestampTooCloseToParentFailsValidation() {
     final TimestampBoundedByFutureParameter uut00 =
-        new TimestampBoundedByFutureParameter(0, TestClock.fixedNow());
+        new TimestampBoundedByFutureParameter(0, TestClock.fixed());
     final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
@@ -70,7 +70,7 @@ public class TimestampValidationRuleTest {
   @Test
   public void headerTimestampIsBehindParentFailsValidation() {
     final TimestampBoundedByFutureParameter uut00 =
-        new TimestampBoundedByFutureParameter(0, TestClock.fixedNow());
+        new TimestampBoundedByFutureParameter(0, TestClock.fixed());
     final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
@@ -91,13 +91,13 @@ public class TimestampValidationRuleTest {
     final long acceptableClockDrift = 5;
 
     final TimestampBoundedByFutureParameter uut00 =
-        new TimestampBoundedByFutureParameter(acceptableClockDrift, TestClock.fixedNow());
+        new TimestampBoundedByFutureParameter(acceptableClockDrift, TestClock.fixed());
     final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
 
     // Create Parent Header @ 'now'
-    headerBuilder.timestamp(TestClock.fixedNow().instant().getEpochSecond());
+    headerBuilder.timestamp(TestClock.fixed().instant().getEpochSecond());
     final BlockHeader parent = headerBuilder.buildHeader();
 
     // Create header for validation with a timestamp in the future (1 second too far away)
@@ -113,12 +113,12 @@ public class TimestampValidationRuleTest {
     final long acceptableClockDrift = 5;
 
     final TimestampBoundedByFutureParameter uut00 =
-        new TimestampBoundedByFutureParameter(acceptableClockDrift, TestClock.fixedNow());
+        new TimestampBoundedByFutureParameter(acceptableClockDrift, TestClock.fixed());
     final TimestampMoreRecentThanParent uut01 = new TimestampMoreRecentThanParent(10);
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
 
-    headerBuilder.timestamp(TestClock.fixedNow().instant().getEpochSecond());
+    headerBuilder.timestamp(TestClock.fixed().instant().getEpochSecond());
     final BlockHeader parent = headerBuilder.buildHeader();
 
     // Create header for validation with a timestamp in the future (1 second too far away)

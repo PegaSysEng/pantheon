@@ -60,7 +60,7 @@ public class FullSyncTargetManagerTest {
     localBlockchain = localBlockchainSetup.getBlockchain();
 
     final ProtocolSchedule<Void> protocolSchedule =
-        MainnetProtocolSchedule.create(TestClock.fixedNow());
+        MainnetProtocolSchedule.create(TestClock.fixed());
     final ProtocolContext<Void> protocolContext =
         new ProtocolContext<>(localBlockchain, localWorldState, null);
     ethProtocolManager =

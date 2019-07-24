@@ -78,7 +78,7 @@ public class IbftBlockCreatorTest {
             Address.fromHexString(String.format("%020d", 4)),
             localAddr);
 
-    Clock testClock = TestClock.fixedNow();
+    Clock testClock = TestClock.fixed();
     final ProtocolSchedule<IbftContext> protocolSchedule =
         IbftProtocolSchedule.create(
             GenesisConfigFile.fromConfig("{\"config\": {\"spuriousDragonBlock\":0}}")

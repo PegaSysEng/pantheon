@@ -894,7 +894,7 @@ public class WorldStateDownloaderTest {
         RespondingEthPeer.partialResponder(
             mock(Blockchain.class),
             remoteWorldStateArchive,
-            MainnetProtocolSchedule.create(TestClock.fixedNow()),
+            MainnetProtocolSchedule.create(TestClock.fixed()),
             .5f);
     final Responder emptyResponder = RespondingEthPeer.emptyResponder();
 

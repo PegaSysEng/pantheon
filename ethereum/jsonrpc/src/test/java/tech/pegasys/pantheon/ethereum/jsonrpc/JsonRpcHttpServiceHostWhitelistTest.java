@@ -101,7 +101,7 @@ public class JsonRpcHttpServiceHostWhitelistTest {
                         new StubGenesisConfigOptions()
                             .constantinopleBlock(0)
                             .chainId(BigInteger.valueOf(CHAIN_ID)),
-                        TestClock.fixedNow()),
+                        TestClock.fixed()),
                     mock(FilterManager.class),
                     mock(TransactionPool.class),
                     mock(EthHashMiningCoordinator.class),

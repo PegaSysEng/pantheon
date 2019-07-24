@@ -39,7 +39,7 @@ public class TestCodeExecutor {
     fixture =
         ExecutionContextTestFixture.builder()
             .protocolSchedule(protocolSchedule)
-            .clock(TestClock.fixedNow())
+            .clock(TestClock.fixed())
             .build();
   }
 

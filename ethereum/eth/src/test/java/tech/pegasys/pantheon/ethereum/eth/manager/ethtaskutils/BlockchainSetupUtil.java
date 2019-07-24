@@ -93,7 +93,7 @@ public class BlockchainSetupUtil<C> {
 
   public static BlockchainSetupUtil<Void> forTesting() {
     final ProtocolSchedule<Void> protocolSchedule =
-        MainnetProtocolSchedule.create(TestClock.fixedNow());
+        MainnetProtocolSchedule.create(TestClock.fixed());
     final TemporaryFolder temp = new TemporaryFolder();
     try {
       temp.create();

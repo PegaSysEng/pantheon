@@ -216,7 +216,7 @@ public final class DefaultP2PNetworkTest {
 
     when(natManager.queryExternalIPAddress())
         .thenReturn(CompletableFuture.completedFuture(externalIp));
-    final P2PNetwork network = builder().natManager(natManager).clock(TestClock.fixedNow()).build();
+    final P2PNetwork network = builder().natManager(natManager).clock(TestClock.fixed()).build();
 
     network.start();
     verify(natManager)
@@ -232,8 +232,7 @@ public final class DefaultP2PNetworkTest {
     final DefaultP2PNetwork network = network();
     network.start();
     final DiscoveryPeer peer = DiscoveryPeer.fromEnode(enode());
-    final PeerBondedEvent peerBondedEvent =
-        new PeerBondedEvent(peer, TestClock.fixedNow().millis());
+    final PeerBondedEvent peerBondedEvent = new PeerBondedEvent(peer, TestClock.fixed().millis());
 
     discoverySubscriberCaptor.getValue().onPeerBonded(peerBondedEvent);
     verify(rlpxAgent, times(1)).connect(peer);
@@ -246,8 +245,7 @@ public final class DefaultP2PNetworkTest {
     final DiscoveryPeer peer =
         DiscoveryPeer.fromIdAndEndpoint(
             Peer.randomId(), new Endpoint("127.0.0.1", 999, OptionalInt.empty()));
-    final PeerBondedEvent peerBondedEvent =
-        new PeerBondedEvent(peer, TestClock.fixedNow().millis());
+    final PeerBondedEvent peerBondedEvent = new PeerBondedEvent(peer, TestClock.fixed().millis());
 
     discoverySubscriberCaptor.getValue().onPeerBonded(peerBondedEvent);
     verify(rlpxAgent, times(1)).connect(peer);
@@ -308,7 +306,7 @@ public final class DefaultP2PNetworkTest {
   }
 
   private DefaultP2PNetwork network() {
-    return (DefaultP2PNetwork) builder().clock(TestClock.fixedNow()).build();
+    return (DefaultP2PNetwork) builder().clock(TestClock.fixed()).build();
   }
 
   private DefaultP2PNetwork.Builder builder() {

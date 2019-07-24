@@ -55,7 +55,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class DetermineCommonAncestorTaskParameterizedTest {
   private final ProtocolSchedule<Void> protocolSchedule =
-      MainnetProtocolSchedule.create(TestClock.fixedNow());
+      MainnetProtocolSchedule.create(TestClock.fixed());
   private static final BlockDataGenerator blockDataGenerator = new BlockDataGenerator();
   private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
 

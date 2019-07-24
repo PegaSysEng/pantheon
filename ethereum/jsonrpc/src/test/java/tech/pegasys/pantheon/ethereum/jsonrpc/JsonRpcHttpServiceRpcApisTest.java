@@ -194,7 +194,7 @@ public class JsonRpcHttpServiceRpcApisTest {
                     mock(P2PNetwork.class),
                     blockchainQueries,
                     mock(Synchronizer.class),
-                    MainnetProtocolSchedule.create(TestClock.fixedNow()),
+                    MainnetProtocolSchedule.create(TestClock.fixed()),
                     mock(FilterManager.class),
                     mock(TransactionPool.class),
                     mock(EthHashMiningCoordinator.class),
@@ -252,7 +252,7 @@ public class JsonRpcHttpServiceRpcApisTest {
             .vertx(vertx)
             .config(config)
             .metricsSystem(new NoOpMetricsSystem())
-            .clock(TestClock.fixedNow())
+            .clock(TestClock.fixed())
             .build();
 
     p2pNetwork.start();
@@ -285,7 +285,7 @@ public class JsonRpcHttpServiceRpcApisTest {
                     p2pNetwork,
                     blockchainQueries,
                     mock(Synchronizer.class),
-                    MainnetProtocolSchedule.create(TestClock.fixedNow()),
+                    MainnetProtocolSchedule.create(TestClock.fixed()),
                     mock(FilterManager.class),
                     mock(TransactionPool.class),
                     mock(EthHashMiningCoordinator.class),
