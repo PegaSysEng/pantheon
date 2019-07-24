@@ -8,7 +8,7 @@ if (env.BRANCH_NAME == "master") {
     properties([
         buildDiscarder(
             logRotator(
-                daysToKeepStr: '30'
+                daysToKeepStr: '30', artifactDaysToKeepStr: '7'
             )
         )
     ])
@@ -16,7 +16,7 @@ if (env.BRANCH_NAME == "master") {
     properties([
         buildDiscarder(
             logRotator(
-                numToKeepStr: '10'
+                numToKeepStr: '10', artifactNumToKeepStr: '3'
             )
         )
     ])
