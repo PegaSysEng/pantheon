@@ -12,12 +12,8 @@
  */
 package tech.pegasys.pantheon.services.kvstore;
 
-import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
-import tech.pegasys.pantheon.metrics.rocksdb.RocksDBStats;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -34,11 +30,13 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.rocksdb.BlockBasedTableConfig;
 import org.rocksdb.ColumnFamilyDescriptor;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ColumnFamilyOptions;
 import org.rocksdb.DBOptions;
 import org.rocksdb.Env;
+import org.rocksdb.LRUCache;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.Statistics;
@@ -56,14 +54,8 @@ public class ColumnarRocksDbKeyValueStorage
   private final TransactionDBOptions txOptions;
   private final TransactionDB db;
   private final AtomicBoolean closed = new AtomicBoolean(false);
-
-  private final OperationTimer readLatency;
-  private final OperationTimer removeLatency;
-  private final OperationTimer writeLatency;
-  private final OperationTimer commitLatency;
-  private final Counter rollbackCount;
-  private final Statistics stats;
   private final Map<String, ColumnFamilyHandle> columnHandlesByName;
+  private final RocksDBMetricsHelper rocksDBMetricsHelper;
 
   public static ColumnarRocksDbKeyValueStorage create(
       final RocksDbConfiguration rocksDbConfiguration,
@@ -87,9 +79,9 @@ public class ColumnarRocksDbKeyValueStorage
           new ColumnFamilyDescriptor(
               DEFAULT_COLUMN.getBytes(StandardCharsets.UTF_8),
               new ColumnFamilyOptions()
-                  .setTableFormatConfig(rocksDbConfiguration.getBlockBasedTableConfig())));
+                  .setTableFormatConfig(createBlockBasedTableConfig(rocksDbConfiguration))));
 
-      stats = new Statistics();
+      final Statistics stats = new Statistics();
       options =
           new DBOptions()
               .setCreateIfMissing(true)
@@ -110,7 +102,8 @@ public class ColumnarRocksDbKeyValueStorage
               rocksDbConfiguration.getDatabaseDir().toString(),
               columnDescriptors,
               columnHandles);
-
+      rocksDBMetricsHelper =
+          RocksDBMetricsHelper.of(metricsSystem, rocksDbConfiguration, db, stats);
       final Map<BytesValue, String> segmentsById =
           segments.stream()
               .collect(
@@ -127,67 +120,14 @@ public class ColumnarRocksDbKeyValueStorage
       }
       columnHandlesByName = builder.build();
 
-      readLatency =
-          metricsSystem
-              .createLabelledTimer(
-                  PantheonMetricCategory.KVSTORE_ROCKSDB,
-                  "read_latency_seconds",
-                  "Latency for read from RocksDB.",
-                  "database")
-              .labels(rocksDbConfiguration.getLabel());
-      removeLatency =
-          metricsSystem
-              .createLabelledTimer(
-                  PantheonMetricCategory.KVSTORE_ROCKSDB,
-                  "remove_latency_seconds",
-                  "Latency of remove requests from RocksDB.",
-                  "database")
-              .labels(rocksDbConfiguration.getLabel());
-      writeLatency =
-          metricsSystem
-              .createLabelledTimer(
-                  PantheonMetricCategory.KVSTORE_ROCKSDB,
-                  "write_latency_seconds",
-                  "Latency for write to RocksDB.",
-                  "database")
-              .labels(rocksDbConfiguration.getLabel());
-      commitLatency =
-          metricsSystem
-              .createLabelledTimer(
-                  PantheonMetricCategory.KVSTORE_ROCKSDB,
-                  "commit_latency_seconds",
-                  "Latency for commits to RocksDB.",
-                  "database")
-              .labels(rocksDbConfiguration.getLabel());
-
-      if (metricsSystem instanceof PrometheusMetricsSystem) {
-        RocksDBStats.registerRocksDBMetrics(stats, (PrometheusMetricsSystem) metricsSystem);
-      }
-
-      metricsSystem.createLongGauge(
-          PantheonMetricCategory.KVSTORE_ROCKSDB,
-          "rocks_db_table_readers_memory_bytes",
-          "Estimated memory used for RocksDB index and filter blocks in bytes",
-          () -> {
-            try {
-              return db.getLongProperty("rocksdb.estimate-table-readers-mem");
-            } catch (final RocksDBException e) {
-              LOG.debug("Failed to get RocksDB metric", e);
-              return 0L;
-            }
-          });
-
-      rollbackCount =
-          metricsSystem
-              .createLabelledCounter(
-                  PantheonMetricCategory.KVSTORE_ROCKSDB,
-                  "rollback_count",
-                  "Number of RocksDB transactions rolled back.",
-                  "database")
-              .labels(rocksDbConfiguration.getLabel());
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }
+  }
+
+  private BlockBasedTableConfig createBlockBasedTableConfig(final RocksDbConfiguration config) {
+    final LRUCache cache = new LRUCache(config.getCacheCapacity());
+    return new BlockBasedTableConfig().setBlockCache(cache);
   }
 
   @Override
@@ -200,7 +140,8 @@ public class ColumnarRocksDbKeyValueStorage
       throws StorageException {
     throwIfClosed();
 
-    try (final OperationTimer.TimingContext ignored = readLatency.startTimer()) {
+    try (final OperationTimer.TimingContext ignored =
+        rocksDBMetricsHelper.getReadLatency().startTimer()) {
       return Optional.ofNullable(db.get(segment, key.getArrayUnsafe())).map(BytesValue::wrap);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -279,7 +220,8 @@ public class ColumnarRocksDbKeyValueStorage
     @Override
     protected void doPut(
         final ColumnFamilyHandle segment, final BytesValue key, final BytesValue value) {
-      try (final OperationTimer.TimingContext ignored = writeLatency.startTimer()) {
+      try (final OperationTimer.TimingContext ignored =
+          rocksDBMetricsHelper.getWriteLatency().startTimer()) {
         innerTx.put(segment, key.getArrayUnsafe(), value.getArrayUnsafe());
       } catch (final RocksDBException e) {
         throw new StorageException(e);
@@ -288,7 +230,8 @@ public class ColumnarRocksDbKeyValueStorage
 
     @Override
     protected void doRemove(final ColumnFamilyHandle segment, final BytesValue key) {
-      try (final OperationTimer.TimingContext ignored = removeLatency.startTimer()) {
+      try (final OperationTimer.TimingContext ignored =
+          rocksDBMetricsHelper.getRemoveLatency().startTimer()) {
         innerTx.delete(segment, key.getArrayUnsafe());
       } catch (final RocksDBException e) {
         throw new StorageException(e);
@@ -297,7 +240,8 @@ public class ColumnarRocksDbKeyValueStorage
 
     @Override
     protected void doCommit() throws StorageException {
-      try (final OperationTimer.TimingContext ignored = commitLatency.startTimer()) {
+      try (final OperationTimer.TimingContext ignored =
+          rocksDBMetricsHelper.getCommitLatency().startTimer()) {
         innerTx.commit();
       } catch (final RocksDBException e) {
         throw new StorageException(e);
@@ -310,7 +254,7 @@ public class ColumnarRocksDbKeyValueStorage
     protected void doRollback() {
       try {
         innerTx.rollback();
-        rollbackCount.inc();
+        rocksDBMetricsHelper.getRollbackCount().inc();
       } catch (final RocksDBException e) {
         throw new StorageException(e);
       } finally {

@@ -30,7 +30,7 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
@@ -94,7 +94,8 @@ public class TestNode implements Closeable {
 
     final GenesisConfigFile genesisConfigFile = GenesisConfigFile.development();
     final ProtocolSchedule<Void> protocolSchedule =
-        FixedDifficultyProtocolSchedule.create(GenesisConfigFile.development().getConfigOptions());
+        FixedDifficultyProtocolSchedule.create(
+            GenesisConfigFile.development().getConfigOptions(), false);
 
     final GenesisState genesisState = GenesisState.fromConfig(genesisConfigFile, protocolSchedule);
     final BlockHeaderFunctions blockHeaderFunctions =
@@ -116,7 +117,7 @@ public class TestNode implements Closeable {
             1,
             TestClock.fixed(),
             new NoOpMetricsSystem(),
-            EthereumWireProtocolConfiguration.defaultConfig());
+            EthProtocolConfiguration.defaultConfig());
 
     final NetworkRunner networkRunner =
         NetworkRunner.builder()

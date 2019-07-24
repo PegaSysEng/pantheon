@@ -63,7 +63,8 @@ public class IbftLegacyPantheonControllerBuilder extends PantheonControllerBuild
 
   @Override
   protected ProtocolSchedule<IbftContext> createProtocolSchedule() {
-    return IbftProtocolSchedule.create(genesisConfig.getConfigOptions(), privacyParameters);
+    return IbftProtocolSchedule.create(
+        genesisConfig.getConfigOptions(), privacyParameters, isRevertReasonEnabled);
   }
 
   @Override
@@ -101,9 +102,9 @@ public class IbftLegacyPantheonControllerBuilder extends PantheonControllerBuild
         protocolContext.getWorldStateArchive(),
         networkId,
         fastSyncEnabled,
-        syncConfig.downloaderParallelism(),
-        syncConfig.transactionsParallelism(),
-        syncConfig.computationParallelism(),
+        syncConfig.getDownloaderParallelism(),
+        syncConfig.getTransactionsParallelism(),
+        syncConfig.getComputationParallelism(),
         clock,
         metricsSystem,
         ethereumWireProtocolConfiguration);

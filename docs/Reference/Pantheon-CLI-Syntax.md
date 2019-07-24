@@ -9,10 +9,28 @@ This reference describes the syntax of the Pantheon Command Line Interface (CLI)
 pantheon [OPTIONS] [COMMAND]
 ```
 
-Runs the Pantheon Ethereum full node client.
+Starts a Pantheon node.
 
-!!!tip
-    Use a [configuration file](../Configuring-Pantheon/Using-Configuration-File.md) to save the command line options in a file.
+## Specifying Options
+
+Pantheon options can be specified: 
+
+* On the command line 
+* As an [environment variable](#pantheon-environment-variables) 
+* In a [configuration file](../Configuring-Pantheon/Using-Configuration-File.md).
+
+If an option is specified in multiple places, the order of priority is command line, environment variable, 
+configuration file. 
+
+### Pantheon Environment Variables
+
+For each command line option, the equivalent environment variable is: 
+
+* Upper-case
+* `-` is replaced by `_` 
+* Has a `PANTHEON_` prefix
+
+For example, set `--miner-coinbase` using the `PANTHEON_MINER_COINBASE` environment variable. 
 
 ## Options
 
@@ -22,11 +40,15 @@ Runs the Pantheon Ethereum full node client.
 --banned-node-ids=<bannedNodeId>[,<bannedNodeId>...]...
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --banned-nodeids=0xc35c3...d615f,0xf42c13...fc456
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_BANNED_NODEIDS=0xc35c3...d615f,0xf42c13...fc456
+```
+
+```bash tab="Configuration File"
 banned-nodeids=["0xc35c3...d615f","0xf42c13...fc456"]
 ```
 
@@ -42,8 +64,12 @@ List of node IDs with which this node will not peer. The node ID is the public k
 --bootnodes[=<enode://id@host:port>[,<enode://id@host:port>...]...]
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --bootnodes=enode://c35c3...d615f@1.2.3.4:30303,enode://f42c13...fc456@1.2.3.5:30303
+```
+
+```bash tab="Environment Variable"
+PANTHEON_BOOTNODES=enode://c35c3...d615f@1.2.3.4:30303,enode://f42c13...fc456@1.2.3.5:30303
 ```
 
 ```bash tab="Example Configuration File"
@@ -73,39 +99,46 @@ an empty list of bootnodes is defined by default unless you define custom bootno
 --config-file=<FILE>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --config-file=/home/me/me_node/config.toml
+```
+
+```bash tab="Environment Variable"
+PANTHEON_CONFIG_FILE=/home/me/me_node/config.toml
 ```
 
 The path to the [TOML configuration file](../Configuring-Pantheon/Using-Configuration-File.md).
 The default is `none`.
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-configuration-file) or in a [configuration file](../Configuring-Pantheon/Using-Configuration-File.md).
-    
+        
 ### data-path
 
 ```bash tab="Syntax"
 --data-path=<PATH>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --data-path=/home/me/me_node
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_DATA_PATH=/home/me/me_node
+```
+
+```bash tab="Configuration File"
 data-path="/home/me/me_node"
 ```
 
-The path to the Pantheon data directory. The default is the directory in which Pantheon is installed.
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#data-directory). 
+The path to the Pantheon data directory. The default is the directory in which Pantheon is installed
+or `/opt/pantheon/database` if using the [Pantheon Docker image](../Getting-Started/Run-Docker-Image.md).
 
 ### discovery-enabled
 
 ```bash tab="Syntax"
 --discovery-enabled=false
+```
+
+```bash tab="Environment Variable"
+PANTHEON_DISCOVERY_ENABLED=false
 ```
 
 ```bash tab="Example Configuration File"
@@ -127,11 +160,15 @@ Genesis file is used to create a custom network.
 --genesis-file=<FILE>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --genesis-file=/home/me/me_node/customGenesisFile.json
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_GENESIS_FILE=/home/me/me_node/customGenesisFile.json
+```
+
+```bash tab="Configuration File"
 genesis-file="/home/me/me_node/customGenesisFile.json"
 ```
 
@@ -140,21 +177,21 @@ The path to the genesis file.
 !!!important
     The [`--genesis-file`](#genesis-file) and [`--network`](#network) option can't be used at the same time.
 
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#custom-genesis-file). 
-
-
 ### graphql-http-cors-origins
 
 ```bash tab="Syntax"
 --graphql-http-cors-origins=<graphQLHttpCorsAllowedOrigins>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --graphql-http-cors-origins="http://medomain.com","https://meotherdomain.com"
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_GRAPHQL_HTTP_CORS_ORIGINS="http://medomain.com","https://meotherdomain.com"
+```
+
+```bash tab="Configuration File"
 graphql-http-cors-origins=["http://medomain.com","https://meotherdomain.com"]
 ```
 
@@ -166,7 +203,11 @@ Comma separated origin domain URLs for CORS validation. The default is none.
 --graphql-http-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_GRAPHQL_HTTP_ENABLED=true
+```
+
+```bash tab="Configuration File"
 graphql-http-enabled=true
 ```
 
@@ -179,12 +220,17 @@ The default is `false`.
 --graphql-http-host=<HOST>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 # to listen on all interfaces
 --graphql-http-host=0.0.0.0
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+# to listen on all interfaces
+PANTHEON_GRAPHQL_HTTP_HOST=0.0.0.0
+```
+
+```bash tab="Configuration File"
 graphql-http-host="0.0.0.0"
 ```
 
@@ -192,9 +238,6 @@ Host for GraphQL HTTP to listen on.
 The default is 127.0.0.1.
 
 To allow remote connections, set to `0.0.0.0`
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
     
 ### graphql-http-port
 
@@ -202,20 +245,22 @@ To allow remote connections, set to `0.0.0.0`
 --graphql-http-port=<PORT>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 # to listen on port 6175
 --graphql-http-port=6175
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+# to listen on port 6175
+PANTHEON_GRAPHQL_HTTP_PORT=6175
+```
+
+```bash tab="Configuration File"
 graphql-http-port="6175"
 ```
 
 Specifies GraphQL HTTP listening port (TCP).
 The default is 8547. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
 ### host-whitelist
 
@@ -223,11 +268,15 @@ The default is 8547. Ports must be [exposed appropriately](../Configuring-Panthe
 --host-whitelist=<hostname>[,<hostname>...]... or "*"
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --host-whitelist=medomain.com,meotherdomain.com
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_HOST_WHITELIST=medomain.com,meotherdomain.com
+```
+
+```bash tab="Configuration File"
 host-whitelist=["medomain.com", "meotherdomain.com"]
 ```
 
@@ -243,15 +292,19 @@ By default, access from `localhost` and `127.0.0.1` is accepted.
 --max-peers=<INTEGER>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --max-peers=42
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_MAX_PEERS=42
+```
+
+```bash tab="Configuration File"
 max-peers=42
 ```
 
-Specifies the maximum P2P peer connections that can be established.
+Specifies the maximum P2P connections that can be established.
 The default is 25.
 
 ### metrics-category
@@ -260,11 +313,15 @@ The default is 25.
 --metrics-category=<metrics-category>[,metrics-category...]...
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --metrics-category=BLOCKCHAIN,PEERS,PROCESS
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_METRICS_CATEGORY=BLOCKCHAIN,PEERS,PROCESS
+```
+
+```bash tab="Configuration File"
 metrics-category=["BLOCKCHAIN","PEERS","PROCESS"]
 ```
 
@@ -277,7 +334,11 @@ Comma separated list of categories for which to track metrics. The default is al
 --metrics-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_METRICS_ENABLED=true
+```
+
+```bash tab="Configuration File"
 metrics-enabled=true
 ```
 
@@ -293,11 +354,15 @@ push gateway support can be enabled but not both at once.
 --metrics-host=<HOST>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --metrics-host=127.0.0.1
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_METRICS_HOST=127.0.0.1
+```
+
+```bash tab="Configuration File"
 metrics-host="127.0.0.1"
 ```
 
@@ -312,11 +377,15 @@ The default is `127.0.0.1`.
 --metrics-port=<PORT>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --metrics-port=6174
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_METRICS_PORT=6174
+```
+
+```bash tab="Configuration File"
 metrics-port="6174"
 ```
 
@@ -329,11 +398,15 @@ The default is `9545`. Ports must be [exposed appropriately](../Configuring-Pant
 --metrics-push-enabled[=<true|false>]
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --metrics-push-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_METRICS_PUSH_ENABLED=true
+```
+
+```bash tab="Configuration File"
 metrics-push-enabled="true"
 ```
 
@@ -348,11 +421,15 @@ push gateway support can be enabled but not both at once.
 --metrics-push-host=<HOST>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --metrics-push-host=127.0.0.1
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_METRICS_PUSH_HOST=127.0.0.1
+```
+
+```bash tab="Configuration File"
 metrics-push-host="127.0.0.1"
 ```
 
@@ -370,11 +447,15 @@ The metrics server respects the [`--host-whitelist` option](#host-whitelist).
 --metrics-push-interval=<INTEGER>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --metrics-push-interval=30
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_METRICS_PUSH_INTERVAL=30
+```
+
+```bash tab="Configuration File"
 metrics-push-interval=30
 ```
 
@@ -386,11 +467,15 @@ Interval in seconds to push metrics when in `push` mode. The default is 15.
 --metrics-push-port=<PORT>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --metrics-push-port=6174
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_METRICS_PUSH_PORT=6174
+```
+
+```bash tab="Configuration File"
 metrics-push-port="6174"
 ```
 
@@ -403,11 +488,15 @@ The default is `9001`. Ports must be [exposed appropriately](../Configuring-Pant
 --metrics-prometheus-job=<metricsPrometheusJob>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --metrics-prometheus-job="my-custom-job"
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_METRICS_PROMETHEUS_JOB="my-custom-job"
+```
+
+```bash tab="Configuration File"
 metrics-prometheus-job="my-custom-job"
 ```
 
@@ -419,11 +508,15 @@ Job name when in `push` mode. The default is `pantheon-client`.
 --miner-coinbase=<Ethereum account address>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --miner-coinbase=fe3b557e8fb62b89f4916b721be55ceb828dbd73
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_MINER_COINBASE=fe3b557e8fb62b89f4916b721be55ceb828dbd73
+```
+
+```bash tab="Configuration File"
 --miner-coinbase="0xfe3b557e8fb62b89f4916b721be55ceb828dbd73"
 ```
 
@@ -440,7 +533,11 @@ option or the [`miner_start`](Pantheon-API-Methods.md#miner_start) JSON RPC-API 
 --miner-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_MINER_ENABLED=true
+```
+
+```bash tab="Configuration File"
 miner-enabled=true
 ```
 
@@ -453,11 +550,15 @@ Default is `false`.
 --miner-extra-data=<Extra data>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --miner-extra-data=0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C2021
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_MINER_EXTRA_DATA=0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C2021
+```
+
+```bash tab="Configuration File"
 miner-extra-data="0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C2021"
 ```
 
@@ -470,16 +571,37 @@ The default is 0x.
 --min-gas-price=<minTransactionGasPrice>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --min-gas-price=1337
 ```
 
-```bash tab="Example Configuration File"
-min-gas-price="1337"
+```bash tab="Environment Variable"
+PANTHEON_MIN_GAS_PRICE=1337
+```
+
+```bash tab="Configuration File"
+min-gas-price=1337
 ```
 
 The minimum price that a transaction offers for it to be included in a mined block.
 The default is 1000.
+
+### nat-method
+
+```bash tab="Syntax"
+--nat-method=<METHOD>
+```
+
+```bash tab="Command Line"
+--nat-method=upnp
+```
+
+```bash tab="Example Configuration File"
+nat-method="upnp"
+```
+
+Specifies the method for handling [NAT environments](../Configuring-Pantheon/Networking/Using-UPnP.md). 
+Options are `upnp` and `none`. The default is `none` (that is, NAT functionality is disabled).
 
 ### network
 
@@ -487,11 +609,15 @@ The default is 1000.
 --network=<NETWORK>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --network=rinkeby
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Command Line"
+PANTHEON_NETWORK=rinkeby
+```
+
+```bash tab="Configuration File"
 network="rinkeby"
 ```
 
@@ -520,18 +646,22 @@ Possible values are :
     
 !!!important
     The [`--network`](#network) and [`--genesis-file`](#genesis-file) option cannot be used at the same time.
-
+    
 ### network-id
 
 ```bash tab="Syntax"
 --network-id=<INTEGER>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --network-id=8675309
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_NETWORK_ID=8675309
+```
+
+```bash tab="Configuration File"
 network-id="8675309"
 ```
 
@@ -546,24 +676,25 @@ The default value is the network chain ID defined in the genesis file.
 --node-private-key-file=<FILE>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --node-private-key-file=/home/me/me_node/myPrivateKey
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_NODE_PRIVATE_KEY_FILE=/home/me/me_node/myPrivateKey
+```
+
+```bash tab="Configuration File"
 node-private-key-file="/home/me/me_node/myPrivateKey"
 ```
 
 `<FILE>` is the path of the private key file of the node.
-The default is the key file in the data directory.
+The default is the key file in the [data directory](#data-path).
 If no key file exists, a key file containing the generated private key is created;
 otherwise, the existing key file specifies the node private key.
 
 !!!attention
     The private key is not encrypted.
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md). 
 
 ### p2p-enabled
 
@@ -575,7 +706,11 @@ otherwise, the existing key file specifies the node private key.
 --p2p-enabled=false
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_P2P_ENABLED=false
+```
+
+```bash tab="Configuration File"
 p2p-enabled=false
 ```
 
@@ -588,20 +723,22 @@ The default is true.
 --p2p-host=<HOST>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 # to listen on all interfaces
 --p2p-host=0.0.0.0
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+# to listen on all interfaces
+PANTHEON_P2P_HOST=0.0.0.0
+```
+
+```bash tab="Configuration File"
 p2p-host="0.0.0.0"
 ```
 
 Specifies the host on which P2P listens.
 The default is 127.0.0.1.
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
 ### p2p-port
 
@@ -609,20 +746,43 @@ The default is 127.0.0.1.
 --p2p-port=<PORT>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 # to listen on port 1789
 --p2p-port=1789
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+# to listen on port 1789
+PANTHEON_P2P_PORT=1789
+```
+
+```bash tab="Configuration File"
 p2p-port="1789"
 ```
 
 Specifies the P2P listening ports (UDP and TCP).
 The default is 30303. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
 
+### nat-method
+
+```bash tab="Syntax"
+--nat-method=UPNP
+```
+
+```bash tab="Example Configuration File"
+nat-method="UPNP"
+```
+
+Specify the method for handling NAT environments. Options are: `UPNP` and `NONE`.
+The default is `NONE`, which disables NAT functionality.
+
+!!!tip
+    `UPNP` works well with a typical home or small office environment where a wireless router or modem provides NAT isolation. This should provide
+    automatic detection and port-forwarding. UPnP support is often disabled by default in networking equipment firmware, however, any may need to be
+    explicitly enabled.
+
 !!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
+    Option `UPNP` may introduce delays during node startup, especially on networks where no UPnP gateway device can be found.
 
 ### permissions-accounts-config-file-enabled
 
@@ -630,11 +790,15 @@ The default is 30303. Ports must be [exposed appropriately](../Configuring-Panth
 --permissions-accounts-config-file-enabled[=<true|false>]
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --permissions-accounts-config-file-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_PERMISSIONS_ACCOUNTS_CONFIG_FILE_ENABLED=true
+```
+
+```bash tab="Configuration File"
 permissions-accounts-config-file-enabled=true
 ```
 
@@ -646,11 +810,15 @@ Set to enable file-based account level permissions. Default is `false`.
 --permissions-accounts-config-file=<FILE>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --permissions-accounts-config-file=/home/me/me_configFiles/myPermissionsFile
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_PERMISSIONS_ACCOUNTS_CONFIG_FILE=/home/me/me_configFiles/myPermissionsFile
+```
+
+```bash tab="Configuration File"
 permissions-accounts-config-file="/home/me/me_configFiles/myPermissionsFile"
 ```
 
@@ -661,20 +829,21 @@ Default is the `permissions_config.toml` file in the [data directory](#data-path
     `--permissions-accounts-config-file` and [`--permissions-nodes-config-file`](#permissions-nodes-config-file)
     can use the same file. 
 
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#permissions-configuration-file).
-
 ### permissions-nodes-config-file-enabled
 
 ```bash tab="Syntax"
 --permissions-nodes-config-file-enabled[=<true|false>]
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --permissions-nodes-config-file-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_PERMISSIONS_NODES_CONFIG_FILE_ENABLED=true
+```
+
+```bash tab="Configuration File"
 permissions-nodes-config-file-enabled=true
 ```
 
@@ -686,11 +855,15 @@ Set to enable file-based node level permissions. Default is `false`.
 --permissions-nodes-config-file=<FILE>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --permissions-nodes-config-file=/home/me/me_configFiles/myPermissionsFile
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_PERMISSIONS_NODES_CONFIG_FILE=/home/me/me_configFiles/myPermissionsFile
+```
+
+```bash tab="Configuration File"
 permissions-nodes-config-file="/home/me/me_configFiles/myPermissionsFile"
 ```
 
@@ -701,20 +874,21 @@ Default is the `permissions_config.toml` file in the [data directory](#data-path
     `--permissions-nodes-config-file` and [`--permissions-accounts-config-file`](#permissions-accounts-config-file)
     can use the same file. 
 
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#permissions-configuration-file).
-
 ### permissions-nodes-contract-address
 
 ```bash tab="Syntax"
 --permissions-nodes-contract-address=<ContractAddress>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --permissions-nodes-contract-address=xyz
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_PERMISSIONS_NODES_CONTRACT_ADDRESS=xyz
+```
+
+```bash tab="Configuration File"
 permissions-nodes-contract-address=xyz
 ```
 
@@ -726,11 +900,15 @@ Specifies the contract address for [onchain node permissioning](../Permissions/O
 --permissions-nodes-contract-enabled[=<true|false>]
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --permissions-nodes-contract-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_PERMISSIONS_NODES_CONTRACT_ENABLED=true
+```
+
+```bash tab="Configuration File"
 permissions-nodes-contract-enabled=true
 ```
 
@@ -742,15 +920,19 @@ Enables contract-based [onchain node permissioning](../Permissions/Onchain-Permi
 --privacy-enabled[=<true|false>]
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --privacy-enabled=false
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_PRIVACY_ENABLED=false
+```
+
+```bash tab="Configuration File"
 privacy-enabled=false
 ```
 
-Set to enable [private transactions](../Privacy/Privacy-Overview.md). 
+Set to enable [private transactions](../Privacy/Explanation/Privacy-Overview.md). 
 The default is false.  
 
 ### privacy-precompiled-address
@@ -759,7 +941,7 @@ The default is false.
 --privacy-precompiled-address=<privacyPrecompiledAddress>
 ```
 
-Address to which the [privacy pre-compiled contract](../Privacy/Private-Transaction-Processing.md) is mapped.
+Address to which the [privacy pre-compiled contract](../Privacy/Explanation/Private-Transaction-Processing.md) is mapped.
 The default is 126.     
     
 ### privacy-public-key-file
@@ -768,18 +950,19 @@ The default is 126.
 --privacy-public-key-file=<privacyPublicKeyFile>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --privacy-public-key-file=Orion/nodeKey.pub
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_PRIVACY_PUBLIC_KEY_FILE=Orion/nodeKey.pub
+```
+
+```bash tab="Configuration File"
 privacy-public-key-file="Orion/nodeKey.pub"
 ```
 
-Path to the [public key of the Orion node](../Privacy/Privacy-Overview.md#pantheon-and-orion-keys).     
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#privacy-public-key-file).
+Path to the [public key of the Orion node](../Privacy/Explanation/Privacy-Overview.md#pantheon-and-orion-keys).     
 
 ### privacy-url
 
@@ -787,15 +970,93 @@ Path to the [public key of the Orion node](../Privacy/Privacy-Overview.md#panthe
 --privacy-url=<privacyUrl>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --privacy-url=http://127.0.0.1:8888
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_PRIVACY_URL=http://127.0.0.1:8888
+```
+
+```bash tab="Configuration File"
 privacy-url="http://127.0.0.1:8888"
 ```
 
-URL on which the [Orion node](../Privacy/Configuring-Privacy.md#4-create-orion-configuration-files) is running.    
+URL on which the [Orion node](../Privacy/Tutorials/Configuring-Privacy.md#4-create-orion-configuration-files) is running.    
+
+### revert-reason-enabled
+
+```bash tab="Syntax"
+--revert-reason-enabled[=<true|false>]
+```
+
+```bash tab="Command Line"
+--revert-reason-enabled=true
+```
+
+```bash tab="Environment Variable"
+REVERT_REASON_ENABLED=true
+```
+
+```bash tab="Configuration File"
+revert-reason-enabled=true
+```
+
+Enables including the [revert reason](../Using-Pantheon/Transactions/Revert-Reason.md) in the transaction 
+receipt. Default is `false`. 
+
+!!! caution 
+    Enabling revert reason may use a significant amount of memory. We do not recommend enabling revert
+    reason when connected to public Ethereum networks. 
+
+### remote-connections-limit-enabled
+
+```bash tab="Syntax"
+--remote-connections-limit-enabled[=<true|false>]
+```
+
+```bash tab="Command Line"
+--remote-connections-limit-enabled=false
+```
+
+```bash tab="Environment Variable"
+PANTHEON_REMOTE_CONNECTIONS_LIMIT_ENABLED=false
+```
+
+```bash tab="Configuration File"
+remote-connections-limit-enabled=false
+```
+
+Specify to limit the percentage of remote P2P connections initiated by peers. Default is true. 
+
+!!! tip
+    In private networks with a level of trust between peers, disabling the remote connection limits 
+    may increase the speed at which nodes can join the network.
+
+!!! important
+    To prevent eclipse attacks, ensure the remote connections limit is enabled when connecting to 
+    any public network and especially when using [fast sync](#fast-sync-options). 
+
+### remote-connections-max-percentage
+
+```bash tab="Syntax"
+--remote-connections-max-percentage=<DOUBLE>
+```
+
+```bash tab="Command Line"
+--remote-connections-max-percentage=25
+```
+
+```bash tab="Environment Variable"
+PANTHEON_REMOTE_CONNECTIONS_MAX_PERCENTAGE=25
+```
+
+```bash tab="Configuration File"
+remote-connections-max-percentage=25
+```
+
+Percentage of remote P2P connections that can be established with the node. Must be between 0 and 100 inclusive.
+Default is 60. 
 
 ### rpc-http-api
 
@@ -803,11 +1064,15 @@ URL on which the [Orion node](../Privacy/Configuring-Privacy.md#4-create-orion-c
 --rpc-http-api=<api name>[,<api name>...]...
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --rpc-http-api=ETH,NET,WEB3
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_HTTP_API=ETH,NET,WEB3
+```
+
+```bash tab="Configuration File"
 rpc-http-api=["ETH","NET","WEB3"]
 ```
 
@@ -826,18 +1091,19 @@ The default is: `ETH`, `NET`, `WEB3`.
 --rpc-http-authentication-credentials-file=<FILE>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --rpc-http-authentication-credentials-file=/home/me/me_node/auth.toml
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_HTTP_AUTHENTICATION_CREDENTIALS_FILE=/home/me/me_node/auth.toml
+```
+
+```bash tab="Configuration File"
 rpc-http-authentication-credentials-file="/home/me/me_node/auth.toml"
 ```
 
 [Credentials file](../Pantheon-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../Pantheon-API/Authentication.md). 
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files).
 
 ### rpc-http-authentication-enabled
 
@@ -845,11 +1111,15 @@ rpc-http-authentication-credentials-file="/home/me/me_node/auth.toml"
 --rpc-http-authentication-enabled
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --rpc-http-authentication-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_HTTP_AUTHENTICATION_ENABLED=true
+```
+
+```bash tab="Configuration File"
 rpc-http-authentication-enabled=true
 ```
 
@@ -861,17 +1131,21 @@ Set to `true` to require [authentication](../Pantheon-API/Authentication.md) for
 --rpc-http-cors-origins=<url>[,<url>...]... or all or "*"
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 # You can whitelist one or more domains with a comma-separated list.
 
 --rpc-http-cors-origins="http://medomain.com","https://meotherdomain.com"
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_HTTP_CORS_ORIGINS="http://medomain.com","https://meotherdomain.com"
+```
+
+```bash tab="Configuration File"
 rpc-http-cors-origins=["http://medomain.com","https://meotherdomain.com"]
 ```
 
-```bash tab="Remix IDE domain example"
+```bash tab="Remix Example"
 # The following allows Remix to interact with your Pantheon node.
 
 --rpc-http-cors-origins="http://remix.ethereum.org"
@@ -901,7 +1175,11 @@ If you don't whitelist any domains, browser apps cannot interact with your Panth
 --rpc-http-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environement Variable"
+PANTHEON_RPC_HTTP_ENABLED=true
+```
+
+```bash tab="Configuration File"
 rpc-http-enabled=true
 ```
 
@@ -914,12 +1192,16 @@ The default is `false`.
 --rpc-http-host=<HOST>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 # to listen on all interfaces
 --rpc-http-host=0.0.0.0
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_HTTP_HOST=0.0.0.0
+```
+
+```bash tab="Configuration File"
 rpc-http-host="0.0.0.0"
 ```
 
@@ -932,29 +1214,27 @@ To allow remote connections, set to `0.0.0.0`
     Setting the host to 0.0.0.0 exposes the RPC connection on your node to any remote connection. In a 
     production environment, ensure you are using a firewall to avoid exposing your node to the internet. 
 
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
-
 ### rpc-http-port
 
 ```bash tab="Syntax"
 --rpc-http-port=<PORT>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 # to listen on port 3435
 --rpc-http-port=3435
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_HTTP_PORT=3435
+```
+
+```bash tab="Configuration File"
 rpc-http-port="3435"
 ```
 
 Specifies HTTP JSON-RPC listening port (TCP).
 The default is 8545. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md). 
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
 ### rpc-ws-api
 
@@ -962,11 +1242,15 @@ The default is 8545. Ports must be [exposed appropriately](../Configuring-Panthe
 --rpc-ws-api=<api name>[,<api name>...]...
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --rpc-ws-api=ETH,NET,WEB3
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_WS_API=ETH,NET,WEB3
+```
+
+```bash tab="Configuration File"
 rpc-ws-api=["ETH","NET","WEB3"]
 ```
 
@@ -985,18 +1269,19 @@ The default is: `ETH`, `NET`, `WEB3`.
 --rpc-ws-authentication-credentials-file=<FILE>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --rpc-ws-authentication-credentials-file=/home/me/me_node/auth.toml
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_WS_AUTHENTICATION_CREDENTIALS_FILE=/home/me/me_node/auth.toml
+```
+
+```bash tab="Configuration File"
 rpc-ws-authentication-credentials-file="/home/me/me_node/auth.toml"
 ```
 
 [Credentials file](../Pantheon-API/Authentication.md#credentials-file) for JSON-RPC API [authentication](../Pantheon-API/Authentication.md).
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#credentials-files). 
 
 ### rpc-ws-authentication-enabled
 
@@ -1004,11 +1289,15 @@ rpc-ws-authentication-credentials-file="/home/me/me_node/auth.toml"
 --rpc-ws-authentication-enabled
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --rpc-ws-authentication-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_WS_AUTHENTICATION_ENABLED=true
+```
+
+```bash tab="Configuration File"
 rpc-ws-authentication-enabled=true
 ```
 
@@ -1024,7 +1313,11 @@ Set to `true` to require [authentication](../Pantheon-API/Authentication.md) for
 --rpc-ws-enabled
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_WS_ENABLED=true
+```
+
+```bash tab="Configuration File"
 rpc-ws-enabled=true
 ```
 
@@ -1037,12 +1330,16 @@ The default is `false`.
 --rpc-ws-host=<HOST>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 # to listen on all interfaces
 --rpc-ws-host=0.0.0.0
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_WS_HOST=0.0.0.0
+```
+
+```bash tab="Configuration File"
 rpc-ws-host="0.0.0.0"
 ```
 
@@ -1050,9 +1347,6 @@ Host for Websocket WS-RPC to listen on.
 The default is 127.0.0.1.
 
 To allow remote connections, set to `0.0.0.0`
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
     
 ### rpc-ws-port
 
@@ -1060,20 +1354,21 @@ To allow remote connections, set to `0.0.0.0`
 --rpc-ws-port=<PORT>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 # to listen on port 6174
 --rpc-ws-port=6174
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_RPC_WS_PORT=6174
+```
+
+```bash tab="Configuration File"
 rpc-ws-port="6174"
 ```
 
 Specifies Websockets JSON-RPC listening port (TCP).
 The default is 8546. Ports must be [exposed appropriately](../Configuring-Pantheon/Networking/Configuring-Ports.md).
-
-!!!note
-    This option is not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md#exposing-ports). 
 
 ### tx-pool-max-size
 
@@ -1081,11 +1376,15 @@ The default is 8546. Ports must be [exposed appropriately](../Configuring-Panthe
 --tx-pool-max-size=<INTEGER>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --tx-pool-max-size=2000
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_TX_POOL_MAX_SIZE=2000
+```
+
+```bash tab="Configuration File"
 tx-pool-max-size="2000"
 ```
 
@@ -1097,11 +1396,15 @@ Maximum number of transactions kept in the transaction pool. Default is 4096.
 --tx-pool-retention-hours=<INTEGER>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --tx-pool-retention-hours=5
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_TX_POOL_RETENTION_HOURS=5
+```
+
+```bash tab="Configuration File"
 tx-pool-retention-hours="5"
 ```
 
@@ -1121,16 +1424,19 @@ Show the help message and exit.
 -l, --logging=<LEVEL>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --logging=DEBUG
 ```
 
+```bash tab="Environment Variable"
+PANTHEON_LOGGING=DEBUG
+```
 ```bash tab="Example Configration File"
 logging="DEBUG"
 ```
 
 Sets the logging verbosity.
-Log levels are `OFF`, `FATAL`, `WARN`, `INFO`, `DEBUG`, `TRACE`, `ALL`.
+Log levels are `OFF`, `FATAL`, `ERROR`, `WARN`, `INFO`, `DEBUG`, `TRACE`, `ALL`.
 Default is `INFO`.
 
 ### version
@@ -1149,11 +1455,15 @@ Print version information and exit.
 --sync-mode=FAST
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --sync-mode=FAST
 ```
 
-```bash tab="Example Configuration File"
+```bash tab="Environment Variable"
+PANTHEON_SYNC_MODE=FAST
+```
+
+```bash tab="Configuration File"
 sync-mode="FAST"
 ```
 
@@ -1165,8 +1475,12 @@ Specifies the synchronization mode. Default is `FULL`.
 --fast-sync-min-peers=<INTEGER>
 ```
 
-```bash tab="Example Command Line"
+```bash tab="Command Line"
 --fast-sync-min-peers=2
+```
+
+```bash tab="Environment Variable"
+PANTHEON_FAST_SYNC_MIN_PEERS=2
 ```
 
 ```bash tab="Example Configuration File"

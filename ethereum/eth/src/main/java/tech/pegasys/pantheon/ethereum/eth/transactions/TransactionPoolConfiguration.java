@@ -15,6 +15,9 @@ package tech.pegasys.pantheon.ethereum.eth.transactions;
 import java.util.Objects;
 
 public class TransactionPoolConfiguration {
+  public static final int DEFAULT_TX_MSG_KEEP_ALIVE = 60;
+  public static final int MAX_PENDING_TRANSACTIONS = 4096;
+  public static final int DEFAULT_TX_RETENTION_HOURS = 13;
 
   private final int txPoolMaxSize;
   private final int pendingTxRetentionPeriod;
@@ -77,9 +80,9 @@ public class TransactionPoolConfiguration {
   }
 
   public static class Builder {
-    private int txPoolMaxSize = PendingTransactions.MAX_PENDING_TRANSACTIONS;
-    private int pendingTxRetentionPeriod = PendingTransactions.DEFAULT_TX_RETENTION_HOURS;
-    private int txMessageKeepAliveSeconds = TransactionPool.DEFAULT_TX_MSG_KEEP_ALIVE;
+    private int txPoolMaxSize = MAX_PENDING_TRANSACTIONS;
+    private int pendingTxRetentionPeriod = DEFAULT_TX_RETENTION_HOURS;
+    private Integer txMessageKeepAliveSeconds = DEFAULT_TX_MSG_KEEP_ALIVE;
 
     public Builder txPoolMaxSize(final int txPoolMaxSize) {
       this.txPoolMaxSize = txPoolMaxSize;

@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
@@ -45,6 +45,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
+import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
 import tech.pegasys.pantheon.ethereum.p2p.network.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
@@ -52,6 +53,7 @@ import tech.pegasys.pantheon.ethereum.util.RawBlockIterator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import tech.pegasys.pantheon.testutil.BlockTestUtil;
 
 import java.net.URL;
 import java.nio.file.Paths;
@@ -72,11 +74,11 @@ import okhttp3.OkHttpClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.rules.TemporaryFolder;
 
 public abstract class AbstractEthJsonRpcHttpServiceTest {
-  @Rule public final TemporaryFolder folder = new TemporaryFolder();
+  @ClassRule public static final TemporaryFolder folder = new TemporaryFolder();
 
   protected static ProtocolSchedule<Void> PROTOCOL_SCHEDULE;
 
@@ -115,18 +117,9 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
   public static void setupConstants() throws Exception {
     PROTOCOL_SCHEDULE = MainnetProtocolSchedule.create();
 
-    final URL blocksUrl =
-        EthJsonRpcHttpBySpecTest.class
-            .getClassLoader()
-            .getResource("tech/pegasys/pantheon/ethereum/jsonrpc/jsonRpcTestBlockchain.blocks");
+    final URL blocksUrl = BlockTestUtil.getTestBlockchainUrl();
 
-    final URL genesisJsonUrl =
-        EthJsonRpcHttpBySpecTest.class
-            .getClassLoader()
-            .getResource("tech/pegasys/pantheon/ethereum/jsonrpc/jsonRpcTestGenesis.json");
-
-    assertThat(blocksUrl).isNotNull();
-    assertThat(genesisJsonUrl).isNotNull();
+    final URL genesisJsonUrl = BlockTestUtil.getTestGenesisUrl();
 
     BLOCKS = new ArrayList<>();
     try (final RawBlockIterator iterator =
@@ -152,6 +145,9 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
     final EthHashMiningCoordinator miningCoordinatorMock = mock(EthHashMiningCoordinator.class);
     when(transactionPoolMock.addLocalTransaction(any(Transaction.class)))
         .thenReturn(ValidationResult.valid());
+    // nonce too low tests uses a tx with nonce=16
+    when(transactionPoolMock.addLocalTransaction(argThat(tx -> tx.getNonce() == 16)))
+        .thenReturn(ValidationResult.invalid(TransactionInvalidReason.NONCE_TOO_LOW));
     final PendingTransactions pendingTransactionsMock = mock(PendingTransactions.class);
     when(transactionPoolMock.getPendingTransactions()).thenReturn(pendingTransactionsMock);
     final PrivacyParameters privacyParameters = mock(PrivacyParameters.class);
@@ -204,6 +200,7 @@ public abstract class AbstractEthJsonRpcHttpServiceTest {
             folder.newFolder().toPath(),
             config,
             new NoOpMetricsSystem(),
+            Optional.empty(),
             methods,
             HealthService.ALWAYS_HEALTHY,
             HealthService.ALWAYS_HEALTHY);

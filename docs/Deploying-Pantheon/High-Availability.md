@@ -8,6 +8,8 @@ or the [JSON-RPC API](../Pantheon-API/Using-JSON-RPC-API.md) run and synchronize
 nodes to the network. Use a load balancer to distribute requests across nodes in the cluster that 
 are ready to receive requests. 
 
+![Load Balancer](../images/LoadBalancer.png)
+
 ## Determining When a Node is Ready 
 
 Use the [readiness endpoint](../Pantheon-API/Using-JSON-RPC-API.md#readiness-and-liveness-endpoints) 
@@ -27,7 +29,7 @@ are sent to multiple nodes, the [`eth_getTransactionCount`](../Reference/Pantheo
 results can be incorrect. 
 
 !!! note
-    If using [private transactions](../Privacy/Privacy-Overview.md), `eea_getTransactionCount` is used to obtain 
+    If using [private transactions](../Privacy/Explanation/Privacy-Overview.md), `eea_getTransactionCount` is used to obtain 
     the account nonce and [`eea_sendRawTransaction`](../Reference/Pantheon-API-Methods.md#eea_sendrawtransaction)
     to send private transactions. 
 

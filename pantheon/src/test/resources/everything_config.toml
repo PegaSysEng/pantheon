@@ -15,6 +15,7 @@ node-private-key-file="./path/to/privateKey"
 
 # P2P network
 p2p-enabled=true
+nat-method="NONE"
 discovery-enabled=false
 bootnodes=[
   "enode://6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0@192.168.0.1:4567",
@@ -26,6 +27,8 @@ banned-node-id=["0x6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec
 p2p-host="1.2.3.4"
 p2p-port=1234
 max-peers=42
+remote-connections-limit-enabled=true
+remote-connections-max-percentage=60
 host-whitelist=["all"]
 
 # chain
@@ -75,7 +78,7 @@ metrics-push-prometheus-job="pantheon-everything"
 miner-enabled=false
 miner-coinbase="0x0000000000000000000000000000000000000002"
 miner-extra-data="0x444F4E27542050414E4943202120484F444C2C20484F444C2C20484F444C2021"
-min-gas-price="1"
+min-gas-price=1
 
 # Permissioning
 permissions-nodes-config-file-enabled=false
@@ -97,4 +100,7 @@ privacy-precompiled-address=9
 tx-pool-retention-hours=999
 
 tx-pool-max-size=1234
-tx-pool-keep-alive-seconds=60
+Xincoming-tx-messages-keep-alive-seconds=60
+
+# Revert Reason
+revert-reason-enabled=false

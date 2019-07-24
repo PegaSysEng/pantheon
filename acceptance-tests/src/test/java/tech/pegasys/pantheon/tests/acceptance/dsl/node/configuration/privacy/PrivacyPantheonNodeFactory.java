@@ -40,8 +40,10 @@ public class PrivacyPantheonNodeFactory {
         config.isDevMode(),
         config.getGenesisConfigProvider(),
         config.isP2pEnabled(),
+        config.getNetworkingConfiguration(),
         config.isDiscoveryEnabled(),
         config.isBootnodeEligible(),
+        config.isRevertReasonEnabled(),
         config.getPlugins(),
         config.getExtraCLIOptions(),
         config.getOrion());

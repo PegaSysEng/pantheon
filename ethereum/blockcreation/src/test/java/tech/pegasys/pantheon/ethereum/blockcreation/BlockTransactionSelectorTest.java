@@ -37,6 +37,7 @@ import tech.pegasys.pantheon.ethereum.core.WorldState;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetTransactionProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetTransactionProcessor.Result;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -56,6 +57,7 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
@@ -68,7 +70,10 @@ public class BlockTransactionSelectorTest {
 
   private final PendingTransactions pendingTransactions =
       new PendingTransactions(
-          PendingTransactions.DEFAULT_TX_RETENTION_HOURS, 5, TestClock.fixed(), metricsSystem);
+          TransactionPoolConfiguration.DEFAULT_TX_RETENTION_HOURS,
+          5,
+          TestClock.fixed(),
+          metricsSystem);
   private final Blockchain blockchain = new TestBlockchain();
   private final DefaultMutableWorldState worldState = inMemoryWorldState();
   private final Supplier<Boolean> isCancelled = () -> false;
@@ -124,7 +129,9 @@ public class BlockTransactionSelectorTest {
 
     when(transactionProcessor.processTransaction(
             any(), any(), any(), eq(transaction), any(), any(), anyBoolean(), any()))
-        .thenReturn(MainnetTransactionProcessor.Result.failed(5, ValidationResult.valid()));
+        .thenReturn(
+            MainnetTransactionProcessor.Result.failed(
+                5, ValidationResult.valid(), Optional.empty()));
 
     // The block should fit 3 transactions only
     final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(5000);
@@ -523,7 +530,8 @@ public class BlockTransactionSelectorTest {
   // This is a duplicate of the MainnetProtocolSpec::frontierTransactionReceiptFactory
   private TransactionReceipt createReceipt(
       final TransactionProcessor.Result result, final WorldState worldState, final long gasUsed) {
-    return new TransactionReceipt(worldState.rootHash(), gasUsed, Lists.newArrayList());
+    return new TransactionReceipt(
+        worldState.rootHash(), gasUsed, Lists.newArrayList(), Optional.empty());
   }
 
   private DefaultMutableWorldState inMemoryWorldState() {

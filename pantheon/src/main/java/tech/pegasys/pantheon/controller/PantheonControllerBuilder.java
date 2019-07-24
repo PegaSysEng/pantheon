@@ -27,7 +27,7 @@ import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.peervalidation.DaoForkPeerValidator;
@@ -66,7 +66,7 @@ public abstract class PantheonControllerBuilder<C> {
   protected GenesisConfigFile genesisConfig;
   protected SynchronizerConfiguration syncConfig;
   protected EthProtocolManager ethProtocolManager;
-  protected EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration;
+  protected EthProtocolConfiguration ethereumWireProtocolConfiguration;
   protected TransactionPoolConfiguration transactionPoolConfiguration;
   protected Integer networkId;
   protected MiningParameters miningParameters;
@@ -75,6 +75,7 @@ public abstract class PantheonControllerBuilder<C> {
   protected Path dataDirectory;
   protected Clock clock;
   protected KeyPair nodeKeys;
+  protected boolean isRevertReasonEnabled;
   private StorageProvider storageProvider;
   private final List<Runnable> shutdownActions = new ArrayList<>();
   private RocksDbConfiguration rocksDbConfiguration;
@@ -101,9 +102,9 @@ public abstract class PantheonControllerBuilder<C> {
     return this;
   }
 
-  public PantheonControllerBuilder<C> ethereumWireProtocolConfiguration(
-      final EthereumWireProtocolConfiguration ethereumWireProtocolConfiguration) {
-    this.ethereumWireProtocolConfiguration = ethereumWireProtocolConfiguration;
+  public PantheonControllerBuilder<C> ethProtocolConfiguration(
+      final EthProtocolConfiguration ethProtocolConfiguration) {
+    this.ethereumWireProtocolConfiguration = ethProtocolConfiguration;
     return this;
   }
 
@@ -154,6 +155,11 @@ public abstract class PantheonControllerBuilder<C> {
     return this;
   }
 
+  public PantheonControllerBuilder<C> isRevertReasonEnabled(final boolean isRevertReasonEnabled) {
+    this.isRevertReasonEnabled = isRevertReasonEnabled;
+    return this;
+  }
+
   public PantheonController<C> build() throws IOException {
     checkNotNull(genesisConfig, "Missing genesis config");
     checkNotNull(syncConfig, "Missing sync config");
@@ -193,7 +199,7 @@ public abstract class PantheonControllerBuilder<C> {
 
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
-    final boolean fastSyncEnabled = syncConfig.syncMode().equals(SyncMode.FAST);
+    final boolean fastSyncEnabled = syncConfig.getSyncMode().equals(SyncMode.FAST);
     ethProtocolManager = createEthProtocolManager(protocolContext, fastSyncEnabled);
     final SyncState syncState =
         new SyncState(blockchain, ethProtocolManager.ethContext().getEthPeers());
@@ -308,9 +314,9 @@ public abstract class PantheonControllerBuilder<C> {
         protocolContext.getWorldStateArchive(),
         networkId,
         fastSyncEnabled,
-        syncConfig.downloaderParallelism(),
-        syncConfig.transactionsParallelism(),
-        syncConfig.computationParallelism(),
+        syncConfig.getDownloaderParallelism(),
+        syncConfig.getTransactionsParallelism(),
+        syncConfig.getComputationParallelism(),
         clock,
         metricsSystem,
         ethereumWireProtocolConfiguration);

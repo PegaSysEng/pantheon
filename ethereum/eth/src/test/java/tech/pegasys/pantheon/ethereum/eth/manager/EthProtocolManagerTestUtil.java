@@ -21,7 +21,7 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.ChainHead;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
-import tech.pegasys.pantheon.ethereum.eth.EthereumWireProtocolConfiguration;
+import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.DeterministicEthScheduler.TimeoutPolicy;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -31,6 +31,8 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
+
+import java.util.OptionalLong;
 
 public class EthProtocolManagerTestUtil {
 
@@ -52,7 +54,7 @@ public class EthProtocolManagerTestUtil {
         networkId,
         false,
         ethScheduler,
-        EthereumWireProtocolConfiguration.defaultConfig(),
+        EthProtocolConfiguration.defaultConfig(),
         TestClock.fixed(),
         new NoOpMetricsSystem());
   }
@@ -134,6 +136,13 @@ public class EthProtocolManagerTestUtil {
 
   public static RespondingEthPeer createPeer(
       final EthProtocolManager ethProtocolManager, final UInt256 td, final long estimatedHeight) {
+    return RespondingEthPeer.create(ethProtocolManager, td, estimatedHeight);
+  }
+
+  public static RespondingEthPeer createPeer(
+      final EthProtocolManager ethProtocolManager,
+      final UInt256 td,
+      final OptionalLong estimatedHeight) {
     return RespondingEthPeer.create(ethProtocolManager, td, estimatedHeight);
   }
 
