@@ -298,7 +298,7 @@ public abstract class MainnetProtocolSpecs {
     final int stackSizeLimit = configStackSizeLimit.orElse(DEFAULT_MAX_STACK_SIZE);
     return constantinopleFixDefinition(
             chainId, configContractSizeLimit, configStackSizeLimit, enableRevertReason)
-        .gasCalculator(ConstantinopleGasCalculator::new)
+        .gasCalculator(IstanbulGasCalculator::new)
         .evmBuilder(gasCalculator -> MainnetEvmRegistries.istanbul(gasCalculator, chainId.get()))
         .precompileContractRegistryBuilder(MainnetPrecompiledContractRegistries::istanbul)
         .transactionProcessorBuilder(
