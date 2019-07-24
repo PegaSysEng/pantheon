@@ -55,7 +55,7 @@ public abstract class TransactionReceiptResult {
   private final String to;
   private final String transactionHash;
   private final String transactionIndex;
-  private final String revertReason;
+  private final BytesValue revertReason;
 
   protected final TransactionReceipt receipt;
 
@@ -141,7 +141,7 @@ public abstract class TransactionReceiptResult {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonGetter(value = "revertReason")
-  public String getRevertReason() {
+  public BytesValue getRevertReason() {
     return revertReason;
   }
 

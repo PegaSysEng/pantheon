@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.vm.ehalt.ExceptionalHaltException;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -68,7 +69,12 @@ public class DebugOperationTracer implements OperationTracer {
               stack,
               memory,
               storage,
-              frame.getRevertReason().orElse(null)));
+              frame
+                  .getRevertReason()
+                  .map(
+                      revertReason ->
+                          new String(revertReason.extractArray(), StandardCharsets.UTF_8))
+                  .orElse(null)));
     }
   }
 
