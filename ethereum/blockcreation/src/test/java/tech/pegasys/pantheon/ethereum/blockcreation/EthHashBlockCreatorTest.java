@@ -58,8 +58,10 @@ public class EthHashBlockCreatorTest {
                       BigInteger.valueOf(42),
                       Function.identity(),
                       PrivacyParameters.DEFAULT,
-                      false)
+                      false,
+                      TestClock.fixedNow())
                   .createProtocolSchedule())
+          .clock(TestClock.fixedNow())
           .build();
 
   @Test
@@ -70,7 +72,7 @@ public class EthHashBlockCreatorTest {
         new PendingTransactions(
             TransactionPoolConfiguration.DEFAULT_TX_RETENTION_HOURS,
             1,
-            TestClock.fixed(),
+            TestClock.fixedNow(),
             metricsSystem);
 
     final EthHashBlockCreator blockCreator =

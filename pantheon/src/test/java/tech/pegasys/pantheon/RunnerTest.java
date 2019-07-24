@@ -131,7 +131,7 @@ public final class RunnerTest {
             .nodeKeys(aheadDbNodeKeys)
             .metricsSystem(noOpMetricsSystem)
             .privacyParameters(PrivacyParameters.DEFAULT)
-            .clock(TestClock.fixed())
+            .clock(TestClock.fixedNow())
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
             .storageProvider(createKeyValueStorageProvider(dbAhead))
             .build()) {
@@ -150,7 +150,7 @@ public final class RunnerTest {
             .nodeKeys(aheadDbNodeKeys)
             .metricsSystem(noOpMetricsSystem)
             .privacyParameters(PrivacyParameters.DEFAULT)
-            .clock(TestClock.fixed())
+            .clock(TestClock.fixedNow())
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
             .storageProvider(createKeyValueStorageProvider(dbAhead))
             .build();
@@ -178,6 +178,7 @@ public final class RunnerTest {
             .graphQLConfiguration(aheadGraphQLConfiguration)
             .webSocketConfiguration(aheadWebSocketConfiguration)
             .metricsConfiguration(aheadMetricsConfiguration)
+            .clock(TestClock.fixedNow())
             .dataDir(dbAhead)
             .build();
     try {
@@ -209,7 +210,7 @@ public final class RunnerTest {
               .storageProvider(new InMemoryStorageProvider())
               .metricsSystem(noOpMetricsSystem)
               .privacyParameters(PrivacyParameters.DEFAULT)
-              .clock(TestClock.fixed())
+              .clock(TestClock.fixedNow())
               .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
               .build();
       final EnodeURL enode = runnerAhead.getLocalEnode().get();

@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.util.Subscribers;
 
 import java.net.InetSocketAddress;
+import java.time.Clock;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -59,6 +60,7 @@ public class NettyConnectionInitializer implements ConnectionInitializer {
   private final LocalNode localNode;
   private final PeerConnectionEventDispatcher eventDispatcher;
   private final MetricsSystem metricsSystem;
+  private final Clock clock;
   private final Subscribers<ConnectCallback> connectSubscribers = Subscribers.create();
 
   private ChannelFuture server;
@@ -72,11 +74,13 @@ public class NettyConnectionInitializer implements ConnectionInitializer {
       final RlpxConfiguration config,
       final LocalNode localNode,
       final PeerConnectionEventDispatcher eventDispatcher,
-      final MetricsSystem metricsSystem) {
+      final MetricsSystem metricsSystem,
+      final Clock clock) {
     this.keyPair = keyPair;
     this.config = config;
     this.localNode = localNode;
     this.eventDispatcher = eventDispatcher;
+    this.clock = clock;
     this.metricsSystem = metricsSystem;
 
     metricsSystem.createIntegerGauge(
@@ -165,7 +169,7 @@ public class NettyConnectionInitializer implements ConnectionInitializer {
     final CompletableFuture<PeerConnection> connectionFuture = new CompletableFuture<>();
 
     if (peer instanceof DiscoveryPeer) {
-      ((DiscoveryPeer) peer).setLastAttemptedConnection(System.currentTimeMillis());
+      ((DiscoveryPeer) peer).setLastAttemptedConnection(clock.millis());
     }
 
     final EnodeURL enode = peer.getEnodeURL();

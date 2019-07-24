@@ -75,7 +75,8 @@ public class IbftBlockCreatorTest {
     final ProtocolSchedule<IbftContext> protocolSchedule =
         IbftProtocolSchedule.create(
             GenesisConfigFile.fromConfig("{\"config\": {\"spuriousDragonBlock\":0}}")
-                .getConfigOptions());
+                .getConfigOptions(),
+            TestClock.fixedNow());
     final ProtocolContext<IbftContext> protContext =
         new ProtocolContext<>(
             blockchain,
@@ -86,7 +87,7 @@ public class IbftBlockCreatorTest {
         new PendingTransactions(
             TransactionPoolConfiguration.DEFAULT_TX_RETENTION_HOURS,
             1,
-            TestClock.fixed(),
+            TestClock.fixedNow(),
             metricsSystem);
 
     final IbftBlockCreator blockCreator =
@@ -110,7 +111,7 @@ public class IbftBlockCreatorTest {
     final Block block = blockCreator.createBlock(Instant.now().getEpochSecond());
 
     final BlockHeaderValidator<IbftContext> rules =
-        IbftBlockHeaderValidationRulesetFactory.ibftBlockHeaderValidator(0);
+        IbftBlockHeaderValidationRulesetFactory.ibftBlockHeaderValidator(0, TestClock.fixedNow());
 
     // NOTE: The header will not contain commit seals, so can only do light validation on header.
     final boolean validationResult =

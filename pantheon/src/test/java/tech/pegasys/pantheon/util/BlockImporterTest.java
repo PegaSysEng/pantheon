@@ -63,7 +63,7 @@ public final class BlockImporterTest {
             .metricsSystem(new NoOpMetricsSystem())
             .privacyParameters(PrivacyParameters.DEFAULT)
             .dataDirectory(dataDir)
-            .clock(TestClock.fixed())
+            .clock(TestClock.fixedNow())
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
             .build();
     final BlockImporter.ImportResult result =
@@ -102,7 +102,7 @@ public final class BlockImporterTest {
             .metricsSystem(new NoOpMetricsSystem())
             .privacyParameters(PrivacyParameters.DEFAULT)
             .dataDirectory(dataDir)
-            .clock(TestClock.fixed())
+            .clock(TestClock.fixedNow())
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
             .build();
     final BlockImporter.ImportResult result = blockImporter.importBlockchain(source, controller);

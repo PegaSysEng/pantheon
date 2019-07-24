@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyCalculator
 import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyProtocolSchedule;
 
 import java.math.BigInteger;
+import java.time.Clock;
 import java.util.function.Function;
 
 /** Provides {@link ProtocolSpec} lookups for mainnet hard forks. */
@@ -26,9 +27,9 @@ public class MainnetProtocolSchedule {
 
   public static final BigInteger DEFAULT_CHAIN_ID = BigInteger.ONE;
 
-  public static ProtocolSchedule<Void> create() {
+  public static ProtocolSchedule<Void> create(final Clock clock) {
     return fromConfig(
-        GenesisConfigFile.mainnet().getConfigOptions(), PrivacyParameters.DEFAULT, false);
+        GenesisConfigFile.mainnet().getConfigOptions(), PrivacyParameters.DEFAULT, false, clock);
   }
 
   /**
@@ -43,13 +44,19 @@ public class MainnetProtocolSchedule {
   public static ProtocolSchedule<Void> fromConfig(
       final GenesisConfigOptions config,
       final PrivacyParameters privacyParameters,
-      final boolean isRevertReasonEnabled) {
+      final boolean isRevertReasonEnabled,
+      final Clock clock) {
     if (FixedDifficultyCalculators.isFixedDifficultyInConfig(config)) {
       return FixedDifficultyProtocolSchedule.create(
-          config, privacyParameters, isRevertReasonEnabled);
+          config, privacyParameters, isRevertReasonEnabled, clock);
     }
-    return new ProtocolScheduleBuilder<>(
-            config, DEFAULT_CHAIN_ID, Function.identity(), privacyParameters, isRevertReasonEnabled)
+    return new ProtocolScheduleBuilder<Void>(
+            config,
+            DEFAULT_CHAIN_ID,
+            Function.identity(),
+            privacyParameters,
+            isRevertReasonEnabled,
+            clock)
         .createProtocolSchedule();
   }
 
@@ -62,8 +69,8 @@ public class MainnetProtocolSchedule {
    * @return A configured mainnet protocol schedule
    */
   public static ProtocolSchedule<Void> fromConfig(
-      final GenesisConfigOptions config, final boolean isRevertReasonEnabled) {
-    return fromConfig(config, PrivacyParameters.DEFAULT, isRevertReasonEnabled);
+      final GenesisConfigOptions config, final boolean isRevertReasonEnabled, final Clock clock) {
+    return fromConfig(config, PrivacyParameters.DEFAULT, isRevertReasonEnabled, clock);
   }
 
   /**
@@ -73,7 +80,8 @@ public class MainnetProtocolSchedule {
    *     starting points
    * @return A configured mainnet protocol schedule
    */
-  public static ProtocolSchedule<Void> fromConfig(final GenesisConfigOptions config) {
-    return fromConfig(config, PrivacyParameters.DEFAULT, false);
+  public static ProtocolSchedule<Void> fromConfig(
+      final GenesisConfigOptions config, final Clock clock) {
+    return fromConfig(config, PrivacyParameters.DEFAULT, false, clock);
   }
 }

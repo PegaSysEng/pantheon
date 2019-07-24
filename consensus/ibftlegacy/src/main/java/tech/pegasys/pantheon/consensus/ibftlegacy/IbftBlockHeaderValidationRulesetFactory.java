@@ -26,6 +26,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.TimestampBou
 import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.TimestampMoreRecentThanParent;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
+import java.time.Clock;
+
 public class IbftBlockHeaderValidationRulesetFactory {
 
   /**
@@ -36,8 +38,8 @@ public class IbftBlockHeaderValidationRulesetFactory {
    * @return BlockHeaderValidator configured for assessing ibft block headers
    */
   public static BlockHeaderValidator<IbftContext> ibftBlockHeaderValidator(
-      final long secondsBetweenBlocks) {
-    return createValidator(secondsBetweenBlocks, true);
+      final long secondsBetweenBlocks, final Clock clock) {
+    return createValidator(secondsBetweenBlocks, true, clock);
   }
 
   /**
@@ -48,17 +50,17 @@ public class IbftBlockHeaderValidationRulesetFactory {
    * @return BlockHeaderValidator configured for assessing ibft block headers
    */
   public static BlockHeaderValidator<IbftContext> ibftProposedBlockValidator(
-      final long secondsBetweenBlocks) {
-    return createValidator(secondsBetweenBlocks, false);
+      final long secondsBetweenBlocks, final Clock clock) {
+    return createValidator(secondsBetweenBlocks, false, clock);
   }
 
   private static BlockHeaderValidator<IbftContext> createValidator(
-      final long secondsBetweenBlocks, final boolean validateCommitSeals) {
+      final long secondsBetweenBlocks, final boolean validateCommitSeals, final Clock clock) {
     return new BlockHeaderValidator.Builder<IbftContext>()
         .addRule(new AncestryValidationRule())
         .addRule(new GasUsageValidationRule())
         .addRule(new GasLimitRangeAndDeltaValidationRule(5000, 0x7fffffffffffffffL))
-        .addRule(new TimestampBoundedByFutureParameter(1))
+        .addRule(new TimestampBoundedByFutureParameter(1, clock))
         .addRule(new TimestampMoreRecentThanParent(secondsBetweenBlocks))
         .addRule(
             new ConstantFieldValidationRule<>(

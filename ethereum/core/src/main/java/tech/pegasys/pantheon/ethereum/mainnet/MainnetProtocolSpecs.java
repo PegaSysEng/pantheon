@@ -33,6 +33,7 @@ import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionProcessor;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -71,7 +72,9 @@ public abstract class MainnetProtocolSpecs {
   private MainnetProtocolSpecs() {}
 
   public static ProtocolSpecBuilder<Void> frontierDefinition(
-      final OptionalInt configContractSizeLimit, final OptionalInt configStackSizeLimit) {
+      final OptionalInt configContractSizeLimit,
+      final OptionalInt configStackSizeLimit,
+      final Clock clock) {
     final int contractSizeLimit = configContractSizeLimit.orElse(FRONTIER_CONTRACT_SIZE_LIMIT);
     final int stackSizeLimit = configStackSizeLimit.orElse(DEFAULT_MAX_STACK_SIZE);
     return new ProtocolSpecBuilder<Void>()
@@ -117,7 +120,8 @@ public abstract class MainnetProtocolSpecs {
                     stackSizeLimit,
                     Account.DEFAULT_VERSION))
         .difficultyCalculator(MainnetDifficultyCalculators.FRONTIER)
-        .blockHeaderValidatorBuilder(MainnetBlockHeaderValidator::create)
+        .blockHeaderValidatorBuilder(
+            difficultyCalculator -> MainnetBlockHeaderValidator.create(difficultyCalculator, clock))
         .ommerHeaderValidatorBuilder(MainnetBlockHeaderValidator::createOmmerValidator)
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .transactionReceiptFactory(MainnetProtocolSpecs::frontierTransactionReceiptFactory)
@@ -132,9 +136,11 @@ public abstract class MainnetProtocolSpecs {
   }
 
   public static ProtocolSpecBuilder<Void> homesteadDefinition(
-      final OptionalInt configContractSizeLimit, final OptionalInt configStackSizeLimit) {
+      final OptionalInt configContractSizeLimit,
+      final OptionalInt configStackSizeLimit,
+      final Clock clock) {
     final int contractSizeLimit = configContractSizeLimit.orElse(FRONTIER_CONTRACT_SIZE_LIMIT);
-    return frontierDefinition(configContractSizeLimit, configStackSizeLimit)
+    return frontierDefinition(configContractSizeLimit, configStackSizeLimit, clock)
         .gasCalculator(HomesteadGasCalculator::new)
         .evmBuilder(MainnetEvmRegistries::homestead)
         .contractCreationProcessorBuilder(
@@ -152,9 +158,13 @@ public abstract class MainnetProtocolSpecs {
   }
 
   public static ProtocolSpecBuilder<Void> daoRecoveryInitDefinition(
-      final OptionalInt contractSizeLimit, final OptionalInt configStackSizeLimit) {
-    return homesteadDefinition(contractSizeLimit, configStackSizeLimit)
-        .blockHeaderValidatorBuilder(MainnetBlockHeaderValidator::createDaoValidator)
+      final OptionalInt contractSizeLimit,
+      final OptionalInt configStackSizeLimit,
+      final Clock clock) {
+    return homesteadDefinition(contractSizeLimit, configStackSizeLimit, clock)
+        .blockHeaderValidatorBuilder(
+            difficultyCalculator ->
+                MainnetBlockHeaderValidator.createDaoValidator(difficultyCalculator, clock))
         .blockProcessorBuilder(
             (transactionProcessor,
                 transactionReceiptFactory,
@@ -170,15 +180,19 @@ public abstract class MainnetProtocolSpecs {
   }
 
   public static ProtocolSpecBuilder<Void> daoRecoveryTransitionDefinition(
-      final OptionalInt contractSizeLimit, final OptionalInt configStackSizeLimit) {
-    return daoRecoveryInitDefinition(contractSizeLimit, configStackSizeLimit)
+      final OptionalInt contractSizeLimit,
+      final OptionalInt configStackSizeLimit,
+      final Clock clock) {
+    return daoRecoveryInitDefinition(contractSizeLimit, configStackSizeLimit, clock)
         .blockProcessorBuilder(MainnetBlockProcessor::new)
         .name("DaoRecoveryTransition");
   }
 
   public static ProtocolSpecBuilder<Void> tangerineWhistleDefinition(
-      final OptionalInt contractSizeLimit, final OptionalInt configStackSizeLimit) {
-    return homesteadDefinition(contractSizeLimit, configStackSizeLimit)
+      final OptionalInt contractSizeLimit,
+      final OptionalInt configStackSizeLimit,
+      final Clock clock) {
+    return homesteadDefinition(contractSizeLimit, configStackSizeLimit, clock)
         .gasCalculator(TangerineWhistleGasCalculator::new)
         .name("TangerineWhistle");
   }
@@ -186,12 +200,13 @@ public abstract class MainnetProtocolSpecs {
   public static ProtocolSpecBuilder<Void> spuriousDragonDefinition(
       final Optional<BigInteger> chainId,
       final OptionalInt configContractSizeLimit,
-      final OptionalInt configStackSizeLimit) {
+      final OptionalInt configStackSizeLimit,
+      final Clock clock) {
     final int contractSizeLimit =
         configContractSizeLimit.orElse(SPURIOUS_DRAGON_CONTRACT_SIZE_LIMIT);
     final int stackSizeLimit = configStackSizeLimit.orElse(DEFAULT_MAX_STACK_SIZE);
 
-    return tangerineWhistleDefinition(OptionalInt.empty(), configStackSizeLimit)
+    return tangerineWhistleDefinition(OptionalInt.empty(), configStackSizeLimit, clock)
         .gasCalculator(SpuriousDragonGasCalculator::new)
         .messageCallProcessorBuilder(
             (evm, precompileContractRegistry) ->
@@ -243,8 +258,9 @@ public abstract class MainnetProtocolSpecs {
       final Optional<BigInteger> chainId,
       final OptionalInt contractSizeLimit,
       final OptionalInt configStackSizeLimit,
-      final boolean enableRevertReason) {
-    return spuriousDragonDefinition(chainId, contractSizeLimit, configStackSizeLimit)
+      final boolean enableRevertReason,
+      final Clock clock) {
+    return spuriousDragonDefinition(chainId, contractSizeLimit, configStackSizeLimit, clock)
         .evmBuilder(MainnetEvmRegistries::byzantium)
         .precompileContractRegistryBuilder(MainnetPrecompiledContractRegistries::byzantium)
         .difficultyCalculator(MainnetDifficultyCalculators.BYZANTIUM)
@@ -261,8 +277,10 @@ public abstract class MainnetProtocolSpecs {
       final Optional<BigInteger> chainId,
       final OptionalInt contractSizeLimit,
       final OptionalInt configStackSizeLimit,
-      final boolean enableRevertReason) {
-    return byzantiumDefinition(chainId, contractSizeLimit, configStackSizeLimit, enableRevertReason)
+      final boolean enableRevertReason,
+      final Clock clock) {
+    return byzantiumDefinition(
+            chainId, contractSizeLimit, configStackSizeLimit, enableRevertReason, clock)
         .difficultyCalculator(MainnetDifficultyCalculators.CONSTANTINOPLE)
         .gasCalculator(ConstantinopleGasCalculator::new)
         .evmBuilder(MainnetEvmRegistries::constantinople)
@@ -274,9 +292,10 @@ public abstract class MainnetProtocolSpecs {
       final Optional<BigInteger> chainId,
       final OptionalInt contractSizeLimit,
       final OptionalInt configStackSizeLimit,
-      final boolean enableRevertReason) {
+      final boolean enableRevertReason,
+      final Clock clock) {
     return constantinopleDefinition(
-            chainId, contractSizeLimit, configStackSizeLimit, enableRevertReason)
+            chainId, contractSizeLimit, configStackSizeLimit, enableRevertReason, clock)
         .gasCalculator(ConstantinopleFixGasCalculator::new)
         .name("ConstantinopleFix");
   }
@@ -285,13 +304,14 @@ public abstract class MainnetProtocolSpecs {
       final Optional<BigInteger> chainId,
       final OptionalInt configContractSizeLimit,
       final OptionalInt configStackSizeLimit,
-      final boolean enableRevertReason) {
+      final boolean enableRevertReason,
+      final Clock clock) {
     checkArgument(chainId.isPresent(), "Istanbul requires the use of chainId");
     final int contractSizeLimit =
         configContractSizeLimit.orElse(SPURIOUS_DRAGON_CONTRACT_SIZE_LIMIT);
     final int stackSizeLimit = configStackSizeLimit.orElse(DEFAULT_MAX_STACK_SIZE);
     return constantinopleFixDefinition(
-            chainId, configContractSizeLimit, configStackSizeLimit, enableRevertReason)
+            chainId, configContractSizeLimit, configStackSizeLimit, enableRevertReason, clock)
         .gasCalculator(IstanbulGasCalculator::new)
         .evmBuilder(gasCalculator -> MainnetEvmRegistries.istanbul(gasCalculator, chainId.get()))
         .precompileContractRegistryBuilder(MainnetPrecompiledContractRegistries::istanbul)
