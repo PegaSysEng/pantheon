@@ -3876,7 +3876,8 @@ Privacy groups containing only the specified members.
 Returns the private transaction count for specified account and privacy group. 
 
 !!! important 
-    If sending a large number of private transactions, calculate the private transaction nonce outside Pantheon. 
+    If sending more than 1 transaction to be mined in the same block (that is, you're not waiting for 
+    the transaction receipt), you must calculate the private transaction nonce outside Pantheon. 
 
 **Parameters** 
 
