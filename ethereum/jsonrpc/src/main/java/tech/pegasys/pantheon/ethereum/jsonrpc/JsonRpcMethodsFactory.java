@@ -90,14 +90,14 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.Per
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermReloadPermissionsFromFile;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveAccountsFromWhitelist;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveNodesFromWhitelist;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea.EeaGetPrivateTransaction;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea.EeaGetTransactionCount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea.EeaGetTransactionReceipt;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea.EeaSendRawTransaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv.PrivCreatePrivacyGroup;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv.PrivDeletePrivacyGroup;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv.PrivFindPrivacyGroup;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv.PrivGetPrivacyPrecompileAddress;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv.PrivGetPrivateTransaction;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv.PrivGetTransactionCount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockReplay;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockTracer;
@@ -322,6 +322,7 @@ public class JsonRpcMethodsFactory {
           new AdminChangeLogLevel(parameter));
     }
     if (rpcApis.contains(RpcApis.EEA)) {
+      //      TODO: josh-richardson change this
       final PrivateTransactionHandler privateTransactionHandler =
           new PrivateTransactionHandler(privacyParameters);
       final Enclave enclave = new Enclave(privacyParameters.getEnclaveUri());
@@ -330,8 +331,8 @@ public class JsonRpcMethodsFactory {
           new EeaGetTransactionReceipt(blockchainQueries, enclave, parameter, privacyParameters),
           new EeaSendRawTransaction(
               blockchainQueries, privateTransactionHandler, transactionPool, parameter),
-          new EeaGetTransactionCount(parameter, privateTransactionHandler),
-          new EeaGetPrivateTransaction(enclave, parameter, privacyParameters));
+          new PrivGetTransactionCount(parameter, privateTransactionHandler),
+          new PrivGetPrivateTransaction(enclave, parameter, privacyParameters));
     }
     if (rpcApis.contains(RpcApis.PRIV)) {
       addMethods(

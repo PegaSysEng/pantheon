@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea;
+package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
@@ -24,12 +24,12 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessRe
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.Quantity;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 
-public class EeaGetTransactionCount implements JsonRpcMethod {
+public class PrivGetTransactionCount implements JsonRpcMethod {
 
   private final JsonRpcParameter parameters;
   private final PrivateTransactionHandler privateTransactionHandler;
 
-  public EeaGetTransactionCount(
+  public PrivGetTransactionCount(
       final JsonRpcParameter parameters,
       final PrivateTransactionHandler privateTransactionHandler) {
     this.parameters = parameters;
@@ -38,7 +38,7 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
 
   @Override
   public String getName() {
-    return RpcMethod.EEA_GET_TRANSACTION_COUNT.getMethodName();
+    return RpcMethod.PRIV_GET_TRANSACTION_COUNT.getMethodName();
   }
 
   @Override
