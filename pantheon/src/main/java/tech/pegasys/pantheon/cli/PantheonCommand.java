@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.RunnerBuilder;
 import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
 import tech.pegasys.pantheon.cli.config.NetworkName;
 import tech.pegasys.pantheon.cli.converter.MetricCategoryConverter;
+import tech.pegasys.pantheon.cli.converter.PercentageConverter;
 import tech.pegasys.pantheon.cli.converter.RpcApisConverter;
 import tech.pegasys.pantheon.cli.custom.CorsAllowedOriginsProperty;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
@@ -81,16 +82,19 @@ import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
+import tech.pegasys.pantheon.nat.NatMethod;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
+import tech.pegasys.pantheon.util.BlockExporter;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.InvalidConfigurationException;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.number.Fraction;
 import tech.pegasys.pantheon.util.number.PositiveNumber;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -150,6 +154,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private CommandLine commandLine;
 
   private final BlockImporter blockImporter;
+  private final BlockExporter blockExporter;
 
   final NetworkingOptions networkingOptions = NetworkingOptions.create();
   final SynchronizerOptions synchronizerOptions = SynchronizerOptions.create();
@@ -234,6 +239,24 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer maxPeers = DEFAULT_MAX_PEERS;
 
   @Option(
+      names = {"--remote-connections-limit-enabled"},
+      description =
+          "Whether to limit the number of P2P connections initiated remotely. (default: ${DEFAULT-VALUE})")
+  private final Boolean isLimitRemoteWireConnectionsEnabled = true;
+
+  @Option(
+      names = {"--remote-connections-max-percentage"},
+      paramLabel = MANDATORY_DOUBLE_FORMAT_HELP,
+      description =
+          "The maximum percentage of P2P connections that can be initiated remotely. Must be between 0 and 100 inclusive. (default: ${DEFAULT-VALUE})",
+      arity = "1",
+      converter = PercentageConverter.class)
+  private final Integer maxRemoteConnectionsPercentage =
+      Fraction.fromFloat(DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED)
+          .toPercentage()
+          .getValue();
+
+  @Option(
       names = {"--banned-node-ids", "--banned-node-id"},
       paramLabel = MANDATORY_NODE_ID_FORMAT_HELP,
       description = "A list of node IDs to ban from the P2P network.",
@@ -290,6 +313,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Port on which to listen for p2p communication (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Integer p2pPort = EnodeURL.DEFAULT_LISTENING_PORT;
+
+  @Option(
+      names = {"--nat-method"},
+      description =
+          "Specify the NAT circumvention method to be used, possible values are ${COMPLETION-CANDIDATES}."
+              + " NONE disables NAT functionality. (default: ${DEFAULT-VALUE})")
+  private final NatMethod natMethod = DEFAULT_NAT_METHOD;
 
   @Option(
       names = {"--network-id"},
@@ -480,7 +510,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--logging", "-l"},
       paramLabel = "<LOG VERBOSITY LEVEL>",
       description =
-          "Logging verbosity levels: OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)")
+          "Logging verbosity levels: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL (default: ${DEFAULT-VALUE})")
   private final Level logLevel = Level.INFO;
 
   @Option(
@@ -536,21 +566,25 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @Option(
       names = {"--permissions-accounts-contract-address"},
       description = "Address of the account permissioning smart contract",
-      arity = "1",
-      hidden = true)
+      arity = "1")
   private final Address permissionsAccountsContractAddress = null;
 
   @Option(
       names = {"--permissions-accounts-contract-enabled"},
       description =
-          "Enable account level permissions via smart contract (default: ${DEFAULT-VALUE})",
-      hidden = true)
+          "Enable account level permissions via smart contract (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsAccountsContractEnabled = false;
 
   @Option(
       names = {"--privacy-enabled"},
       description = "Enable private transactions (default: ${DEFAULT-VALUE})")
   private final Boolean isPrivacyEnabled = false;
+
+  @Option(
+      names = {"--revert-reason-enabled"},
+      description =
+          "Enable passing the revert reason back through TransactionReceipts (default: ${DEFAULT-VALUE})")
+  private final Boolean isRevertReasonEnabled = false;
 
   @Option(
       names = {"--privacy-url"},
@@ -595,12 +629,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   public PantheonCommand(
       final Logger logger,
       final BlockImporter blockImporter,
+      final BlockExporter blockExporter,
       final RunnerBuilder runnerBuilder,
       final PantheonController.Builder controllerBuilderFactory,
       final PantheonPluginContextImpl pantheonPluginContext,
       final Map<String, String> environment) {
     this.logger = logger;
     this.blockImporter = blockImporter;
+    this.blockExporter = blockExporter;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilderFactory = controllerBuilderFactory;
     this.pantheonPluginContext = pantheonPluginContext;
@@ -645,7 +681,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private PantheonCommand addSubCommands(
       final AbstractParseResultHandler<List<Object>> resultHandler, final InputStream in) {
     commandLine.addSubcommand(
-        BlocksSubCommand.COMMAND_NAME, new BlocksSubCommand(blockImporter, resultHandler.out()));
+        BlocksSubCommand.COMMAND_NAME,
+        new BlocksSubCommand(blockImporter, blockExporter, resultHandler.out()));
     commandLine.addSubcommand(
         PublicKeySubCommand.COMMAND_NAME,
         new PublicKeySubCommand(resultHandler.out(), getKeyLoader()));
@@ -666,6 +703,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(UInt256.class, (arg) -> UInt256.of(new BigInteger(arg)));
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
+
     final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
     metricCategoryConverter.addCategories(PantheonMetricCategory.class);
     metricCategoryConverter.addCategories(StandardMetricCategory.class);
@@ -757,8 +795,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             "--discovery-enabled",
             "--max-peers",
             "--banned-node-id",
-            "--banned-node-ids"));
-
+            "--banned-node-ids",
+            "--remote-connections-max-percentage"));
     // Check that mining options are able to work or send an error
     checkOptionDependencies(
         logger,
@@ -846,6 +884,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
+          .isRevertReasonEnabled(isRevertReasonEnabled)
           .build();
     } catch (final InvalidConfigurationException e) {
       throw new ExecutionException(this.commandLine, e.getMessage());
@@ -1142,11 +1181,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .vertx(Vertx.vertx(createVertxOptions(metricsSystem)))
             .pantheonController(controller)
             .p2pEnabled(p2pEnabled)
+            .natMethod(natMethod)
             .discovery(peerDiscoveryEnabled)
             .ethNetworkConfig(ethNetworkConfig)
             .p2pAdvertisedHost(p2pAdvertisedHost)
             .p2pListenPort(p2pListenPort)
             .maxPeers(maxPeers)
+            .limitRemoteWireConnectionsEnabled(isLimitRemoteWireConnectionsEnabled)
+            .fractionRemoteConnectionsAllowed(
+                Fraction.fromPercentage(maxRemoteConnectionsPercentage).getValue())
             .networkingConfiguration(networkingOptions.toDomainObject())
             .graphQLConfiguration(graphQLConfiguration)
             .jsonRpcConfiguration(jsonRpcConfiguration)

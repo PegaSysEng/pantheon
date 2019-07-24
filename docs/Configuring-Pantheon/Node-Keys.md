@@ -43,14 +43,12 @@ Specified by the [`--p2p-host`](../Reference/Pantheon-CLI-Syntax.md#p2p-host) an
 The enode is displayed when starting a Pantheon node and can be obtained using the [`net_enode`](../Reference/Pantheon-API-Methods.md#net_enode) 
 JSON-RPC API method. 
 
+If [UPnP](Networking/Using-UPnP.md) is enabled, the enode advertised to other nodes during discovery is the 
+external IP address and port. 
+
 ## Specifying a Custom Node Private Key File
 
 Use the [`--node-private-key-file`](../Reference/Pantheon-CLI-Syntax.md#node-private-key-file) option to specify a custom `key` file in any location. 
-
-!!!note
-    The [`--node-private-key-file`](../Reference/Pantheon-CLI-Syntax.md#node-private-key-file) option is 
-    not used when running Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md). When running 
-    from the Docker image, Pantheon always uses the key file in the [data directory](../Getting-Started/Run-Docker-Image.md#data-directory).
 
 If the `key` file exists, the node is started with the private key in the custom `key` file. If the custom `key` file does not exist, 
 a node private key is generated and written to the custom `key` file.
