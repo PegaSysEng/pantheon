@@ -15,10 +15,10 @@ The Options parameter is used by:
 The Options parameter has the following properties: 
 
 * `privateKey`: Ethereum private key with which to sign the transaction
-* `privateFrom` : Orion public key
+* `privateFrom` : Orion public key of the sender
 * `privateFor` : Orion public keys of recipients
 * `nonce` : Optional. If not provided, calculated using [`eea_getTransctionCount`](../Reference/Pantheon-API-Methods.md).
-* `to` : Optional. Contract address to which to send the transaction. Do not specify for contract deployment transactions
+* `to` : Optional. Contract address to send the transaction to. Do not specify for contract deployment transactions
 * `data` : Transaction data
 
 ## generatePrivacyGroup
@@ -49,7 +49,7 @@ Gets the [privacy marker transaction](../Privacy/Private-Transaction-Processing.
 
 `txHash` - `string` : Transaction hash of the private transaction
 
-`retries` - `int` : Number of attempts to make to get the private marker transaction receipt 
+`retries` - `int` : Maximum number of attempts to get the private marker transaction receipt 
 
 `delay` - `int` : Delay between retries in milliseconds
 
@@ -94,9 +94,9 @@ Gets the private transaction receipt using [`eea_getTransactionReceipt`](../Refe
 
 `enclavePublicKey` - `string` : [`privateFrom` key for the transaction](#options-parameter) 
 
-`retries` - `int` : Optional. Number of attempts to make to get the private marker transaction receipt. Default is `300`. 
+`retries` - `int` : Optional. Maximum number of attempts to get the private marker transaction receipt. Default is `300`. 
 
-`delay` - `int` : Optional. Delay between retries in milliseconds. Optional. Default is `1000`.
+`delay` - `int` : Optional. Delay between retries in milliseconds. Default is `1000`.
 
 **Returns**
 
