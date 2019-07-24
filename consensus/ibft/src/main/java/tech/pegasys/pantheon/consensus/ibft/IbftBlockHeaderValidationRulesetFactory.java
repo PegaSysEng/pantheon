@@ -35,6 +35,7 @@ public class IbftBlockHeaderValidationRulesetFactory {
    * part of the BlockChain (i.e. not proposed blocks, which do not contain commit seals)
    *
    * @param secondsBetweenBlocks the minimum number of seconds which must elapse between blocks.
+   * @param clock System clock
    * @return BlockHeaderValidator configured for assessing ibft block headers
    */
   public static BlockHeaderValidator<IbftContext> ibftBlockHeaderValidator(

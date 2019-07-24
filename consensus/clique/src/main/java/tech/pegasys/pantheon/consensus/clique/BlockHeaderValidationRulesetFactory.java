@@ -40,6 +40,7 @@ public class BlockHeaderValidationRulesetFactory {
    *
    * @param secondsBetweenBlocks the minimum number of seconds which must elapse between blocks.
    * @param epochManager an object which determines if a given block is an epoch block.
+   * @param clock System clock
    * @return the header validator.
    */
   public static BlockHeaderValidator<CliqueContext> cliqueBlockHeaderValidator(
