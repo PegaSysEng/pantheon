@@ -36,7 +36,7 @@ to include the revert reason in the transaction receipt in Pantheon.
 
 ## Where is the Revert Reason Included 
 
-When revert reason is enabled, the revert reason is included in the transaction receipt returned by 
+When revert reason is enabled, the revert reason is included as an ABI-encoded string in the transaction receipt returned by 
 [`eth_getTransactionReceipt`](../../Reference/Pantheon-API-Methods.md#eth_gettransactionreceipt). 
 
 !!! important 
@@ -62,7 +62,7 @@ When revert reason is enabled, the revert reason is included in the transaction 
          "to": "0xf17f52151ebef6c7334fad080c5704d77216b732",
          "transactionHash": "0xc00e97af59c6f88de163306935f7682af1a34c67245e414537d02e422815efc3",
          "transactionIndex": "0x0",
-         "revertReason":"Not enough Ether provided"
+         "revertReason":"0x08c379a00x00000000000000000000000000000000000000000000000000000000000000200x000000000000000000000000000000000000000000000000000000000000001a0x4e6f7420656e6f7567682045746865722070726f76696465642e000000000000"
        }
     }
     ```
