@@ -1,8 +1,10 @@
 description: web3js-eea methods reference
 <!--- END of page meta data -->
 
+# web3js-eea 
+
 Use the [web3.js-eea library](https://github.com/PegaSysEng/eeajs) to [create and send 
-private transactions](../Privacy/Private-Transactions/eeajs.md).
+private transactions](../Privacy/How-To/Creating-Sending-Private-Transactions.md).
 
 ## Options Parameter 
 
@@ -43,7 +45,7 @@ Generates the privacy group ID. The privacy group ID is the RLP-encoded `private
 
 ## getMarkerTransaction
 
-Gets the [privacy marker transaction](../Privacy/Private-Transaction-Processing.md) transaction receipt.
+Gets the [privacy marker transaction](../Privacy/Explanation/Private-Transaction-Processing.md) transaction receipt.
 
 **Parameters**
 
@@ -117,7 +119,7 @@ Signs and sends a RLP-encoded private transaction to Pantheon using [`eea_sendRa
 
 **Returns**
 
-`string` : Transaction hash of the [`privacy marker transaction`](../Privacy/Private-Transaction-Processing.md)   
+`string` : Transaction hash of the [`privacy marker transaction`](../Privacy/Explanation/Private-Transaction-Processing.md)   
         
 !!! example 
     ```bash tab="Contract Deployment"
