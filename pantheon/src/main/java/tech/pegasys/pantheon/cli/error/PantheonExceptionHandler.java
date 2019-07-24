@@ -32,7 +32,7 @@ public class PantheonExceptionHandler
   public List<Object> handleParseException(
       final CommandLine.ParameterException ex, final String[] args) {
     final Level logLevel = levelSupplier.get();
-    if (ex.getMessage() == null || (logLevel != null && Level.DEBUG.isMoreSpecificThan(logLevel))) {
+    if (logLevel != null && Level.DEBUG.isMoreSpecificThan(logLevel)) {
       ex.printStackTrace(err());
     } else {
       err().println(ex.getMessage());

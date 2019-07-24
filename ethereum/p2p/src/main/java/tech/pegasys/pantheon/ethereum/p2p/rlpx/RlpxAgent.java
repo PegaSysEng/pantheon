@@ -522,7 +522,7 @@ public class RlpxAgent {
       if (connectionInitializer == null) {
         connectionInitializer =
             new NettyConnectionInitializer(
-                keyPair, config, localNode, connectionEvents, metricsSystem, clock);
+                keyPair, config, localNode, connectionEvents, metricsSystem);
       }
 
       final PeerRlpxPermissions rlpxPermissions =
