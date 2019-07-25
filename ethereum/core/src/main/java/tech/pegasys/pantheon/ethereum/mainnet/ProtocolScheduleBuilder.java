@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionValidator;
 
 import java.math.BigInteger;
 import java.time.Clock;
@@ -25,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ProtocolScheduleBuilder<C> {
+
   private static final Logger LOG = LogManager.getLogger();
   private final GenesisConfigOptions config;
   private final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter;
@@ -179,6 +181,8 @@ public class ProtocolScheduleBuilder<C> {
                 protocolSpecAdapter
                     .apply(definition)
                     .privacyParameters(privacyParameters)
+                    .privateTransactionValidatorBuilder(
+                        () -> new PrivateTransactionValidator(protocolSchedule.getChainId()))
                     .build(protocolSchedule)));
   }
 
