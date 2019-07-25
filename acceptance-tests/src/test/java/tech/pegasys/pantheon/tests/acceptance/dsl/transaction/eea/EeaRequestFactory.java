@@ -100,7 +100,7 @@ public class EeaRequestFactory {
         PrivateTransactionReceiptResponse.class);
   }
 
-  Request<?, EthGetTransactionCount> privGetTransactionCount(
+  public Request<?, EthGetTransactionCount> privGetTransactionCount(
       final String accountAddress, final String privacyGroupId) {
     return new Request<>(
         "priv_getTransactionCount",

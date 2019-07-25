@@ -321,27 +321,31 @@ public class JsonRpcMethodsFactory {
           new AdminPeers(p2pNetwork),
           new AdminChangeLogLevel(parameter));
     }
-    if (rpcApis.contains(RpcApis.EEA)) {
-      //      TODO: josh-richardson change this
+
+    boolean eea = rpcApis.contains(RpcApis.EEA), priv = rpcApis.contains(RpcApis.PRIV);
+    if (eea || priv) {
       final PrivateTransactionHandler privateTransactionHandler =
           new PrivateTransactionHandler(privacyParameters);
       final Enclave enclave = new Enclave(privacyParameters.getEnclaveUri());
-      addMethods(
-          enabledMethods,
-          new EeaGetTransactionReceipt(blockchainQueries, enclave, parameter, privacyParameters),
-          new EeaSendRawTransaction(
-              blockchainQueries, privateTransactionHandler, transactionPool, parameter),
-          new PrivGetTransactionCount(parameter, privateTransactionHandler),
-          new PrivGetPrivateTransaction(enclave, parameter, privacyParameters));
+      if (eea) {
+        addMethods(
+            enabledMethods,
+            new EeaGetTransactionReceipt(blockchainQueries, enclave, parameter, privacyParameters),
+            new EeaSendRawTransaction(
+                blockchainQueries, privateTransactionHandler, transactionPool, parameter));
+      }
+      if (priv) {
+        addMethods(
+            enabledMethods,
+            new PrivCreatePrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
+            new PrivDeletePrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
+            new PrivFindPrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
+            new PrivGetPrivacyPrecompileAddress(privacyParameters),
+            new PrivGetTransactionCount(parameter, privateTransactionHandler),
+            new PrivGetPrivateTransaction(enclave, parameter, privacyParameters));
+      }
     }
-    if (rpcApis.contains(RpcApis.PRIV)) {
-      addMethods(
-          enabledMethods,
-          new PrivCreatePrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
-          new PrivDeletePrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
-          new PrivFindPrivacyGroup(new Enclave(privacyParameters.getEnclaveUri()), parameter),
-          new PrivGetPrivacyPrecompileAddress(privacyParameters));
-    }
+
     return enabledMethods;
   }
 

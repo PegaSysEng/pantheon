@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.priv.PrivGetTransactionCountTransaction;
+
 public class EeaTransactions {
 
   public EeaGetTransactionReceiptTransaction getTransactionReceipt(final String transactionHash) {

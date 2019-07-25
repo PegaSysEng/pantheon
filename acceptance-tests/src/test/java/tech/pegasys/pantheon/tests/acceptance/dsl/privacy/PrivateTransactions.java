@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.privacy;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaSendRawTransactionTransaction;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivGetTransactionCountTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.priv.PrivGetTransactionCountTransaction;
 
 public class PrivateTransactions {
 
