@@ -188,8 +188,7 @@ public class TransactionReceipt {
         if (!revertReasonAllowed) {
           throw new RLPException("Unexpected value at end of TransactionReceipt");
         }
-        final byte[] bytes = input.readBytesValue().getArrayUnsafe();
-        revertReason = Optional.of(BytesValue.wrap(bytes));
+        revertReason = Optional.of(input.readBytesValue());
       }
 
       // Status code-encoded transaction receipts have a single

@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.results;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.debug.TraceFrame;
 import tech.pegasys.pantheon.util.bytes.Bytes32s;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Arrays;
@@ -36,7 +37,7 @@ public class StructLog {
   private final int pc;
   private final String[] stack;
   private final Object storage;
-  private final String reason;
+  private final BytesValue reason;
 
   public StructLog(final TraceFrame traceFrame) {
     depth = traceFrame.getDepth() + 1;
@@ -107,7 +108,7 @@ public class StructLog {
   }
 
   @JsonGetter("reason")
-  public String reason() {
+  public BytesValue reason() {
     return reason;
   }
 
