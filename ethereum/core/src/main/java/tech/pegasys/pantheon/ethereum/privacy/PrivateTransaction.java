@@ -383,7 +383,6 @@ public class PrivateTransaction {
    * @param out the output to write the transaction to
    */
   public void writeTo(final RLPOutput out) {
-
     out.startList();
 
     out.writeLongScalar(getNonce());
