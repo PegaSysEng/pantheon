@@ -45,13 +45,13 @@ public class NodeSmartContractPermissioningOutOfSyncAcceptanceTest
   }
 
   @Test
-  public void testOutOfSyncNodeConnectionToPeers() {
-    final long blockChainHeight = 50L;
+  public void addNodeToClusterAndVerifyNonBootNodePeerConnectionWorksAfterSync() {
+    final long blockchainHeight = 50L;
     WaitUtils.waitFor(
         120,
         () ->
             assertThat(currentHeight(permissionedNodeA))
-                .isGreaterThanOrEqualTo(BigInteger.valueOf(blockChainHeight)));
+                .isGreaterThanOrEqualTo(BigInteger.valueOf(blockchainHeight)));
 
     // Add Node B
     permissionedCluster.addNode(permissionedNodeB);
@@ -65,7 +65,7 @@ public class NodeSmartContractPermissioningOutOfSyncAcceptanceTest
     WaitUtils.waitFor(
         () ->
             assertThat(currentHeight(permissionedNodeB))
-                .isGreaterThanOrEqualTo(BigInteger.valueOf(blockChainHeight)));
+                .isGreaterThanOrEqualTo(BigInteger.valueOf(blockchainHeight)));
 
     permissionedNodeB.verify(connectionIsAllowed(permissionedNodeA, permissionedNodeB));
   }
