@@ -25,7 +25,10 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransac
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class EventEmitterHarness {
@@ -74,7 +77,7 @@ public class EventEmitterHarness {
   public void deployWithPrivacyGroup(
       final String contractName,
       final String sender,
-      String mPrivacyGroupId,
+      final String mPrivacyGroupId,
       final String... groupMembers) {
     deployWithPrivacyGroup(
         contractName,
