@@ -8,10 +8,10 @@ description: Install Pantheon from binary distribution
 ### Prerequisites
 
 * [Homebrew](https://brew.sh/)
-* [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+* Java JDK
 
 !!!attention
-    Pantheon requires Java 11+ to compile; earlier versions are not supported.
+    Pantheon requires Java 11+ to compile; earlier versions are not supported. You can install Java using `brew cask install adoptopenjdk`. Alternatively, you can manually install the [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html).
 
 ### Install Using Homebrew
 
