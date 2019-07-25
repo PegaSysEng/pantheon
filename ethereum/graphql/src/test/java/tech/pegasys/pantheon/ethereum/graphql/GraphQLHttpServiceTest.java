@@ -175,7 +175,6 @@ public class GraphQLHttpServiceTest {
     when(miningCoordinatorMock.getMinTransactionGasPrice()).thenReturn(price);
 
     try (final Response resp = client.newCall(buildGetRequest("?query={gasPrice}")).execute()) {
-
       assertThat(resp.code()).isEqualTo(200);
       final JsonObject json = new JsonObject(resp.body().string());
       testHelper.assertValidGraphQLResult(json);
