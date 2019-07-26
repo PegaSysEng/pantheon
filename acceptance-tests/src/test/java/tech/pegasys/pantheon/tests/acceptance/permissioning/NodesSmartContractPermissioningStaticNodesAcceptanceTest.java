@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;
 
-public class StaticNodesOnchainPermissioningAcceptanceTest
+public class NodesSmartContractPermissioningStaticNodesAcceptanceTest
     extends NodeSmartContractPermissioningAcceptanceTestBase {
 
   private Node miner;
