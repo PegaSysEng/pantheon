@@ -293,7 +293,6 @@ public class EventEmitterHarness {
       final String transactionHash,
       final String fromNodeName,
       final String[] toNodeNames) {
-
     verifyForParticipant(condition, transactionHash, fromNodeName);
     Arrays.stream(toNodeNames)
         .forEach(node -> verifyForParticipant(condition, transactionHash, node));

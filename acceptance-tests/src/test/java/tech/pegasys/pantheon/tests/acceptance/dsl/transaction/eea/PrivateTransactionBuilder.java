@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,7 +70,7 @@ public class PrivateTransactionBuilder {
     Address to;
     BytesValue privateFrom;
     Optional<BytesValue> privacyGroupId = Optional.empty();
-    Optional<List<BytesValue>> privateFor = Optional.empty();
+    Optional<List<BytesValue>> privateFor = Optional.of(new ArrayList<>());
     SECP256K1.KeyPair keyPair;
 
     public Builder nonce(final long nonce) {
@@ -136,11 +137,10 @@ public class PrivateTransactionBuilder {
               .privateFrom(privateFrom)
               .restriction(Restriction.RESTRICTED);
 
-      if (privateFor.isPresent()) {
-        builder = builder.privateFor(privateFor.get());
-      }
       if (privacyGroupId.isPresent()) {
         builder = builder.privacyGroupId(privacyGroupId.get());
+      } else {
+        builder = builder.privateFor(privateFor.get());
       }
 
       return RLP.encode(builder.signAndBuild(keyPair)::writeTo).toString();
