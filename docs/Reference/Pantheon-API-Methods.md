@@ -3962,7 +3962,8 @@ Returns the private transaction count for specified account and privacy group.
 Creates a private transaction from a signed transaction, generates the transaction hash and submits it 
 to the transaction pool, and returns the transaction hash of the Privacy Marker Transaction.
 
-The signed transaction passed as an input parameter includes the `privateFrom`, `privateFor`, and `restriction` fields.
+The signed transaction passed as an input parameter includes the `privateFrom`, [`privateFor` or `privacyGroupId`](../Privacy/Explanation/Privacy-Groups.md)
+, and `restriction` fields.
 
 To avoid exposing your private key, create signed transactions offline and send the signed transaction 
 data using `eea_sendRawTransaction`.
@@ -4006,7 +4007,7 @@ data using `eea_sendRawTransaction`.
     }
     ```
 
-### eea_getTransactionReceipt
+### 
 
 Returns information about the private transaction after the transaction was mined. Receipts for pending transactions 
 are not available.
