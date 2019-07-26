@@ -3772,7 +3772,8 @@ None
     The `EEA` API methods are not enabled by default for JSON-RPC. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
     or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `EEA` API methods.
 
-### eea_getPrivateTransaction
+
+### priv_getPrivateTransaction
 
 Returns the private transaction if you are a participant; otherwise, null. To get the public transaction, 
 use [`eth_getTransactionByHash`](#eth_gettransactionbyhash) with the transaction hash returned by 
@@ -3789,11 +3790,11 @@ Object - [Private transaction object](Pantheon-API-Objects.md#private-transactio
 
 !!! example
     ```bash tab="curl HTTP request"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_getPrivateTransaction","params":["0xd2274e3da9ac7f7fcec531adeefdc205688e85544ccf515c4de73b0540c9b818"], "id":1}' http://127.0.0.1:8545
+    curl -X POST --data '{"jsonrpc":"2.0","method":"priv_getPrivateTransaction","params":["0xd2274e3da9ac7f7fcec531adeefdc205688e85544ccf515c4de73b0540c9b818"], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eea_getPrivateTransaction","params":["0xd2274e3da9ac7f7fcec531adeefdc205688e85544ccf515c4de73b0540c9b818"], "id":1}
+    {"jsonrpc":"2.0","method":"priv_getPrivateTransaction","params":["0xd2274e3da9ac7f7fcec531adeefdc205688e85544ccf515c4de73b0540c9b818"], "id":1}
     ```
     
     ```bash tab="json tab="JSON result"
@@ -3822,7 +3823,7 @@ Object - [Private transaction object](Pantheon-API-Objects.md#private-transactio
     ```
 
 
-### eea_createPrivacyGroup 
+### priv_createPrivacyGroup  
 
 Creates a privacy group containing the specified members. Members are specified by their Orion public key. 
 
@@ -3842,11 +3843,11 @@ Privacy group ID
 
 !!! example
     ```bash tab="curl HTTP request"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_createPrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "Group A", "Description Group A", ["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=","g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id":1}' http://127.0.0.1:8545
+    curl -X POST --data '{"jsonrpc":"2.0","method":"priv_createPrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "Group A", "Description Group A", ["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=","g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eea_createPrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "Group A", "Description Group A", ["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=","g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id":1}
+    {"jsonrpc":"2.0","method":"priv_createPrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "Group A", "Description Group A", ["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=","g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -3857,7 +3858,7 @@ Privacy group ID
     }
     ``` 
 
-### eea_deletePrivacyGroup
+### priv_deletePrivacyGroup
 
 Deletes the specified privacy group. 
 
@@ -3869,11 +3870,11 @@ Privacy group ID
 
 !!! example
     ```bash tab="curl HTTP request"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_deletePrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "ewuTVoc5nlvWMwTFdRRK/wvV0dcyQo/Pauvx5bNEbTk="],"id":1}' http://127.0.0.1:8545
+    curl -X POST --data '{"jsonrpc":"2.0","method":"priv_deletePrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "ewuTVoc5nlvWMwTFdRRK/wvV0dcyQo/Pauvx5bNEbTk="],"id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eea_deletePrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "ewuTVoc5nlvWMwTFdRRK/wvV0dcyQo/Pauvx5bNEbTk="],"id":1}
+    {"jsonrpc":"2.0","method":"priv_deletePrivacyGroup","params":["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "ewuTVoc5nlvWMwTFdRRK/wvV0dcyQo/Pauvx5bNEbTk="],"id":1}
     ```
     
     ```json tab="JSON result"
@@ -3884,7 +3885,7 @@ Privacy group ID
     }
     ```
 
-### eea_findPrivacyGroup
+### priv_findPrivacyGroup
 
 Returns a list of privacy groups containing only the listed members. For example, if the listed members 
 are A and B, a privacy group containing A, B, and C is not returned. 
@@ -3899,11 +3900,11 @@ Privacy groups containing only the specified members.
 
 !!! example
     ```bash tab="curl HTTP request"
-    curl -X POST --data '{"jsonrpc": "2.0","method": "eea_findPrivacyGroup","params": [["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id": 1}' http://127.0.0.1:8545
+    curl -X POST --data '{"jsonrpc": "2.0","method": "priv_findPrivacyGroup","params": [["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id": 1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc": "2.0","method": "eea_findPrivacyGroup","params": [["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id": 1}
+    {"jsonrpc": "2.0","method": "priv_findPrivacyGroup","params": [["negmDcN2P4ODpqn/6WkJ02zT/0w0bjhGpkZ8UP6vARk=", "g59BmTeJIn7HIcnq8VQWgyh/pDbvbt2eyP0Ii60aDDw="]],"id": 1}
     ```
  
      ```json tab="JSON result"
@@ -3922,7 +3923,7 @@ Privacy groups containing only the specified members.
     }
     ```
     
-### eea_getTransactionCount
+### priv_getTransactionCount
 
 Returns the private transaction count for specified account and privacy group. 
 
@@ -3942,11 +3943,11 @@ Returns the private transaction count for specified account and privacy group.
 
 !!! example 
     ```bash tab="curl HTTP request"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_getTransactionCount","params":["0xfe3b557e8fb62b89f4916b721be55ceb828dbd73", "kAbelwaVW7okoEn1+okO+AbA4Hhz/7DaCOWVQz9nx5M="], "id":1}' http://127.0.0.1:8545
+    curl -X POST --data '{"jsonrpc":"2.0","method":"priv_getTransactionCount","params":["0xfe3b557e8fb62b89f4916b721be55ceb828dbd73", "kAbelwaVW7okoEn1+okO+AbA4Hhz/7DaCOWVQz9nx5M="], "id":1}' http://127.0.0.1:8545
     ```
     
     ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eea_getTransactionCount","params":["0xfe3b557e8fb62b89f4916b721be55ceb828dbd73", "kAbelwaVW7okoEn1+okO+AbA4Hhz/7DaCOWVQz9nx5M="], "id":1}
+    {"jsonrpc":"2.0","method":"priv_getTransactionCount","params":["0xfe3b557e8fb62b89f4916b721be55ceb828dbd73", "kAbelwaVW7okoEn1+okO+AbA4Hhz/7DaCOWVQz9nx5M="], "id":1}
     ```
 
     ```json tab="JSON result"

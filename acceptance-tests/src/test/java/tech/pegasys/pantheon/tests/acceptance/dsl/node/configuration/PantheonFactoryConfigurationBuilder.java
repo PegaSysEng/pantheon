@@ -67,6 +67,7 @@ public class PantheonFactoryConfigurationBuilder {
 
   public PantheonFactoryConfigurationBuilder miningEnabled() {
     this.miningParameters = new MiningParametersTestBuilder().enabled(true).build();
+    this.jsonRpcConfiguration.addRpcApi(RpcApis.MINER);
     return this;
   }
 
@@ -87,6 +88,7 @@ public class PantheonFactoryConfigurationBuilder {
   public PantheonFactoryConfigurationBuilder enablePrivateTransactions(
       final PrivacyParameters privacyParameters) {
     this.jsonRpcConfiguration.addRpcApi(RpcApis.EEA);
+    this.jsonRpcConfiguration.addRpcApi(RpcApis.PRIV);
     this.privacyParameters = privacyParameters;
     this.privacyParameters.setEnabled(true);
     return this;
