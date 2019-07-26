@@ -3908,7 +3908,10 @@ Privacy groups containing only the specified members.
     ```
  
      ```json tab="JSON result"
-     "result": [
+     {
+       "jsonrpc": "2.0",
+       "id": 1,
+       "result": [
          {
            "privacyGroupId": "GpK3ErNO0xF27T0sevgkJ3+4qk9Z+E3HtXYxcKIBKX8=",
            "name": "Group B",
