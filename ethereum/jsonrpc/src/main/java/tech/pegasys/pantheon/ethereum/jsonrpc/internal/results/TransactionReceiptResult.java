@@ -55,7 +55,7 @@ public abstract class TransactionReceiptResult {
   private final String to;
   private final String transactionHash;
   private final String transactionIndex;
-  private final BytesValue revertReason;
+  private final String revertReason;
 
   protected final TransactionReceipt receipt;
 
@@ -81,7 +81,7 @@ public abstract class TransactionReceiptResult {
     this.to = receiptWithMetadata.getTransaction().getTo().map(BytesValue::toString).orElse(null);
     this.transactionHash = receiptWithMetadata.getTransaction().hash().toString();
     this.transactionIndex = Quantity.create(receiptWithMetadata.getTransactionIndex());
-    this.revertReason = receipt.getRevertReason().orElse(null);
+    this.revertReason = receipt.getRevertReason().map(BytesValue::toString).orElse(null);
   }
 
   @JsonGetter(value = "blockHash")
@@ -141,7 +141,7 @@ public abstract class TransactionReceiptResult {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @JsonGetter(value = "revertReason")
-  public BytesValue getRevertReason() {
+  public String getRevertReason() {
     return revertReason;
   }
 
