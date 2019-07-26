@@ -21,8 +21,8 @@ import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class PrivateTransactionBuilder {
 
@@ -68,8 +68,8 @@ public class PrivateTransactionBuilder {
     Address from;
     Address to;
     BytesValue privateFrom;
-    BytesValue privacyGroupId;
-    List<BytesValue> privateFor = new ArrayList<>();
+    Optional<BytesValue> privacyGroupId = Optional.empty();
+    Optional<List<BytesValue>> privateFor = Optional.empty();
     SECP256K1.KeyPair keyPair;
 
     public Builder nonce(final long nonce) {
@@ -93,12 +93,12 @@ public class PrivateTransactionBuilder {
     }
 
     public Builder privacyGroupId(final BytesValue privacyGroupId) {
-      this.privacyGroupId = privacyGroupId;
+      this.privacyGroupId = Optional.of(privacyGroupId);
       return this;
     }
 
     public Builder privateFor(final List<BytesValue> privateFor) {
-      this.privateFor = privateFor;
+      this.privateFor = Optional.of(privateFor);
       return this;
     }
 
@@ -122,24 +122,28 @@ public class PrivateTransactionBuilder {
         default:
           throw new IllegalStateException("Unexpected value: " + type);
       }
-      return RLP.encode(
-              PrivateTransaction.builder()
-                      .nonce(nonce)
-                      .gasPrice(Wei.of(1000))
-                      .gasLimit(63992)
-                      .to(to)
-                      .value(Wei.ZERO)
-                      .payload(payload)
-                      .sender(from)
-                      .chainId(BigInteger.valueOf(2018))
-                      .privateFrom(privateFrom)
-                      .privateFor(privateFor)
-                      .privacyGroupId(privacyGroupId)
-                      .ensureWellFormed()
-                      .restriction(Restriction.RESTRICTED)
-                      .signAndBuild(keyPair)
-                  ::writeTo)
-          .toString();
+
+      var builder =
+          PrivateTransaction.builder()
+              .nonce(nonce)
+              .gasPrice(Wei.of(1000))
+              .gasLimit(63992)
+              .to(to)
+              .value(Wei.ZERO)
+              .payload(payload)
+              .sender(from)
+              .chainId(BigInteger.valueOf(2018))
+              .privateFrom(privateFrom)
+              .restriction(Restriction.RESTRICTED);
+
+      if (privateFor.isPresent()) {
+        builder = builder.privateFor(privateFor.get());
+      }
+      if (privacyGroupId.isPresent()) {
+        builder = builder.privacyGroupId(privacyGroupId.get());
+      }
+
+      return RLP.encode(builder.signAndBuild(keyPair)::writeTo).toString();
     }
   }
 }

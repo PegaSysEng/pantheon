@@ -663,13 +663,6 @@ public class PrivateTransaction {
       return this;
     }
 
-    public Builder ensureWellFormed() {
-      if (this.privacyGroupId.isPresent() && this.privateFor.isPresent()) {
-        this.privateFor = Optional.empty();
-      }
-      return this;
-    }
-
     public PrivateTransaction build() {
       if (privacyGroupId.isPresent() && privateFor.isPresent()) {
         throw new IllegalArgumentException(
