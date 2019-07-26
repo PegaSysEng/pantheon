@@ -105,6 +105,8 @@ nav:
           - Using web3.js-eea Multinode Example: Privacy/Tutorials/eeajs-Multinode-example.md
         - How To:
           - Create and Send Private Transactions: Privacy/How-To/Creating-Sending-Private-Transactions.md
+          - Access Private and Privacy Marker Transactions: Privacy/How-To/Access-Private-Transactions.md
+          - Create and Manage Privacy Groups: Privacy/How-To/Create-Manage-Privacy-Groups.md
           - Use the web3.js-eea Client Library: Privacy/How-To/eeajs.md
         - Explanation:
           - Privacy Overview: Privacy/Explanation/Privacy-Overview.md
