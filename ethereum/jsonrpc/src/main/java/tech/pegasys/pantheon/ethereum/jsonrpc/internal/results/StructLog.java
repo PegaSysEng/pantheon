@@ -56,7 +56,7 @@ public class StructLog {
             .map(a -> Arrays.stream(a).map(Bytes32s::unprefixedHexString).toArray(String[]::new))
             .orElse(null);
     storage = traceFrame.getStorage().map(StructLog::formatStorage).orElse(null);
-    reason = traceFrame.getRevertReason().toUnprefixedString();
+    reason = traceFrame.getRevertReason().map(BytesValue::toUnprefixedString).orElse(null);
   }
 
   private static Map<String, String> formatStorage(final Map<UInt256, UInt256> storage) {

@@ -14,12 +14,14 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.condition.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.nio.charset.StandardCharsets;
-import org.web3j.utils.Numeric;
 import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptWithRevertReason;
+
+import java.nio.charset.StandardCharsets;
+
+import org.web3j.utils.Numeric;
 
 public class ExpectSuccessfulEthGetTransactionReceiptWithReason implements Condition {
 
