@@ -3,7 +3,7 @@ description: JSON-RPC methods to use for EEA-compliant privacy
 
 # Using EEA-compliant Privacy 
 
-When using EEA-compliant privacy, the group of nodes specified by `privateFrom`and `privateFor` form a privacy group and are given a unique 
+When using [EEA-compliant privacy](../Explanation/Privacy-Groups.md), the group of nodes specified by `privateFrom`and `privateFor` form a privacy group and are given a unique 
 privacy group ID by Orion.
 
 Enable the [`EEA` API methods](../../Reference/Pantheon-API-Methods.md#eea-methods) using the [`--rpc-http-api`](../../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) 
