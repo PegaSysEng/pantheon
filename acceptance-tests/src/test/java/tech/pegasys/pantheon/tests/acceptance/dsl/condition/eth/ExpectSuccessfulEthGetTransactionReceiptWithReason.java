@@ -20,7 +20,6 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptWithRevertReason;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public class ExpectSuccessfulEthGetTransactionReceiptWithReason implements Condition {
 
@@ -45,7 +44,6 @@ public class ExpectSuccessfulEthGetTransactionReceiptWithReason implements Condi
             transactionReceipt -> {
               final byte[] bytes =
                   Numeric.hexStringToByteArray(transactionReceipt.getRevertReason());
-              System.out.println("THE BYTES ARE");
               final String utf8Encoded = new String(bytes, StandardCharsets.UTF_8);
               return utf8Encoded.contains(expectedRevertReason);
             })
