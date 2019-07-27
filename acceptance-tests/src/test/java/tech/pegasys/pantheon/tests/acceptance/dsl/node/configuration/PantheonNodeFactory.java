@@ -13,15 +13,18 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.Node;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
+import tech.pegasys.pantheon.tests.acceptance.dsl.node.RunnableNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +52,8 @@ public class PantheonNodeFactory {
         config.isBootnodeEligible(),
         config.isRevertReasonEnabled(),
         config.getPlugins(),
-        config.getExtraCLIOptions());
+        config.getExtraCLIOptions(),
+        config.getStaticNodes());
   }
 
   public PantheonNode createMinerNode(final String name) throws IOException {
@@ -218,16 +222,30 @@ public class PantheonNodeFactory {
 
   public PantheonNode createCustomGenesisNode(
       final String name, final String genesisPath, final boolean canBeBootnode) throws IOException {
+    return createCustomGenesisNode(name, genesisPath, canBeBootnode, false);
+  }
+
+  public PantheonNode createCustomGenesisNode(
+      final String name,
+      final String genesisPath,
+      final boolean canBeBootnode,
+      final boolean mining)
+      throws IOException {
     final String genesisFile = genesis.readGenesisFile(genesisPath);
-    return create(
+    final PantheonFactoryConfigurationBuilder builder =
         new PantheonFactoryConfigurationBuilder()
             .name(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
             .genesisConfigProvider((a) -> Optional.of(genesisFile))
             .devMode(false)
-            .bootnodeEligible(canBeBootnode)
-            .build());
+            .bootnodeEligible(canBeBootnode);
+
+    if (mining) {
+      builder.miningEnabled();
+    }
+
+    return create(builder.build());
   }
 
   public PantheonNode createCliqueNodeWithValidators(final String name, final String... validators)
@@ -261,6 +279,27 @@ public class PantheonNodeFactory {
                 nodes ->
                     node.createGenesisConfigForValidators(
                         asList(validators), nodes, genesis::createIbft2GenesisConfig))
+            .build());
+  }
+
+  public PantheonNode createNodeWithStaticNodes(final String name, final List<Node> staticNodes)
+      throws IOException {
+
+    final List<String> staticNodesUrls =
+        staticNodes.stream()
+            .map(node -> (RunnableNode) node)
+            .map(RunnableNode::enodeUrl)
+            .map(URI::toASCIIString)
+            .collect(toList());
+
+    return create(
+        new PantheonFactoryConfigurationBuilder()
+            .name(name)
+            .jsonRpcEnabled()
+            .webSocketEnabled()
+            .discoveryEnabled(false)
+            .staticNodes(staticNodesUrls)
+            .bootnodeEligible(false)
             .build());
   }
 }

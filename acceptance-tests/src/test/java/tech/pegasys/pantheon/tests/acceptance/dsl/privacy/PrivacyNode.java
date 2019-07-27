@@ -28,11 +28,12 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaGetTransactionCountTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.priv.PrivGetTransactionCountTransaction;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +84,8 @@ public class PrivacyNode extends PantheonNode {
         bootnodeEligible,
         revertReasonEnabled,
         plugins,
-        extraCLIOptions);
+        extraCLIOptions,
+        new ArrayList<>());
     this.orion = orion;
   }
 
@@ -113,7 +115,7 @@ public class PrivacyNode extends PantheonNode {
 
   public long nextNonce(final BytesValue privacyGroupId) {
     return execute(
-            new EeaGetTransactionCountTransaction(
+            new PrivGetTransactionCountTransaction(
                 getAddress().toString(), BytesValues.asBase64String(privacyGroupId)))
         .longValue();
   }
