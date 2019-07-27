@@ -2,7 +2,7 @@ description: Setting up and using onchain Permissioning
 <!--- END of page meta data -->
 
 # Getting Started with Onchain Permissioning 
- 
+
 The following steps describe bootstrapping a local permissioned network using a Pantheon node and a 
 development server to run the Permissioning Management Dapp. 
 

@@ -6,6 +6,10 @@ description: Onchain Permissioning
 Onchain permissioning uses smart contracts to store and maintain the node, account, and admin whitelists. 
 Using onchain permissioning enables all nodes to read the whitelists from a single source, the blockchain.                                        
 
+!!! important 
+    The dependency chain for our implementation of onchain permissioning includes [web3j](https://github.com/web3j/web3j) which is 
+    LGPL licensed.  
+
 ## Permissioning Contracts
 
 The permissioning smart contracts are provided in the [PegaSysEng/permissioning-smart-contracts](https://github.com/PegaSysEng/permissioning-smart-contracts) repository: 
