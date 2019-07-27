@@ -101,7 +101,7 @@ to enable onchain nodes permissioning
 * [--permissions-nodes-contract-address](../../Reference/Pantheon-CLI-Syntax.md#permissions-nodes-contract-address)
 set to the address of the Node Ingress contract in the genesis file (`"0x0000000000000000000000000000000000009999"`)  
 
-## Clone Contracts and Install Dependencies 
+## Clone Project and Install Dependencies 
 
 1. Clone the `permissioning-smart-contracts` repository: 
 
@@ -114,6 +114,14 @@ set to the address of the Node Ingress contract in the genesis file (`"0x0000000
     ```bash
     yarn install
     ```
+    
+## Build Project
+
+In the `permissioning-smart-contracts` directory, build the project:
+
+```bash
+yarn run build
+```
 
 ## Deploy Contracts 
     

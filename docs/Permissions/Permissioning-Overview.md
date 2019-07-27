@@ -32,13 +32,7 @@ Use account permissioning:
 
 ![Account Permissioning](../images/account-permissioning.png)
 
-
-<<<<<<< HEAD
-[Local permissioning](Local-Permissioning.md) is specified at the node level. Each node in the network has a [permissions configuration file](Local-Permissioning.md#permissions-configuration-file).
-Updates to local permissioning must be made to the configuration file for each node. 
-=======
 ## Specifying Permissioning 
->>>>>>> a4bb4af0dfc8ca9e7b97720aa8ef47e330d7f903
 
 Permissioning is [local](#local) or [onchain](#onchain).
 
@@ -54,16 +48,11 @@ protect your node. Your rules are not enforced in blocks produced by other nodes
 
 ### Onchain 
 
-<<<<<<< HEAD
 [Onchain permissioning](Onchain-Permissioning/Onchain-Permissioning.md) is specified in a smart contract on the network. Specifying permissioning onchain
 enables all nodes to read and update permissioning configuration from one location. 
-=======
-[Onchain permissioning](Onchain-Permissioning.md) is specified in a smart contract on the network. Specifying permissioning onchain
-enables all nodes to read and update permissioning in one location. 
 
 Onchain permissioning requires co-ordination to update rules. The network may not be able to act immediately 
 (for example, the smart contract may enforce a minimum of votes before changing permissioning rules). 
 
 When onchain permissioning is updated, the update is applied across the network and new blocks abide by the updated rules. 
 For example, blocked accounts can no longer add transactions to the chain.
->>>>>>> a4bb4af0dfc8ca9e7b97720aa8ef47e330d7f903
