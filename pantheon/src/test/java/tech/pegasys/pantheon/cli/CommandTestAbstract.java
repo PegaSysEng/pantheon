@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.cli;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyFloat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -44,6 +45,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
+import tech.pegasys.pantheon.util.BlockExporter;
 import tech.pegasys.pantheon.util.BlockImporter;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -97,6 +99,8 @@ public abstract class CommandTestAbstract {
   @Mock protected BlockBroadcaster mockBlockBroadcaster;
   @Mock protected PantheonController<Object> mockController;
   @Mock protected BlockImporter mockBlockImporter;
+  @Mock protected BlockExporter mockBlockExporter;
+
   @Mock protected Logger mockLogger;
   @Mock protected PantheonPluginContextImpl mockPantheonPluginContext;
 
@@ -105,6 +109,7 @@ public abstract class CommandTestAbstract {
   @Captor protected ArgumentCaptor<File> fileArgumentCaptor;
   @Captor protected ArgumentCaptor<String> stringArgumentCaptor;
   @Captor protected ArgumentCaptor<Integer> intArgumentCaptor;
+  @Captor protected ArgumentCaptor<Float> floatCaptor;
   @Captor protected ArgumentCaptor<EthNetworkConfig> ethNetworkConfigArgumentCaptor;
   @Captor protected ArgumentCaptor<SynchronizerConfiguration> syncConfigurationCaptor;
   @Captor protected ArgumentCaptor<JsonRpcConfiguration> jsonRpcConfigArgumentCaptor;
@@ -141,6 +146,7 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.metricsSystem(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.clock(any())).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.isRevertReasonEnabled(false)).thenReturn(mockControllerBuilder);
 
     // doReturn used because of generic PantheonController
     doReturn(mockController).when(mockControllerBuilder).build();
@@ -158,7 +164,12 @@ public abstract class CommandTestAbstract {
     when(mockRunnerBuilder.p2pAdvertisedHost(anyString())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.p2pListenPort(anyInt())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.maxPeers(anyInt())).thenReturn(mockRunnerBuilder);
+    when(mockRunnerBuilder.limitRemoteWireConnectionsEnabled(anyBoolean()))
+        .thenReturn(mockRunnerBuilder);
+    when(mockRunnerBuilder.fractionRemoteConnectionsAllowed(anyFloat()))
+        .thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.p2pEnabled(anyBoolean())).thenReturn(mockRunnerBuilder);
+    when(mockRunnerBuilder.natMethod(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.jsonRpcConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.graphQLConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.webSocketConfiguration(any())).thenReturn(mockRunnerBuilder);
@@ -208,6 +219,7 @@ public abstract class CommandTestAbstract {
         new TestPantheonCommand(
             mockLogger,
             mockBlockImporter,
+            mockBlockExporter,
             mockRunnerBuilder,
             mockControllerBuilderFactory,
             keyLoader,
@@ -236,6 +248,7 @@ public abstract class CommandTestAbstract {
     TestPantheonCommand(
         final Logger mockLogger,
         final BlockImporter mockBlockImporter,
+        final BlockExporter mockBlockExporter,
         final RunnerBuilder mockRunnerBuilder,
         final PantheonController.Builder controllerBuilderFactory,
         final KeyLoader keyLoader,
@@ -244,6 +257,7 @@ public abstract class CommandTestAbstract {
       super(
           mockLogger,
           mockBlockImporter,
+          mockBlockExporter,
           mockRunnerBuilder,
           controllerBuilderFactory,
           pantheonPluginContext,

@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.PantheonFactoryConfiguration;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +46,7 @@ public class PrivacyPantheonFactoryConfiguration extends PantheonFactoryConfigur
       final NetworkingConfiguration networkingConfiguration,
       final boolean discoveryEnabled,
       final boolean bootnodeEligible,
+      final boolean revertReasonEnabled,
       final List<String> plugins,
       final List<String> extraCLIOptions,
       final OrionTestHarness orion) {
@@ -63,8 +65,10 @@ public class PrivacyPantheonFactoryConfiguration extends PantheonFactoryConfigur
         networkingConfiguration,
         discoveryEnabled,
         bootnodeEligible,
+        revertReasonEnabled,
         plugins,
-        extraCLIOptions);
+        extraCLIOptions,
+        new ArrayList<>());
     this.orion = orion;
   }
 

@@ -1,12 +1,14 @@
 description: Pantheon high availability 
 <!--- END of page meta data -->
 
-# High Availability 
+# High Availability of JSON-RPC and RPC Rub/Sub APIs
 
 To enable high availability to the [RPC Pub/Sub API over WebSockets](../Pantheon-API/RPC-PubSub.md) 
 or the [JSON-RPC API](../Pantheon-API/Using-JSON-RPC-API.md) run and synchronize multiple Pantheon 
 nodes to the network. Use a load balancer to distribute requests across nodes in the cluster that 
 are ready to receive requests. 
+
+![Load Balancer](../images/LoadBalancer.png)
 
 ## Determining When a Node is Ready 
 
@@ -27,7 +29,7 @@ are sent to multiple nodes, the [`eth_getTransactionCount`](../Reference/Pantheo
 results can be incorrect. 
 
 !!! note
-    If using [private transactions](../Privacy/Privacy-Overview.md), `eea_getTransactionCount` is used to obtain 
+    If using [private transactions](../Privacy/Explanation/Privacy-Overview.md), `priv_getTransactionCount` is used to obtain 
     the account nonce and [`eea_sendRawTransaction`](../Reference/Pantheon-API-Methods.md#eea_sendrawtransaction)
     to send private transactions. 
 

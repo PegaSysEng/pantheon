@@ -58,10 +58,6 @@ Properties that have specific values in IBFT 2.0 genesis files are:
 
 To start a node on an IBFT 2.0 private network, use the [`--genesis-file`](../Reference/Pantheon-CLI-Syntax.md#genesis-file) option to specify the custom genesis file. 
 
-!!!note
-    The [`--genesis-file`](../Reference/Pantheon-CLI-Syntax.md#genesis-file) option is not used when running 
-    Pantheon from the [Docker image](../Getting-Started/Run-Docker-Image.md). Use a bind mount to [specify a configuration file with Docker](../Getting-Started/Run-Docker-Image.md#custom-genesis-file).
-
 ### Extra Data 
 
 The `extraData` property is RLP encoded. RLP encoding is a space efficient object serialization scheme 
@@ -102,7 +98,7 @@ to two times `blockperiodseconds` generally results in blocks being added every 
 
 !!! example 
     An internal PegaSys IBFT 2.0 testnet has 4 geographically dispersed validators in Sweden, 
-    Sydney, and North Viringia (2 validators). With a `blockperiodseconds`of 5 and a `requesttimeoutseconds` of 10,
+    Sydney, and North Virginia (2 validators). With a `blockperiodseconds`of 5 and a `requesttimeoutseconds` of 10,
     the testnet consistently creates block with a 5 second blocktime. 
 
 ### Optional Configuration Options 

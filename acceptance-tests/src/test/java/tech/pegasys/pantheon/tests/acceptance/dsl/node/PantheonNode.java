@@ -37,7 +37,8 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueReque
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
-import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.CustomNetJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.miner.MinerRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.CustomRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
 
 import java.io.File;
@@ -80,6 +81,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private final Properties portsProperties = new Properties();
   private final Boolean p2pEnabled;
   private final NetworkingConfiguration networkingConfiguration;
+  private final boolean revertReasonEnabled;
 
   private final String name;
   private final MiningParameters miningParameters;
@@ -93,7 +95,6 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private final boolean discoveryEnabled;
   private final List<URI> bootnodes = new ArrayList<>();
   private final boolean bootnodeEligible;
-
   private Optional<String> genesisConfig = Optional.empty();
   private NodeRequests nodeRequests;
   private LoginRequestFactory loginRequestFactory;
@@ -101,6 +102,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private String token = null;
   private final List<String> plugins = new ArrayList<>();
   private final List<String> extraCLIOptions;
+  private final List<String> staticNodes;
 
   public PantheonNode(
       final String name,
@@ -117,10 +119,13 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       final NetworkingConfiguration networkingConfiguration,
       final boolean discoveryEnabled,
       final boolean bootnodeEligible,
+      final boolean revertReasonEnabled,
       final List<String> plugins,
-      final List<String> extraCLIOptions)
+      final List<String> extraCLIOptions,
+      final List<String> staticNodes)
       throws IOException {
     this.bootnodeEligible = bootnodeEligible;
+    this.revertReasonEnabled = revertReasonEnabled;
     this.homeDirectory = Files.createTempDirectory("acctest");
     keyfilePath.ifPresent(
         path -> {
@@ -156,6 +161,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
           }
         });
     this.extraCLIOptions = extraCLIOptions;
+    this.staticNodes = staticNodes;
     LOG.info("Created PantheonNode {}", this.toString());
   }
 
@@ -287,7 +293,8 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
               new PermissioningJsonRpcRequestFactory(web3jService),
               new AdminRequestFactory(web3jService),
               new EeaRequestFactory(web3jService),
-              new CustomNetJsonRpcRequestFactory(web3jService),
+              new CustomRequestFactory(web3jService),
+              new MinerRequestFactory(web3jService),
               websocketService,
               loginRequestFactory());
     }
@@ -519,6 +526,20 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   @Override
   public List<String> getExtraCLIOptions() {
     return extraCLIOptions;
+  }
+
+  @Override
+  public boolean isRevertReasonEnabled() {
+    return revertReasonEnabled;
+  }
+
+  @Override
+  public List<String> getStaticNodes() {
+    return staticNodes;
+  }
+
+  public boolean hasStaticNodes() {
+    return staticNodes != null && !staticNodes.isEmpty();
   }
 
   @Override

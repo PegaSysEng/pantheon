@@ -118,6 +118,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .rocksDbConfiguration(RocksDbConfiguration.builder().databaseDir(tempDir).build())
               .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
               .clock(Clock.systemUTC())
+              .isRevertReasonEnabled(node.isRevertReasonEnabled())
               .build();
     } catch (final IOException e) {
       throw new RuntimeException("Error building PantheonController", e);
@@ -153,6 +154,10 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .metricsConfiguration(node.metricsConfiguration())
             .p2pEnabled(node.isP2pEnabled())
             .graphQLConfiguration(GraphQLConfiguration.createDefault())
+            .staticNodes(
+                node.getStaticNodes().stream()
+                    .map(EnodeURL::fromString)
+                    .collect(Collectors.toList()))
             .build();
 
     runner.start();

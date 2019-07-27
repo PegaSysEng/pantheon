@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionValidator;
 
 import java.math.BigInteger;
 import java.util.Optional;
@@ -24,36 +25,47 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ProtocolScheduleBuilder<C> {
+
   private static final Logger LOG = LogManager.getLogger();
   private final GenesisConfigOptions config;
   private final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter;
   private final Optional<BigInteger> defaultChainId;
   private final PrivacyParameters privacyParameters;
+  private final boolean isRevertReasonEnabled;
 
   public ProtocolScheduleBuilder(
       final GenesisConfigOptions config,
       final BigInteger defaultChainId,
       final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter,
-      final PrivacyParameters privacyParameters) {
-    this(config, Optional.of(defaultChainId), protocolSpecAdapter, privacyParameters);
+      final PrivacyParameters privacyParameters,
+      final boolean isRevertReasonEnabled) {
+    this(
+        config,
+        Optional.of(defaultChainId),
+        protocolSpecAdapter,
+        privacyParameters,
+        isRevertReasonEnabled);
   }
 
   public ProtocolScheduleBuilder(
       final GenesisConfigOptions config,
       final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter,
-      final PrivacyParameters privacyParameters) {
-    this(config, Optional.empty(), protocolSpecAdapter, privacyParameters);
+      final PrivacyParameters privacyParameters,
+      final boolean isRevertReasonEnabled) {
+    this(config, Optional.empty(), protocolSpecAdapter, privacyParameters, isRevertReasonEnabled);
   }
 
   private ProtocolScheduleBuilder(
       final GenesisConfigOptions config,
       final Optional<BigInteger> defaultChainId,
       final Function<ProtocolSpecBuilder<Void>, ProtocolSpecBuilder<C>> protocolSpecAdapter,
-      final PrivacyParameters privacyParameters) {
+      final PrivacyParameters privacyParameters,
+      final boolean isRevertReasonEnabled) {
     this.config = config;
     this.defaultChainId = defaultChainId;
     this.protocolSpecAdapter = protocolSpecAdapter;
     this.privacyParameters = privacyParameters;
+    this.isRevertReasonEnabled = isRevertReasonEnabled;
   }
 
   public ProtocolSchedule<C> createProtocolSchedule() {
@@ -109,22 +121,34 @@ public class ProtocolScheduleBuilder<C> {
         protocolSchedule,
         config.getByzantiumBlockNumber(),
         MainnetProtocolSpecs.byzantiumDefinition(
-            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
+            chainId,
+            config.getContractSizeLimit(),
+            config.getEvmStackSize(),
+            isRevertReasonEnabled));
     addProtocolSpec(
         protocolSchedule,
         config.getConstantinopleBlockNumber(),
         MainnetProtocolSpecs.constantinopleDefinition(
-            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
+            chainId,
+            config.getContractSizeLimit(),
+            config.getEvmStackSize(),
+            isRevertReasonEnabled));
     addProtocolSpec(
         protocolSchedule,
         config.getConstantinopleFixBlockNumber(),
         MainnetProtocolSpecs.constantinopleFixDefinition(
-            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
+            chainId,
+            config.getContractSizeLimit(),
+            config.getEvmStackSize(),
+            isRevertReasonEnabled));
     addProtocolSpec(
         protocolSchedule,
         config.getIstanbulBlockNumber(),
         MainnetProtocolSpecs.istanbulDefinition(
-            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
+            chainId,
+            config.getContractSizeLimit(),
+            config.getEvmStackSize(),
+            isRevertReasonEnabled));
 
     LOG.info("Protocol schedule created with milestones: {}", protocolSchedule.listMilestones());
     return protocolSchedule;
@@ -141,6 +165,8 @@ public class ProtocolScheduleBuilder<C> {
                 protocolSpecAdapter
                     .apply(definition)
                     .privacyParameters(privacyParameters)
+                    .privateTransactionValidatorBuilder(
+                        () -> new PrivateTransactionValidator(protocolSchedule.getChainId()))
                     .build(protocolSchedule)));
   }
 
