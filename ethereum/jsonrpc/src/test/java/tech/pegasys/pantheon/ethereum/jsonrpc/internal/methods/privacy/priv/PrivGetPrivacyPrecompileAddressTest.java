@@ -30,7 +30,7 @@ import org.junit.Test;
 public class PrivGetPrivacyPrecompileAddressTest {
 
   private final int rawPrivacyAddress = Address.PRIVACY;
-  private final Address privacyAddress = Address.privacyPrecompiled(rawPrivacyAddress);
+  private final String privacyAddress = Address.privacyPrecompiled(rawPrivacyAddress).toString();
   private final PrivacyParameters privacyParameters = mock(PrivacyParameters.class);
 
   @Test

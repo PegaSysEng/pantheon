@@ -42,7 +42,7 @@ public class PrivGetPrivacyPrecompileAddress implements JsonRpcMethod {
 
     if (privacyEnabled) {
       return new JsonRpcSuccessResponse(
-          request.getId(), Address.privacyPrecompiled(privacyAddress));
+          request.getId(), Address.privacyPrecompiled(privacyAddress).toString());
     } else {
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.PRIVACY_NOT_ENABLED);
     }
