@@ -3772,36 +3772,6 @@ None
     The `EEA` API methods are not enabled by default for JSON-RPC. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
     or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `EEA` API methods.
 
-### eea_getPrivacyPrecompileAddress
-
-Returns the address to which the [privacy pre-compiled contract](../Privacy/Private-Transaction-Processing.md) is mapped. 
-The address is specified by the [`--privacy-precompiled-address`](Pantheon-CLI-Syntax.md#privacy-precompiled-address) command line option. 
-
-**Parameters**
-
-None
-
-**Returns**
-
-`result` : `int` - Address of the privacy precompile 
-
-!!! example 
-    ```bash tab="curl HTTP request"
-    curl -X POST --data '{"jsonrpc":"2.0","method":"eea_getPrivacyPrecompileAddress","params":[], "id":1}' http://127.0.0.1:8545
-    ```
-        
-    ```bash tab="wscat WS request"
-    {"jsonrpc":"2.0","method":"eea_getPrivacyPrecompileAddress","params":[], "id":1}
-    ```
-        
-    ```json tab="JSON result"
-    {
-        "jsonrpc": "2.0",
-        "id": 1,
-        "result": 126
-    }
-    ```
-
 ### eea_sendRawTransaction
 
 Creates a [private transaction](../Privacy/Explanation/Privacy-Overview.md) from a signed transaction, generates the transaction hash 
@@ -3893,6 +3863,35 @@ are not available.
     The `PRIV` API methods are not enabled by default for JSON-RPC. Use the [`--rpc-http-api`](Pantheon-CLI-Syntax.md#rpc-http-api) 
     or [`--rpc-ws-api`](Pantheon-CLI-Syntax.md#rpc-ws-api) options to enable the `PRIV` API methods.
 
+### priv_getPrivacyPrecompileAddress
+
+Returns the address to which the [privacy pre-compiled contract](../Privacy/Private-Transaction-Processing.md) is mapped. 
+The address is specified by the [`--privacy-precompiled-address`](Pantheon-CLI-Syntax.md#privacy-precompiled-address) command line option. 
+
+**Parameters**
+
+None
+
+**Returns**
+
+`result` : `data` - Address of the privacy precompile 
+
+!!! example 
+    ```bash tab="curl HTTP request"
+    curl -X POST --data '{"jsonrpc":"2.0","method":"priv_getPrivacyPrecompileAddress","params":[], "id":1}' http://127.0.0.1:8545
+    ```
+        
+    ```bash tab="wscat WS request"
+    {"jsonrpc":"2.0","method":"priv_getPrivacyPrecompileAddress","params":[], "id":1}
+    ```
+        
+    ```json tab="JSON result"
+    {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x000000000000000000000000000000000000007e"
+    }
+    ```
 
 ### priv_getPrivateTransaction
 
