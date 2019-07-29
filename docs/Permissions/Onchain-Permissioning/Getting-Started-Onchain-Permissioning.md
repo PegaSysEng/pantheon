@@ -79,7 +79,7 @@ Set to JSON-RPC host and port. When bootstrapping the network, the specified nod
 in the network. 
 
 !!! important 
-    The account specified must be a miner (PoW networks) or validator (PoA networks).
+    The node specified must be a miner (PoW networks) or validator (PoA networks).
     
     If your network is not a [free gas network](../../Configuring-Pantheon/FreeGas.md), the account used to 
     interact with the permissioning contracts must have a balance. 
