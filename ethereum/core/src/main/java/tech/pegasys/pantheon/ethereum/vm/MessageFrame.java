@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.vm;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -131,7 +132,7 @@ public class MessageFrame {
    * <h3>Message Execution Failed ({@link #COMPLETED_FAILED})</h3>
    *
    * <p>The message execution failed to execute successfully; most likely due to encountering an
-   * exceptoinal halting condition. At this point the message frame is finalized and the parent is
+   * exceptional halting condition. At this point the message frame is finalized and the parent is
    * notified.
    *
    * <h3>Message Execution Completed Successfully ({@link #COMPLETED_SUCCESS})</h3>
@@ -206,6 +207,7 @@ public class MessageFrame {
   private final Address recipient;
   private final Address originator;
   private final Address contract;
+  private final int contractAccountVersion;
   private final Wei gasPrice;
   private final BytesValue inputData;
   private final Address sender;
@@ -238,6 +240,7 @@ public class MessageFrame {
       final Address recipient,
       final Address originator,
       final Address contract,
+      final int contractAccountVersion,
       final Wei gasPrice,
       final BytesValue inputData,
       final Address sender,
@@ -271,6 +274,7 @@ public class MessageFrame {
     this.recipient = recipient;
     this.originator = originator;
     this.contract = contract;
+    this.contractAccountVersion = contractAccountVersion;
     this.gasPrice = gasPrice;
     this.inputData = inputData;
     this.sender = sender;
@@ -305,7 +309,7 @@ public class MessageFrame {
     this.pc = pc;
   }
 
-  /** Deducts the remainging gas. */
+  /** Deducts the remaining gas. */
   public void clearGasRemaining() {
     this.gasRemaining = Gas.ZERO;
   }
@@ -340,7 +344,7 @@ public class MessageFrame {
   /**
    * Set the amount of remaining gas.
    *
-   * @param amount The amount of remainging gas
+   * @param amount The amount of remaining gas
    */
   public void setGasRemaining(final Gas amount) {
     this.gasRemaining = amount;
@@ -846,6 +850,10 @@ public class MessageFrame {
     this.currentOperation = currentOperation;
   }
 
+  public int getContractAccountVersion() {
+    return contractAccountVersion;
+  }
+
   public static class Builder {
 
     private Type type;
@@ -856,6 +864,7 @@ public class MessageFrame {
     private Address address;
     private Address originator;
     private Address contract;
+    private int contractAccountVersion = -1;
     private Wei gasPrice;
     private BytesValue inputData;
     private Address sender;
@@ -909,6 +918,12 @@ public class MessageFrame {
 
     public Builder contract(final Address contract) {
       this.contract = contract;
+      return this;
+    }
+
+    public Builder contractAccountVersion(final int contractAccountVersion) {
+      checkArgument(contractAccountVersion >= 0, "Contract account version cannot be negative");
+      this.contractAccountVersion = contractAccountVersion;
       return this;
     }
 
@@ -1008,6 +1023,7 @@ public class MessageFrame {
       checkState(miningBeneficiary != null, "Missing mining beneficiary");
       checkState(blockHashLookup != null, "Missing block hash lookup");
       checkState(isPersistingState != null, "Missing isPersistingState");
+      checkState(contractAccountVersion != -1, "Missing contractAccountVersion");
     }
 
     public MessageFrame build() {
@@ -1022,6 +1038,7 @@ public class MessageFrame {
           address,
           originator,
           contract,
+          contractAccountVersion,
           gasPrice,
           inputData,
           sender,

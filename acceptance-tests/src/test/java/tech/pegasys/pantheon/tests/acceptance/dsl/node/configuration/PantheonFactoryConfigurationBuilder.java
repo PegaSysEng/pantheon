@@ -52,6 +52,7 @@ public class PantheonFactoryConfigurationBuilder {
   private boolean revertReasonEnabled = false;
   private List<String> plugins = new ArrayList<>();
   private List<String> extraCLIOptions = new ArrayList<>();
+  private List<String> staticNodes = new ArrayList<>();
 
   public PantheonFactoryConfigurationBuilder() {
     // Check connections more frequently during acceptance tests to cut down on
@@ -66,6 +67,7 @@ public class PantheonFactoryConfigurationBuilder {
 
   public PantheonFactoryConfigurationBuilder miningEnabled() {
     this.miningParameters = new MiningParametersTestBuilder().enabled(true).build();
+    this.jsonRpcConfiguration.addRpcApi(RpcApis.MINER);
     return this;
   }
 
@@ -86,6 +88,7 @@ public class PantheonFactoryConfigurationBuilder {
   public PantheonFactoryConfigurationBuilder enablePrivateTransactions(
       final PrivacyParameters privacyParameters) {
     this.jsonRpcConfiguration.addRpcApi(RpcApis.EEA);
+    this.jsonRpcConfiguration.addRpcApi(RpcApis.PRIV);
     this.privacyParameters = privacyParameters;
     this.privacyParameters.setEnabled(true);
     return this;
@@ -193,6 +196,11 @@ public class PantheonFactoryConfigurationBuilder {
     return this;
   }
 
+  public PantheonFactoryConfigurationBuilder staticNodes(final List<String> staticNodes) {
+    this.staticNodes = staticNodes;
+    return this;
+  }
+
   public PantheonFactoryConfiguration build() {
     return new PantheonFactoryConfiguration(
         name,
@@ -211,6 +219,7 @@ public class PantheonFactoryConfigurationBuilder {
         bootnodeEligible,
         revertReasonEnabled,
         plugins,
-        extraCLIOptions);
+        extraCLIOptions,
+        staticNodes);
   }
 }

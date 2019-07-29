@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy;
 
-import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
-
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
@@ -53,11 +51,15 @@ public class PrivateTransactionProcessor {
   @SuppressWarnings("unused")
   private final TransactionValidator transactionValidator;
 
+  private final PrivateTransactionValidator privateTransactionValidator;
+
   private final AbstractMessageProcessor contractCreationProcessor;
 
   private final AbstractMessageProcessor messageCallProcessor;
 
   private final int maxStackSize;
+
+  private final int createContractAccountVersion;
 
   public static class Result implements TransactionProcessor.Result {
 
@@ -160,13 +162,17 @@ public class PrivateTransactionProcessor {
       final AbstractMessageProcessor contractCreationProcessor,
       final AbstractMessageProcessor messageCallProcessor,
       final boolean clearEmptyAccounts,
-      final int maxStackSize) {
+      final int maxStackSize,
+      final int createContractAccountVersion,
+      final PrivateTransactionValidator privateTransactionValidator) {
     this.gasCalculator = gasCalculator;
     this.transactionValidator = transactionValidator;
     this.contractCreationProcessor = contractCreationProcessor;
     this.messageCallProcessor = messageCallProcessor;
     this.clearEmptyAccounts = clearEmptyAccounts;
     this.maxStackSize = maxStackSize;
+    this.createContractAccountVersion = createContractAccountVersion;
+    this.privateTransactionValidator = privateTransactionValidator;
   }
 
   @SuppressWarnings("unused")
@@ -189,13 +195,10 @@ public class PrivateTransactionProcessor {
             ? maybePrivateSender
             : privateWorldState.createAccount(senderAddress, 0, Wei.ZERO);
 
-    if (transaction.getNonce() < sender.getNonce()) {
-      return Result.invalid(
-          ValidationResult.invalid(
-              NONCE_TOO_LOW,
-              String.format(
-                  "transaction nonce %s below sender account nonce %s",
-                  transaction.getNonce(), sender.getNonce())));
+    final ValidationResult<TransactionInvalidReason> validationResult =
+        privateTransactionValidator.validate(transaction, sender.getNonce());
+    if (!validationResult.isValid()) {
+      return Result.invalid(validationResult);
     }
 
     final long previousNonce = sender.incrementNonce();
@@ -227,6 +230,7 @@ public class PrivateTransactionProcessor {
               .address(privateContractAddress)
               .originator(senderAddress)
               .contract(privateContractAddress)
+              .contractAccountVersion(createContractAccountVersion)
               .initialGas(Gas.MAX_VALUE)
               .gasPrice(transaction.getGasPrice())
               .inputData(BytesValue.EMPTY)
@@ -255,6 +259,8 @@ public class PrivateTransactionProcessor {
               .address(to)
               .originator(senderAddress)
               .contract(to)
+              .contractAccountVersion(
+                  contract != null ? contract.getVersion() : Account.DEFAULT_VERSION)
               .initialGas(Gas.MAX_VALUE)
               .gasPrice(transaction.getGasPrice())
               .inputData(transaction.getPayload())

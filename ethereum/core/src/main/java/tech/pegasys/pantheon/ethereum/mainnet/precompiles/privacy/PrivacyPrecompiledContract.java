@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet.precompiles.privacy;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static tech.pegasys.pantheon.crypto.Hash.keccak256;
 
 import tech.pegasys.pantheon.enclave.Enclave;
@@ -39,10 +38,8 @@ import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.util.bytes.BytesValues;
 
-import java.util.Base64;
-
-import com.google.common.base.Charsets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -95,7 +92,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
 
   @Override
   public BytesValue compute(final BytesValue input, final MessageFrame messageFrame) {
-    final String key = new String(input.extractArray(), UTF_8);
+    final String key = BytesValues.asBase64String(input);
     final ReceiveRequest receiveRequest = new ReceiveRequest(key, enclavePublicKey);
 
     ReceiveResponse receiveResponse;
@@ -107,15 +104,14 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
     }
 
     final BytesValueRLPInput bytesValueRLPInput =
-        new BytesValueRLPInput(
-            BytesValue.wrap(Base64.getDecoder().decode(receiveResponse.getPayload())), false);
+        new BytesValueRLPInput(BytesValues.fromBase64(receiveResponse.getPayload()), false);
 
     final PrivateTransaction privateTransaction = PrivateTransaction.readFrom(bytesValueRLPInput);
 
     final WorldUpdater publicWorldState = messageFrame.getWorldState();
 
-    final BytesValue privacyGroupId =
-        BytesValue.wrap(receiveResponse.getPrivacyGroupId().getBytes(Charsets.UTF_8));
+    final BytesValue privacyGroupId = BytesValues.fromBase64(receiveResponse.getPrivacyGroupId());
+
     // get the last world state root hash - or create a new one
     final Hash lastRootHash =
         privateStateStorage.getPrivateAccountState(privacyGroupId).orElse(EMPTY_ROOT_HASH);
