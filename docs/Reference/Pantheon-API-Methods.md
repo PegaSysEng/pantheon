@@ -3865,7 +3865,7 @@ are not available.
 
 ### priv_getPrivacyPrecompileAddress
 
-Returns the address to which the [privacy pre-compiled contract](../Privacy/Private-Transaction-Processing.md) is mapped. 
+Returns the address of the [privacy precompiled contract](../Privacy/Private-Transaction-Processing.md). 
 The address is specified by the [`--privacy-precompiled-address`](Pantheon-CLI-Syntax.md#privacy-precompiled-address) command line option. 
 
 **Parameters**
