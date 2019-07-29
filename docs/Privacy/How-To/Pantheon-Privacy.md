@@ -3,9 +3,9 @@ description: Pantheon-extended privacy
 
 # Using Pantheon-extended Privacy 
 
-Pantheon provides an extended implementation of privacy. When using Pantheon-extended privacy, a [privacy
-group is created for a set of participants](../Explanation/Privacy-Groups.md) and the privacy group ID 
-is specified when sending private transactions. 
+Pantheon provides an extended implementation of privacy by allowing a [privacy
+group to be created for a set of participants](../Explanation/Privacy-Groups.md). The privacy group ID 
+must be specified when sending private transactions. 
 
 Using the [`--rpc-http-api`](../../Reference/Pantheon-CLI-Syntax.md#rpc-http-api) or [`--rpc-ws-api`](../../Reference/Pantheon-CLI-Syntax.md#rpc-ws-api)
 command line options enable: 
@@ -20,7 +20,7 @@ Specify `privacyGroupId` when creating the signed transaction passed as an input
 to create an EEA-compliant private transaction. 
 
 !!! note
-    Support for specifying `privacyGroupId` when using eea_sendTransaction with EthSigner will be available in
+    Support for specifying `privacyGroupId` when using `eea_sendTransaction` with EthSigner will be available in
     a future EthSigner release. 
     
 ## Privacy Group Type 
