@@ -113,7 +113,7 @@ Private transaction receipt
 
 Signs and sends a RLP-encoded private transaction to Pantheon using [`eea_sendRawTransaction`](Pantheon-API-Methods.md#eea_sendrawtransaction). 
 
-`sendRawTransaction` support [EEA-compliant privacy](../Privacy/How-To/EEA-Compliant.md) using `privateFor` or [Pantheon-extended privacy](../Privacy/How-To/Pantheon-Privacy.md) using `privacyGroupId`. 
+`sendRawTransaction` supports [EEA-compliant privacy](../Privacy/How-To/EEA-Compliant.md) using `privateFor`, or [Pantheon-extended privacy](../Privacy/How-To/Pantheon-Privacy.md) using `privacyGroupId`. 
 
 **Parameters**
 
