@@ -106,7 +106,7 @@ to enable onchain nodes permissioning
 set to the address of the Node Ingress contract in the genesis file (`"0x0000000000000000000000000000000000009999"`)  
 
 Start your first node with command line options to enable onchain permissioning and the JSON-RPC HTTP host and port 
-matching enviroment variable `PANTHEON_NODE_PERM_ENDPOINT`. 
+matching environment variable `PANTHEON_NODE_PERM_ENDPOINT`. 
 
 ## Clone Project and Install Dependencies 
 
