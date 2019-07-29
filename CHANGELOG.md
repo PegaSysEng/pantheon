@@ -12,9 +12,8 @@ for information on options that were previously automatically added to the Panth
 ## 1.2 
 
 ### Additions and Improvements 
-
 - Documentation updates include: 
-  - Updated web3.js-eea to include privacy group methods 
+  - Updated [web3.js-eea reference] to [include privacy group methods] 
   - Updated onchain permissioning to include account permissioning and Permissioning Management Dapp
   - Added deployment procedure for Permissioning Management Dapp 
   - Add privacy content for EEA-compliant and Pantheon-extended privacy 
