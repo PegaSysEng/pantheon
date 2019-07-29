@@ -9,10 +9,21 @@ From v1.2, Pantheon requires Java 11.  Pantheon on Java 8 is no longer supported
 In v1.2, we removed the entry-point script from our Docker image. Refer to the [migration guide](https://docs.pantheon.pegasys.tech/en/latest/Deploying-Pantheon/High-Availability/)
 for information on options that were previously automatically added to the Pantheon command line. 
 
-### Docker Image Migration for v1.2
+## 1.2 
 
-In v1.2, we removed the entry-point script from our Docker image. Refer to the [migration guide](https://docs.pantheon.pegasys.tech/en/latest/Deploying-Pantheon/High-Availability/)
-for information on options that were previously automatically added to the Pantheon command line. 
+### Additions and Improvements 
+
+- Documentation updates include: 
+  - Updated web3.js-eea to include privacy group methods 
+  - Updated onchain permissioning to include account permissioning and Permissioning Management Dapp
+  - Added deployment procedure for Permissioning Management Dapp 
+  - Add privacy content for EEA-compliant and Pantheon-extended privacy 
+  
+### Technical Improvements
+
+- Report node local address as the coinbase in Clique and IBFT [\#1760](https://github.com/PegaSysEng/pantheon/pull/1760)
+- Report 0 hashrate when the mining coordinator doesn't support mining [\#1757](https://github.com/PegaSysEng/pantheon/pull/1757)
+- Fix private tx signature validation [\#1753](https://github.com/PegaSysEng/pantheon/pull/1753)
 
 ## 1.2-RC 
 
