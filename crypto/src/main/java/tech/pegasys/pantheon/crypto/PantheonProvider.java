@@ -24,7 +24,7 @@ public final class PantheonProvider extends Provider {
 
   @SuppressWarnings("unchecked")
   public PantheonProvider() {
-    super(PROVIDER_NAME, 1.0, info);
+    super(PROVIDER_NAME, "1.0", info);
     AccessController.doPrivileged(
         (PrivilegedAction)
             () -> {
