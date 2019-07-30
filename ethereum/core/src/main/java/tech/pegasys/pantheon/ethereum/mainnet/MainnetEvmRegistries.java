@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
-import static tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSpecs.ISTANBUL_ACCOUNT_VERSION;
-
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.vm.EVM;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
@@ -83,6 +81,7 @@ import tech.pegasys.pantheon.ethereum.vm.operations.SLtOperation;
 import tech.pegasys.pantheon.ethereum.vm.operations.SModOperation;
 import tech.pegasys.pantheon.ethereum.vm.operations.SStoreOperation;
 import tech.pegasys.pantheon.ethereum.vm.operations.SarOperation;
+import tech.pegasys.pantheon.ethereum.vm.operations.SelfBalanceOperation;
 import tech.pegasys.pantheon.ethereum.vm.operations.SelfDestructOperation;
 import tech.pegasys.pantheon.ethereum.vm.operations.Sha3Operation;
 import tech.pegasys.pantheon.ethereum.vm.operations.ShlOperation;
@@ -135,7 +134,7 @@ abstract class MainnetEvmRegistries {
   }
 
   static EVM istanbul(final GasCalculator gasCalculator, final BigInteger chainId) {
-    final OperationRegistry registry = new OperationRegistry(2);
+    final OperationRegistry registry = new OperationRegistry();
 
     registerIstanbulOpcodes(registry, gasCalculator, Account.DEFAULT_VERSION, chainId);
 
@@ -269,16 +268,11 @@ abstract class MainnetEvmRegistries {
       final BigInteger chainId) {
     registerConstantinopleOpcodes(registry, gasCalculator, accountVersion);
     registry.put(
+        new ChainIdOperation(gasCalculator, Bytes32.leftPad(BytesValue.of(chainId.toByteArray()))),
+        Account.DEFAULT_VERSION);
+    registry.put(new SelfBalanceOperation(gasCalculator), Account.DEFAULT_VERSION);
+    registry.put(
         new SStoreOperation(gasCalculator, SStoreOperation.EIP_1706_MINIMUM),
         Account.DEFAULT_VERSION);
-
-    registerConstantinopleOpcodes(registry, gasCalculator, ISTANBUL_ACCOUNT_VERSION);
-    registry.put(
-        new ChainIdOperation(gasCalculator, Bytes32.leftPad(BytesValue.of(chainId.toByteArray()))),
-        ISTANBUL_ACCOUNT_VERSION);
-    registerConstantinopleOpcodes(registry, gasCalculator, ISTANBUL_ACCOUNT_VERSION);
-    registry.put(
-        new SStoreOperation(gasCalculator, SStoreOperation.EIP_1706_MINIMUM),
-        MainnetProtocolSpecs.ISTANBUL_ACCOUNT_VERSION);
   }
 }
