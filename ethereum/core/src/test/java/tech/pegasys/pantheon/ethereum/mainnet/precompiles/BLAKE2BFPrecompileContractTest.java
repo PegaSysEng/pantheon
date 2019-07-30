@@ -25,11 +25,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class BLAKE2fPrecompileContractTest {
-  private final BLAKE2fPrecompileContract contract =
-      new BLAKE2fPrecompileContract(new ConstantinopleFixGasCalculator());
+public class BLAKE2BFPrecompileContractTest {
+  private final BLAKE2BFPrecompileContract contract =
+      new BLAKE2BFPrecompileContract(new ConstantinopleFixGasCalculator());
 
-  public BLAKE2fPrecompileContractTest() {}
+  public BLAKE2BFPrecompileContractTest() {}
 
   private MessageFrame messageFrame = mock(MessageFrame.class);
 

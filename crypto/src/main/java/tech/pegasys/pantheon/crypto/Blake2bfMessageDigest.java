@@ -19,10 +19,10 @@ import org.bouncycastle.jcajce.provider.digest.BCMessageDigest;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Pack;
 
-public class Blake2fMessageDigest extends BCMessageDigest {
+public class Blake2bfMessageDigest extends BCMessageDigest {
 
-  public Blake2fMessageDigest() {
-    super(new Blake2fDigest());
+  public Blake2bfMessageDigest() {
+    super(new Blake2bfDigest());
   }
 
   /**
@@ -34,7 +34,7 @@ public class Blake2fMessageDigest extends BCMessageDigest {
    *
    * <p>Optimized for 64-bit platforms
    */
-  public static class Blake2fDigest implements Digest {
+  public static class Blake2bfDigest implements Digest {
 
     public static final int MESSAGE_LENGTH_BYTES = 213;
 
@@ -75,7 +75,7 @@ public class Blake2fMessageDigest extends BCMessageDigest {
 
     private final long[] v;
 
-    Blake2fDigest() {
+    Blake2bfDigest() {
       buffer = new byte[MESSAGE_LENGTH_BYTES];
       bufferPos = 0;
 
@@ -89,7 +89,7 @@ public class Blake2fMessageDigest extends BCMessageDigest {
     }
 
     // for tests
-    Blake2fDigest(
+    Blake2bfDigest(
         final long[] h, final long[] m, final long[] t, final boolean f, final long rounds) {
       assert rounds <= 4294967295L; // uint max value
       buffer = new byte[MESSAGE_LENGTH_BYTES];

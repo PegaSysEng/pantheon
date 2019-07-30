@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.mainnet.precompiles;
 
 import static java.util.Arrays.copyOfRange;
-import static tech.pegasys.pantheon.crypto.Blake2fMessageDigest.Blake2fDigest.MESSAGE_LENGTH_BYTES;
+import static tech.pegasys.pantheon.crypto.Blake2bfMessageDigest.Blake2bfDigest.MESSAGE_LENGTH_BYTES;
 
 import tech.pegasys.pantheon.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.core.Gas;
@@ -25,8 +25,8 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.math.BigInteger;
 
 // https://github.com/keep-network/go-ethereum/pull/4
-public class BLAKE2fPrecompileContract extends AbstractPrecompiledContract {
-  public BLAKE2fPrecompileContract(final GasCalculator gasCalculator) {
+public class BLAKE2BFPrecompileContract extends AbstractPrecompiledContract {
+  public BLAKE2BFPrecompileContract(final GasCalculator gasCalculator) {
     super("BLAKE2f", gasCalculator);
   }
 
@@ -48,6 +48,6 @@ public class BLAKE2fPrecompileContract extends AbstractPrecompiledContract {
     if (input.size() != MESSAGE_LENGTH_BYTES) {
       return BytesValue.EMPTY;
     }
-    return Hash.blake2f(input);
+    return Hash.blake2bf(input);
   }
 }

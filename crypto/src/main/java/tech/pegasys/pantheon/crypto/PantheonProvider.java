@@ -28,7 +28,7 @@ public final class PantheonProvider extends Provider {
     AccessController.doPrivileged(
         (PrivilegedAction)
             () -> {
-              put("MessageDigest.Blake2f", "tech.pegasys.pantheon.crypto.Blake2fMessageDigest");
+              put("MessageDigest.Blake2bf", "tech.pegasys.pantheon.crypto.Blake2bfMessageDigest");
               return null;
             });
   }

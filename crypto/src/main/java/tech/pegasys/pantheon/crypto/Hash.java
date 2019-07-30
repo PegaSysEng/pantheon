@@ -26,7 +26,7 @@ public abstract class Hash {
 
   private static final String SHA256_ALG = "SHA-256";
   private static final String RIPEMD160 = "RIPEMD160";
-  private static final String BLAKE2F_ALG = "BLAKE2f";
+  private static final String BLAKE2BF_ALG = "BLAKE2BF";
 
   /**
    * Helper method to generate a digest using the provided algorithm.
@@ -81,7 +81,7 @@ public abstract class Hash {
    * @param input The input bytes to produce the digest for.
    * @return A digest.
    */
-  public static BytesValue blake2f(final BytesValue input) {
-    return BytesValue.wrap(digestUsingAlgorithm(input, BLAKE2F_ALG));
+  public static BytesValue blake2bf(final BytesValue input) {
+    return BytesValue.wrap(digestUsingAlgorithm(input, BLAKE2BF_ALG));
   }
 }
