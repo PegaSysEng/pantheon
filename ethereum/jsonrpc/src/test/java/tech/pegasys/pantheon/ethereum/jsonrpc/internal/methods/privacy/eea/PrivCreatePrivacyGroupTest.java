@@ -46,7 +46,7 @@ public class PrivCreatePrivacyGroupTest {
 
   @Test
   public void verifyCreatePrivacyGroup() throws Exception {
-    PrivacyGroup privacyGroup =
+    final PrivacyGroup privacyGroup =
         new PrivacyGroup(privacyGroupId, PrivacyGroup.Type.PANTHEON, name, description, addresses);
     when(enclave.createPrivacyGroup(any())).thenReturn(privacyGroup);
     when(privacyParameters.getEnclavePublicKey()).thenReturn(from);
@@ -54,7 +54,7 @@ public class PrivCreatePrivacyGroupTest {
     final PrivCreatePrivacyGroup eeaCreatePrivacyGroup =
         new PrivCreatePrivacyGroup(enclave, privacyParameters, parameters);
 
-    Object[] params = new Object[] {name, description, addresses};
+    final Object[] params = new Object[] {addresses, name, description};
     final JsonRpcRequest request = new JsonRpcRequest("1", "priv_createPrivacyGroup", params);
 
     final JsonRpcSuccessResponse response =
