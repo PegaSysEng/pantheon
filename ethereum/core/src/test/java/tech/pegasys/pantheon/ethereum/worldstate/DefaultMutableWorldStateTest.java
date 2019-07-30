@@ -17,8 +17,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldState;
 
 import tech.pegasys.pantheon.ethereum.core.Account;
+import tech.pegasys.pantheon.ethereum.core.AccountStorageEntry;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
@@ -27,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldState;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.WorldStateKeyValueStorage;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.WorldStatePreimageKeyValueStorage;
 import tech.pegasys.pantheon.ethereum.trie.MerklePatriciaTrie;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
@@ -34,8 +37,12 @@ import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.util.NavigableMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 
@@ -49,12 +56,13 @@ public class DefaultMutableWorldStateTest {
       Address.fromHexString("0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b");
 
   private static MutableWorldState createEmpty(final WorldStateKeyValueStorage storage) {
-    return new DefaultMutableWorldState(storage);
+    final WorldStatePreimageKeyValueStorage preimageStorage =
+        new WorldStatePreimageKeyValueStorage(new InMemoryKeyValueStorage());
+    return new DefaultMutableWorldState(storage, preimageStorage);
   }
 
   private static MutableWorldState createEmpty() {
-    final InMemoryKeyValueStorage inMemoryKeyValueStorage = new InMemoryKeyValueStorage();
-    return createEmpty(new WorldStateKeyValueStorage(inMemoryKeyValueStorage));
+    return createInMemoryWorldState();
   }
 
   @Test
@@ -157,6 +165,80 @@ public class DefaultMutableWorldStateTest {
   }
 
   @Test
+  public void streamAccounts_empty() {
+    final MutableWorldState worldState = createEmpty();
+    final Stream<Account> accounts = worldState.streamAccounts(Bytes32.ZERO, 10);
+    assertThat(accounts.count()).isEqualTo(0L);
+  }
+
+  @Test
+  public void streamAccounts_singleAccount() {
+    final MutableWorldState worldState = createEmpty();
+    final WorldUpdater updater = worldState.updater();
+    updater.createAccount(ADDRESS).setBalance(Wei.of(100000));
+    updater.commit();
+
+    List<Account> accounts =
+        worldState.streamAccounts(Bytes32.ZERO, 10).collect(Collectors.toList());
+    assertThat(accounts.size()).isEqualTo(1L);
+    assertThat(accounts.get(0).getAddress()).isEqualTo(ADDRESS);
+    assertThat(accounts.get(0).getBalance()).isEqualTo(Wei.of(100000));
+
+    // Check again after persisting
+    worldState.persist();
+    accounts = worldState.streamAccounts(Bytes32.ZERO, 10).collect(Collectors.toList());
+    assertThat(accounts.size()).isEqualTo(1L);
+    assertThat(accounts.get(0).getAddress()).isEqualTo(ADDRESS);
+    assertThat(accounts.get(0).getBalance()).isEqualTo(Wei.of(100000));
+  }
+
+  @Test
+  public void streamAccounts_multipleAccounts() {
+    final Address addr1 = Address.fromHexString("0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b");
+    final Address addr2 = Address.fromHexString("0xa94f5374fce5edbc8e2a8697c15331677e6ebf0c");
+
+    final MutableWorldState worldState = createEmpty();
+    final WorldUpdater updater = worldState.updater();
+
+    // Create an account
+    final MutableAccount accountA = updater.createAccount(addr1);
+    accountA.setBalance(Wei.of(100000));
+    // Create another
+    final MutableAccount accountB = updater.createAccount(addr2);
+    accountB.setNonce(1);
+    // Commit changes
+    updater.commit();
+
+    final boolean accountAIsFirst =
+        accountA.getAddressHash().compareTo(accountB.getAddressHash()) < 0;
+    final Hash startHash = accountAIsFirst ? accountA.getAddressHash() : accountB.getAddressHash();
+
+    // Get first account
+    final List<Account> firstAccount =
+        worldState.streamAccounts(startHash, 1).collect(Collectors.toList());
+    assertThat(firstAccount.size()).isEqualTo(1L);
+    assertThat(firstAccount.get(0).getAddress())
+        .isEqualTo(accountAIsFirst ? accountA.getAddress() : accountB.getAddress());
+
+    // Get both accounts
+    final List<Account> allAccounts =
+        worldState.streamAccounts(Bytes32.ZERO, 2).collect(Collectors.toList());
+    assertThat(allAccounts.size()).isEqualTo(2L);
+    assertThat(allAccounts.get(0).getAddress())
+        .isEqualTo(accountAIsFirst ? accountA.getAddress() : accountB.getAddress());
+    assertThat(allAccounts.get(1).getAddress())
+        .isEqualTo(accountAIsFirst ? accountB.getAddress() : accountA.getAddress());
+
+    // Get second account
+    final Bytes32 startHashForSecondAccount = startHash.asUInt256().plus(1L).getBytes();
+    final List<Account> secondAccount =
+        worldState.streamAccounts(startHashForSecondAccount, 100).collect(Collectors.toList());
+    assertThat(secondAccount.size()).isEqualTo(1L);
+    assertThat(secondAccount.get(0).getAddress())
+        .isEqualTo(accountAIsFirst ? accountB.getAddress() : accountA.getAddress());
+  }
+
+  @Test
   public void commitAndPersist() {
     final KeyValueStorage storage = new InMemoryKeyValueStorage();
     final WorldStateKeyValueStorage kvWorldStateStorage = new WorldStateKeyValueStorage(storage);
@@ -190,7 +272,10 @@ public class DefaultMutableWorldStateTest {
 
     // Create new world state and check that it can access modified address
     final MutableWorldState newWorldState =
-        new DefaultMutableWorldState(expectedRootHash, new WorldStateKeyValueStorage(storage));
+        new DefaultMutableWorldState(
+            expectedRootHash,
+            new WorldStateKeyValueStorage(storage),
+            new WorldStatePreimageKeyValueStorage(new InMemoryKeyValueStorage()));
     assertEquals(expectedRootHash, newWorldState.rootHash());
     assertNotNull(newWorldState.get(ADDRESS));
     assertEquals(newBalance, newWorldState.get(ADDRESS).getBalance());
@@ -544,21 +629,36 @@ public class DefaultMutableWorldStateTest {
     account.setStorageValue(UInt256.of(2), UInt256.of(5));
     updater.commit();
 
+    final List<AccountStorageEntry> initialSetOfEntries = new ArrayList<>();
+    initialSetOfEntries.add(AccountStorageEntry.forKeyAndValue(UInt256.ONE, UInt256.of(2)));
+    initialSetOfEntries.add(AccountStorageEntry.forKeyAndValue(UInt256.of(2), UInt256.of(5)));
+    final Map<Bytes32, AccountStorageEntry> initialEntries = new TreeMap<>();
+    initialSetOfEntries.forEach(entry -> initialEntries.put(entry.getKeyHash(), entry));
+
     updater = worldState.updater();
     account = updater.getMutable(ADDRESS);
     account.setStorageValue(UInt256.ONE, UInt256.of(3));
     account.setStorageValue(UInt256.of(3), UInt256.of(6));
 
-    final NavigableMap<Bytes32, UInt256> storage = account.storageEntriesFrom(Hash.ZERO, 10);
+    final List<AccountStorageEntry> finalSetOfEntries = new ArrayList<>();
+    finalSetOfEntries.add(AccountStorageEntry.forKeyAndValue(UInt256.ONE, UInt256.of(3)));
+    finalSetOfEntries.add(AccountStorageEntry.forKeyAndValue(UInt256.of(2), UInt256.of(5)));
+    finalSetOfEntries.add(AccountStorageEntry.forKeyAndValue(UInt256.of(3), UInt256.of(6)));
+    final Map<Bytes32, AccountStorageEntry> finalEntries = new TreeMap<>();
+    finalSetOfEntries.forEach(entry -> finalEntries.put(entry.getKeyHash(), entry));
 
-    final NavigableMap<Bytes32, UInt256> expected = new TreeMap<>();
-    expected.put(hash(UInt256.ONE), UInt256.of(3));
-    expected.put(hash(UInt256.of(2)), UInt256.of(5));
-    expected.put(hash(UInt256.of(3)), UInt256.of(6));
-    assertThat(storage).isEqualTo(expected);
-  }
+    assertThat(account.storageEntriesFrom(Hash.ZERO, 10)).isEqualTo(finalEntries);
+    assertThat(updater.get(ADDRESS).storageEntriesFrom(Hash.ZERO, 10)).isEqualTo(finalEntries);
+    assertThat(worldState.get(ADDRESS).storageEntriesFrom(Hash.ZERO, 10)).isEqualTo(initialEntries);
 
-  private Hash hash(final UInt256 key) {
-    return Hash.hash(key.getBytes());
+    worldState.persist();
+    assertThat(updater.get(ADDRESS).storageEntriesFrom(Hash.ZERO, 10)).isEqualTo(finalEntries);
+    assertThat(worldState.get(ADDRESS).storageEntriesFrom(Hash.ZERO, 10)).isEqualTo(initialEntries);
+
+    updater.commit();
+    assertThat(worldState.get(ADDRESS).storageEntriesFrom(Hash.ZERO, 10)).isEqualTo(finalEntries);
+
+    worldState.persist();
+    assertThat(worldState.get(ADDRESS).storageEntriesFrom(Hash.ZERO, 10)).isEqualTo(finalEntries);
   }
 }
