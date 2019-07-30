@@ -102,9 +102,9 @@ public abstract class MainnetPrecompiledContractRegistries {
         AltBN128PairingPrecompiledContract.istanbul(
             precompiledContractConfiguration.getGasCalculator()));
     registry.put(
-            Address.BLAKE2B_F_COMPRESSION,
-            ISTANBUL_ACCOUNT_VERSION,
-            new BLAKE2BFPrecompileContract(precompiledContractConfiguration.getGasCalculator()));
+        Address.BLAKE2B_F_COMPRESSION,
+        ISTANBUL_ACCOUNT_VERSION,
+        new BLAKE2BFPrecompileContract(precompiledContractConfiguration.getGasCalculator()));
 
     return registry;
   }
