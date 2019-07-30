@@ -260,7 +260,7 @@ public class PrivateTransactionProcessor {
               .address(to)
               .originator(senderAddress)
               .contract(to)
-              .contractBalance(contract.getBalance())
+              .contractBalance(contract != null ? contract.getBalance() : Wei.ZERO)
               .contractAccountVersion(
                   contract != null ? contract.getVersion() : Account.DEFAULT_VERSION)
               .initialGas(Gas.MAX_VALUE)

@@ -265,7 +265,7 @@ public class MainnetTransactionProcessor implements TransactionProcessor {
               .address(to)
               .originator(senderAddress)
               .contract(to)
-              .contractBalance(contract.getBalance())
+              .contractBalance(contract != null ? contract.getBalance() : Wei.ZERO)
               .contractAccountVersion(
                   contract != null ? contract.getVersion() : Account.DEFAULT_VERSION)
               .gasPrice(transaction.getGasPrice())
