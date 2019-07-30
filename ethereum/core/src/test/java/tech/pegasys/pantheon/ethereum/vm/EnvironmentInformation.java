@@ -84,7 +84,7 @@ public class EnvironmentInformation {
         code,
         0,
         account == null ? null : Address.fromHexString(account),
-        balance == null ? null : Wei.fromHexString(balance),
+        balance == null ? Wei.ZERO : Wei.fromHexString(balance),
         caller == null ? null : Address.fromHexString(caller),
         origin == null ? null : Address.fromHexString(origin),
         data == null ? null : BytesValue.fromHexString(data),
