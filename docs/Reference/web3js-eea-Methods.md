@@ -12,7 +12,7 @@ The Options parameter has the following properties:
 
 * `privateKey`: Ethereum private key with which to sign the transaction
 * `privateFrom` : Orion public key of the sender
-* `privateFor` : Orion public keys of recipients
+* [`privateFor` : Orion public keys of recipients or `privacyGroupId`: Privacy group to receive the transaction](../Privacy/Explanation/Privacy-Groups.md)  
 * `nonce` : Optional. If not provided, calculated using [`eea_getTransctionCount`](../Reference/Pantheon-API-Methods.md).
 * `to` : Optional. Contract address to send the transaction to. Do not specify for contract deployment transactions
 * `data` : Transaction data
@@ -25,6 +25,10 @@ Creates privacy group for Pantheon privacy.
 
 [Transaction options](#options-parameter)
 
+`name` : `string` - Name of the privacy group. Optional.
+
+`description` : `string` - Name of the privacy group. Optional. 
+
 **Returns** 
 
 `string` : Privacy group ID 
@@ -34,7 +38,6 @@ Creates privacy group for Pantheon privacy.
     const createPrivacyGroup = () => {
       const contractOptions = {
         addresses: [orion.node1.publicKey, orion.node2.publicKey],
-        privateFrom: orion.node1.publicKey,
         name: "Privacy Group A",
         description: "Members of Group A"
       };
@@ -61,8 +64,7 @@ Deletes privacy group.
     ```bash
     const deletePrivacyGroup = givenPrivacyGroupId => {
       const contractOptions = {
-        privacyGroupId: givenPrivacyGroupId,
-        privateFrom: orion.node1.publicKey
+        privacyGroupId: givenPrivacyGroupId
       };
       return web3.eea.deletePrivacyGroup(contractOptions).then(result => {
         console.log(`The privacy group deleted is:`, result);
@@ -98,7 +100,8 @@ Finds privacy groups containing only the specified members.
 
 ## generatePrivacyGroup
     
-Generates the privacy group ID for EEA privacy. The privacy group ID is the RLP-encoded `privateFor` and `privateFrom` keys.
+Generates the privacy group ID for [EEA privacy](../Privacy/Explanation/Privacy-Groups.md#eea-compliant-privacy). 
+The privacy group ID is the RLP-encoded `privateFor` and `privateFrom` keys.
     
 **Parameters**
     
@@ -186,6 +189,8 @@ Private transaction receipt
 
 Signs and sends a RLP-encoded private transaction to Pantheon using [`eea_sendRawTransaction`](Pantheon-API-Methods.md#eea_sendrawtransaction). 
 
+`sendRawTransaction` supports [EEA-compliant privacy](../Privacy/How-To/EEA-Compliant.md) using `privateFor`, or [Pantheon-extended privacy](../Privacy/How-To/Pantheon-Privacy.md) using `privacyGroupId`. 
+
 **Parameters**
 
 [Transaction options](#options-parameter)
@@ -194,8 +199,32 @@ Signs and sends a RLP-encoded private transaction to Pantheon using [`eea_sendRa
 
 `string` : Transaction hash of the [`privacy marker transaction`](../Privacy/Explanation/Private-Transaction-Processing.md)   
         
-!!! example 
-    ```bash tab="Contract Deployment"
+!!! example "Pantheon-extended Privacy"
+    ```bash tab="Contract Deployment with privacyGroupId"
+    const createPrivateEmitterContract = privacyGroupId => {
+      const contractOptions = {
+        data: `0x${binary}`,
+        privateFrom: orion.node1.publicKey,
+        privacyGroupId,
+        privateKey: pantheon.node1.privateKey
+      };
+      return web3.eea.sendRawTransaction(contractOptions);
+    };
+    ```
+                
+    ```bash tab="Contract Invocation with privacyGroupId "
+    const functionCall = {
+       to: address,
+       data: functionAbi.signature,
+       privateFrom,
+       privacyGroupId,
+       privateKey
+    };
+    return web3.eea.sendRawTransaction(functionCall);
+    ```
+
+!!! example "EEA-compliant Privacy"
+    ```bash tab="Contract Deployment with privateFor"
     const createPrivateEmitterContract = () => {
       const contractOptions = {
          data: `0x${binary}`,
@@ -207,7 +236,7 @@ Signs and sends a RLP-encoded private transaction to Pantheon using [`eea_sendRa
     };
     ```
             
-    ```bash tab="Contract Invocation"
+    ```bash tab="Contract Invocation with privateFor"
     const functionCall = {
       to: address,
       data: functionAbi.signature + functionArgs,
