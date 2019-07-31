@@ -103,7 +103,7 @@ public abstract class MainnetPrecompiledContractRegistries {
             precompiledContractConfiguration.getGasCalculator()));
     registry.put(
         Address.BLAKE2B_F_COMPRESSION,
-        ISTANBUL_ACCOUNT_VERSION,
+        Account.DEFAULT_VERSION,
         new BLAKE2BFPrecompileContract(precompiledContractConfiguration.getGasCalculator()));
 
     return registry;
