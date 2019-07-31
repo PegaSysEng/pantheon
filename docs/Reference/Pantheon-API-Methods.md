@@ -3951,9 +3951,9 @@ Creates a privacy group containing the specified members. Members are specified 
 
 `array of data` - Array of members specified by Orion public keys 
 
-`string` - Privacy group name. Optional. 
+`string` - Privacy group name 
 
-`string` - Privacy group description. Optional. 
+`string` - Privacy group description
 
 **Returns** 
 
