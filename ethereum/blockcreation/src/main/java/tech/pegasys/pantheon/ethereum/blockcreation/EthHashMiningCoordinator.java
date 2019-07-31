@@ -69,6 +69,15 @@ public class EthHashMiningCoordinator extends AbstractMiningCoordinator<Void, Et
   }
 
   @Override
+  public boolean submitHashesPerSecond(final String remoteMinerId, final long hashrate) {
+    synchronized (this) {
+      return currentRunningMiner
+          .map(miner -> miner.submitHashesPerSecond(remoteMinerId, hashrate))
+          .orElse(false);
+    }
+  }
+
+  @Override
   protected void haltCurrentMiningOperation() {
     currentRunningMiner.ifPresent(
         miner -> {

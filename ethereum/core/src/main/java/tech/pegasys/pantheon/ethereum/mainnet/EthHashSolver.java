@@ -18,10 +18,13 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.base.Stopwatch;
 
@@ -72,6 +75,7 @@ public class EthHashSolver {
   private final Iterable<Long> nonceGenerator;
   private final EthHasher ethHasher;
   private volatile long hashesPerSecond = NO_MINING_CONDUCTED;
+  private final Map<String, Long> hashPerSecondOfRemoteMiners = new ConcurrentHashMap<>();
 
   private volatile Optional<EthHashSolverJob> currentJob = Optional.empty();
 
@@ -129,10 +133,16 @@ public class EthHashSolver {
   }
 
   public Optional<Long> hashesPerSecond() {
-    if (hashesPerSecond == NO_MINING_CONDUCTED) {
+    if (hashesPerSecond == NO_MINING_CONDUCTED && hashPerSecondOfRemoteMiners.isEmpty()) {
       return Optional.empty();
     }
-    return Optional.of(hashesPerSecond);
+
+    AtomicLong totalHashrate = new AtomicLong(hashesPerSecond);
+    // add remote miners hashes per second if present
+    totalHashrate.addAndGet(
+        hashPerSecondOfRemoteMiners.values().stream().mapToLong(Long::longValue).sum());
+
+    return Optional.of(totalHashrate.longValue());
   }
 
   public boolean submitSolution(final EthHashSolution solution) {
@@ -155,5 +165,10 @@ public class EthHashSolver {
       return true;
     }
     return false;
+  }
+
+  public boolean submitHashesPerSecond(final String remoteMinerId, final long hashesPerSecond) {
+    hashPerSecondOfRemoteMiners.put(remoteMinerId, hashesPerSecond);
+    return true;
   }
 }

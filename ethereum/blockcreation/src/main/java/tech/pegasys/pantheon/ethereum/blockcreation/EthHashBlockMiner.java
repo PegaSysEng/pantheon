@@ -52,4 +52,8 @@ public class EthHashBlockMiner extends BlockMiner<Void, EthHashBlockCreator> {
   public boolean submitWork(final EthHashSolution solution) {
     return blockCreator.submitWork(solution);
   }
+
+  public boolean submitHashesPerSecond(final String remoteMinerId, final long hashrate) {
+    return blockCreator.submitHashesPerSecond(remoteMinerId, hashrate);
+  }
 }

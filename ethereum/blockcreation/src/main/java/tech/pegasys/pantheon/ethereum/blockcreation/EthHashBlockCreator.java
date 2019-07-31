@@ -106,6 +106,10 @@ public class EthHashBlockCreator extends AbstractBlockCreator<Void> {
     return nonceSolver.submitSolution(solution);
   }
 
+  public boolean submitHashesPerSecond(final String remoteMinerId, final long hashrate) {
+    return nonceSolver.submitHashesPerSecond(remoteMinerId, hashrate);
+  }
+
   @Override
   public void cancel() {
     super.cancel();
