@@ -37,7 +37,7 @@ public class PrivGetTransactionCountTransaction implements Transaction<BigIntege
   public BigInteger execute(final NodeRequests node) {
     try {
       EthGetTransactionCount result =
-          node.eea().privGetTransactionCount(accountAddress, privacyGroupId).send();
+          node.priv().privGetTransactionCount(accountAddress, privacyGroupId).send();
       assertThat(result).isNotNull();
       return result.getTransactionCount();
     } catch (final IOException e) {
