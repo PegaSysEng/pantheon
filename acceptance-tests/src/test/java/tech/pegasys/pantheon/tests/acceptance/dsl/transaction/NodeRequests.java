@@ -17,8 +17,10 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.clique.CliqueReque
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.miner.MinerRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.CustomRequestFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.priv.PrivRequestFactory;
 
 import java.util.Optional;
 
@@ -33,9 +35,11 @@ public class NodeRequests {
   private final PermissioningJsonRpcRequestFactory perm;
   private final AdminRequestFactory admin;
   private final EeaRequestFactory eea;
+  private final PrivRequestFactory priv;
   private final CustomRequestFactory custom;
   private final Optional<WebSocketService> websocketService;
   private final LoginRequestFactory login;
+  private final MinerRequestFactory miner;
 
   public NodeRequests(
       final Web3j netEth,
@@ -44,7 +48,9 @@ public class NodeRequests {
       final PermissioningJsonRpcRequestFactory perm,
       final AdminRequestFactory admin,
       final EeaRequestFactory eea,
+      final PrivRequestFactory priv,
       final CustomRequestFactory custom,
+      final MinerRequestFactory miner,
       final Optional<WebSocketService> websocketService,
       final LoginRequestFactory login) {
     this.netEth = netEth;
@@ -53,7 +59,9 @@ public class NodeRequests {
     this.perm = perm;
     this.admin = admin;
     this.eea = eea;
+    this.priv = priv;
     this.custom = custom;
+    this.miner = miner;
     this.websocketService = websocketService;
     this.login = login;
   }
@@ -90,8 +98,16 @@ public class NodeRequests {
     return eea;
   }
 
+  public PrivRequestFactory priv() {
+    return priv;
+  }
+
   public LoginRequestFactory login() {
     return login;
+  }
+
+  public MinerRequestFactory miner() {
+    return miner;
   }
 
   public void shutdown() {

@@ -72,7 +72,7 @@ public class PrivateTransactionProcessor {
     private final BytesValue output;
 
     private final ValidationResult<TransactionInvalidReason> validationResult;
-    private final Optional<String> revertReason;
+    private final Optional<BytesValue> revertReason;
 
     public static Result invalid(
         final ValidationResult<TransactionInvalidReason> validationResult) {
@@ -88,7 +88,7 @@ public class PrivateTransactionProcessor {
     public static Result failed(
         final long gasRemaining,
         final ValidationResult<TransactionInvalidReason> validationResult,
-        final Optional<String> revertReason) {
+        final Optional<BytesValue> revertReason) {
       return new Result(
           Status.FAILED,
           LogSeries.empty(),
@@ -113,7 +113,7 @@ public class PrivateTransactionProcessor {
         final long gasRemaining,
         final BytesValue output,
         final ValidationResult<TransactionInvalidReason> validationResult,
-        final Optional<String> revertReason) {
+        final Optional<BytesValue> revertReason) {
       this.status = status;
       this.logs = logs;
       this.gasRemaining = gasRemaining;
@@ -148,7 +148,7 @@ public class PrivateTransactionProcessor {
     }
 
     @Override
-    public Optional<String> getRevertReason() {
+    public Optional<BytesValue> getRevertReason() {
       return revertReason;
     }
   }
@@ -163,15 +163,16 @@ public class PrivateTransactionProcessor {
       final AbstractMessageProcessor messageCallProcessor,
       final boolean clearEmptyAccounts,
       final int maxStackSize,
-      final int createContractAccountVersion) {
+      final int createContractAccountVersion,
+      final PrivateTransactionValidator privateTransactionValidator) {
     this.gasCalculator = gasCalculator;
     this.transactionValidator = transactionValidator;
-    this.privateTransactionValidator = new PrivateTransactionValidator();
     this.contractCreationProcessor = contractCreationProcessor;
     this.messageCallProcessor = messageCallProcessor;
     this.clearEmptyAccounts = clearEmptyAccounts;
     this.maxStackSize = maxStackSize;
     this.createContractAccountVersion = createContractAccountVersion;
+    this.privateTransactionValidator = privateTransactionValidator;
   }
 
   @SuppressWarnings("unused")
@@ -229,6 +230,7 @@ public class PrivateTransactionProcessor {
               .address(privateContractAddress)
               .originator(senderAddress)
               .contract(privateContractAddress)
+              .contractBalance(Wei.ZERO)
               .contractAccountVersion(createContractAccountVersion)
               .initialGas(Gas.MAX_VALUE)
               .gasPrice(transaction.getGasPrice())
@@ -258,6 +260,7 @@ public class PrivateTransactionProcessor {
               .address(to)
               .originator(senderAddress)
               .contract(to)
+              .contractBalance(contract != null ? contract.getBalance() : Wei.ZERO)
               .contractAccountVersion(
                   contract != null ? contract.getVersion() : Account.DEFAULT_VERSION)
               .initialGas(Gas.MAX_VALUE)

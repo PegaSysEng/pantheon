@@ -237,7 +237,7 @@ public abstract class PantheonControllerBuilder<C> {
             syncConfig,
             protocolSchedule,
             protocolContext,
-            protocolContext.getWorldStateArchive().getStorage(),
+            protocolContext.getWorldStateArchive().getWorldStateStorage(),
             ethProtocolManager.getBlockBroadcaster(),
             pruner,
             ethProtocolManager.ethContext(),
