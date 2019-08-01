@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.WorldStateKeyValueStorage;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.WorldStatePreimageKeyValueStorage;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -39,7 +40,10 @@ public class MarkSweepPrunerTest {
     final InMemoryKeyValueStorage markStorage = new InMemoryKeyValueStorage();
     final InMemoryKeyValueStorage stateStorage = new InMemoryKeyValueStorage();
     final WorldStateStorage worldStateStorage = new WorldStateKeyValueStorage(stateStorage);
-    final WorldStateArchive worldStateArchive = new WorldStateArchive(worldStateStorage);
+    final WorldStateArchive worldStateArchive =
+        new WorldStateArchive(
+            worldStateStorage,
+            new WorldStatePreimageKeyValueStorage(new InMemoryKeyValueStorage()));
     final MutableWorldState worldState = worldStateArchive.getMutable();
 
     // Generate accounts and save corresponding state root

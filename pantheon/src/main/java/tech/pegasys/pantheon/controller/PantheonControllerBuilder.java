@@ -206,7 +206,7 @@ public abstract class PantheonControllerBuilder<C> {
     final Pruner pruner =
         new Pruner(
             new MarkSweepPruner(
-                protocolContext.getWorldStateArchive().getStorage(),
+                protocolContext.getWorldStateArchive().getWorldStateStorage(),
                 storageProvider.createPruningStorage(),
                 metricsSystem),
             protocolContext.getBlockchain(),
