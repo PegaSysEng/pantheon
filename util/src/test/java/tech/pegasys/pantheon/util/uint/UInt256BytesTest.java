@@ -202,13 +202,14 @@ public class UInt256BytesTest {
         .isEqualTo("0xdecafbad");
     assertThat(UInt256.fromHexString("cafebabe").toShortHexString()).isEqualTo("0xcafebabe");
     assertThat(UInt256.fromHexString("facefeed").toShortHexString()).isEqualTo("0xfacefeed");
-    }
+  }
 
   @Test
   public void strictShortHexStrings() {
     assertThat(UInt256.of(0).toStrictShortHexString()).isEqualTo("0x00");
     assertThat(UInt256.of(1).toStrictShortHexString()).isEqualTo("0x01");
-    assertThat(UInt256.fromHexString("0xdeadbeef").toStrictShortHexString()).isEqualTo("0xdeadbeef");
+    assertThat(UInt256.fromHexString("0xdeadbeef").toStrictShortHexString())
+        .isEqualTo("0xdeadbeef");
     assertThat(
             UInt256.fromHexString(
                     "0x00000000000000000000000000000000000000000000000000000000decafbad")
@@ -224,7 +225,7 @@ public class UInt256BytesTest {
         .isEqualTo("0x0dcafbad");
     assertThat(UInt256.fromHexString("cafebab").toStrictShortHexString()).isEqualTo("0x0cafebab");
     assertThat(UInt256.fromHexString("facefed").toStrictShortHexString()).isEqualTo("0x0facefed");
-    }
+  }
 
   @Test
   public void fullHexStrings() {

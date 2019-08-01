@@ -167,7 +167,8 @@ public interface UInt256Value<T extends UInt256Value<T>> extends Bytes32Backed, 
   }
 
   /**
-   * @return This value represented as a byte-minimal hexadecimal string (without leading zero pairs).
+   * @return This value represented as a byte-minimal hexadecimal string (without leading zero
+   *     pairs).
    */
   default String toStrictShortHexString() {
     final String hex = toHexString();
