@@ -75,16 +75,18 @@ public class Pruner {
       markBlockNumber = blockNumber;
     }
 
-    if (blockNumber >= markBlockNumber + transientForkThreshold
-        && state.compareAndSet(State.TRANSIENT_FORK_OUTLIVING, State.MARKING)) {
-      markedBlockHeader = blockchain.getBlockHeader(markBlockNumber).get();
-      mark(markedBlockHeader);
+    if (blockNumber >= markBlockNumber + transientForkThreshold) {
+      if (state.compareAndSet(State.TRANSIENT_FORK_OUTLIVING, State.MARKING)) {
+        markedBlockHeader = blockchain.getBlockHeader(markBlockNumber).get();
+        mark(markedBlockHeader);
+      }
     }
 
     if (blockNumber >= markBlockNumber + retentionPeriodInBlocks
-        && blockchain.blockIsOnCanonicalChain(markedBlockHeader.getHash())
-        && state.compareAndSet(State.MARKING_COMPLETE, State.SWEEPING)) {
-      sweep();
+        && blockchain.blockIsOnCanonicalChain(markedBlockHeader.getHash())) {
+      if (state.compareAndSet(State.MARKING_COMPLETE, State.SWEEPING)) {
+        sweep();
+      }
     }
   }
 
