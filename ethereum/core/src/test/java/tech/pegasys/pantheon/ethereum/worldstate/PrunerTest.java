@@ -168,4 +168,19 @@ public class PrunerTest {
     assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, 1, 0))
         .isInstanceOf(IllegalArgumentException.class);
   }
+
+  @Test
+  public void shouldCleanUpPruningStrategyOnShutdown() throws InterruptedException {
+    final Block genesisBlock = gen.genesisBlock();
+    final BlockchainStorage blockchainStorage =
+        new KeyValueStoragePrefixedKeyBlockchainStorage(
+            new InMemoryKeyValueStorage(), new MainnetBlockHeaderFunctions());
+    final DefaultMutableBlockchain blockchain =
+        new DefaultMutableBlockchain(genesisBlock, blockchainStorage, metricsSystem);
+
+    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);
+    pruner.start();
+    pruner.stop();
+    verify(markSweepPruner).cleanup();
+  }
 }

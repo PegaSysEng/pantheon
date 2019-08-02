@@ -60,6 +60,7 @@ public class Pruner {
   }
 
   public void stop() throws InterruptedException {
+    pruningStrategy.cleanup();
     executorService.awaitTermination(10, TimeUnit.SECONDS);
   }
 

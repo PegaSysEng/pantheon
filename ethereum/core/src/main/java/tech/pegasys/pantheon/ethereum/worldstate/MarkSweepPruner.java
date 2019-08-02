@@ -83,6 +83,10 @@ public class MarkSweepPruner {
     nodeAddedListenerId = worldStateStorage.addNodeAddedListener(this::markNewNodes);
   }
 
+  public void cleanup() {
+    worldStateStorage.removeNodeAddedListener(nodeAddedListenerId);
+  }
+
   public void mark(final Hash rootHash) {
     markOperationCounter.inc();
     markStorage.clear();
