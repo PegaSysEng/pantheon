@@ -32,6 +32,7 @@ import tech.pegasys.pantheon.services.kvstore.InMemoryKeyValueStorage;
 import tech.pegasys.pantheon.testutil.MockExecutorService;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,7 +47,7 @@ public class PrunerTest {
   private final BlockDataGenerator gen = new BlockDataGenerator();
 
   @Mock private MarkSweepPruner markSweepPruner;
-  private final ExecutorServiceBuilder mockExecutorServiceBuilder = MockExecutorService::new;
+  private final ExecutorService mockExecutorService = new MockExecutorService();
 
   @Test
   public void shouldMarkCorrectBlockAndSweep() throws InterruptedException {
@@ -57,7 +58,7 @@ public class PrunerTest {
     final DefaultMutableBlockchain blockchain =
         new DefaultMutableBlockchain(genesisBlock, blockchainStorage, metricsSystem);
 
-    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorServiceBuilder, 0, 0);
+    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);
     pruner.start();
 
     BlockOptions options =
@@ -80,7 +81,7 @@ public class PrunerTest {
     final DefaultMutableBlockchain blockchain =
         new DefaultMutableBlockchain(genesisBlock, blockchainStorage, metricsSystem);
 
-    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorServiceBuilder, 1, 2);
+    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 1, 2);
     pruner.start();
 
     BlockOptions options =
@@ -118,7 +119,7 @@ public class PrunerTest {
         new DefaultMutableBlockchain(genesisBlock, blockchainStorage, metricsSystem);
 
     // start pruner so it can start handling block added events
-    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorServiceBuilder, 0, 1);
+    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 1);
     pruner.start();
 
     /*
@@ -160,14 +161,11 @@ public class PrunerTest {
   @Test
   public void shouldRejectInvalidArguments() {
     final Blockchain mockchain = mock(Blockchain.class);
-    assertThatThrownBy(
-            () -> new Pruner(markSweepPruner, mockchain, mockExecutorServiceBuilder, -1, -2))
+    assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, -1, -2))
         .isInstanceOf(IllegalArgumentException.class);
-    assertThatThrownBy(
-            () -> new Pruner(markSweepPruner, mockchain, mockExecutorServiceBuilder, 0, -1))
+    assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, 0, -1))
         .isInstanceOf(IllegalArgumentException.class);
-    assertThatThrownBy(
-            () -> new Pruner(markSweepPruner, mockchain, mockExecutorServiceBuilder, 1, 0))
+    assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, 1, 0))
         .isInstanceOf(IllegalArgumentException.class);
   }
 }

@@ -29,8 +29,7 @@ public class Pruner {
 
   private final MarkSweepPruner pruningStrategy;
   private final Blockchain blockchain;
-  private final ExecutorServiceBuilder executorServiceBuilder;
-  private ExecutorService executor;
+  private ExecutorService executorService;
   private final long retentionPeriodInBlocks;
   private final AtomicReference<State> state = new AtomicReference<>(State.IDLE);
   private volatile long markBlockNumber = 0;
@@ -40,11 +39,11 @@ public class Pruner {
   public Pruner(
       final MarkSweepPruner pruningStrategy,
       final Blockchain blockchain,
-      final ExecutorServiceBuilder executorServiceBuilder,
+      final ExecutorService executorService,
       final long transientForkThreshold,
       final long retentionPeriodInBlocks) {
     this.pruningStrategy = pruningStrategy;
-    this.executorServiceBuilder = executorServiceBuilder;
+    this.executorService = executorService;
     this.blockchain = blockchain;
     if (!(transientForkThreshold >= 0 && retentionPeriodInBlocks >= transientForkThreshold)) {
       throw new IllegalArgumentException(
@@ -57,14 +56,11 @@ public class Pruner {
   }
 
   public void start() {
-    executor = executorServiceBuilder.build();
     blockchain.observeBlockAdded((event, blockchain) -> handleNewBlock(event));
   }
 
   public void stop() throws InterruptedException {
-    if (executor != null) {
-      executor.awaitTermination(30, TimeUnit.SECONDS);
-    }
+    executorService.awaitTermination(10, TimeUnit.SECONDS);
   }
 
   private void handleNewBlock(final BlockAddedEvent event) {
@@ -117,7 +113,7 @@ public class Pruner {
 
   private void execute(final Runnable action) {
     try {
-      executor.execute(action);
+      executorService.execute(action);
     } catch (final Throwable t) {
       LOG.error("Pruning failed", t);
       state.set(State.IDLE);
