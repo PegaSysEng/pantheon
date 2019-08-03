@@ -94,7 +94,8 @@ public class MarkSweepPruner {
         .visitAll(
             node -> {
               if (Thread.interrupted()) {
-                // TODO: Probably need a better abort process than this....
+                // Since we don't expect to abort marking ourselves,
+                // our abort process consists only of handling interrupts
                 throw new RuntimeException("Interrupted while marking");
               }
               markNode(node.getHash());
