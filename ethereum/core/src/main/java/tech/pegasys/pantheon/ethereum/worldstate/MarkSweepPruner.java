@@ -108,8 +108,7 @@ public class MarkSweepPruner {
     flushPendingMarks();
     sweepOperationCounter.inc();
     LOG.info("Sweeping unused nodes");
-    final long prunedNodeCount =
-        worldStateStorage.prune(key -> pendingMarks.contains(key) || markStorage.containsKey(key));
+    final long prunedNodeCount = worldStateStorage.prune(markStorage::containsKey);
     sweptNodesCounter.inc(prunedNodeCount);
     worldStateStorage.removeNodeAddedListener(nodeAddedListenerId);
     markStorage.clear();
