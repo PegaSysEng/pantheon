@@ -35,16 +35,12 @@ public class DatabaseMetadata {
     return version;
   }
 
-  static DatabaseMetadata fromFile(final File jsonFile) throws IOException {
+  static DatabaseMetadata fromDirectory(final Path databaseDir) throws IOException {
     try {
-      return MAPPER.readValue(jsonFile, DatabaseMetadata.class);
+      return MAPPER.readValue(getDefaultMetadataFile(databaseDir), DatabaseMetadata.class);
     } catch (FileNotFoundException fnfe) {
       return new DatabaseMetadata(0);
     }
-  }
-
-  static DatabaseMetadata fromDirectory(final Path databaseDir) throws IOException {
-    return fromFile(getDefaultMetadataFile(databaseDir));
   }
 
   void writeToDirectory(final Path databaseDir) throws IOException {
