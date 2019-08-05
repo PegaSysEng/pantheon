@@ -39,6 +39,10 @@ public class RocksDbStorageProvider {
   public static long DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE = 5_000L;
   private static final Logger LOG = LogManager.getLogger();
   public static final int CURRENT_VERSION = 1;
+  /**
+   * This list contains the methods used to load the version at its index. Index 0 of the list loads
+   * a version 0 database and so on...
+   */
   private static final List<StorageProviderFunction> PROVIDERS_BY_VERSION =
       Arrays.asList(RocksDbStorageProvider::ofUnsegmented, RocksDbStorageProvider::ofSegmented);
 
