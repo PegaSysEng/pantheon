@@ -66,8 +66,10 @@ public class RocksDbStorageProvider {
     final int databaseVersion;
     if (databaseExists) {
       databaseVersion = DatabaseMetadata.fromDirectory(databaseDir).getVersion();
+      LOG.info("Existing database detected. Version {}", databaseVersion);
     } else {
       databaseVersion = CURRENT_VERSION;
+      LOG.info("No existing database detected. Using version {}", databaseVersion);
       Files.createDirectories(databaseDir);
       new DatabaseMetadata(databaseVersion).writeToDirectory(databaseDir);
     }
@@ -99,7 +101,6 @@ public class RocksDbStorageProvider {
       final MetricsSystem metricsSystem,
       final long worldStatePreimageCacheSize)
       throws IOException {
-    LOG.info("Using RocksDB columns");
 
     final SegmentedKeyValueStorage<?> columnarStorage =
         ColumnarRocksDbKeyValueStorage.create(
