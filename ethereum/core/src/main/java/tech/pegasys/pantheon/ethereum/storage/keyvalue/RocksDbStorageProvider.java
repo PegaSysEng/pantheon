@@ -56,7 +56,9 @@ public class RocksDbStorageProvider {
 
     final Path databaseDir = rocksDbConfiguration.getDatabaseDir();
     final boolean databaseExists =
-        Optional.ofNullable(databaseDir.toFile().list()).filter(x -> x.length > 0).isPresent();
+        Optional.ofNullable(databaseDir.toFile().list())
+            .filter(files -> files.length > 0)
+            .isPresent();
     final int databaseVersion;
     if (databaseExists) {
       databaseVersion = DatabaseMetadata.fromDirectory(databaseDir).getVersion();
