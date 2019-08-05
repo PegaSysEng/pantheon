@@ -57,11 +57,14 @@ public class RocksDbStorageProvider {
     final Path databaseDir = rocksDbConfiguration.getDatabaseDir();
     final boolean databaseExists =
         Optional.ofNullable(databaseDir.toFile().list()).filter(x -> x.length > 0).isPresent();
-    final int databaseVersion =
-        databaseExists ? DatabaseMetadata.fromDirectory(databaseDir).getVersion() : CURRENT_VERSION;
-
-    Files.createDirectories(databaseDir);
-    new DatabaseMetadata(databaseVersion).writeToDirectory(databaseDir);
+    final int databaseVersion;
+    if (databaseExists) {
+      databaseVersion = DatabaseMetadata.fromDirectory(databaseDir).getVersion();
+    } else {
+      databaseVersion = CURRENT_VERSION;
+      Files.createDirectories(databaseDir);
+      new DatabaseMetadata(databaseVersion).writeToDirectory(databaseDir);
+    }
 
     try {
       return PROVIDERS_BY_VERSION
