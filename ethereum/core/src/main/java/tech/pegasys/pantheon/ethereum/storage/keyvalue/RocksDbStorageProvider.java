@@ -74,7 +74,9 @@ public class RocksDbStorageProvider {
           .apply(rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
     } catch (IndexOutOfBoundsException ioobe) {
       throw new IllegalStateException(
-          String.format("Invalid database version %d", databaseVersion));
+          String.format(
+              "Invalid database version %d. Latest version is %d",
+              databaseVersion, CURRENT_VERSION));
     }
   }
 
