@@ -170,7 +170,7 @@ public class EthSignerClient {
       return convert(nonce);
     }
 
-    private String convert(BigInteger value) {
+    private String convert(final BigInteger value) {
       return value == null ? null : Numeric.encodeQuantity(value);
     }
 
