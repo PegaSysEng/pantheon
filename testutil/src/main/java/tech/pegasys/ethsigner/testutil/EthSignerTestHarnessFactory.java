@@ -12,8 +12,16 @@
  */
 package tech.pegasys.ethsigner.testutil;
 
-import static net.consensys.cava.io.file.Files.copyResource;
-
+import io.netty.handler.codec.http.HttpResponseStatus;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.web3j.crypto.CipherException;
+import org.web3j.crypto.WalletUtils;
+import tech.pegasys.ethsigner.core.EthSigner;
 import tech.pegasys.ethsigner.core.signing.ConfigurationChainId;
 import tech.pegasys.ethsigner.signer.filebased.CredentialTransactionSigner;
 
@@ -23,11 +31,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.web3j.crypto.CipherException;
-import org.web3j.crypto.WalletUtils;
+import static net.consensys.cava.io.file.Files.copyResource;
 
 public class EthSignerTestHarnessFactory {
 
@@ -40,33 +44,40 @@ public class EthSignerTestHarnessFactory {
       final Integer pantheonPort,
       final Integer ethsignerPort,
       final long chainId)
-      throws IOException, CipherException {
+          throws IOException, CipherException {
 
     Path keyFilePath = copyResource(keyPath, tempDir.resolve(keyPath));
 
     final EthSignerConfig config =
         new EthSignerConfig(
             Level.DEBUG,
-            InetAddress.getByName("localhost"),
+            InetAddress.getByName(HOST),
             pantheonPort,
             Duration.ofSeconds(10),
-            InetAddress.getLocalHost(),
+            InetAddress.getByName(HOST),
             ethsignerPort,
             new ConfigurationChainId(chainId),
             tempDir);
 
-    final tech.pegasys.ethsigner.core.EthSigner ethSigner =
-        new tech.pegasys.ethsigner.core.EthSigner(
+    final EthSigner ethSigner =
+        new EthSigner(
             config,
             new CredentialTransactionSigner(
                 WalletUtils.loadCredentials("", keyFilePath.toAbsolutePath().toFile())));
     ethSigner.run();
 
-    // FIXME: Figure out how to start ethsigner synchronously.
-    try {
-      TimeUnit.SECONDS.sleep(3);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    final OkHttpClient client = new OkHttpClient.Builder().build();
+    final Request request = new Request.Builder().url("http://" + HOST + ":" + ethsignerPort + "/upcheck").get().build();
+    while (true){
+      try (Response response = client.newCall(request).execute()) {
+        if (response.code() == HttpResponseStatus.OK.code()){
+         break;
+        } else {
+          TimeUnit.SECONDS.sleep(3);
+        }
+      } catch (IOException | InterruptedException e){
+        LOG.error(e);
+      }
     }
 
     LOG.info("EthSigner port: {}", config.getHttpListenPort());

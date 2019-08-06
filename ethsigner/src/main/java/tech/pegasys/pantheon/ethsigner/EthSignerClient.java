@@ -111,12 +111,12 @@ public class EthSignerClient {
   public class PrivateTransaction {
 
     private final String from;
-    private final String to;
-    private final BigInteger gas;
+    private final BigInteger nonce; // nonce field is not present on eth_call/eth_estimateGas
     private final BigInteger gasPrice;
+    private final BigInteger gas;
+    private final String to;
     private final BigInteger value;
     private String data;
-    private final BigInteger nonce; // nonce field is not present on eth_call/eth_estimateGas
     private final String privateFrom;
     private final List<String> privateFor;
     private final String restriction;

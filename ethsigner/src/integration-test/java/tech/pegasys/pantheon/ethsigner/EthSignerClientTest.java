@@ -42,10 +42,13 @@ public class EthSignerClientTest {
           + MOCK_RESPONSE
           + "\"\n"
           + "}";
+  private static final String ENCLAVE_PUBLIC_KEY = "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=";
+
   private static EthSignerClient ethSignerClient;
 
   private static EthSignerTestHarness testHarness;
 
+  // The downstream server EthSigner should proxy requests to
   private static HttpServer mockServer;
 
   @BeforeClass
@@ -104,7 +107,7 @@ public class EthSignerClientTest {
             BigInteger.ZERO,
             "",
             BigInteger.ZERO,
-            "",
+            ENCLAVE_PUBLIC_KEY,
             Collections.emptyList(),
             "");
 
