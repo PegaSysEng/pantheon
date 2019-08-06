@@ -62,9 +62,11 @@ public class PrunerTest {
     final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);
     pruner.start();
 
-    final Block newBlock = appendBlockWithParent(blockchain, genesisBlock);
+    final Block block1 = appendBlockWithParent(blockchain, genesisBlock);
+    appendBlockWithParent(blockchain, block1);
+    appendBlockWithParent(blockchain, blockchain.getChainHeadBlock());
 
-    verify(markSweepPruner).mark(newBlock.getHeader().getStateRoot());
+    verify(markSweepPruner).mark(block1.getHeader().getStateRoot());
     verify(markSweepPruner).sweep();
     pruner.stop();
   }
@@ -110,25 +112,28 @@ public class PrunerTest {
 
     /*
      Set up pre-marking state:
-      O <---- this is a fork as of now (non-canonical)
-      |  O <- marking of the full state trie will begin at this block
+      O <---- marking of the this block's parent will begin when this block is added
+      |
+      |  O <- this is a fork as of now (non-canonical)
+      O  | <- this is the initially canonical block that will be marked
        \/
        O <--- the common ancestor when the reorg happens
     */
-    final Block canonicalHead = appendBlockWithParent(blockchain, genesisBlock);
+    final Block initiallyCanonicalBlock = appendBlockWithParent(blockchain, genesisBlock);
+    appendBlockWithParent(blockchain, initiallyCanonicalBlock);
     final Block forkBlock = appendBlockWithParent(blockchain, genesisBlock);
     /*
       Cause reorg:
-      O <---- this block causes a reorg; this branch becomes canonical
-      |
-      O <---- which means that state here is referring to nodes from the common ancestor block,
-      |       which is not fully marked
-      |  O <- because this was block at which marking began
+     Set up pre-marking state:
+      O
+      |  O <---- this block causes a reorg; this branch becomes canonical
+      |  O <---- which means that state here is referring to nodes from the common ancestor block,
+      O  | <- because this was block at which marking began
        \/
        O
     */
     appendBlockWithParent(blockchain, forkBlock);
-    verify(markSweepPruner).mark(canonicalHead.getHeader().getStateRoot());
+    verify(markSweepPruner).mark(initiallyCanonicalBlock.getHeader().getStateRoot());
     verify(markSweepPruner, never()).sweep();
     pruner.stop();
   }
