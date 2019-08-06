@@ -163,10 +163,6 @@ public class PrunerTest {
     final Blockchain mockchain = mock(Blockchain.class);
     assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, -1, -2))
         .isInstanceOf(IllegalArgumentException.class);
-    assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, 0, -1))
-        .isInstanceOf(IllegalArgumentException.class);
-    assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, 1, 0))
-        .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
