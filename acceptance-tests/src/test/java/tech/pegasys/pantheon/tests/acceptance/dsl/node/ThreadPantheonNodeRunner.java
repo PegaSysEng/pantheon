@@ -134,7 +134,9 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     pantheonPluginContext.addService(
         PantheonEvents.class,
-        new PantheonEventsImpl(pantheonController.getProtocolManager().getBlockBroadcaster()));
+        new PantheonEventsImpl(
+            pantheonController.getProtocolManager().getBlockBroadcaster(),
+            pantheonController.getTransactionPool()));
     pantheonPluginContext.startPlugins();
 
     final Runner runner =

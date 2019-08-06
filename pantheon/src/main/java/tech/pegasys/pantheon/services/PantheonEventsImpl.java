@@ -12,17 +12,17 @@
  */
 package tech.pegasys.pantheon.services;
 
-import io.vertx.core.json.JsonObject;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.google.common.collect.ImmutableMap;
 import io.vertx.core.json.Json;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import io.vertx.core.json.JsonObject;
 
 public class PantheonEventsImpl implements PantheonEvents {
   private final BlockBroadcaster blockBroadcaster;
@@ -74,8 +74,17 @@ public class PantheonEventsImpl implements PantheonEvents {
   private void onPendingTransactionAdded(
       final PendingTransactionsListener pendingTransactionsListener,
       final Transaction transaction) {
+    final JsonObject jsonTransaction =
+        new JsonObject()
+            .put("nonce", transaction.getNonce())
+            .put("gasPrice", transaction.getGasPrice().toLong())
+            .put("gasLimit", transaction.getGasLimit())
+            .put("value", transaction.getValue().toLong())
+            .put("payload", transaction.getPayload().toString())
+            .put("hash", transaction.hash().toString());
+    transaction.getTo().ifPresent(address -> jsonTransaction.put("to", address.toString()));
     final JsonObject result =
-        new JsonObject().put("type", "PendingTransactionAdded").put("transaction", transaction);
+        new JsonObject().put("type", "PendingTransactionAdded").put("transaction", jsonTransaction);
     pendingTransactionsListener.onPendingTransactionAdded(result.encodePrettily());
   }
 }

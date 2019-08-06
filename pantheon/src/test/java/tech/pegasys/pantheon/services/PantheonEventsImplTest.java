@@ -21,6 +21,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Collections;
@@ -38,6 +39,7 @@ public class PantheonEventsImplTest {
 
   @Mock private EthPeers ethPeers;
   @Mock private EthContext mockEthContext;
+  @Mock private TransactionPool mockTransactionPool;
   private BlockBroadcaster blockBroadcaster;
   private PantheonEventsImpl serviceImpl;
 
@@ -47,7 +49,7 @@ public class PantheonEventsImplTest {
     when(mockEthContext.getEthPeers()).thenReturn(ethPeers);
 
     blockBroadcaster = new BlockBroadcaster(mockEthContext);
-    serviceImpl = new PantheonEventsImpl(blockBroadcaster);
+    serviceImpl = new PantheonEventsImpl(blockBroadcaster, mockTransactionPool);
   }
 
   @Test

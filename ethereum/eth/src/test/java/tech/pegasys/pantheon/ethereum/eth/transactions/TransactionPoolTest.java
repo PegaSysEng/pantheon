@@ -33,6 +33,7 @@ import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.Transa
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
 import static tech.pegasys.pantheon.ethereum.mainnet.ValidationResult.valid;
 
+import io.vertx.core.json.JsonObject;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
