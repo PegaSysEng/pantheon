@@ -107,8 +107,7 @@ public class EthSignerClient {
         .getTransactionHash();
   }
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public class PrivateTransaction {
+  public static class PrivateTransaction {
 
     private final String from;
     private final BigInteger nonce; // nonce field is not present on eth_call/eth_estimateGas
@@ -116,7 +115,7 @@ public class EthSignerClient {
     private final BigInteger gas;
     private final String to;
     private final BigInteger value;
-    private String data;
+    private final String data;
     private final String privateFrom;
     private final List<String> privateFor;
     private final String restriction;
@@ -137,11 +136,7 @@ public class EthSignerClient {
       this.gas = gasLimit;
       this.gasPrice = gasPrice;
       this.value = value;
-
-      if (data != null) {
-        this.data = Numeric.prependHexPrefix(data);
-      }
-
+      this.data = data == null ? null : Numeric.prependHexPrefix(data);
       this.nonce = nonce;
       this.privateFrom = privateFrom;
       this.privateFor = privateFor;
@@ -177,11 +172,7 @@ public class EthSignerClient {
     }
 
     private String convert(BigInteger value) {
-      if (value != null) {
-        return Numeric.encodeQuantity(value);
-      } else {
-        return null; // we don't want the field to be encoded if not present
-      }
+      return value == null ? null : Numeric.encodeQuantity(value);
     }
 
     public String getPrivateFrom() {
