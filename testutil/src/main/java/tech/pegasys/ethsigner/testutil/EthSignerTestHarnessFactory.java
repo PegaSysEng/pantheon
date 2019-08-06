@@ -77,10 +77,14 @@ public class EthSignerTestHarnessFactory {
       try (Response response = client.newCall(request).execute()) {
         if (response.code() == HttpResponseStatus.OK.code()) {
           break;
-        } else {
-          TimeUnit.SECONDS.sleep(3);
         }
-      } catch (IOException | InterruptedException e) {
+      } catch (IOException e) {
+        LOG.error(e);
+      }
+
+      try {
+        TimeUnit.SECONDS.sleep(1);
+      } catch (InterruptedException e) {
         LOG.error(e);
       }
     }
