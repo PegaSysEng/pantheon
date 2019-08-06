@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.Rule;
@@ -43,5 +44,16 @@ public class RocksDbStorageProviderTest {
     assertEquals(
         RocksDbStorageProvider.CURRENT_VERSION,
         DatabaseMetadata.fromDirectory(rocksDbConfiguration.getDatabaseDir()).getVersion());
+  }
+
+  @Test
+  public void shouldDetectVersion0DatabaseIfNoMetadataFileFound() throws Exception {
+    final Path tempDatabaseDir = temporaryFolder.newFolder().toPath().resolve("db");
+    Files.createDirectories(tempDatabaseDir);
+    when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
+    tempDatabaseDir.resolve("filler-file").toFile().createNewFile();
+    RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
+    assertEquals(
+        0, DatabaseMetadata.fromDirectory(rocksDbConfiguration.getDatabaseDir()).getVersion());
   }
 }
