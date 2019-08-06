@@ -49,9 +49,10 @@ public class PrunerTest {
   @Mock private MarkSweepPruner markSweepPruner;
   private final ExecutorService mockExecutorService = new MockExecutorService();
 
+  private final Block genesisBlock = gen.genesisBlock();
+
   @Test
   public void shouldMarkCorrectBlockAndSweep() throws InterruptedException {
-    final Block genesisBlock = gen.genesisBlock();
     final BlockchainStorage blockchainStorage =
         new KeyValueStoragePrefixedKeyBlockchainStorage(
             new InMemoryKeyValueStorage(), new MainnetBlockHeaderFunctions());
@@ -61,11 +62,8 @@ public class PrunerTest {
     final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);
     pruner.start();
 
-    BlockOptions options =
-        new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
-    final Block newBlock = gen.block(options);
-    List<TransactionReceipt> receipts = gen.receipts(newBlock);
-    blockchain.appendBlock(newBlock, receipts);
+    final Block newBlock = appendBlockWithParent(blockchain, genesisBlock);
+
     verify(markSweepPruner).mark(newBlock.getHeader().getStateRoot());
     verify(markSweepPruner).sweep();
     pruner.stop();
@@ -74,7 +72,6 @@ public class PrunerTest {
   @Test
   public void shouldOnlySweepAfterTransientForkPeriodAndRetentionPeriodEnds()
       throws InterruptedException {
-    final Block genesisBlock = gen.genesisBlock();
     final BlockchainStorage blockchainStorage =
         new KeyValueStoragePrefixedKeyBlockchainStorage(
             new InMemoryKeyValueStorage(), new MainnetBlockHeaderFunctions());
@@ -84,26 +81,16 @@ public class PrunerTest {
     final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 1, 2);
     pruner.start();
 
-    BlockOptions options =
-        new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
-    Block newBlock = gen.block(options);
-    List<TransactionReceipt> receipts = gen.receipts(newBlock);
-    blockchain.appendBlock(newBlock, receipts);
-    final Hash markBlockStateRootHash = newBlock.getHeader().getStateRoot();
+    final Hash markBlockStateRootHash =
+        appendBlockWithParent(blockchain, genesisBlock).getHeader().getStateRoot();
     verify(markSweepPruner, never()).mark(markBlockStateRootHash);
     verify(markSweepPruner, never()).sweep();
 
-    options = options.setBlockNumber(2L).setParentHash(newBlock.getHash());
-    newBlock = gen.block(options);
-    receipts = gen.receipts(newBlock);
-    blockchain.appendBlock(newBlock, receipts);
+    appendBlockWithParent(blockchain, blockchain.getChainHeadBlock());
     verify(markSweepPruner).mark(markBlockStateRootHash);
     verify(markSweepPruner, never()).sweep();
 
-    options = options.setBlockNumber(3L).setParentHash(newBlock.getHash());
-    newBlock = gen.block(options);
-    receipts = gen.receipts(newBlock);
-    blockchain.appendBlock(newBlock, receipts);
+    appendBlockWithParent(blockchain, blockchain.getChainHeadBlock());
     verify(markSweepPruner).sweep();
     pruner.stop();
   }
@@ -111,7 +98,6 @@ public class PrunerTest {
   @Test
   public void abortsPruningWhenFullyMarkedBlockNoLongerOnCanonicalChain()
       throws InterruptedException {
-    final Block genesisBlock = gen.genesisBlock();
     final BlockchainStorage blockchainStorage =
         new KeyValueStoragePrefixedKeyBlockchainStorage(
             new InMemoryKeyValueStorage(), new MainnetBlockHeaderFunctions());
@@ -129,16 +115,8 @@ public class PrunerTest {
        \/
        O <--- the common ancestor when the reorg happens
     */
-    BlockOptions options =
-        new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
-    final Block canonicalHead = gen.block(options);
-    List<TransactionReceipt> receipts = gen.receipts(canonicalHead);
-    blockchain.appendBlock(canonicalHead, receipts);
-
-    options = new BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
-    final Block forkBlock = gen.block(options);
-    receipts = gen.receipts(forkBlock);
-    blockchain.appendBlock(forkBlock, receipts);
+    final Block canonicalHead = appendBlockWithParent(blockchain, genesisBlock);
+    final Block forkBlock = appendBlockWithParent(blockchain, genesisBlock);
     /*
       Cause reorg:
       O <---- this block causes a reorg; this branch becomes canonical
@@ -149,10 +127,7 @@ public class PrunerTest {
        \/
        O
     */
-    options = new BlockOptions().setBlockNumber(2L).setParentHash(forkBlock.getHash());
-    final Block reorgCausingBlock = gen.block(options);
-    receipts = gen.receipts(reorgCausingBlock);
-    blockchain.appendBlock(reorgCausingBlock, receipts);
+    appendBlockWithParent(blockchain, forkBlock);
     verify(markSweepPruner).mark(canonicalHead.getHeader().getStateRoot());
     verify(markSweepPruner, never()).sweep();
     pruner.stop();
@@ -167,7 +142,6 @@ public class PrunerTest {
 
   @Test
   public void shouldCleanUpPruningStrategyOnShutdown() throws InterruptedException {
-    final Block genesisBlock = gen.genesisBlock();
     final BlockchainStorage blockchainStorage =
         new KeyValueStoragePrefixedKeyBlockchainStorage(
             new InMemoryKeyValueStorage(), new MainnetBlockHeaderFunctions());
@@ -178,5 +152,17 @@ public class PrunerTest {
     pruner.start();
     pruner.stop();
     verify(markSweepPruner).cleanup();
+  }
+
+  private Block appendBlockWithParent(
+      final DefaultMutableBlockchain blockchain, final Block parent) {
+    BlockOptions options =
+        new BlockOptions()
+            .setBlockNumber(parent.getHeader().getNumber() + 1)
+            .setParentHash(parent.getHash());
+    final Block newBlock = gen.block(options);
+    final List<TransactionReceipt> receipts = gen.receipts(newBlock);
+    blockchain.appendBlock(newBlock, receipts);
+    return newBlock;
   }
 }
