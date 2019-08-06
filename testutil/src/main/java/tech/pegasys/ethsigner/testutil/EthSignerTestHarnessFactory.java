@@ -79,7 +79,7 @@ public class EthSignerTestHarnessFactory {
           break;
         }
       } catch (IOException e) {
-        LOG.error(e);
+        LOG.warn(e + " - will retry");
       }
 
       try {
