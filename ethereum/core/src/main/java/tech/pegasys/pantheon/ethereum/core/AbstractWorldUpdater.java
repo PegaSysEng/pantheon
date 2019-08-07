@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import tech.pegasys.pantheon.util.bytes.Bytes32;
@@ -51,7 +52,8 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
   protected abstract A getForMutation(Address address);
 
   protected UpdateTrackingAccount<A> track(final UpdateTrackingAccount<A> account) {
-    checkArgument(account.getAddress().isPresent, "Mutable account must have a non-empty address.");
+    checkArgument(
+        account.getAddress().isPresent(), "Mutable account must have a non-empty address.");
     final Address address = account.getAddress().get();
     updatedAccounts.put(address, account);
     deletedAccounts.remove(address);
@@ -191,7 +193,8 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
     UpdateTrackingAccount(final A account) {
       checkNotNull(account);
 
-      checkArgument(account.getAddress().isPresent, "Mutable account must have a non-empty address.");
+      checkArgument(
+          account.getAddress().isPresent(), "Mutable account must have a non-empty address.");
       this.address = account.getAddress().get();
       this.account = account;
 
@@ -230,6 +233,11 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
     @Override
     public SortedMap<UInt256, UInt256> getUpdatedStorage() {
       return updatedStorage;
+    }
+
+    @Override
+    public Hash getAddressHash() {
+      return null;
     }
 
     @Override
