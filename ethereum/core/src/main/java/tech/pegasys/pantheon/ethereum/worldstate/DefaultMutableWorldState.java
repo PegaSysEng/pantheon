@@ -381,7 +381,7 @@ public class DefaultMutableWorldState implements MutableWorldState {
 
         // Save the code in key-value storage ...
         Hash codeHash = origin == null ? Hash.EMPTY : origin.getCodeHash();
-        if (updated.codeWasUpdated() && updated.getAddress().isPresent()) {
+        if (updated.codeWasUpdated()) {
           codeHash = Hash.hash(updated.getCode());
           wrapped.updatedAccountCode.put(updated.getAddress().get(), updated.getCode());
         }
