@@ -191,7 +191,8 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
     UpdateTrackingAccount(final A account) {
       checkNotNull(account);
 
-      this.address = account.getAddress().orElse(Address.ZERO);
+      checkArgument(account.getAddress().isPresent, "Mutable account must have a non-empty address.");
+      this.address = account.getAddress().get();
       this.account = account;
 
       this.nonce = account.getNonce();
