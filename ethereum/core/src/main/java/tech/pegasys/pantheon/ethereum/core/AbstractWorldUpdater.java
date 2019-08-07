@@ -51,7 +51,8 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
   protected abstract A getForMutation(Address address);
 
   protected UpdateTrackingAccount<A> track(final UpdateTrackingAccount<A> account) {
-    final Address address = account.getAddress().orElse(Address.ZERO);
+    checkArgument(account.getAddress().isPresent, "Mutable account must have a non-empty address.");
+    final Address address = account.getAddress().get();
     updatedAccounts.put(address, account);
     deletedAccounts.remove(address);
     return account;
