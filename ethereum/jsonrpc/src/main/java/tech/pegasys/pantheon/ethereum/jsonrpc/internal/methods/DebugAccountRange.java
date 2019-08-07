@@ -102,7 +102,7 @@ public class DebugAccountRange implements JsonRpcMethod {
                   .collect(
                       Collectors.toMap(
                           account -> account.getAddressHash().toString(),
-                          account -> account.getAddress().map(Address::toString()).orElse(null)
+                          account -> {
                             if (account.getAddress().isPresent()) {
                               return account.getAddress().get().toString();
                             } else {
