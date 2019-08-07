@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 public class DatabaseMetadata {
   static final String METADATA_FILENAME = "DATABASE_METADATA.json";
@@ -36,10 +37,14 @@ public class DatabaseMetadata {
   }
 
   static DatabaseMetadata fromDirectory(final Path databaseDir) throws IOException {
+    final File metadataFile = getDefaultMetadataFile(databaseDir);
     try {
-      return MAPPER.readValue(getDefaultMetadataFile(databaseDir), DatabaseMetadata.class);
+      return MAPPER.readValue(metadataFile, DatabaseMetadata.class);
     } catch (FileNotFoundException fnfe) {
       return new DatabaseMetadata(0);
+    } catch (UnrecognizedPropertyException upe) {
+      throw new IllegalStateException(
+          String.format("Invalid metadata file %s", metadataFile.getAbsolutePath()), upe);
     }
   }
 
