@@ -97,8 +97,7 @@ public class RocksDbStorageProvider {
   private static StorageProvider ofSegmented(
       final RocksDbConfiguration rocksDbConfiguration,
       final MetricsSystem metricsSystem,
-      final long worldStatePreimageCacheSize)
-      throws IOException {
+      final long worldStatePreimageCacheSize) {
 
     final SegmentedKeyValueStorage<?> columnarStorage =
         ColumnarRocksDbKeyValueStorage.create(
