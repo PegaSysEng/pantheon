@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.storage.keyvalue;
 
+import static java.util.AbstractMap.SimpleEntry;
 import static java.util.Arrays.asList;
 
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
@@ -28,8 +29,8 @@ import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,12 +39,13 @@ public class RocksDbStorageProvider {
   public static long DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE = 5_000L;
   private static final Logger LOG = LogManager.getLogger();
   public static final int CURRENT_VERSION = 1;
-  /**
-   * This list contains the methods used to load the version at its index. Index 0 of the list loads
-   * a version 0 database and so on...
-   */
-  private static final List<StorageProviderFunction> PROVIDERS_BY_VERSION =
-      Arrays.asList(RocksDbStorageProvider::ofUnsegmented, RocksDbStorageProvider::ofSegmented);
+  /** This key is the version and the value is the function used to create or load the database. */
+  private static final Map<Integer, StorageProviderFunction> PROVIDERS_BY_VERSION =
+      Map.ofEntries(
+          new SimpleEntry<Integer, StorageProviderFunction>(
+              0, RocksDbStorageProvider::ofUnsegmented),
+          new SimpleEntry<Integer, StorageProviderFunction>(
+              1, RocksDbStorageProvider::ofSegmented));
 
   public static StorageProvider create(
       final RocksDbConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem)
@@ -70,16 +72,16 @@ public class RocksDbStorageProvider {
       new DatabaseMetadata(databaseVersion).writeToDirectory(databaseDir);
     }
 
-    try {
-      return PROVIDERS_BY_VERSION
-          .get(databaseVersion)
-          .apply(rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
-    } catch (IndexOutOfBoundsException ioobe) {
-      throw new IllegalStateException(
-          String.format(
-              "Invalid database version %d. Latest version is %d",
-              databaseVersion, CURRENT_VERSION));
-    }
+    final StorageProviderFunction providerFunction =
+        Optional.ofNullable(PROVIDERS_BY_VERSION.get(databaseVersion))
+            .orElseThrow(
+                () ->
+                    new IllegalStateException(
+                        String.format(
+                            "Invalid database version %d. Latest version is %d",
+                            databaseVersion, CURRENT_VERSION)));
+
+    return providerFunction.apply(rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
   }
 
   private static StorageProvider ofUnsegmented(
