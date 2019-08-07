@@ -237,7 +237,7 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
 
     @Override
     public Hash getAddressHash() {
-      return null;
+      return Hash.hash(getAddress().orElse(Address.ZERO));
     }
 
     @Override
