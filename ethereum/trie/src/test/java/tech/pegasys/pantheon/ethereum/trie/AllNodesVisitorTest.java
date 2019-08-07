@@ -12,32 +12,34 @@
  */
 package tech.pegasys.pantheon.ethereum.trie;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class AllNodesVisitorTest {
 
-  private final StoredNode storedNode = mock(StoredNode.class);
+  @Mock private StoredNode<String> storedNode;
+  @Mock private ExtensionNode<String> extensionNode;
+  @Mock private BranchNode<String> branchNode;
 
   @Test
   public void visitExtension() {
-    final ExtensionNode extensionNode = mock(ExtensionNode.class);
     when(extensionNode.getChild()).thenReturn(storedNode);
-    new AllNodesVisitor(x -> {}).visit(extensionNode);
+    new AllNodesVisitor<String>(x -> {}).visit(extensionNode);
     verify(storedNode).unload();
   }
 
   @Test
   public void visitBranch() {
-    final BranchNode branchNode = mock(BranchNode.class);
     when(branchNode.getChildren()).thenReturn(Collections.singletonList(storedNode));
-    new AllNodesVisitor(x -> {}).visit(branchNode);
+    new AllNodesVisitor<String>(x -> {}).visit(branchNode);
     verify(storedNode).unload();
   }
 }
