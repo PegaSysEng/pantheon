@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.storage.keyvalue;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -65,5 +66,16 @@ public class RocksDbStorageProviderTest {
     when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
     RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
     assertEquals(1, DatabaseMetadata.fromDirectory(tempDatabaseDir).getVersion());
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenVersionNumberIsInvalid() throws Exception {
+    final Path tempDatabaseDir = temporaryFolder.newFolder().toPath().resolve("db");
+    Files.createDirectories(tempDatabaseDir);
+    tempDatabaseDir.resolve("IDENTITY").toFile().createNewFile();
+    new DatabaseMetadata(-1).writeToDirectory(tempDatabaseDir);
+    when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
+    assertThatThrownBy(() -> RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem))
+        .isInstanceOf(IllegalStateException.class);
   }
 }
