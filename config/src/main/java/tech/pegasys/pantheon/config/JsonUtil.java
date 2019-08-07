@@ -33,11 +33,12 @@ public class JsonUtil {
    * Converts all to lowercase for easier lookup. This is useful incases such as the 'genesis.json'
    * file where all keys are assumed to be case insensitive.
    *
+   * @param objectNode The ObjectNode to be normalized
    * @return a copy of the json object with all keys in lower case.
    */
-  public static ObjectNode normalizeKeys(final ObjectNode genesis) {
+  public static ObjectNode normalizeKeys(final ObjectNode objectNode) {
     final ObjectNode normalized = JsonUtil.createEmptyObjectNode();
-    genesis
+    objectNode
         .fields()
         .forEachRemaining(
             entry -> {
