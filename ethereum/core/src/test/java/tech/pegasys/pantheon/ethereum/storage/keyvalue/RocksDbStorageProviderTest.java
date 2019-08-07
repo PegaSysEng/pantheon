@@ -92,6 +92,6 @@ public class RocksDbStorageProviderTest {
         corruptMetadata.getBytes(Charset.defaultCharset()));
     when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
     assertThatThrownBy(() -> RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem))
-        .isInstanceOf(UnrecognizedPropertyException.class);
+        .isInstanceOf(IllegalStateException.class);
   }
 }
