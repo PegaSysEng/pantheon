@@ -50,10 +50,9 @@ public class RocksDbStorageProviderTest {
   public void shouldDetectVersion0DatabaseIfNoMetadataFileFound() throws Exception {
     final Path tempDatabaseDir = temporaryFolder.newFolder().toPath().resolve("db");
     Files.createDirectories(tempDatabaseDir);
-    Path databaseDir = rocksDbConfiguration.getDatabaseDir();
-    when(databaseDir).thenReturn(tempDatabaseDir);
-    tempDatabaseDir.resolve("filler-file").toFile().createNewFile();
+    tempDatabaseDir.resolve("IDENTITY").toFile().createNewFile();
+    when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
     RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
-    assertEquals(0, DatabaseMetadata.fromDirectory(databaseDir).getVersion());
+    assertEquals(0, DatabaseMetadata.fromDirectory(tempDatabaseDir).getVersion());
   }
 }

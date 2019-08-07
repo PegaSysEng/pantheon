@@ -30,7 +30,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,10 +58,7 @@ public class RocksDbStorageProvider {
       throws IOException {
 
     final Path databaseDir = rocksDbConfiguration.getDatabaseDir();
-    final boolean databaseExists =
-        Optional.ofNullable(databaseDir.toFile().list())
-            .filter(files -> files.length > 0)
-            .isPresent();
+    final boolean databaseExists = databaseDir.resolve("IDENTITY").toFile().exists();
     final int databaseVersion;
     if (databaseExists) {
       databaseVersion = DatabaseMetadata.fromDirectory(databaseDir).getVersion();
