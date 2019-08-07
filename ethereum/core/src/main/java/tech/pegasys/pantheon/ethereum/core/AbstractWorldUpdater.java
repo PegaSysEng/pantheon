@@ -234,7 +234,7 @@ public abstract class AbstractWorldUpdater<W extends WorldView, A extends Accoun
 
     @Override
     public Optional<Address> getAddress() {
-      return Optional.ofNullable(address);
+      return Optional.of(address);
     }
 
     @Override
