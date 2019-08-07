@@ -51,7 +51,7 @@ public interface Account {
    *
    * @return the Keccak-256 hash of the account address.
    */
-  default Hash getAddressHash() {
+  Hash getAddressHash();
     return Hash.hash(getAddress().orElse(Address.ZERO));
   }
 
