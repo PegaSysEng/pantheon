@@ -29,7 +29,7 @@ public class Pruner {
 
   private final MarkSweepPruner pruningStrategy;
   private final Blockchain blockchain;
-  private ExecutorService executorService;
+  private final ExecutorService executorService;
   private final long retentionPeriodInBlocks;
   private final AtomicReference<State> state = new AtomicReference<>(State.IDLE);
   private volatile long markBlockNumber = 0;
