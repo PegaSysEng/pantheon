@@ -30,8 +30,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class JsonUtil {
 
   /**
-   * Converts all to lowercase for easier lookup. This is useful in cases such as the 'genesis.json'
-   * file where all keys are assumed to be case insensitive.
+   * Converts all the object keys (but none of the string values) to lowercase for easier lookup.
+   * This is useful in cases such as the 'genesis.json' file where all keys are assumed to be case
+   * insensitive.
    *
    * @param objectNode The ObjectNode to be normalized
    * @return a copy of the json object with all keys in lower case.
