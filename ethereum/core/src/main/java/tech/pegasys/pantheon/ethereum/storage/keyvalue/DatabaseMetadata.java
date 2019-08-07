@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DatabaseMetadata {
-  private static final String METADATA_FILENAME = "DATABASE_METADATA.json";
+  static final String METADATA_FILENAME = "DATABASE_METADATA.json";
   private static ObjectMapper MAPPER = new ObjectMapper();
   private final int version;
 

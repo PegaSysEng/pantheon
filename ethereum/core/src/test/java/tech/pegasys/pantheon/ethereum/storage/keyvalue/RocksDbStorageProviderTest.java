@@ -20,9 +20,11 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -77,5 +79,19 @@ public class RocksDbStorageProviderTest {
     when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
     assertThatThrownBy(() -> RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem))
         .isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
+  public void shouldThrowExceptionWhenMetaDataFileIsCorrupted() throws Exception {
+    final Path tempDatabaseDir = temporaryFolder.newFolder().toPath().resolve("db");
+    Files.createDirectories(tempDatabaseDir);
+    tempDatabaseDir.resolve("IDENTITY").toFile().createNewFile();
+    final String corruptMetadata = "{\"🦄\":1}";
+    Files.write(
+        tempDatabaseDir.resolve(DatabaseMetadata.METADATA_FILENAME),
+        corruptMetadata.getBytes(Charset.defaultCharset()));
+    when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
+    assertThatThrownBy(() -> RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem))
+        .isInstanceOf(UnrecognizedPropertyException.class);
   }
 }
