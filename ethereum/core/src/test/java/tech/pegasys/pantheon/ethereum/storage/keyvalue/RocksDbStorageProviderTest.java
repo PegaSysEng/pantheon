@@ -43,7 +43,7 @@ public class RocksDbStorageProviderTest {
     when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
     RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
     assertEquals(
-        RocksDbStorageProvider.CURRENT_VERSION,
+        RocksDbStorageProvider.DEFAULT_VERSION,
         DatabaseMetadata.fromDirectory(rocksDbConfiguration.getDatabaseDir()).getVersion());
   }
 

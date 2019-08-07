@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,14 +39,13 @@ import org.apache.logging.log4j.Logger;
 public class RocksDbStorageProvider {
   public static long DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE = 5_000L;
   private static final Logger LOG = LogManager.getLogger();
-  public static final int CURRENT_VERSION = 1;
+  public static final int DEFAULT_VERSION = 1;
   /** This key is the version and the value is the function used to create or load the database. */
-  private static final Map<Integer, StorageProviderFunction> PROVIDERS_BY_VERSION =
-      Map.ofEntries(
-          new SimpleEntry<Integer, StorageProviderFunction>(
-              0, RocksDbStorageProvider::ofUnsegmented),
-          new SimpleEntry<Integer, StorageProviderFunction>(
-              1, RocksDbStorageProvider::ofSegmented));
+  private static final TreeMap<Integer, StorageProviderFunction> PROVIDERS_BY_VERSION =
+      new TreeMap<>(
+          Map.ofEntries(
+              new SimpleEntry<>(0, RocksDbStorageProvider::ofUnsegmented),
+              new SimpleEntry<>(1, RocksDbStorageProvider::ofSegmented)));
 
   public static StorageProvider create(
       final RocksDbConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem)
@@ -66,7 +66,7 @@ public class RocksDbStorageProvider {
       databaseVersion = DatabaseMetadata.fromDirectory(databaseDir).getVersion();
       LOG.info("Existing database detected. Version {}", databaseVersion);
     } else {
-      databaseVersion = CURRENT_VERSION;
+      databaseVersion = DEFAULT_VERSION;
       LOG.info("No existing database detected. Using version {}", databaseVersion);
       Files.createDirectories(databaseDir);
       new DatabaseMetadata(databaseVersion).writeToDirectory(databaseDir);
@@ -78,8 +78,10 @@ public class RocksDbStorageProvider {
                 () ->
                     new IllegalStateException(
                         String.format(
-                            "Invalid database version %d. Latest version is %d",
-                            databaseVersion, CURRENT_VERSION)));
+                            "Invalid database version %d. Valid versions are: %s. Default version is %d",
+                            databaseVersion,
+                            PROVIDERS_BY_VERSION.navigableKeySet().toString(),
+                            DEFAULT_VERSION)));
 
     return providerFunction.apply(rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
   }
