@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.core.Account;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
@@ -94,6 +95,16 @@ public class DebugAccountRange implements JsonRpcMethod {
         nextKey = accounts.get(maxResults).getAddressHash();
         accounts.remove(maxResults);
       }
+
+      new JsonRpcSuccessResponse(
+          request.getId(),
+          new DebugAccountRangeAtResult(
+              accounts.stream()
+                  .collect(
+                      Collectors.toMap(
+                          account -> account.getAddressHash().toString(),
+                          account -> account.getAddress().map(Address::toString).orElse(null))),
+              nextKey.toString()));
 
       return new JsonRpcSuccessResponse(
           request.getId(),
