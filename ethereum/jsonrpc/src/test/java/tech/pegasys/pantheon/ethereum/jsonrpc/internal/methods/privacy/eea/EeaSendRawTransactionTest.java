@@ -287,8 +287,7 @@ public class EeaSendRawTransactionTest {
             new String[] {PRIVATE_TRANSACTION_RLP_PRIVACY_GROUP_NO_PRIVATE_FROM});
 
     final JsonRpcResponse expectedResponse =
-        new JsonRpcErrorResponse(
-            request.getId(), JsonRpcError.DECODE_ERROR);
+        new JsonRpcErrorResponse(request.getId(), JsonRpcError.DECODE_ERROR);
 
     final JsonRpcResponse actualResponse = method.response(request);
 
