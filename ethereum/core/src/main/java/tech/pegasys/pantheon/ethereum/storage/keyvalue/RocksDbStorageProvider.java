@@ -64,10 +64,11 @@ public class RocksDbStorageProvider {
     final int databaseVersion;
     if (databaseExists) {
       databaseVersion = DatabaseMetadata.fromDirectory(databaseDir).getVersion();
-      LOG.info("Existing database detected. Version {}", databaseVersion);
+      LOG.info("Existing database detected at {}. Version {}", databaseDir, databaseVersion);
     } else {
       databaseVersion = DEFAULT_VERSION;
-      LOG.info("No existing database detected. Using version {}", databaseVersion);
+      LOG.info(
+          "No existing database detected at {}. Using version {}", databaseDir, databaseVersion);
       Files.createDirectories(databaseDir);
       new DatabaseMetadata(databaseVersion).writeToDirectory(databaseDir);
     }
