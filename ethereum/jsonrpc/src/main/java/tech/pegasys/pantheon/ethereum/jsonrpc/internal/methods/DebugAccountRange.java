@@ -12,10 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
-import tech.pegasys.pantheon.ethereum.core.Account;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
+import tech.pegasys.pantheon.ethereum.core.WorldState.StreamableAccount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.BlockParameterOrBlockHash;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -54,7 +55,7 @@ public class DebugAccountRange implements JsonRpcMethod {
   public String getName() {
     // TODO(shemnon) 5229b899 is the last stable commit of retesteth, after this they rename the
     //  method to just "debug_accountRange".  Once the tool is stable we will support the new name.
-    return "debug_accountRangeAt";
+    return "debug_accountRange";
   }
 
   @Override
@@ -84,7 +85,7 @@ public class DebugAccountRange implements JsonRpcMethod {
     if (state.isEmpty()) {
       return emptyResponse(request);
     } else {
-      final List<Account> accounts =
+      final List<StreamableAccount> accounts =
           state
               .get()
               .streamAccounts(Bytes32.fromHexStringLenient(addressHash), maxResults + 1)
@@ -102,7 +103,7 @@ public class DebugAccountRange implements JsonRpcMethod {
                   .collect(
                       Collectors.toMap(
                           account -> account.getAddressHash().toString(),
-                          account -> account.getAddress().toString())),
+                          account -> account.getAddress().orElse(Address.ZERO).toString())),
               nextKey.toString()));
     }
   }
