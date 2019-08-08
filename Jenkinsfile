@@ -4,7 +4,11 @@ import hudson.model.Result
 import hudson.model.Run
 import jenkins.model.CauseOfInterruption.UserInterruption
 
-if (env.BRANCH_NAME == "master") {
+def shouldPublish() {
+    return env.BRANCH_NAME == 'master' || env.BRANCH_NAME ==~ /^release-\d+\.\d+/
+}
+
+if (shouldPublish()) {
     properties([
         buildDiscarder(
             logRotator(
@@ -48,7 +52,7 @@ def abortPreviousBuilds() {
     }
 }
 
-if (env.BRANCH_NAME != "master") {
+if (shouldPublish()) {
     abortPreviousBuilds()
 }
 
@@ -202,7 +206,7 @@ try {
                             sh "rm -rf ${reports_folder}"
                         }
 
-                        if (env.BRANCH_NAME == "master") {
+                        if (shouldPublish()) {
                             stage(stage_name + 'Push image') {
                                 docker.withRegistry(registry, userAccount) {
                                     docker.image(image).push()
@@ -213,7 +217,7 @@ try {
                 }
         }
 
-        if (env.BRANCH_NAME == "master") {
+        if (shouldPublish()) {
             BintrayPublish: {
                 def stage_name = "Bintray publish node: "
                 node {
@@ -245,7 +249,7 @@ try {
     currentBuild.result = 'FAILURE'
 } finally {
     // If we're on master and it failed, notify slack
-    if (env.BRANCH_NAME == "master") {
+    if (shouldPublish()) {
         def currentResult = currentBuild.result ?: 'SUCCESS'
         def channel = '#priv-pegasys-prod-dev'
         if (currentResult == 'SUCCESS') {
