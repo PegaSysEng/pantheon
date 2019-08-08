@@ -22,21 +22,20 @@ import org.rocksdb.WriteOptions;
 
 public class RocksDBTransaction implements KeyValueStorageTransaction {
 
-  private final RocksDBMetrics rocksDBMetrics;
+  private final RocksDBMetrics metrics;
   private final Transaction innerTx;
   private final WriteOptions options;
 
   RocksDBTransaction(
-      final Transaction innerTx, final WriteOptions options, final RocksDBMetrics rocksDBMetrics) {
+      final Transaction innerTx, final WriteOptions options, final RocksDBMetrics metrics) {
     this.innerTx = innerTx;
     this.options = options;
-    this.rocksDBMetrics = rocksDBMetrics;
+    this.metrics = metrics;
   }
 
   @Override
   public void put(byte[] key, byte[] value) {
-    try (final OperationTimer.TimingContext ignored =
-        rocksDBMetrics.getWriteLatency().startTimer()) {
+    try (final OperationTimer.TimingContext ignored = metrics.getWriteLatency().startTimer()) {
       innerTx.put(key, value);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -45,8 +44,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
 
   @Override
   public void remove(byte[] key) {
-    try (final OperationTimer.TimingContext ignored =
-        rocksDBMetrics.getRemoveLatency().startTimer()) {
+    try (final OperationTimer.TimingContext ignored = metrics.getRemoveLatency().startTimer()) {
       innerTx.delete(key);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -55,8 +53,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
 
   @Override
   public void commit() throws StorageException {
-    try (final OperationTimer.TimingContext ignored =
-        rocksDBMetrics.getCommitLatency().startTimer()) {
+    try (final OperationTimer.TimingContext ignored = metrics.getCommitLatency().startTimer()) {
       innerTx.commit();
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -69,7 +66,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
   public void rollback() {
     try {
       innerTx.rollback();
-      rocksDBMetrics.getRollbackCount().inc();
+      metrics.getRollbackCount().inc();
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     } finally {
