@@ -84,12 +84,20 @@ public class RocksDbStorageProviderTest {
   public void shouldThrowExceptionWhenMetaDataFileIsCorrupted() throws Exception {
     final Path tempDatabaseDir = temporaryFolder.newFolder().toPath().resolve("db");
     Files.createDirectories(tempDatabaseDir);
+    when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
     tempDatabaseDir.resolve("IDENTITY").toFile().createNewFile();
-    final String corruptMetadata = "{\"🦄\":1}";
+
+    final String badVersion = "{\"🦄\":1}";
     Files.write(
         tempDatabaseDir.resolve(DatabaseMetadata.METADATA_FILENAME),
-        corruptMetadata.getBytes(Charset.defaultCharset()));
-    when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
+        badVersion.getBytes(Charset.defaultCharset()));
+    assertThatThrownBy(() -> RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem))
+        .isInstanceOf(IllegalStateException.class);
+
+    final String badValue = "{\"version\":\"iomedae\"}";
+    Files.write(
+        tempDatabaseDir.resolve(DatabaseMetadata.METADATA_FILENAME),
+        badValue.getBytes(Charset.defaultCharset()));
     assertThatThrownBy(() -> RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem))
         .isInstanceOf(IllegalStateException.class);
   }

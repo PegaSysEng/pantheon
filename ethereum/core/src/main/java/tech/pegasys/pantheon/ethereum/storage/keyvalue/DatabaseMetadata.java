@@ -19,8 +19,8 @@ import java.nio.file.Path;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
 public class DatabaseMetadata {
   static final String METADATA_FILENAME = "DATABASE_METADATA.json";
@@ -42,9 +42,9 @@ public class DatabaseMetadata {
       return MAPPER.readValue(metadataFile, DatabaseMetadata.class);
     } catch (FileNotFoundException fnfe) {
       return new DatabaseMetadata(0);
-    } catch (UnrecognizedPropertyException upe) {
+    } catch (JsonProcessingException jpe) {
       throw new IllegalStateException(
-          String.format("Invalid metadata file %s", metadataFile.getAbsolutePath()), upe);
+          String.format("Invalid metadata file %s", metadataFile.getAbsolutePath()), jpe);
     }
   }
 
