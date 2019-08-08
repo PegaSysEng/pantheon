@@ -12,41 +12,135 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
+import tech.pegasys.pantheon.services.util.RocksDbUtil;
 
-import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.rocksdb.BlockBasedTableConfig;
+import org.rocksdb.LRUCache;
+import org.rocksdb.Options;
+import org.rocksdb.RocksDBException;
+import org.rocksdb.RocksIterator;
+import org.rocksdb.Statistics;
+import org.rocksdb.TransactionDB;
+import org.rocksdb.TransactionDBOptions;
+import org.rocksdb.WriteOptions;
 
 public class RocksDBKeyValueStorage implements KeyValueStorage {
 
+  private static final Logger LOG = LogManager.getLogger();
+
+  private final Options options;
+  private final TransactionDBOptions txOptions;
+  private final TransactionDB db;
+  private final AtomicBoolean closed = new AtomicBoolean(false);
+  private final RocksDBMetrics rocksDBMetrics;
+
+  public RocksDBKeyValueStorage(
+      final RocksDBConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem) {
+    RocksDbUtil.loadNativeLibrary();
+    try {
+      final Statistics stats = new Statistics();
+      options =
+          new Options()
+              .setCreateIfMissing(true)
+              .setMaxOpenFiles(rocksDbConfiguration.getMaxOpenFiles())
+              .setTableFormatConfig(createBlockBasedTableConfig(rocksDbConfiguration))
+              .setMaxBackgroundCompactions(rocksDbConfiguration.getMaxBackgroundCompactions())
+              .setStatistics(stats);
+      options.getEnv().setBackgroundThreads(rocksDbConfiguration.getBackgroundThreadCount());
+
+      txOptions = new TransactionDBOptions();
+      db = TransactionDB.open(options, txOptions, rocksDbConfiguration.getDatabaseDir().toString());
+      rocksDBMetrics = RocksDBMetrics.of(metricsSystem, rocksDbConfiguration, db, stats);
+    } catch (final RocksDBException e) {
+      throw new StorageException(e);
+    }
+  }
+
   @Override
   public void clear() throws StorageException {
-    // TODO code
+    try (final RocksIterator rocksIterator = db.newIterator()) {
+      if (!rocksIterator.isValid()) {
+        return;
+      }
+      rocksIterator.seekToFirst();
+      final byte[] firstKey = rocksIterator.key();
+      rocksIterator.seekToLast();
+      if (!rocksIterator.isValid()) {
+        return;
+      }
+      db.deleteRange(firstKey, rocksIterator.key());
+    } catch (final RocksDBException e) {
+      throw new StorageException(e);
+    }
   }
 
   @Override
   public Optional<byte[]> get(final byte[] key) throws StorageException {
-    return Optional.empty();
-    // TODO code
+    throwIfClosed();
+
+    try (final OperationTimer.TimingContext ignored =
+        rocksDBMetrics.getReadLatency().startTimer()) {
+      return Optional.ofNullable(db.get(key));
+    } catch (final RocksDBException e) {
+      throw new StorageException(e);
+    }
   }
 
   @Override
   public long removeAllKeysUnless(final Predicate<byte[]> retainCondition) throws StorageException {
-    // TODO code
-    return 0;
+    long removedNodeCounter = 0;
+    try (final RocksIterator rocksIterator = db.newIterator()) {
+      rocksIterator.seekToFirst();
+      while (rocksIterator.isValid()) {
+        final byte[] key = rocksIterator.key();
+        if (!retainCondition.test(key)) {
+          removedNodeCounter++;
+          db.delete(key);
+        }
+        rocksIterator.next();
+      }
+    } catch (final RocksDBException e) {
+      throw new StorageException(e);
+    }
+    return removedNodeCounter;
   }
 
   @Override
   public KeyValueStorageTransaction startTransaction() throws StorageException {
-    // TODO code
-    return null;
+    throwIfClosed();
+    final WriteOptions options = new WriteOptions();
+    return new RocksDBTransaction(db.beginTransaction(options), options, rocksDBMetrics);
   }
 
   @Override
-  public void close() throws IOException {
-    // TODO code
+  public void close() {
+    if (closed.compareAndSet(false, true)) {
+      txOptions.close();
+      options.close();
+      db.close();
+    }
+  }
+
+  private BlockBasedTableConfig createBlockBasedTableConfig(final RocksDBConfiguration config) {
+    final LRUCache cache = new LRUCache(config.getCacheCapacity());
+    return new BlockBasedTableConfig().setBlockCache(cache);
+  }
+
+  private void throwIfClosed() {
+    if (closed.get()) {
+      LOG.error("Attempting to use a closed RocksDBKeyValueStorage");
+      throw new IllegalStateException("Storage has been closed");
+    }
   }
 }
