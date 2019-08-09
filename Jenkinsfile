@@ -29,10 +29,6 @@ if (shouldPublish()) {
 def docker_image_dind = 'docker:18.06.0-ce-dind'
 def docker_image = 'docker:18.06.0-ce'
 def build_image = 'pegasyseng/pantheon-build:0.0.7-jdk11'
-def registry = 'https://registry.hub.docker.com'
-def userAccount = 'dockerhub-pegasysengci'
-def imageRepos = 'pegasyseng'
-def imageTag = 'develop'
 
 def abortPreviousBuilds() {
     Run previousBuild = currentBuild.rawBuild.getPreviousBuildInProgress()
@@ -166,6 +162,10 @@ try {
                 }
             }
         }, DockerImage: {
+                def registry = 'https://registry.hub.docker.com'
+                def userAccount = 'dockerhub-pegasysengci'
+                def imageRepos = 'pegasyseng'
+                def imageTag = 'develop'
                 def stage_name = 'Docker image node: '
                 def image = imageRepos + '/pantheon:' + imageTag
                 def docker_folder = 'docker'
