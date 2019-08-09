@@ -13,17 +13,24 @@
 package tech.pegasys.pantheon.services;
 
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.plugin.adapter.BlockHeaderAdapter;
+import tech.pegasys.pantheon.ethereum.plugin.adapter.TransactionAdapter;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 
-import com.google.common.collect.ImmutableMap;
-import io.vertx.core.json.Json;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PantheonEventsImpl implements PantheonEvents {
   private final BlockBroadcaster blockBroadcaster;
+  private final AtomicLong subscriptionIdGenerator = new AtomicLong(0);
+  private final TransactionPool transactionPool;
 
-  public PantheonEventsImpl(final BlockBroadcaster blockBroadcaster) {
+  public PantheonEventsImpl(
+      final BlockBroadcaster blockBroadcaster, final TransactionPool transactionPool) {
     this.blockBroadcaster = blockBroadcaster;
+    this.transactionPool = transactionPool;
   }
 
   @Override
@@ -39,15 +46,24 @@ public class PantheonEventsImpl implements PantheonEvents {
     }
   }
 
+  @Override
+  public Object addNewTransactionAddedListener(final NewTransactionAddedListener listener) {
+    transactionPool.addTransactionListener(
+        transaction -> dispatchTransactionAddedMessage(transaction, listener));
+
+    return subscriptionIdGenerator.incrementAndGet();
+  }
+
+  @Override
+  public void removeNewTransactionAddedListener(final Object listenerIdentifier) {}
+
   private void dispatchNewBlockPropagatedMessage(
       final Block block, final NewBlockPropagatedListener listener) {
-    final ImmutableMap<Object, Object> result =
-        new ImmutableMap.Builder<>()
-            .put("type", "NewBlock")
-            .put("blockHash", block.getHash().toString())
-            .put("blockNumber", block.getHeader().getNumber())
-            .put("timestamp", block.getHeader().getTimestamp())
-            .build();
-    listener.newBlockPropagated(Json.encode(result));
+    listener.newBlockPropagated(new BlockHeaderAdapter(block.getHeader()));
+  }
+
+  private void dispatchTransactionAddedMessage(
+      final Transaction transaction, final NewTransactionAddedListener listener) {
+    listener.newTransactionAdded(new TransactionAdapter(transaction));
   }
 }

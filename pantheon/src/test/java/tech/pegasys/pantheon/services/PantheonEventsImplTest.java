@@ -21,6 +21,8 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.plugin.data.BlockHeader;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Collections;
@@ -38,6 +40,7 @@ public class PantheonEventsImplTest {
 
   @Mock private EthPeers ethPeers;
   @Mock private EthContext mockEthContext;
+  @Mock private TransactionPool transactionPool;
   private BlockBroadcaster blockBroadcaster;
   private PantheonEventsImpl serviceImpl;
 
@@ -47,23 +50,23 @@ public class PantheonEventsImplTest {
     when(mockEthContext.getEthPeers()).thenReturn(ethPeers);
 
     blockBroadcaster = new BlockBroadcaster(mockEthContext);
-    serviceImpl = new PantheonEventsImpl(blockBroadcaster);
+    serviceImpl = new PantheonEventsImpl(blockBroadcaster, transactionPool);
   }
 
   @Test
   public void eventFiresAfterSubscribe() {
-    final AtomicReference<String> result = new AtomicReference<>();
+    final AtomicReference<BlockHeader> result = new AtomicReference<>();
     serviceImpl.addNewBlockPropagatedListener(result::set);
 
     assertThat(result.get()).isNull();
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
 
-    assertThat(result.get()).isNotEmpty();
+    assertThat(result.get()).isNotNull();
   }
 
   @Test
   public void eventDoesNotFireAfterUnsubscribe() {
-    final AtomicReference<String> result = new AtomicReference<>();
+    final AtomicReference<BlockHeader> result = new AtomicReference<>();
     final Object id = serviceImpl.addNewBlockPropagatedListener(result::set);
 
     assertThat(result.get()).isNull();

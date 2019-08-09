@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.plugins;
 
 import tech.pegasys.pantheon.plugin.PantheonContext;
 import tech.pegasys.pantheon.plugin.PantheonPlugin;
+import tech.pegasys.pantheon.plugin.data.BlockHeader;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 
 import java.io.File;
@@ -24,6 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.auto.service.AutoService;
+import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,8 +65,9 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
     LOG.info("No longer listening with ID#" + subscriptionId);
   }
 
-  private void onBlockAnnounce(final String json) {
+  private void onBlockAnnounce(final BlockHeader blockHeader) {
     final int blockCount = blockCounter.incrementAndGet();
+    final String json = new Gson().toJson(blockHeader);
     LOG.info("I got a new block! (I've seen {}) - {}", blockCount, json);
     try {
       final File callbackFile = new File(callbackDir, "newBlock." + blockCount);
