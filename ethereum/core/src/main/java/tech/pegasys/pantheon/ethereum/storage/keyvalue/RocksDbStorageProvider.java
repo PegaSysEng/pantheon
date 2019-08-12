@@ -140,12 +140,12 @@ public class RocksDbStorageProvider {
       return id;
     }
   }
-}
 
-interface StorageProviderFunction {
-  StorageProvider apply(
-      final RocksDbConfiguration rocksDbConfiguration,
-      final MetricsSystem metricsSystem,
-      final long worldStatePreimageCacheSize)
-      throws IOException;
+  private interface StorageProviderFunction {
+    StorageProvider apply(
+        final RocksDbConfiguration rocksDbConfiguration,
+        final MetricsSystem metricsSystem,
+        final long worldStatePreimageCacheSize)
+        throws IOException;
+  }
 }
