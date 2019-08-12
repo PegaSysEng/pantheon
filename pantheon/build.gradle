@@ -40,11 +40,14 @@ dependencies {
   implementation project(':ethereum:graphql')
   implementation project(':ethereum:permissioning')
   implementation project(':ethereum:p2p')
+  implementation project(':ethereum:retesteth')
   implementation project(':ethereum:rlp')
   implementation project(':metrics:core')
   implementation project(':nat')
   implementation project(':services:kvstore')
 
+  implementation 'com.fasterxml.jackson.core:jackson-databind'
+  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.9.8'
   implementation 'com.graphql-java:graphql-java'
   implementation 'com.google.guava:guava'
   implementation 'info.picocli:picocli'
