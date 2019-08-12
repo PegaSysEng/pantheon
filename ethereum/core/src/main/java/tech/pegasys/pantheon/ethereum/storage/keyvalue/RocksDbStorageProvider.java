@@ -16,11 +16,11 @@ import static java.util.Arrays.asList;
 
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.ColumnarRocksDbKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.LimitedInMemoryKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
-import tech.pegasys.pantheon.services.kvstore.RocksDbKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Segment;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
@@ -32,17 +32,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RocksDbStorageProvider {
+
   public static long DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE = 5_000L;
   private static final Logger LOG = LogManager.getLogger();
 
   public static StorageProvider create(
-      final RocksDbConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem)
+      final RocksDBConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem)
       throws IOException {
     return create(rocksDbConfiguration, metricsSystem, DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE);
   }
 
-  public static StorageProvider create(
-      final RocksDbConfiguration rocksDbConfiguration,
+  private static StorageProvider create(
+      final RocksDBConfiguration rocksDbConfiguration,
       final MetricsSystem metricsSystem,
       final long worldStatePreimageCacheSize)
       throws IOException {
@@ -56,19 +57,19 @@ public class RocksDbStorageProvider {
   }
 
   private static StorageProvider createUnsegmentedProvider(
-      final RocksDbConfiguration rocksDbConfiguration,
+      final RocksDBConfiguration rocksDbConfiguration,
       final MetricsSystem metricsSystem,
       final long worldStatePreimageCacheSize)
       throws IOException {
     Files.createDirectories(rocksDbConfiguration.getDatabaseDir());
-    final KeyValueStorage kv = RocksDbKeyValueStorage.create(rocksDbConfiguration, metricsSystem);
+    final KeyValueStorage kv = new RocksDBKeyValueStorage(rocksDbConfiguration, metricsSystem);
     final KeyValueStorage preimageKv =
-        new LimitedInMemoryKeyValueStorage(worldStatePreimageCacheSize);
+        new LimitedMemoryKeyValueStorage(worldStatePreimageCacheSize);
     return new KeyValueStorageProvider(kv, kv, preimageKv, kv, kv, kv);
   }
 
   private static StorageProvider createSegmentedProvider(
-      final RocksDbConfiguration rocksDbConfiguration,
+      final RocksDBConfiguration rocksDbConfiguration,
       final MetricsSystem metricsSystem,
       final long worldStatePreimageCacheSize)
       throws IOException {

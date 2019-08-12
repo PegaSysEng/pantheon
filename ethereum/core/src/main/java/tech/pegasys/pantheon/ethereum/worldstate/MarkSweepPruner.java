@@ -19,8 +19,8 @@ import tech.pegasys.pantheon.ethereum.trie.StoredMerklePatriciaTrie;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage.Transaction;
+import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
+import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -36,7 +36,7 @@ import org.apache.logging.log4j.Logger;
 
 public class MarkSweepPruner {
   private static final Logger LOG = LogManager.getLogger();
-  private static final BytesValue IN_USE = BytesValue.of(1);
+  private static final byte[] IN_USE = BytesValue.of(1).getArrayUnsafe();
   private static final int MARKS_PER_TRANSACTION = 1000;
   private final WorldStateStorage worldStateStorage;
   private final KeyValueStorage markStorage;
@@ -108,7 +108,7 @@ public class MarkSweepPruner {
     flushPendingMarks();
     sweepOperationCounter.inc();
     LOG.info("Sweeping unused nodes");
-    final long prunedNodeCount = worldStateStorage.prune(markStorage::containsKey);
+    final long prunedNodeCount = worldStateStorage.prune(a -> markStorage.get(a).isPresent());
     sweptNodesCounter.inc(prunedNodeCount);
     worldStateStorage.removeNodeAddedListener(nodeAddedListenerId);
     markStorage.clear();
@@ -159,8 +159,8 @@ public class MarkSweepPruner {
   void flushPendingMarks() {
     markLock.lock();
     try {
-      final Transaction transaction = markStorage.startTransaction();
-      pendingMarks.forEach(node -> transaction.put(node, IN_USE));
+      final KeyValueStorageTransaction transaction = markStorage.startTransaction();
+      pendingMarks.forEach(node -> transaction.put(node.getArrayUnsafe(), IN_USE));
       transaction.commit();
       pendingMarks.clear();
     } finally {

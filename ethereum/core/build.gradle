@@ -34,10 +34,15 @@ dependencies {
   implementation project(':metrics:core')
   implementation project(':services:kvstore')
 
+  //TODO remove this dependency
+  implementation project(':plugins:rocksdb')
+
+
   implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'com.google.guava:guava'
   implementation 'io.vertx:vertx-core'
   implementation 'org.apache.logging.log4j:log4j-api'
+  implementation 'tech.pegasys.pantheon:plugin-api'
 
   runtime 'org.apache.logging.log4j:log4j-core'
 

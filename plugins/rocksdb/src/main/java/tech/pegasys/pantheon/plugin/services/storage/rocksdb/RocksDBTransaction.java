@@ -34,7 +34,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
   }
 
   @Override
-  public void put(byte[] key, byte[] value) {
+  public void put(final byte[] key, final byte[] value) {
     try (final OperationTimer.TimingContext ignored = metrics.getWriteLatency().startTimer()) {
       innerTx.put(key, value);
     } catch (final RocksDBException e) {
@@ -43,7 +43,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
   }
 
   @Override
-  public void remove(byte[] key) {
+  public void remove(final byte[] key) {
     try (final OperationTimer.TimingContext ignored = metrics.getRemoveLatency().startTimer()) {
       innerTx.delete(key);
     } catch (final RocksDBException e) {

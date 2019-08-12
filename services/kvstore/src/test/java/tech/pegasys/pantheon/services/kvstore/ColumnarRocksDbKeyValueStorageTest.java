@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rocksdb.ColumnFamilyHandle;
 
-public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
+public class ColumnarRocksDbKeyValueStorageTest { // extends AbstractKeyValueStorageTest {
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
   @Test
@@ -104,7 +104,6 @@ public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageT
         new NoOpMetricsSystem());
   }
 
-  @Override
   protected KeyValueStorage createStore() throws Exception {
     return new SegmentedKeyValueStorageAdapter<>(TestSegment.FOO, createSegmentedStore());
   }
