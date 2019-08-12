@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.auto.service.AutoService;
-import com.google.gson.Gson;
+import io.vertx.core.json.Json;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -67,7 +67,7 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
 
   private void onBlockAnnounce(final BlockHeader blockHeader) {
     final int blockCount = blockCounter.incrementAndGet();
-    final String json = new Gson().toJson(blockHeader);
+    final String json = Json.encodePrettily(blockHeader);
     LOG.info("I got a new block! (I've seen {}) - {}", blockCount, json);
     try {
       final File callbackFile = new File(callbackDir, "newBlock." + blockCount);
