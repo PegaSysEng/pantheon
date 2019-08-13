@@ -133,7 +133,7 @@ public class PrivacyParameters {
     this.privateStateStorage = privateStateStorage;
   }
 
-  public Optional<Path> getPrivateKeyPath() {
+  public Optional<Path> getSignignKeyPath() {
     return privateKeyPath;
   }
 

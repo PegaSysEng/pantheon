@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
@@ -113,6 +114,8 @@ import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
+import tech.pegasys.pantheon.ethereum.privacy.markertransaction.PrivateMarkerTransactionFactory;
+import tech.pegasys.pantheon.ethereum.privacy.markertransaction.RandomSigningPrivateMarkerTransactionFactory;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -360,4 +363,17 @@ public class JsonRpcMethodsFactory {
       methods.put(rpcMethod.getName(), rpcMethod);
     }
   }
+
+
+  public PrivateMarkerTransactionFactory createPrivateMarkerTransactionFactory(
+      final PrivacyParameters privacyParameters) {
+    if (privacyParameters.getSignignKeyPath().isPresent()) {
+
+    } else {
+      final Address privateContractAddress =
+          Address.privacyPrecompiled(privacyParameters.getPrivacyAddress());
+      return new RandomSigningPrivateMarkerTransactionFactory(privateContractAddress);
+    }
+  }
+
 }
