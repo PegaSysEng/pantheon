@@ -214,6 +214,20 @@ try {
                             stage(stage_name + 'Push image') {
                                 docker.withRegistry(registry, userAccount) {
                                     docker.image(image).push()
+
+                                    def additionalTags = []
+                                    if (env.BRANCH_NAME == 'master') {
+                                        additionalTags.add('develop')
+                                    }
+
+                                    if (! version ==~ /.*-SNAPSHOT/) {
+                                        additionalTags.add('latest')
+                                        additionalTags.add(version.split(/\./)[0..1].join('.'))
+                                    }
+
+                                    additional.each { tag ->
+                                        docker.image(image).push tag.trim()
+                                    }
                                 }
                             }
                         }
