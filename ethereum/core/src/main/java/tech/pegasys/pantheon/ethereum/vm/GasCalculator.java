@@ -327,7 +327,7 @@ public interface GasCalculator {
    * Returns the cost for executing a {@link SelfDestructOperation}.
    *
    * @param recipient The recipient of the self destructed inheritance (may be null)
-   * @param inheritance The amount the recipient will receive
+   * @param inheritance The amount the recipient will retrieveData
    * @return the cost for executing the self destruct operation
    */
   Gas selfDestructOperationGasCost(Account recipient, Wei inheritance);

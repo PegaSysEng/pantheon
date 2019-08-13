@@ -25,6 +25,9 @@ import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.debug.TraceOptions;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
+import tech.pegasys.pantheon.ethereum.privacy.EnclaveHandler;
+import tech.pegasys.pantheon.ethereum.privacy.EnclaveUser;
+import tech.pegasys.pantheon.ethereum.privacy.EnclaveUserDetails;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionProcessor;
@@ -40,11 +43,12 @@ import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
-  private final Enclave enclave;
+  private final EnclaveHandler enclaveHandler;
   private final String enclavePublicKey;
   private final WorldStateArchive privateWorldStateArchive;
   private final PrivateTransactionStorage privateTransactionStorage;
@@ -59,7 +63,12 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
     this(
         gasCalculator,
         privacyParameters.getEnclavePublicKey(),
-        new Enclave(privacyParameters.getEnclaveUri()),
+        new EnclaveHandler(
+            ImmutableMap.of(
+                EnclaveUser.defaultUser(),
+                new EnclaveUserDetails(
+                    privacyParameters.getEnclavePublicKey(),
+                    new Enclave(privacyParameters.getEnclaveUri())))),
         privacyParameters.getPrivateWorldStateArchive(),
         privacyParameters.getPrivateTransactionStorage(),
         privacyParameters.getPrivateStateStorage());
@@ -68,12 +77,12 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
   PrivacyPrecompiledContract(
       final GasCalculator gasCalculator,
       final String publicKey,
-      final Enclave enclave,
+      final EnclaveHandler enclaveHandler,
       final WorldStateArchive worldStateArchive,
       final PrivateTransactionStorage privateTransactionStorage,
       final PrivateStateStorage privateStateStorage) {
     super("Privacy", gasCalculator);
-    this.enclave = enclave;
+    this.enclaveHandler = enclaveHandler;
     this.enclavePublicKey = publicKey;
     this.privateWorldStateArchive = worldStateArchive;
     this.privateTransactionStorage = privateTransactionStorage;
@@ -97,7 +106,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
 
     ReceiveResponse receiveResponse;
     try {
-      receiveResponse = enclave.receive(receiveRequest);
+      receiveResponse = enclaveHandler.retrieveData(receiveRequest);
     } catch (Exception e) {
       LOG.error("Enclave probably does not have private transaction with key {}.", key, e);
       return BytesValue.EMPTY;

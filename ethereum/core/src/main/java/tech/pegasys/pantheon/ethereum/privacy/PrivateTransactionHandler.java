@@ -12,10 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy;
 
+import static tech.pegasys.pantheon.ethereum.privacy.EnclaveUser.defaultUser;
+
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
-import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendRequestLegacy;
 import tech.pegasys.pantheon.enclave.types.SendRequestPantheon;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,7 +45,7 @@ public class PrivateTransactionHandler {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private final Enclave enclave;
+  private final EnclaveHandler enclaveHandler;
   private final Address privacyPrecompileAddress;
   private final SECP256K1.KeyPair nodeKeyPair;
   private final Address signerAddress;
@@ -55,7 +57,12 @@ public class PrivateTransactionHandler {
   public PrivateTransactionHandler(
       final PrivacyParameters privacyParameters, final Optional<BigInteger> chainId) {
     this(
-        new Enclave(privacyParameters.getEnclaveUri()),
+        new EnclaveHandler(
+            ImmutableMap.of(
+                defaultUser(),
+                new EnclaveUserDetails(
+                    privacyParameters.getEnclavePublicKey(),
+                    new Enclave(privacyParameters.getEnclaveUri())))),
         Address.privacyPrecompiled(privacyParameters.getPrivacyAddress()),
         privacyParameters.getSigningKeyPair(),
         privacyParameters.getEnclavePublicKey(),
@@ -65,14 +72,14 @@ public class PrivateTransactionHandler {
   }
 
   public PrivateTransactionHandler(
-      final Enclave enclave,
+      final EnclaveHandler enclaveHandler,
       final Address privacyPrecompileAddress,
       final SECP256K1.KeyPair nodeKeyPair,
       final String enclavePublicKey,
       final PrivateStateStorage privateStateStorage,
       final WorldStateArchive privateWorldStateArchive,
       final PrivateTransactionValidator privateTransactionValidator) {
-    this.enclave = enclave;
+    this.enclaveHandler = enclaveHandler;
     this.privacyPrecompileAddress = privacyPrecompileAddress;
     this.nodeKeyPair = nodeKeyPair;
     this.signerAddress = Util.publicKeyToAddress(nodeKeyPair.getPublicKey());
@@ -88,7 +95,7 @@ public class PrivateTransactionHandler {
 
     try {
       LOG.trace("Storing private transaction in enclave");
-      sendResponse = enclave.send(sendRequest);
+      sendResponse = enclaveHandler.sendData(defaultUser(), sendRequest);
       return sendResponse.getKey();
     } catch (Exception e) {
       LOG.error("Failed to store private transaction in enclave", e);
@@ -106,10 +113,8 @@ public class PrivateTransactionHandler {
     LOG.debug(
         "Getting privacy group for {}",
         BytesValues.asBase64String(privateTransaction.getPrivateFrom()));
-    final ReceiveResponse receiveResponse;
     try {
-      receiveResponse = enclave.receive(receiveRequest);
-      return receiveResponse.getPrivacyGroupId();
+      return enclaveHandler.retrievePrivacyGroupId(defaultUser(), receiveRequest);
     } catch (Exception e) {
       LOG.error("Failed to retrieve private transaction in enclave", e);
       throw e;

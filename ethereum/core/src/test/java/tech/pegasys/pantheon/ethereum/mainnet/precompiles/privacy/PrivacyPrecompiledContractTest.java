@@ -19,7 +19,7 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.enclave.Enclave;
+import tech.pegasys.pantheon.enclave.EnclaveException;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.ProcessableBlockHeader;
 import tech.pegasys.pantheon.ethereum.core.WorldUpdater;
 import tech.pegasys.pantheon.ethereum.mainnet.SpuriousDragonGasCalculator;
+import tech.pegasys.pantheon.ethereum.privacy.EnclaveHandler;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionProcessor;
@@ -40,7 +41,6 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import java.io.IOException;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -53,7 +53,6 @@ public class PrivacyPrecompiledContractTest {
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
   private final String actual = "Test String";
-  private final String publicKey = "public key";
   private final BytesValue key = BytesValue.wrap(actual.getBytes(UTF_8));
   private PrivacyPrecompiledContract privacyPrecompiledContract;
   private PrivacyPrecompiledContract brokenPrivateTransactionHandler;
@@ -76,11 +75,11 @@ public class PrivacyPrecompiledContractTest {
                           + "64")
                   .extractArray());
 
-  private Enclave mockEnclave() throws Exception {
-    Enclave mockEnclave = mock(Enclave.class);
+  private EnclaveHandler mockEnclaveHanlder() {
+    EnclaveHandler mockEnclaveHandler = mock(EnclaveHandler.class);
     ReceiveResponse response = new ReceiveResponse(VALID_PRIVATE_TRANSACTION_RLP_BASE64, "");
-    when(mockEnclave.receive(any(ReceiveRequest.class))).thenReturn(response);
-    return mockEnclave;
+    when(mockEnclaveHandler.retrieveData(any(ReceiveRequest.class))).thenReturn(response);
+    return mockEnclaveHandler;
   }
 
   private PrivateTransactionProcessor mockPrivateTxProcessor() {
@@ -105,14 +104,15 @@ public class PrivacyPrecompiledContractTest {
     return mockPrivateTransactionProcessor;
   }
 
-  private Enclave brokenMockEnclave() throws Exception {
-    Enclave mockEnclave = mock(Enclave.class);
-    when(mockEnclave.receive(any(ReceiveRequest.class))).thenThrow(IOException.class);
-    return mockEnclave;
+  private EnclaveHandler brokenMockEnclaveHandler() {
+    EnclaveHandler mockEnclaveHandler = mock(EnclaveHandler.class);
+    when(mockEnclaveHandler.retrieveData(any(ReceiveRequest.class)))
+        .thenThrow(EnclaveException.class);
+    return mockEnclaveHandler;
   }
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     WorldStateArchive worldStateArchive;
     worldStateArchive = mock(WorldStateArchive.class);
     MutableWorldState mutableWorldState = mock(MutableWorldState.class);
@@ -132,11 +132,12 @@ public class PrivacyPrecompiledContractTest {
         .thenReturn(storageUpdater);
     when(privateStateStorage.updater()).thenReturn(storageUpdater);
 
+    final String publicKey = "public key";
     privacyPrecompiledContract =
         new PrivacyPrecompiledContract(
             new SpuriousDragonGasCalculator(),
             publicKey,
-            mockEnclave(),
+            mockEnclaveHanlder(),
             worldStateArchive,
             privateTransactionStorage,
             privateStateStorage);
@@ -145,7 +146,7 @@ public class PrivacyPrecompiledContractTest {
         new PrivacyPrecompiledContract(
             new SpuriousDragonGasCalculator(),
             publicKey,
-            brokenMockEnclave(),
+            brokenMockEnclaveHandler(),
             worldStateArchive,
             privateTransactionStorage,
             privateStateStorage);
