@@ -23,7 +23,6 @@ plugins {
   id 'io.spring.dependency-management' version '1.0.8.RELEASE'
   id 'me.champeau.gradle.jmh' version '0.4.8' apply false
   id 'net.ltgt.errorprone' version '0.8.1'
-  id 'net.researchgate.release' version '2.8.1'
 }
 
 if (!JavaVersion.current().java11Compatible) {
@@ -35,12 +34,23 @@ group = 'tech.pegasys.pantheon'
 
 defaultTasks 'build', 'checkLicenses', 'javadoc'
 
-def buildAliases = ['dev': [
+def buildAliases = [
+  'dev': [
     'spotlessApply',
     'build',
     'checkLicenses',
     'javadoc'
-  ]]
+  ],
+  'release': [
+    'build',
+    'releaseIntegrationTest',
+    'releaseAcceptanceTest',
+    'releaseReferenceTest',
+    'checkLicenses',
+    'javadoc',
+    'bintrayUpload'
+  ]
+]
 
 def expandedTaskList = []
 gradle.startParameter.taskNames.each {
@@ -583,7 +593,7 @@ def getCheckedOutGitCommitHash() {
   refHead.text.trim().take takeFromHash
 }
 
-apply plugin: 'net.researchgate.release'
+
 
 task releaseIntegrationTest(type: Test) {
   for (TaskContainer taskList : subprojects.tasks) {
@@ -622,25 +632,6 @@ tasks.register("verifyDistributions") {
   }
 }
 
-
-release {
-  preTagCommitMessage = '[Gradle Release Plugin] - pre tag commit: '
-  tagCommitMessage = '[Gradle Release Plugin] - creating tag: '
-  newVersionCommitMessage = '[Gradle Release Plugin] - new version commit: '
-  buildTasks = [
-    'build',
-    'releaseIntegrationTest',
-    'releaseAcceptanceTest',
-    'releaseReferenceTest',
-    'checkLicenses',
-    'javadoc'
-  ]
-
-  git {
-    requireBranch = project.hasProperty('release.branch') ? project.property('release.branch') : 'master'
-  }
-}
-
 bintray {
   user = bintrayUser
   key = bintrayKey
@@ -659,6 +650,5 @@ bintray {
 
 build.dependsOn verifyDistributions
 bintrayUpload.dependsOn verifyDistributions
-afterReleaseBuild.dependsOn bintrayUpload
 bintrayUpload.mustRunAfter(distTar)
 bintrayUpload.mustRunAfter(distZip)
