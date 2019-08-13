@@ -8,14 +8,13 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
-public class FixedKeySigningPrivateTransactionFactory extends PrivateTransactionFactory {
+public class FixedKeySigningPrivateMarkerTransactionFactory extends
+    PrivateMarkerTransactionFactory {
 
-  private final Blockchain blockchain;
-  private final PendingTransactions pendingTransactions;
   private final KeyPair signingKey;
   private final Address sender;
 
-  public FixedKeySigningPrivateTransactionFactory(
+  public FixedKeySigningPrivateMarkerTransactionFactory(
       final Blockchain blockchain, final Address privacyPrecompileAddress,
       final KeyPair signingKey,
       final Address sender) {

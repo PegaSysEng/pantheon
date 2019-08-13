@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.util.Optional;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionStorage;
@@ -48,6 +49,8 @@ public class PrivacyParameters {
 
   private PrivateTransactionStorage privateTransactionStorage;
   private PrivateStateStorage privateStateStorage;
+
+  private Optional<Path> privateKeyPath;
 
   public Integer getPrivacyAddress() {
     return privacyAddress;
@@ -130,6 +133,14 @@ public class PrivacyParameters {
     this.privateStateStorage = privateStateStorage;
   }
 
+  public Optional<Path> getPrivateKeyPath() {
+    return privateKeyPath;
+  }
+
+  public void setPrivateKeyPath(final Path privateKeyPath) {
+    this.privateKeyPath = Optional.ofNullable(privateKeyPath);
+  }
+
   @Override
   public String toString() {
     return "PrivacyParameters{" + "enabled=" + enabled + ", enclaveUri='" + enclaveUri + '\'' + '}';
@@ -145,6 +156,7 @@ public class PrivacyParameters {
     private Path dataDir;
     private File enclavePublicKeyFile;
     private String enclavePublicKey;
+    private Path privateKeyPath;
 
     public Builder setPrivacyAddress(final Integer privacyAddress) {
       this.privacyAddress = privacyAddress;
@@ -169,6 +181,10 @@ public class PrivacyParameters {
     public Builder setDataDir(final Path dataDir) {
       this.dataDir = dataDir;
       return this;
+    }
+
+    public Builder setPrivateKeyPath(final Path privateKeyPath) {
+      this.privateKeyPath = privateKeyPath;
     }
 
     public PrivacyParameters build() throws IOException {
@@ -200,6 +216,7 @@ public class PrivacyParameters {
         config.setPrivateStorageProvider(privateStorageProvider);
         config.setPrivateTransactionStorage(privateTransactionStorage);
         config.setPrivateStateStorage(privateStateStorage);
+        config.setPrivateKeyPath(privateKeyPath);
       }
       config.setEnabled(enabled);
       config.setEnclaveUri(enclaveUrl);

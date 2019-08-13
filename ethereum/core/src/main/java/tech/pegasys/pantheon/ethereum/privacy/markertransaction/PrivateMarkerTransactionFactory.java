@@ -5,16 +5,16 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 
-public abstract class PrivateTransactionFactory {
+public abstract class PrivateMarkerTransactionFactory {
 
   private final Address privacyPrecompileAddress;
 
-  public PrivateTransactionFactory(
+  public PrivateMarkerTransactionFactory(
       Address privacyPrecompileAddress) {
     this.privacyPrecompileAddress = privacyPrecompileAddress;
   }
 
-  public Address getPrivacyPrecompileAddress() {
+  protected Address getPrivacyPrecompileAddress() {
     return privacyPrecompileAddress;
   }
 

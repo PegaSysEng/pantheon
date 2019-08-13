@@ -13,7 +13,6 @@
 package tech.pegasys.pantheon.ethereum.privacy;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
@@ -28,6 +27,7 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
+import tech.pegasys.pantheon.ethereum.privacy.markertransaction.PrivateMarkerTransactionFactory;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
@@ -52,7 +52,7 @@ public class PrivateTransactionHandler {
   private final PrivateStateStorage privateStateStorage;
   private final WorldStateArchive privateWorldStateArchive;
   private final PrivateTransactionValidator privateTransactionValidator;
-  private final Optional<TransactionSigner> signer;
+  private final PrivateMarkerTransactionFactory privateMarkerTransactionFactory;
 
   public PrivateTransactionHandler(
       final PrivacyParameters privacyParameters, final Optional<BigInteger> chainId) {
@@ -120,18 +120,8 @@ public class PrivateTransactionHandler {
 
   public Transaction createPrivacyMarkerTransaction(
       final String transactionEnclaveKey,
-      final PrivateTransaction privateTransaction,
-      final Long nonce) {
-
-    return Transaction.builder()
-        .nonce(nonce)
-        .gasPrice(privateTransaction.getGasPrice())
-        .gasLimit(privateTransaction.getGasLimit())
-        .to(privacyPrecompileAddress)
-        .value(privateTransaction.getValue())
-        .payload(BytesValues.fromBase64(transactionEnclaveKey))
-        .sender(signerAddress)
-        .signAndBuild(nodeKeyPair);
+      final PrivateTransaction privateTransaction) {
+    return privateMarkerTransactionFactory.create(transactionEnclaveKey, privateTransaction);
   }
 
   public ValidationResult<TransactionInvalidReason> validatePrivateTransaction(

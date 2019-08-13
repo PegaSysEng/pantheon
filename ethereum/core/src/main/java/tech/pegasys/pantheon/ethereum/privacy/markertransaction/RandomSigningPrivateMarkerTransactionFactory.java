@@ -6,9 +6,9 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
-public class RandomSigningPrivateTransactionFactory extends PrivateTransactionFactory {
+public class RandomSigningPrivateMarkerTransactionFactory extends PrivateMarkerTransactionFactory {
 
-  public RandomSigningPrivateTransactionFactory(Address privacyPrecompileAddress) {
+  public RandomSigningPrivateMarkerTransactionFactory(Address privacyPrecompileAddress) {
     super(privacyPrecompileAddress);
   }
 
