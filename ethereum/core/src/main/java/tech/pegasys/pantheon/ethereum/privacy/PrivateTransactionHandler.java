@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.privacy;
 
 import tech.pegasys.pantheon.crypto.SECP256K1;
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
@@ -51,6 +52,7 @@ public class PrivateTransactionHandler {
   private final PrivateStateStorage privateStateStorage;
   private final WorldStateArchive privateWorldStateArchive;
   private final PrivateTransactionValidator privateTransactionValidator;
+  private final Optional<TransactionSigner> signer;
 
   public PrivateTransactionHandler(
       final PrivacyParameters privacyParameters, final Optional<BigInteger> chainId) {
@@ -67,15 +69,15 @@ public class PrivateTransactionHandler {
   public PrivateTransactionHandler(
       final Enclave enclave,
       final Address privacyPrecompileAddress,
-      final SECP256K1.KeyPair nodeKeyPair,
+      final SECP256K1.KeyPair signingKeyPair,
       final String enclavePublicKey,
       final PrivateStateStorage privateStateStorage,
       final WorldStateArchive privateWorldStateArchive,
       final PrivateTransactionValidator privateTransactionValidator) {
     this.enclave = enclave;
     this.privacyPrecompileAddress = privacyPrecompileAddress;
-    this.nodeKeyPair = nodeKeyPair;
-    this.signerAddress = Util.publicKeyToAddress(nodeKeyPair.getPublicKey());
+    this.nodeKeyPair = signingKeyPair;
+    this.signerAddress = Util.publicKeyToAddress(signingKeyPair.getPublicKey());
     this.enclavePublicKey = enclavePublicKey;
     this.privateStateStorage = privateStateStorage;
     this.privateWorldStateArchive = privateWorldStateArchive;
@@ -186,10 +188,6 @@ public class PrivateTransactionHandler {
         .orElse(
             // private state does not exist
             Account.DEFAULT_NONCE);
-  }
-
-  public Address getSignerAddress() {
-    return signerAddress;
   }
 
   public String getEnclaveKey() {
