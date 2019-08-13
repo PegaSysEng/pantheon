@@ -114,6 +114,7 @@ import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
 import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
+import tech.pegasys.pantheon.ethereum.privacy.markertransaction.FixedKeySigningPrivateMarkerTransactionFactory;
 import tech.pegasys.pantheon.ethereum.privacy.markertransaction.PrivateMarkerTransactionFactory;
 import tech.pegasys.pantheon.ethereum.privacy.markertransaction.RandomSigningPrivateMarkerTransactionFactory;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
@@ -367,11 +368,18 @@ public class JsonRpcMethodsFactory {
 
   public PrivateMarkerTransactionFactory createPrivateMarkerTransactionFactory(
       final PrivacyParameters privacyParameters) {
+    final Address privateContractAddress =
+        Address.privacyPrecompiled(privacyParameters.getPrivacyAddress());
+
     if (privacyParameters.getSignignKeyPath().isPresent()) {
 
+      
+
+      return new FixedKeySigningPrivateMarkerTransactionFactory(privateContractAddress,
+          )
+
     } else {
-      final Address privateContractAddress =
-          Address.privacyPrecompiled(privacyParameters.getPrivacyAddress());
+
       return new RandomSigningPrivateMarkerTransactionFactory(privateContractAddress);
     }
   }
