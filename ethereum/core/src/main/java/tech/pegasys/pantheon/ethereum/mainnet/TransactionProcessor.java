@@ -113,7 +113,7 @@ public interface TransactionProcessor {
    * @param worldState The current world state
    * @param blockHeader The current block header
    * @param transaction The transaction to process
-   * @param miningBeneficiary The address which is to retrieveData the transaction fee
+   * @param miningBeneficiary The address which is to receive the transaction fee
    * @param blockHashLookup The {@link BlockHashLookup} to use for BLOCKHASH operations
    * @param isPersistingState Whether the state will be modified by this process
    * @param transactionValidationParams Validation parameters that will be used by the {@link
@@ -151,7 +151,7 @@ public interface TransactionProcessor {
    * @param blockHeader The current block header
    * @param transaction The transaction to process
    * @param operationTracer The tracer to record results of each EVM operation
-   * @param miningBeneficiary The address which is to retrieveData the transaction fee
+   * @param miningBeneficiary The address which is to receive the transaction fee
    * @param blockHashLookup The {@link BlockHashLookup} to use for BLOCKHASH operations
    * @param isPersistingState Whether the state will be modified by this process
    * @return the transaction result
