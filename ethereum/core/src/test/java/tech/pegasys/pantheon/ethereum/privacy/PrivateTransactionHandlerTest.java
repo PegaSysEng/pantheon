@@ -120,9 +120,7 @@ public class PrivateTransactionHandlerTest {
             worldStateArchive,
             privateTransactionValidator,
             new FixedKeySigningPrivateMarkerTransactionFactory(
-                Address.DEFAULT_PRIVACY,
-                (address) -> 0,
-                KEY_PAIR));
+                Address.DEFAULT_PRIVACY, (address) -> 0, KEY_PAIR));
     brokenPrivateTransactionHandler =
         new PrivateTransactionHandler(
             brokenMockEnclave(),
@@ -131,9 +129,7 @@ public class PrivateTransactionHandlerTest {
             worldStateArchive,
             privateTransactionValidator,
             new FixedKeySigningPrivateMarkerTransactionFactory(
-                Address.DEFAULT_PRIVACY,
-                (address) -> 0,
-                KEY_PAIR));
+                Address.DEFAULT_PRIVACY, (address) -> 0, KEY_PAIR));
   }
 
   @Test

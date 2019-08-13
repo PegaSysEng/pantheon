@@ -231,8 +231,7 @@ public class EeaSendRawTransactionTest {
     verify(privateTxHandler)
         .validatePrivateTransaction(any(PrivateTransaction.class), any(String.class));
     verify(privateTxHandler)
-        .createPrivacyMarkerTransaction(
-            any(String.class), any(PrivateTransaction.class));
+        .createPrivacyMarkerTransaction(any(String.class), any(PrivateTransaction.class));
     verify(transactionPool).addLocalTransaction(any(Transaction.class));
   }
 
@@ -270,8 +269,7 @@ public class EeaSendRawTransactionTest {
     verify(privateTxHandler)
         .validatePrivateTransaction(any(PrivateTransaction.class), any(String.class));
     verify(privateTxHandler)
-        .createPrivacyMarkerTransaction(
-            any(String.class), any(PrivateTransaction.class));
+        .createPrivacyMarkerTransaction(any(String.class), any(PrivateTransaction.class));
     verify(transactionPool).addLocalTransaction(any(Transaction.class));
   }
 
@@ -389,8 +387,7 @@ public class EeaSendRawTransactionTest {
     verify(privateTxHandler)
         .validatePrivateTransaction(any(PrivateTransaction.class), any(String.class));
     verify(privateTxHandler)
-        .createPrivacyMarkerTransaction(
-            any(String.class), any(PrivateTransaction.class));
+        .createPrivacyMarkerTransaction(any(String.class), any(PrivateTransaction.class));
     verify(transactionPool).addLocalTransaction(any(Transaction.class));
   }
 

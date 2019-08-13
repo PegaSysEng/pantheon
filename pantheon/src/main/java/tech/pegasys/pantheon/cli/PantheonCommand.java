@@ -1185,7 +1185,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
       final Optional<PermissioningConfiguration> permissioningConfiguration,
-      final Collection<EnodeURL> staticNodes) throws IOException {
+      final Collection<EnodeURL> staticNodes)
+      throws IOException {
 
     checkNotNull(runnerBuilder);
 

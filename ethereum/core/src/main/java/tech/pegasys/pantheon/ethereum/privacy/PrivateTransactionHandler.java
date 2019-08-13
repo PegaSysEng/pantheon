@@ -12,12 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy;
 
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
@@ -36,6 +30,14 @@ import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class PrivateTransactionHandler {
 
   private static final Logger LOG = LogManager.getLogger();
@@ -48,7 +50,8 @@ public class PrivateTransactionHandler {
   private final PrivateMarkerTransactionFactory privateMarkerTransactionFactory;
 
   public PrivateTransactionHandler(
-      final PrivacyParameters privacyParameters, final Optional<BigInteger> chainId,
+      final PrivacyParameters privacyParameters,
+      final Optional<BigInteger> chainId,
       final PrivateMarkerTransactionFactory privateMarkerTransactionFactory) {
     this(
         new Enclave(privacyParameters.getEnclaveUri()),
@@ -108,8 +111,8 @@ public class PrivateTransactionHandler {
     }
   }
 
-  public Transaction createPrivacyMarkerTransaction(final String transactionEnclaveKey,
-      final PrivateTransaction privateTransaction) {
+  public Transaction createPrivacyMarkerTransaction(
+      final String transactionEnclaveKey, final PrivateTransaction privateTransaction) {
     return privateMarkerTransactionFactory.create(transactionEnclaveKey, privateTransaction);
   }
 

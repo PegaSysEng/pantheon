@@ -12,12 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
-import java.io.IOException;
-import java.util.OptionalLong;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
@@ -121,7 +116,6 @@ import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermission
 import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import tech.pegasys.pantheon.ethereum.privacy.markertransaction.FixedKeySigningPrivateMarkerTransactionFactory;
-import tech.pegasys.pantheon.ethereum.privacy.markertransaction.FixedKeySigningPrivateMarkerTransactionFactory.NonceProvider;
 import tech.pegasys.pantheon.ethereum.privacy.markertransaction.PrivateMarkerTransactionFactory;
 import tech.pegasys.pantheon.ethereum.privacy.markertransaction.RandomSigningPrivateMarkerTransactionFactory;
 import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
@@ -133,11 +127,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 
 public class JsonRpcMethodsFactory {
-
-  private static final Logger LOG = LogManager.getLogger();
 
   private final BlockResultFactory blockResult = new BlockResultFactory();
   private final JsonRpcParameter parameter = new JsonRpcParameter();
@@ -341,13 +334,11 @@ public class JsonRpcMethodsFactory {
     if (eea || priv) {
       final PrivateMarkerTransactionFactory markerTransactionFactory =
           createPrivateMarkerTransactionFactory(
-              privacyParameters,
-              blockchainQueries,
-              transactionPool.getPendingTransactions());
+              privacyParameters, blockchainQueries, transactionPool.getPendingTransactions());
 
       final PrivateTransactionHandler privateTransactionHandler =
-          new PrivateTransactionHandler(privacyParameters, protocolSchedule.getChainId(),
-              markerTransactionFactory);
+          new PrivateTransactionHandler(
+              privacyParameters, protocolSchedule.getChainId(), markerTransactionFactory);
       final Enclave enclave = new Enclave(privacyParameters.getEnclaveUri());
       if (eea) {
         addMethods(
@@ -381,27 +372,29 @@ public class JsonRpcMethodsFactory {
     }
   }
 
-
   private PrivateMarkerTransactionFactory createPrivateMarkerTransactionFactory(
-      final PrivacyParameters privacyParameters, final BlockchainQueries blockchain,
+      final PrivacyParameters privacyParameters,
+      final BlockchainQueries blockchain,
       final PendingTransactions pendingTransactions) {
 
     final Address privateContractAddress =
         Address.privacyPrecompiled(privacyParameters.getPrivacyAddress());
 
     if (privacyParameters.getSigningKeyPair().isPresent()) {
-      return new FixedKeySigningPrivateMarkerTransactionFactory(privateContractAddress,
+      return new FixedKeySigningPrivateMarkerTransactionFactory(
+          privateContractAddress,
           address -> getNonce(address, blockchain, pendingTransactions),
           privacyParameters.getSigningKeyPair().get());
     }
     return new RandomSigningPrivateMarkerTransactionFactory(privateContractAddress);
   }
 
-  private long getNonce(final Address address, final BlockchainQueries blockchain,
+  private long getNonce(
+      final Address address,
+      final BlockchainQueries blockchain,
       final PendingTransactions pendingTransactions) {
     final OptionalLong pendingNonce = pendingTransactions.getNextNonceForSender(address);
     return pendingNonce.orElseGet(
         () -> blockchain.getTransactionCount(address, blockchain.headBlockNumber()));
   }
-
 }

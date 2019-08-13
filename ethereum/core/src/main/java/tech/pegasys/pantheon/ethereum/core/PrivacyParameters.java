@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import java.util.Optional;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
@@ -32,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import com.google.common.io.Files;
 
@@ -208,7 +208,7 @@ public class PrivacyParameters {
         config.setPrivateStorageProvider(privateStorageProvider);
         config.setPrivateTransactionStorage(privateTransactionStorage);
         config.setPrivateStateStorage(privateStateStorage);
-        if(privateKeyPath != null) {
+        if (privateKeyPath != null) {
           config.setSigningKeyPair(KeyPair.load(privateKeyPath.toFile()));
         }
       }
