@@ -113,8 +113,7 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
               final Transaction privacyMarkerTransaction =
                   privateTransactionHandler.createPrivacyMarkerTransaction(
                       enclaveKey,
-                      privateTransaction,
-                      getNonce(privateTransactionHandler.getSignerAddress()));
+                      privateTransaction);
               return transactionPool
                   .addLocalTransaction(privacyMarkerTransaction)
                   .either(

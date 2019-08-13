@@ -757,7 +757,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand startSynchronization() {
+  private PantheonCommand startSynchronization() throws IOException {
     synchronize(
         pantheonController,
         p2pEnabled,
@@ -1185,7 +1185,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final WebSocketConfiguration webSocketConfiguration,
       final MetricsConfiguration metricsConfiguration,
       final Optional<PermissioningConfiguration> permissioningConfiguration,
-      final Collection<EnodeURL> staticNodes) {
+      final Collection<EnodeURL> staticNodes) throws IOException {
 
     checkNotNull(runnerBuilder);
 
