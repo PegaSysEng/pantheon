@@ -162,16 +162,12 @@ try {
                 }
             }
         }, DockerImage: {
-                def registry = 'https://registry.hub.docker.com'
-                def userAccount = 'dockerhub-pegasysengci'
-                def imageRepos = 'pegasyseng'
-                def imageTag = 'develop'
                 def stage_name = 'Docker image node: '
-                def image = imageRepos + '/pantheon:' + imageTag
                 def docker_folder = 'docker'
-                def version_property_file = 'gradle.properties'
                 def reports_folder = docker_folder + '/reports'
                 def dockerfile = docker_folder + '/Dockerfile'
+                def version = ''
+                def image = ''
                 node {
                     checkout scm
                     docker.image(build_image).inside() {
@@ -183,9 +179,15 @@ try {
                             sh './gradlew distDocker'
                         }
 
+                        stage(stage_name + 'Calculate variables') {
+                            def gradleProperties = readProperties file: 'gradle.properties'
+                            version = gradleProperties.version
+                            def imageRepos = 'pegasyseng'
+                            image = "${imageRepos}/pantheon:${version}"
+                        }
+
                         stage(stage_name + "Test image labels") {
                             shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
-                            version = sh(returnStdout: true, script: "grep -oE \"version=(.*)\" ${version_property_file} | cut -d= -f2").trim()
                             sh "docker image inspect \
     --format='{{index .Config.Labels \"org.label-schema.vcs-ref\"}}' \
     ${image} \
@@ -207,6 +209,8 @@ try {
                         }
 
                         if (shouldPublish()) {
+                            def registry = 'https://registry.hub.docker.com'
+                            def userAccount = 'dockerhub-pegasysengci'
                             stage(stage_name + 'Push image') {
                                 docker.withRegistry(registry, userAccount) {
                                     docker.image(image).push()
