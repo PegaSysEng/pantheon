@@ -26,9 +26,14 @@ jar {
 }
 
 dependencies {
+  implementation project(':util')
+
   implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'com.google.guava:guava'
   implementation 'com.squareup.okhttp3:okhttp'
+  implementation 'junit:junit'
   implementation 'net.consensys:orion'
+  implementation 'org.assertj:assertj-core'
   implementation 'org.mockito:mockito-core'
+  implementation 'tech.pegasys.pantheon:plugin-api'
 }

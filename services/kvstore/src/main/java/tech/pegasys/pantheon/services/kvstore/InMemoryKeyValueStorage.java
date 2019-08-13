@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon.services.kvstore;
 
+import tech.pegasys.pantheon.plugin.services.exception.StorageException;
+import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
+import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.Collections;
@@ -27,7 +30,7 @@ import java.util.function.Predicate;
 
 public class InMemoryKeyValueStorage implements KeyValueStorage {
 
-  private final Map<BytesValue, BytesValue> hashValueStore = new HashMap<>();
+  private final Map<BytesValue, byte[]> hashValueStore = new HashMap<>();
   private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
   @Override
@@ -42,69 +45,69 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
   }
 
   @Override
-  public void close() {}
-
-  @Override
-  public boolean containsKey(final BytesValue key) throws StorageException {
+  public boolean containsKey(final byte[] key) throws StorageException {
     final Lock lock = rwLock.readLock();
     lock.lock();
     try {
-      return hashValueStore.containsKey(key);
+      return hashValueStore.containsKey(BytesValue.wrap(key));
     } finally {
       lock.unlock();
     }
   }
 
   @Override
-  public Optional<BytesValue> get(final BytesValue key) {
+  public Optional<byte[]> get(final byte[] key) throws StorageException {
     final Lock lock = rwLock.readLock();
     lock.lock();
     try {
-      return Optional.ofNullable(hashValueStore.get(key));
+      return Optional.ofNullable(hashValueStore.get(BytesValue.wrap(key)));
     } finally {
       lock.unlock();
     }
   }
 
   @Override
-  public long removeUnless(final Predicate<BytesValue> inUseCheck) {
-    hashValueStore.keySet().removeIf(key -> !inUseCheck.test(key));
+  public long removeAllKeysUnless(final Predicate<byte[]> retainCondition) throws StorageException {
+    hashValueStore.keySet().removeIf(key -> !retainCondition.test(key.getArrayUnsafe()));
     return 0;
   }
 
   @Override
-  public Transaction startTransaction() {
-    return new InMemoryTransaction();
+  public void close() {}
+
+  @Override
+  public KeyValueStorageTransaction startTransaction() {
+    return new KeyValueStorageTransactionTransitionValidatorDecorator(new InMemoryTransaction());
   }
 
   public Set<BytesValue> keySet() {
     return Collections.unmodifiableSet(new HashSet<>(hashValueStore.keySet()));
   }
 
-  private class InMemoryTransaction extends AbstractTransaction {
+  private class InMemoryTransaction implements KeyValueStorageTransaction {
 
-    private Map<BytesValue, BytesValue> updatedValues = new HashMap<>();
+    private Map<BytesValue, byte[]> updatedValues = new HashMap<>();
     private Set<BytesValue> removedKeys = new HashSet<>();
 
     @Override
-    protected void doPut(final BytesValue key, final BytesValue value) {
-      updatedValues.put(key, value);
-      removedKeys.remove(key);
+    public void put(final byte[] key, final byte[] value) {
+      updatedValues.put(BytesValue.wrap(key), value);
+      removedKeys.remove(BytesValue.wrap(key));
     }
 
     @Override
-    protected void doRemove(final BytesValue key) {
-      removedKeys.add(key);
-      updatedValues.remove(key);
+    public void remove(final byte[] key) {
+      removedKeys.add(BytesValue.wrap(key));
+      updatedValues.remove(BytesValue.wrap(key));
     }
 
     @Override
-    protected void doCommit() {
+    public void commit() throws StorageException {
       final Lock lock = rwLock.writeLock();
       lock.lock();
       try {
         hashValueStore.putAll(updatedValues);
-        removedKeys.forEach(k -> hashValueStore.remove(k));
+        removedKeys.forEach(hashValueStore::remove);
         updatedValues = null;
         removedKeys = null;
       } finally {
@@ -113,7 +116,7 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
     }
 
     @Override
-    protected void doRollback() {
+    public void rollback() {
       updatedValues = null;
       removedKeys = null;
     }

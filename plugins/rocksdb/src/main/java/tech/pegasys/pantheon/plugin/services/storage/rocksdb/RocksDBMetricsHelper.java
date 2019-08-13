@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.services.kvstore;
+package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
@@ -49,7 +49,7 @@ public class RocksDBMetricsHelper {
 
   public static RocksDBMetricsHelper of(
       final MetricsSystem metricsSystem,
-      final RocksDbConfiguration rocksDbConfiguration,
+      final RocksDBConfiguration rocksDbConfiguration,
       final TransactionDB db,
       final Statistics stats) {
     final OperationTimer readLatency =

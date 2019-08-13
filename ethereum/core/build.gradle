@@ -34,9 +34,8 @@ dependencies {
   implementation project(':metrics:core')
   implementation project(':services:kvstore')
 
-  //TODO remove this dependency
+  //TODO should this be in here? should it be abstracted?
   implementation project(':plugins:rocksdb')
-
 
   implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'com.google.guava:guava'
@@ -78,9 +77,11 @@ dependencies {
   jmhImplementation project(':ethereum:trie')
   jmhImplementation project(':metrics:core')
   jmhImplementation project(':services:kvstore')
+  jmhImplementation project(':plugins:rocksdb')
   jmhImplementation project(':util')
 
   jmhImplementation 'com.google.guava:guava'
+  jmhImplementation 'tech.pegasys.pantheon:plugin-api'
 }
 
 configurations { testArtifacts }

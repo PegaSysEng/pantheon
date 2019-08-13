@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.services.kvstore;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage.StorageException;
 
 public class KeyValueStorageTransactionTransitionValidatorDecorator
     implements KeyValueStorageTransaction {

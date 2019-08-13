@@ -10,14 +10,18 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.services.kvstore;
+package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import tech.pegasys.pantheon.kvstore.AbstractKeyValueStorageTest;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
+import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Segment;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Transaction;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -27,7 +31,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rocksdb.ColumnFamilyHandle;
 
-public class ColumnarRocksDbKeyValueStorageTest { // extends AbstractKeyValueStorageTest {
+public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
   @Test
@@ -37,12 +41,13 @@ public class ColumnarRocksDbKeyValueStorageTest { // extends AbstractKeyValueSto
     Transaction<ColumnFamilyHandle> tx = store.startTransaction();
     tx.put(
         store.getSegmentIdentifierByName(TestSegment.BAR),
-        BytesValue.fromHexString("0001"),
-        BytesValue.fromHexString("0FFF"));
+        bytesFromHexString("0001"),
+        bytesFromHexString("0FFF"));
     tx.commit();
-    final Optional<BytesValue> result =
-        store.get(
-            store.getSegmentIdentifierByName(TestSegment.FOO), BytesValue.fromHexString("0001"));
+
+    final Optional<byte[]> result =
+        store.get(store.getSegmentIdentifierByName(TestSegment.FOO), bytesFromHexString("0001"));
+
     assertEquals(Optional.empty(), result);
   }
 
@@ -53,27 +58,27 @@ public class ColumnarRocksDbKeyValueStorageTest { // extends AbstractKeyValueSto
     final ColumnFamilyHandle barSegment = store.getSegmentIdentifierByName(TestSegment.BAR);
 
     Transaction<ColumnFamilyHandle> tx = store.startTransaction();
-    tx.put(fooSegment, BytesValue.of(1), BytesValue.of(1));
-    tx.put(fooSegment, BytesValue.of(2), BytesValue.of(2));
-    tx.put(fooSegment, BytesValue.of(3), BytesValue.of(3));
-    tx.put(barSegment, BytesValue.of(4), BytesValue.of(4));
-    tx.put(barSegment, BytesValue.of(5), BytesValue.of(5));
-    tx.put(barSegment, BytesValue.of(6), BytesValue.of(6));
+    tx.put(fooSegment, bytesOf(1), bytesOf(1));
+    tx.put(fooSegment, bytesOf(2), bytesOf(2));
+    tx.put(fooSegment, bytesOf(3), bytesOf(3));
+    tx.put(barSegment, bytesOf(4), bytesOf(4));
+    tx.put(barSegment, bytesOf(5), bytesOf(5));
+    tx.put(barSegment, bytesOf(6), bytesOf(6));
     tx.commit();
 
-    final long removedFromFoo = store.removeUnless(fooSegment, x -> x.equals(BytesValue.of(3)));
-    final long removedFromBar = store.removeUnless(barSegment, x -> x.equals(BytesValue.of(4)));
+    final long removedFromFoo = store.removeUnless(fooSegment, x -> Arrays.equals(x, bytesOf(3)));
+    final long removedFromBar = store.removeUnless(barSegment, x -> Arrays.equals(x, bytesOf(4)));
 
     assertEquals(2, removedFromFoo);
     assertEquals(2, removedFromBar);
 
-    assertEquals(Optional.empty(), store.get(fooSegment, BytesValue.of(1)));
-    assertEquals(Optional.empty(), store.get(fooSegment, BytesValue.of(2)));
-    assertEquals(Optional.of(BytesValue.of(3)), store.get(fooSegment, BytesValue.of(3)));
+    assertEquals(Optional.empty(), store.get(fooSegment, bytesOf(1)));
+    assertEquals(Optional.empty(), store.get(fooSegment, bytesOf(2)));
+    assertArrayEquals(bytesOf(3), store.get(fooSegment, bytesOf(3)).get());
 
-    assertEquals(Optional.of(BytesValue.of(4)), store.get(barSegment, BytesValue.of(4)));
-    assertEquals(Optional.empty(), store.get(barSegment, BytesValue.of(5)));
-    assertEquals(Optional.empty(), store.get(barSegment, BytesValue.of(6)));
+    assertArrayEquals(bytesOf(4), store.get(barSegment, bytesOf(4)).get());
+    assertEquals(Optional.empty(), store.get(barSegment, bytesOf(5)));
+    assertEquals(Optional.empty(), store.get(barSegment, bytesOf(6)));
   }
 
   public enum TestSegment implements Segment {
@@ -99,7 +104,7 @@ public class ColumnarRocksDbKeyValueStorageTest { // extends AbstractKeyValueSto
 
   private SegmentedKeyValueStorage<ColumnFamilyHandle> createSegmentedStore() throws Exception {
     return ColumnarRocksDbKeyValueStorage.create(
-        RocksDbConfiguration.builder().databaseDir(folder.newFolder().toPath()).build(),
+        RocksDBConfiguration.builder().databaseDir(folder.newFolder().toPath()).build(),
         Arrays.asList(TestSegment.FOO, TestSegment.BAR),
         new NoOpMetricsSystem());
   }

@@ -86,6 +86,11 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   }
 
   @Override
+  public boolean containsKey(byte[] key) throws StorageException {
+    return get(key).isPresent();
+  }
+
+  @Override
   public Optional<byte[]> get(final byte[] key) throws StorageException {
     throwIfClosed();
 

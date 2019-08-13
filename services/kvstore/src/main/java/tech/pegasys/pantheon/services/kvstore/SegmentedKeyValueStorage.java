@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.services.kvstore;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 
 import java.io.Closeable;
 import java.util.Optional;
@@ -34,9 +34,9 @@ public interface SegmentedKeyValueStorage<S> extends Closeable {
    * @param key Index into persistent data repository.
    * @return The value persisted at the key index.
    */
-  Optional<BytesValue> get(S segment, BytesValue key) throws StorageException;
+  Optional<byte[]> get(S segment, byte[] key) throws StorageException;
 
-  default boolean containsKey(final S segment, final BytesValue key) throws StorageException {
+  default boolean containsKey(final S segment, final byte[] key) throws StorageException {
     return get(segment, key).isPresent();
   }
 
@@ -47,15 +47,9 @@ public interface SegmentedKeyValueStorage<S> extends Closeable {
    */
   Transaction<S> startTransaction() throws StorageException;
 
-  long removeUnless(S segmentHandle, Predicate<BytesValue> inUseCheck);
+  long removeUnless(S segmentHandle, Predicate<byte[]> inUseCheck);
 
   void clear(S segmentHandle);
-
-  class StorageException extends RuntimeException {
-    public StorageException(final Throwable t) {
-      super(t);
-    }
-  }
 
   /**
    * Represents a set of changes to be committed atomically. A single transaction is not
@@ -72,7 +66,7 @@ public interface SegmentedKeyValueStorage<S> extends Closeable {
      * @param key The key to set / modify.
      * @param value The value to be set.
      */
-    void put(S segment, BytesValue key, BytesValue value);
+    void put(S segment, byte[] key, byte[] value);
 
     /**
      * Schedules the given key to be deleted from storage.
@@ -80,7 +74,7 @@ public interface SegmentedKeyValueStorage<S> extends Closeable {
      * @param segment the database segment
      * @param key The key to delete
      */
-    void remove(S segment, BytesValue key);
+    void remove(S segment, byte[] key);
 
     /**
      * Atomically commit the set of changes contained in this transaction to the underlying
@@ -96,24 +90,26 @@ public interface SegmentedKeyValueStorage<S> extends Closeable {
     void rollback();
   }
 
+  // TODO use plugin api segment
   interface Segment {
     String getName();
 
     byte[] getId();
   }
 
+  // TODO follow decorator pattern, same as other abstrax
   abstract class AbstractTransaction<S> implements Transaction<S> {
 
     private boolean active = true;
 
     @Override
-    public final void put(final S segment, final BytesValue key, final BytesValue value) {
+    public final void put(final S segment, final byte[] key, final byte[] value) {
       checkState(active, "Cannot invoke put() on a completed transaction.");
       doPut(segment, key, value);
     }
 
     @Override
-    public final void remove(final S segment, final BytesValue key) {
+    public final void remove(final S segment, final byte[] key) {
       checkState(active, "Cannot invoke remove() on a completed transaction.");
       doRemove(segment, key);
     }
@@ -132,9 +128,9 @@ public interface SegmentedKeyValueStorage<S> extends Closeable {
       doRollback();
     }
 
-    protected abstract void doPut(S segment, BytesValue key, BytesValue value);
+    protected abstract void doPut(S segment, byte[] key, byte[] value);
 
-    protected abstract void doRemove(S segment, BytesValue key);
+    protected abstract void doRemove(S segment, byte[] key);
 
     protected abstract void doCommit() throws StorageException;
 

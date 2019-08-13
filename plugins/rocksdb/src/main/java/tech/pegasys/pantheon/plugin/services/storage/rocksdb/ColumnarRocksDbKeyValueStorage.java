@@ -10,10 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.services.kvstore;
+package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.plugin.services.exception.StorageException;
+import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -26,6 +28,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import javax.swing.text.Segment;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
@@ -58,7 +61,7 @@ public class ColumnarRocksDbKeyValueStorage
   private final RocksDBMetricsHelper rocksDBMetricsHelper;
 
   public static ColumnarRocksDbKeyValueStorage create(
-      final RocksDbConfiguration rocksDbConfiguration,
+      final RocksDBConfiguration rocksDbConfiguration,
       final List<Segment> segments,
       final MetricsSystem metricsSystem)
       throws StorageException {
@@ -66,7 +69,7 @@ public class ColumnarRocksDbKeyValueStorage
   }
 
   private ColumnarRocksDbKeyValueStorage(
-      final RocksDbConfiguration rocksDbConfiguration,
+      final RocksDBConfiguration rocksDbConfiguration,
       final List<Segment> segments,
       final MetricsSystem metricsSystem) {
     RocksDbUtil.loadNativeLibrary();
@@ -125,7 +128,7 @@ public class ColumnarRocksDbKeyValueStorage
     }
   }
 
-  private BlockBasedTableConfig createBlockBasedTableConfig(final RocksDbConfiguration config) {
+  private BlockBasedTableConfig createBlockBasedTableConfig(final RocksDBConfiguration config) {
     final LRUCache cache = new LRUCache(config.getCacheCapacity());
     return new BlockBasedTableConfig().setBlockCache(cache);
   }
@@ -136,13 +139,13 @@ public class ColumnarRocksDbKeyValueStorage
   }
 
   @Override
-  public Optional<BytesValue> get(final ColumnFamilyHandle segment, final BytesValue key)
+  public Optional<byte[]> get(final ColumnFamilyHandle segment, final byte[] key)
       throws StorageException {
     throwIfClosed();
 
     try (final OperationTimer.TimingContext ignored =
         rocksDBMetricsHelper.getReadLatency().startTimer()) {
-      return Optional.ofNullable(db.get(segment, key.getArrayUnsafe())).map(BytesValue::wrap);
+      return Optional.ofNullable(db.get(segment, key));
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }
@@ -157,20 +160,20 @@ public class ColumnarRocksDbKeyValueStorage
 
   @Override
   public long removeUnless(
-      final ColumnFamilyHandle segmentHandle, final Predicate<BytesValue> inUseCheck) {
+      final ColumnFamilyHandle segmentHandle, final Predicate<byte[]> inUseCheck) {
     long removedNodeCounter = 0;
     try (final RocksIterator rocksIterator = db.newIterator(segmentHandle)) {
       rocksIterator.seekToFirst();
       while (rocksIterator.isValid()) {
         final byte[] key = rocksIterator.key();
-        if (!inUseCheck.test(BytesValue.wrap(key))) {
+        if (!inUseCheck.test(key)) {
           removedNodeCounter++;
           db.delete(segmentHandle, key);
         }
         rocksIterator.next();
       }
     } catch (final RocksDBException e) {
-      throw new KeyValueStorage.StorageException(e);
+      throw new StorageException(e);
     }
     return removedNodeCounter;
   }
@@ -187,7 +190,7 @@ public class ColumnarRocksDbKeyValueStorage
         }
       }
     } catch (final RocksDBException e) {
-      throw new KeyValueStorage.StorageException(e);
+      throw new StorageException(e);
     }
   }
 
@@ -218,21 +221,20 @@ public class ColumnarRocksDbKeyValueStorage
     }
 
     @Override
-    protected void doPut(
-        final ColumnFamilyHandle segment, final BytesValue key, final BytesValue value) {
+    protected void doPut(final ColumnFamilyHandle segment, final byte[] key, final byte[] value) {
       try (final OperationTimer.TimingContext ignored =
           rocksDBMetricsHelper.getWriteLatency().startTimer()) {
-        innerTx.put(segment, key.getArrayUnsafe(), value.getArrayUnsafe());
+        innerTx.put(segment, key, value);
       } catch (final RocksDBException e) {
         throw new StorageException(e);
       }
     }
 
     @Override
-    protected void doRemove(final ColumnFamilyHandle segment, final BytesValue key) {
+    protected void doRemove(final ColumnFamilyHandle segment, final byte[] key) {
       try (final OperationTimer.TimingContext ignored =
           rocksDBMetricsHelper.getRemoveLatency().startTimer()) {
-        innerTx.delete(segment, key.getArrayUnsafe());
+        innerTx.delete(segment, key);
       } catch (final RocksDBException e) {
         throw new StorageException(e);
       }

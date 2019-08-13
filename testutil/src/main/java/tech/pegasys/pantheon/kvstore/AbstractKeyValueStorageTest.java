@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.services.kvstore;
+package tech.pegasys.pantheon.kvstore;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -63,12 +63,12 @@ public abstract class AbstractKeyValueStorageTest {
     KeyValueStorageTransaction tx = store.startTransaction();
     tx.put(key, firstValue);
     tx.commit();
-    assertEquals(Optional.of(firstValue), store.get(key));
+    assertArrayEquals(firstValue, store.get(key).get());
 
     tx = store.startTransaction();
     tx.put(key, secondValue);
     tx.commit();
-    assertEquals(Optional.of(secondValue), store.get(key));
+    assertArrayEquals(secondValue, store.get(key).get());
   }
 
   @Test
@@ -77,13 +77,13 @@ public abstract class AbstractKeyValueStorageTest {
     final byte[] key = bytesFromHexString("ABCD");
     final byte[] value = bytesFromHexString("DEFF");
 
-    assertFalse(store.get(key).isPresent());
+    assertFalse(store.containsKey(key));
 
     final KeyValueStorageTransaction transaction = store.startTransaction();
     transaction.put(key, value);
     transaction.commit();
 
-    assertTrue(store.get(key).isPresent());
+    assertTrue(store.containsKey(key));
   }
 
   @Test
@@ -365,10 +365,10 @@ public abstract class AbstractKeyValueStorageTest {
     // Expecting the same value for all entries
     final byte[] expected = finalValues.get(0);
     for (final byte[] actual : finalValues) {
-      assertEquals(expected, actual);
+      assertArrayEquals(expected, actual);
     }
 
-    assertTrue(expected.equals(a) || expected.equals(b));
+    assertTrue(Arrays.equals(expected, a) || Arrays.equals(expected, b));
 
     store.close();
   }
@@ -376,11 +376,11 @@ public abstract class AbstractKeyValueStorageTest {
   /*
    * Used to mimic the wrapping with BytesValue performed in Pantheon
    */
-  private byte[] bytesFromHexString(final String hex) {
+  protected byte[] bytesFromHexString(final String hex) {
     return BytesValue.fromHexString("0001").getArrayUnsafe();
   }
 
-  private byte[] bytesOf(final int... bytes) {
+  protected byte[] bytesOf(final int... bytes) {
     return BytesValue.of(bytes).getArrayUnsafe();
   }
 }

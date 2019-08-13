@@ -17,9 +17,9 @@ import static java.util.Arrays.asList;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.ColumnarRocksDbKeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.ColumnarRocksDbKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.LimitedInMemoryKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Segment;
@@ -64,7 +64,7 @@ public class RocksDbStorageProvider {
     Files.createDirectories(rocksDbConfiguration.getDatabaseDir());
     final KeyValueStorage kv = new RocksDBKeyValueStorage(rocksDbConfiguration, metricsSystem);
     final KeyValueStorage preimageKv =
-        new LimitedMemoryKeyValueStorage(worldStatePreimageCacheSize);
+        new LimitedInMemoryKeyValueStorage(worldStatePreimageCacheSize);
     return new KeyValueStorageProvider(kv, kv, preimageKv, kv, kv, kv);
   }
 

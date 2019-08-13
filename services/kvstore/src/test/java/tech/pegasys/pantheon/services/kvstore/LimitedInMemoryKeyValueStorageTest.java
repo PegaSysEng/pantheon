@@ -13,10 +13,11 @@
 package tech.pegasys.pantheon.services.kvstore;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
 
+import tech.pegasys.pantheon.kvstore.AbstractKeyValueStorageTest;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import org.junit.Test;
 
@@ -34,19 +35,19 @@ public class LimitedInMemoryKeyValueStorageTest extends AbstractKeyValueStorageT
 
     for (int i = 0; i < limit * 2; i++) {
       final KeyValueStorageTransaction tx = storage.startTransaction();
-      tx.put(BytesValue.of(i).getArrayUnsafe(), BytesValue.of(i).getArrayUnsafe());
+      tx.put(bytesOf(i), bytesOf(i));
       tx.commit();
     }
 
     int hits = 0;
     for (int i = 0; i < limit * 2; i++) {
-      if (storage.get(BytesValue.of(i).getArrayUnsafe()).isPresent()) {
+      if (storage.get(bytesOf(i)).isPresent()) {
         hits++;
       }
     }
 
     assertThat(hits <= limit).isTrue();
     // Oldest key should've been dropped first
-    assertThat(storage.get(BytesValue.of(0).getArrayUnsafe()).isPresent()).isFalse();
+    assertFalse(storage.containsKey(bytesOf((0))));
   }
 }
