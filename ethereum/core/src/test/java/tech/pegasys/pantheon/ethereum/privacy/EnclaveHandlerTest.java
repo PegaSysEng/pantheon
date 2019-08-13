@@ -54,14 +54,8 @@ public class EnclaveHandlerTest {
 
   @Before
   public void setup() {
-    final Map<EnclaveUser, EnclaveUserDetails> enclaves =
-        ImmutableMap.of(
-            enclaveUser1,
-            new EnclaveUserDetails("publicKey1", enclave1),
-            enclaveUser2,
-            new EnclaveUserDetails("publicKey2", enclave2),
-            enclaveUser3,
-            new EnclaveUserDetails("publicKey2", enclave3));
+    final Map<EnclaveUser, Enclave> enclaves =
+        ImmutableMap.of(enclaveUser1, enclave1, enclaveUser2, enclave2, enclaveUser3, enclave3);
     enclaveHandler = new EnclaveHandler(enclaves);
   }
 

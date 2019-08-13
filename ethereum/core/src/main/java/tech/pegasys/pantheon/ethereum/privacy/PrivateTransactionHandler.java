@@ -58,11 +58,7 @@ public class PrivateTransactionHandler {
       final PrivacyParameters privacyParameters, final Optional<BigInteger> chainId) {
     this(
         new EnclaveHandler(
-            ImmutableMap.of(
-                defaultUser(),
-                new EnclaveUserDetails(
-                    privacyParameters.getEnclavePublicKey(),
-                    new Enclave(privacyParameters.getEnclaveUri())))),
+            ImmutableMap.of(defaultUser(), new Enclave(privacyParameters.getEnclaveUri()))),
         Address.privacyPrecompiled(privacyParameters.getPrivacyAddress()),
         privacyParameters.getSigningKeyPair(),
         privacyParameters.getEnclavePublicKey(),

@@ -27,7 +27,6 @@ import tech.pegasys.pantheon.ethereum.debug.TraceOptions;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
 import tech.pegasys.pantheon.ethereum.privacy.EnclaveHandler;
 import tech.pegasys.pantheon.ethereum.privacy.EnclaveUser;
-import tech.pegasys.pantheon.ethereum.privacy.EnclaveUserDetails;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionProcessor;
@@ -65,10 +64,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
         privacyParameters.getEnclavePublicKey(),
         new EnclaveHandler(
             ImmutableMap.of(
-                EnclaveUser.defaultUser(),
-                new EnclaveUserDetails(
-                    privacyParameters.getEnclavePublicKey(),
-                    new Enclave(privacyParameters.getEnclaveUri())))),
+                EnclaveUser.defaultUser(), new Enclave(privacyParameters.getEnclaveUri()))),
         privacyParameters.getPrivateWorldStateArchive(),
         privacyParameters.getPrivateTransactionStorage(),
         privacyParameters.getPrivateStateStorage());

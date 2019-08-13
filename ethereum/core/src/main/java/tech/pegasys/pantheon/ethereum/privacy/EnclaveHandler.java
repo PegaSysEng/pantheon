@@ -31,9 +31,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class EnclaveHandler {
-  private Map<EnclaveUser, EnclaveUserDetails> enclaves = new HashMap<>();
+  private Map<EnclaveUser, Enclave> enclaves = new HashMap<>();
 
-  public EnclaveHandler(final Map<EnclaveUser, EnclaveUserDetails> enclaves) {
+  public EnclaveHandler(final Map<EnclaveUser, Enclave> enclaves) {
     this.enclaves.putAll(enclaves);
   }
 
@@ -46,8 +46,7 @@ public class EnclaveHandler {
   public ReceiveResponse retrieveData(final ReceiveRequest receiveRequest) {
     final List<ReceiveResponse> receiveResponses =
         enclaves.values().stream()
-            .map(
-                enclaveUserDetails -> asyncReceive(enclaveUserDetails.getEnclave(), receiveRequest))
+            .map(enclave -> asyncReceive(enclave, receiveRequest))
             .map(CompletableFuture::join)
             .collect(Collectors.toList());
     return receiveResponses.stream()
@@ -87,11 +86,11 @@ public class EnclaveHandler {
   }
 
   private Enclave findEnclave(final EnclaveUser enclaveUser) {
-    final EnclaveUserDetails enclaveUserDetails = enclaves.get(enclaveUser);
-    if (enclaveUserDetails == null) {
+    final Enclave enclave = enclaves.get(enclaveUser);
+    if (enclave == null) {
       throw new EnclaveException("Unknown enclave user " + enclaveUser);
     }
-    return enclaveUserDetails.getEnclave();
+    return enclave;
   }
 
   private CompletableFuture<ReceiveResponse> asyncReceive(
