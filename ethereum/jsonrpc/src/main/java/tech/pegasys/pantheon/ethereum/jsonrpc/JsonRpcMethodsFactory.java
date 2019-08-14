@@ -381,7 +381,7 @@ public class JsonRpcMethodsFactory {
     if (privacyParameters.getSigningKeyPair().isPresent()) {
       return new FixedKeySigningPrivateMarkerTransactionFactory(
           privateContractAddress,
-          new BlockChainNonceProvider(blockchain, pendingTransactions),
+          new LatestNonceProvider(blockchain, pendingTransactions),
           privacyParameters.getSigningKeyPair().get());
     }
     return new RandomSigningPrivateMarkerTransactionFactory(privateContractAddress);

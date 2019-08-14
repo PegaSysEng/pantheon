@@ -19,12 +19,12 @@ import tech.pegasys.pantheon.ethereum.util.NonceProvider;
 
 import java.util.OptionalLong;
 
-public class BlockChainNonceProvider implements NonceProvider {
+public class LatestNonceProvider implements NonceProvider {
 
   final BlockchainQueries blockchain;
   final PendingTransactions pendingTransactions;
 
-  public BlockChainNonceProvider(
+  public LatestNonceProvider(
       final BlockchainQueries blockchain, final PendingTransactions pendingTransactions) {
     this.blockchain = blockchain;
     this.pendingTransactions = pendingTransactions;
