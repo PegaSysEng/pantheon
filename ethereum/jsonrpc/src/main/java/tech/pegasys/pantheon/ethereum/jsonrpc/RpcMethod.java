@@ -36,6 +36,7 @@ public enum RpcMethod {
   PRIV_GET_PRIVATE_TRANSACTION("priv_getPrivateTransaction"),
   PRIV_GET_TRANSACTION_COUNT("priv_getTransactionCount"),
   PRIV_GET_PRIVACY_PRECOMPILE_ADDRESS("priv_getPrivacyPrecompileAddress"),
+  PRIV_GET_LEGACY_TRANSACTION_COUNT("priv_getLegacyTransactionCount"),
   EEA_GET_TRANSACTION_RECEIPT("eea_getTransactionReceipt"),
   PRIV_CREATE_PRIVACY_GROUP("priv_createPrivacyGroup"),
   PRIV_DELETE_PRIVACY_GROUP("priv_deletePrivacyGroup"),
