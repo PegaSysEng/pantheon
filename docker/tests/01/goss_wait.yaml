@@ -12,12 +12,12 @@ port:
   tcp:8545:
     listening: true
     ip:
-      - 127.0.0.1
+      - 0.0.0.0
   tcp:8546:
     listening: true
     ip:
-      - 127.0.0.1
+      - 0.0.0.0
   tcp:8547:
     listening: true
     ip:
-      - 127.0.0.1
+      - 0.0.0.0
