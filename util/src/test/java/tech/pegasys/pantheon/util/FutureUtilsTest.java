@@ -12,21 +12,25 @@
  */
 package tech.pegasys.pantheon.util;
 
+import static java.util.function.Predicate.isEqual;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static tech.pegasys.pantheon.util.FutureUtils.anyOfMatching;
 import static tech.pegasys.pantheon.util.FutureUtils.exceptionallyCompose;
 import static tech.pegasys.pantheon.util.FutureUtils.propagateCancellation;
 import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
 
+import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
 public class FutureUtilsTest {
@@ -186,6 +190,62 @@ public class FutureUtilsTest {
     input.complete("Done");
     verifyZeroInteractions(errorHandler);
     assertThat(result).isCompletedWithValue("Done");
+  }
+
+  @Test
+  public void shouldReturnMatchingSuccessfulFutureWhenUsingAllOfMatching() {
+    final CompletableFuture<String> future1 = new CompletableFuture<>();
+    final CompletableFuture<String> future2 = new CompletableFuture<>();
+    final CompletableFuture<String> future3 = new CompletableFuture<>();
+    future1.complete("a");
+    future2.complete("b");
+    future3.complete("c");
+
+    final CompletableFuture<String> result =
+        anyOfMatching(ImmutableList.of(future1, future2, future3), isEqual("a"));
+
+    assertThat(result).isCompletedWithValue("a");
+  }
+
+  @Test
+  public void shouldReturnFirstMatchingSuccessfulFutureWhenUsingAllOfMatching() {
+    final CompletableFuture<String> future1 = new CompletableFuture<>();
+    final CompletableFuture<String> future2 = new CompletableFuture<>();
+    final CompletableFuture<String> future3 = new CompletableFuture<>();
+    future1.complete("a");
+    future2.complete("ab");
+    future3.complete("abc");
+
+    final CompletableFuture<String> result =
+        anyOfMatching(ImmutableList.of(future1, future2, future3), v -> v.startsWith("a"));
+
+    assertThat(result).isCompletedWithValue("a");
+  }
+
+  @Test
+  public void shouldFailWhenNoMatchingResultsWhenUsingAllOfMatching() {
+    final CompletableFuture<String> future1 = new CompletableFuture<>();
+    final CompletableFuture<String> future2 = new CompletableFuture<>();
+    final CompletableFuture<String> future3 = new CompletableFuture<>();
+    future1.complete("a");
+    future2.complete("ab");
+    future3.complete("abc");
+    final CompletableFuture<String> result =
+        anyOfMatching(ImmutableList.of(future1, future2, future3), isEqual("d"));
+
+    assertThatThrownBy(result::join).hasRootCauseInstanceOf(NoSuchElementException.class);
+  }
+
+  @Test
+  public void shouldFailWithOriginalExceptionIfNoMatchingResultsWhenUsingAllOfMatching() {
+    final CompletableFuture<String> future1 = new CompletableFuture<>();
+    final CompletableFuture<String> future2 = new CompletableFuture<>();
+    future1.completeExceptionally(ERROR);
+    future2.completeExceptionally(ERROR);
+    final CompletableFuture<String> result =
+        anyOfMatching(ImmutableList.of(future1, future2), isEqual("d"));
+
+    assertCompletedExceptionally(result, ERROR);
   }
 
   private void assertCompletedExceptionally(

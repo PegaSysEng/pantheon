@@ -14,10 +14,14 @@ package tech.pegasys.pantheon.util;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class FutureUtils {
@@ -130,5 +134,39 @@ public class FutureUtils {
           }
           return null;
         });
+  }
+
+  /**
+   * Creates a {@link CompletableFuture} that is completed when any of the provided
+   * CompletableFutures completes and matches the supplied predicate.
+   *
+   * <p>If no successful CompletableFuture matches the predicate then the CompletableFuture will
+   * complete with a NoSuchElementException.
+   *
+   * @param futures the CompletableFutures to wait for completion on
+   * @param predicate the Predicate that the CompletableFutures must match
+   * @param <T> the type of CompletableFuture
+   * @return a CompletableFuture that is completed when any of CompletableFutures matching the
+   *     predicate completes
+   */
+  public static <T> CompletableFuture<T> anyOfMatching(
+      final List<CompletableFuture<T>> futures, final Predicate<T> predicate) {
+    final CompletableFuture<T> result = new CompletableFuture<>();
+    final Consumer<T> predicateCompleter =
+        value -> {
+          if (predicate.test(value)) {
+            result.complete(value);
+          }
+        };
+    CompletableFuture.allOf(
+            futures.stream()
+                .map(future -> future.thenAccept(predicateCompleter))
+                .toArray(CompletableFuture[]::new))
+        .whenComplete(
+            (ignored, throwable) -> {
+              final Throwable ex = throwable != null ? throwable : new NoSuchElementException();
+              result.completeExceptionally(ex);
+            });
+    return result;
   }
 }

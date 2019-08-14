@@ -33,6 +33,8 @@ import tech.pegasys.pantheon.enclave.types.SendResponse;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.CompletionException;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Before;
@@ -117,7 +119,8 @@ public class EnclaveHandlerTest {
 
     assertThatThrownBy(
             () -> enclaveHandler.retrieveData(new ReceiveRequest("abc123", "user2PublicKey")))
-        .isInstanceOf(EnclaveException.class);
+        .isInstanceOf(CompletionException.class)
+        .hasRootCauseInstanceOf(NoSuchElementException.class);
     verify(enclave1).receive(any());
     verify(enclave2).receive(any());
     verify(enclave3).receive(any());
@@ -210,7 +213,7 @@ public class EnclaveHandlerTest {
   }
 
   @Test
-  public void findPrivacyGroupIdShouldFailIfNoEnclaveUserConfiguredForAnEnclave() throws Exception {
+  public void findPrivacyGroupIdShouldFailIfNoEnclaveUserConfiguredForAnEnclave() {
     final FindPrivacyGroupRequest findPrivacyGroupRequest =
         new FindPrivacyGroupRequest(new String[] {"user2PublicKey"});
     assertThatThrownBy(

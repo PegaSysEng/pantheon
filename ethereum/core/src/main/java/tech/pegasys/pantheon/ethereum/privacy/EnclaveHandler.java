@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
 import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendResponse;
+import tech.pegasys.pantheon.util.FutureUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,53 +40,41 @@ public class EnclaveHandler {
 
   public SendResponse sendData(final EnclaveUser enclaveUser, final SendRequest sendRequest)
       throws Exception {
-    final Enclave enclave = findEnclave(enclaveUser);
-    return enclave.send(sendRequest);
+    return enclave(enclaveUser).send(sendRequest);
   }
 
   public ReceiveResponse retrieveData(final ReceiveRequest receiveRequest) {
-    final List<ReceiveResponse> receiveResponses =
+    final List<CompletableFuture<ReceiveResponse>> retrieveFutures =
         enclaves.values().stream()
             .map(enclave -> asyncReceive(enclave, receiveRequest))
-            .map(CompletableFuture::join)
             .collect(Collectors.toList());
-    return receiveResponses.stream()
-        .filter(Objects::nonNull)
-        .findFirst()
-        .orElseThrow(
-            () ->
-                new EnclaveException(
-                    "No enclave found containing data for key " + receiveRequest.getKey()));
+    return FutureUtils.anyOfMatching(retrieveFutures, Objects::nonNull).join();
   }
 
   public String retrievePrivacyGroupId(
       final EnclaveUser enclaveUser, final ReceiveRequest receiveRequest) throws Exception {
-    final Enclave enclave = findEnclave(enclaveUser);
-    return enclave.receive(receiveRequest).getPrivacyGroupId();
+    return enclave(enclaveUser).receive(receiveRequest).getPrivacyGroupId();
   }
 
   public PrivacyGroup createPrivacyGroup(
       final EnclaveUser enclaveUser, final CreatePrivacyGroupRequest createPrivacyGroupRequest)
       throws Exception {
-    final Enclave enclave = findEnclave(enclaveUser);
-    return enclave.createPrivacyGroup(createPrivacyGroupRequest);
+    return enclave(enclaveUser).createPrivacyGroup(createPrivacyGroupRequest);
   }
 
   public String deletePrivacyGroup(
       final EnclaveUser enclaveUser, final DeletePrivacyGroupRequest deletePrivacyGroupRequest)
       throws Exception {
-    final Enclave enclave = findEnclave(enclaveUser);
-    return enclave.deletePrivacyGroup(deletePrivacyGroupRequest);
+    return enclave(enclaveUser).deletePrivacyGroup(deletePrivacyGroupRequest);
   }
 
   public PrivacyGroup[] findPrivacyGroup(
       final EnclaveUser enclaveUser, final FindPrivacyGroupRequest findPrivacyGroupRequest)
       throws Exception {
-    final Enclave enclave = findEnclave(enclaveUser);
-    return enclave.findPrivacyGroup(findPrivacyGroupRequest);
+    return enclave(enclaveUser).findPrivacyGroup(findPrivacyGroupRequest);
   }
 
-  private Enclave findEnclave(final EnclaveUser enclaveUser) {
+  private Enclave enclave(final EnclaveUser enclaveUser) {
     final Enclave enclave = enclaves.get(enclaveUser);
     if (enclave == null) {
       throw new EnclaveException("Unknown enclave user " + enclaveUser);
