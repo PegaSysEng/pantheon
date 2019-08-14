@@ -603,6 +603,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer privacyPrecompiledAddress = Address.PRIVACY;
 
   @Option(
+      names = {"--privacy-marker-transaction-signing-key-file"},
+      description = "The name of a file containing the private key used to sign privacy marker transactions. If unset, each will be signed with a random key.")
+  private final Path privacyMarkerTransactionSigningKeyPath = null;
+
+  @Option(
       names = {"--tx-pool-max-size"},
       paramLabel = MANDATORY_INTEGER_FORMAT_HELP,
       description =
@@ -1147,6 +1152,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       privacyParametersBuilder.setPrivacyAddress(privacyPrecompiledAddress);
       privacyParametersBuilder.setMetricsSystem(metricsSystem.get());
       privacyParametersBuilder.setDataDir(dataDir());
+      privacyParametersBuilder.setPrivateKeyPath(privacyMarkerTransactionSigningKeyPath);
     }
     return privacyParametersBuilder.build();
   }
