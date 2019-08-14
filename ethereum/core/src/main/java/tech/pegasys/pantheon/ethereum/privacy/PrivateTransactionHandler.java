@@ -171,8 +171,4 @@ public class PrivateTransactionHandler {
             // private state does not exist
             Account.DEFAULT_NONCE);
   }
-
-  public String getEnclaveKey() {
-    return enclavePublicKey;
-  }
 }

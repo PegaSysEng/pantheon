@@ -137,10 +137,4 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
       throw new InvalidJsonRpcRequestException("Invalid raw private transaction hex", e);
     }
   }
-
-  protected long getNonce(final Address address) {
-    final OptionalLong pendingNonce = pendingTransactions.getNextNonceForSender(address);
-    return pendingNonce.orElseGet(
-        () -> blockchain.getTransactionCount(address, blockchain.headBlockNumber()));
-  }
 }

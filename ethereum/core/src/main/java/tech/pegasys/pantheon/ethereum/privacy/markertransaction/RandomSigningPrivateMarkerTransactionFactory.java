@@ -30,7 +30,7 @@ public class RandomSigningPrivateMarkerTransactionFactory extends PrivateMarkerT
     final KeyPair keyPair = KeyPair.generate();
 
     return Transaction.builder()
-        .nonce(0)
+        .nonce(0L)
         .gasPrice(privateTransaction.getGasPrice())
         .gasLimit(privateTransaction.getGasLimit())
         .to(getPrivacyPrecompileAddress())
