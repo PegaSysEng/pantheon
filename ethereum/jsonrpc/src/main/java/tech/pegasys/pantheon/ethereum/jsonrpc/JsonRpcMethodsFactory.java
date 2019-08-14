@@ -344,8 +344,7 @@ public class JsonRpcMethodsFactory {
         addMethods(
             enabledMethods,
             new EeaGetTransactionReceipt(blockchainQueries, enclave, parameter, privacyParameters),
-            new EeaSendRawTransaction(
-                blockchainQueries, privateTransactionHandler, transactionPool, parameter));
+            new EeaSendRawTransaction(privateTransactionHandler, transactionPool, parameter));
       }
       if (priv) {
         addMethods(

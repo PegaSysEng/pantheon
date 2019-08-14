@@ -41,7 +41,6 @@ import tech.pegasys.pantheon.util.bytes.BytesValue;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Optional;
-import java.util.OptionalLong;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -125,8 +124,7 @@ public class EeaSendRawTransactionTest {
   @Before
   public void before() {
     when(transactionPool.getPendingTransactions()).thenReturn(pendingTransactions);
-    method =
-        new EeaSendRawTransaction(blockchainQueries, privateTxHandler, transactionPool, parameter);
+    method = new EeaSendRawTransaction(privateTxHandler, transactionPool, parameter);
   }
 
   @Test
@@ -389,13 +387,6 @@ public class EeaSendRawTransactionTest {
     verify(privateTxHandler)
         .createPrivacyMarkerTransaction(any(String.class), any(PrivateTransaction.class));
     verify(transactionPool).addLocalTransaction(any(Transaction.class));
-  }
-
-  @Test
-  public void nextNonceUsesTxPool() {
-    Address address = PUBLIC_TRANSACTION.getSender();
-    when(pendingTransactions.getNextNonceForSender(address)).thenReturn(OptionalLong.of(123));
-    assertThat(method.getNonce(address)).isEqualTo(123);
   }
 
   @Test

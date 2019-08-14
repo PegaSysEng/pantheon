@@ -604,7 +604,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--privacy-marker-transaction-signing-key-file"},
-      description = "The name of a file containing the private key used to sign privacy marker transactions. If unset, each will be signed with a random key.")
+      description =
+          "The name of a file containing the private key used to sign privacy marker transactions. If unset, each will be signed with a random key.")
   private final Path privacyMarkerTransactionSigningKeyPath = null;
 
   @Option(
