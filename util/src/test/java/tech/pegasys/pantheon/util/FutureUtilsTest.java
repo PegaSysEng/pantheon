@@ -193,7 +193,7 @@ public class FutureUtilsTest {
   }
 
   @Test
-  public void shouldReturnMatchingSuccessfulFutureWhenUsingAllOfMatching() {
+  public void shouldReturnMatchingSuccessfulFutureWhenUsingAnyOfMatching() {
     final CompletableFuture<String> future1 = new CompletableFuture<>();
     final CompletableFuture<String> future2 = new CompletableFuture<>();
     final CompletableFuture<String> future3 = new CompletableFuture<>();
@@ -208,7 +208,7 @@ public class FutureUtilsTest {
   }
 
   @Test
-  public void shouldReturnFirstMatchingSuccessfulFutureWhenUsingAllOfMatching() {
+  public void shouldReturnFirstMatchingSuccessfulFutureWhenUsingAnyOfMatching() {
     final CompletableFuture<String> future1 = new CompletableFuture<>();
     final CompletableFuture<String> future2 = new CompletableFuture<>();
     final CompletableFuture<String> future3 = new CompletableFuture<>();
@@ -223,7 +223,7 @@ public class FutureUtilsTest {
   }
 
   @Test
-  public void shouldFailWhenNoMatchingResultsWhenUsingAllOfMatching() {
+  public void shouldFailWhenNoMatchingResultsWhenUsingAnyOfMatching() {
     final CompletableFuture<String> future1 = new CompletableFuture<>();
     final CompletableFuture<String> future2 = new CompletableFuture<>();
     final CompletableFuture<String> future3 = new CompletableFuture<>();
@@ -234,18 +234,6 @@ public class FutureUtilsTest {
         anyOfMatching(ImmutableList.of(future1, future2, future3), isEqual("d"));
 
     assertThatThrownBy(result::join).hasRootCauseInstanceOf(NoSuchElementException.class);
-  }
-
-  @Test
-  public void shouldFailWithOriginalExceptionIfNoMatchingResultsWhenUsingAllOfMatching() {
-    final CompletableFuture<String> future1 = new CompletableFuture<>();
-    final CompletableFuture<String> future2 = new CompletableFuture<>();
-    future1.completeExceptionally(ERROR);
-    future2.completeExceptionally(ERROR);
-    final CompletableFuture<String> result =
-        anyOfMatching(ImmutableList.of(future1, future2), isEqual("d"));
-
-    assertCompletedExceptionally(result, ERROR);
   }
 
   private void assertCompletedExceptionally(

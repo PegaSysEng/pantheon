@@ -163,10 +163,7 @@ public class FutureUtils {
                 .map(future -> future.thenAccept(predicateCompleter))
                 .toArray(CompletableFuture[]::new))
         .whenComplete(
-            (ignored, throwable) -> {
-              final Throwable ex = throwable != null ? throwable : new NoSuchElementException();
-              result.completeExceptionally(ex);
-            });
+            (ignored, throwable) -> result.completeExceptionally(new NoSuchElementException()));
     return result;
   }
 }
