@@ -16,7 +16,6 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 public class RandomSigningPrivateMarkerTransactionFactory extends PrivateMarkerTransactionFactory {
 
@@ -27,15 +26,7 @@ public class RandomSigningPrivateMarkerTransactionFactory extends PrivateMarkerT
   @Override
   public Transaction create(
       final String transactionEnclaveKey, final PrivateTransaction privateTransaction) {
-    final KeyPair keyPair = KeyPair.generate();
-
-    return Transaction.builder()
-        .nonce(0L)
-        .gasPrice(privateTransaction.getGasPrice())
-        .gasLimit(privateTransaction.getGasLimit())
-        .to(getPrivacyPrecompileAddress())
-        .value(privateTransaction.getValue())
-        .payload(BytesValues.fromBase64(transactionEnclaveKey))
-        .signAndBuild(keyPair);
+    final KeyPair signingKey = KeyPair.generate();
+    return create(transactionEnclaveKey, privateTransaction, 0, signingKey);
   }
 }

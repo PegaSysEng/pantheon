@@ -12,9 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy.markertransaction;
 
+import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
+import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 public abstract class PrivateMarkerTransactionFactory {
 
@@ -30,4 +32,19 @@ public abstract class PrivateMarkerTransactionFactory {
 
   public abstract Transaction create(
       final String transactionEnclaveKey, final PrivateTransaction privateTransaction);
+
+  protected Transaction create(
+      final String transactionEnclaveKey,
+      final PrivateTransaction privateTransaction,
+      final long nonce,
+      final KeyPair signingKey) {
+    return Transaction.builder()
+        .nonce(nonce)
+        .gasPrice(privateTransaction.getGasPrice())
+        .gasLimit(privateTransaction.getGasLimit())
+        .to(getPrivacyPrecompileAddress())
+        .value(privateTransaction.getValue())
+        .payload(BytesValues.fromBase64(transactionEnclaveKey))
+        .signAndBuild(signingKey);
+  }
 }

@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
 import tech.pegasys.pantheon.ethereum.util.NonceProvider;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 public class FixedKeySigningPrivateMarkerTransactionFactory
     extends PrivateMarkerTransactionFactory {
@@ -40,13 +39,7 @@ public class FixedKeySigningPrivateMarkerTransactionFactory
   @Override
   public Transaction create(
       final String transactionEnclaveKey, final PrivateTransaction privateTransaction) {
-    return Transaction.builder()
-        .nonce(nonceProvider.getNonce(sender))
-        .gasPrice(privateTransaction.getGasPrice())
-        .gasLimit(privateTransaction.getGasLimit())
-        .to(getPrivacyPrecompileAddress())
-        .value(privateTransaction.getValue())
-        .payload(BytesValues.fromBase64(transactionEnclaveKey))
-        .signAndBuild(signingKey);
+    return create(
+        transactionEnclaveKey, privateTransaction, nonceProvider.getNonce(sender), signingKey);
   }
 }
