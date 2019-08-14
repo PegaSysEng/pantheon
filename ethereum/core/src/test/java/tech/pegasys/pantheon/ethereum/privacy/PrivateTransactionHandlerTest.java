@@ -22,7 +22,9 @@ import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.Transa
 import tech.pegasys.orion.testutil.OrionKeyUtils;
 import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
+import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendResponse;
 import tech.pegasys.pantheon.ethereum.core.Account;
@@ -73,26 +75,23 @@ public class PrivateTransactionHandlerTest {
           .chainId(BigInteger.valueOf(2018))
           .signAndBuild(KEY_PAIR);
 
-  private EnclaveHandler mockEnclaveHandler() throws Exception {
-    final EnclaveHandler mockEnclaveHandler = mock(EnclaveHandler.class);
-    final SendResponse response = new SendResponse(TRANSACTION_KEY);
-    when(mockEnclaveHandler.sendData(any(EnclaveUser.class), any(SendRequest.class)))
-        .thenReturn(response);
-    when(mockEnclaveHandler.retrievePrivacyGroupId(
-            any(EnclaveUser.class), any(ReceiveRequest.class)))
-        .thenReturn("mock");
-    return mockEnclaveHandler;
+  Enclave mockEnclave() throws Exception {
+    Enclave mockEnclave = mock(Enclave.class);
+    SendResponse response = new SendResponse(TRANSACTION_KEY);
+    ReceiveResponse receiveResponse = new ReceiveResponse(new byte[0], "mock");
+    when(mockEnclave.send(any(SendRequest.class))).thenReturn(response);
+    when(mockEnclave.receive(any(ReceiveRequest.class))).thenReturn(receiveResponse);
+    return mockEnclave;
   }
 
-  private EnclaveHandler brokenMockEnclave() throws Exception {
-    final EnclaveHandler mockEnclaveHandler = mock(EnclaveHandler.class);
-    when(mockEnclaveHandler.sendData(any(EnclaveUser.class), any(SendRequest.class)))
-        .thenThrow(IOException.class);
-    return mockEnclaveHandler;
+  Enclave brokenMockEnclave() throws Exception {
+    Enclave mockEnclave = mock(Enclave.class);
+    when(mockEnclave.send(any(SendRequest.class))).thenThrow(IOException.class);
+    return mockEnclave;
   }
 
-  private PrivateTransactionValidator mockPrivateTransactionValidator() {
-    final PrivateTransactionValidator validator = mock(PrivateTransactionValidator.class);
+  PrivateTransactionValidator mockPrivateTransactionValidator() {
+    PrivateTransactionValidator validator = mock(PrivateTransactionValidator.class);
     when(validator.validate(any(), any())).thenReturn(ValidationResult.valid());
     return validator;
   }
@@ -114,7 +113,7 @@ public class PrivateTransactionHandlerTest {
 
     privateTransactionHandler =
         new PrivateTransactionHandler(
-            mockEnclaveHandler(),
+            mockEnclave(),
             Address.DEFAULT_PRIVACY,
             KEY_PAIR,
             OrionKeyUtils.loadKey("orion_key_0.pub"),
