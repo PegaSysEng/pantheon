@@ -1,3 +1,5 @@
+---
+# runtime docker tests
 file:
   /opt/pantheon/bin/pantheon:
     exists: true

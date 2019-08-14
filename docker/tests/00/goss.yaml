@@ -1,0 +1,9 @@
+---
+# static Dockerfile tests
+
+# ensure there are no env vars set in the dockerfile
+file:
+  Dockerfile:
+    exists: true
+    contains:
+      - "!/ENV/"
