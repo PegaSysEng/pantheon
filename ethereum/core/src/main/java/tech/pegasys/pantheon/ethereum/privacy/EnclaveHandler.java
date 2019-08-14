@@ -88,7 +88,7 @@ public class EnclaveHandler {
         () -> {
           try {
             return enclave.receive(receiveRequest);
-          } catch (Exception e) {
+          } catch (final Exception e) {
             return null;
           }
         });
