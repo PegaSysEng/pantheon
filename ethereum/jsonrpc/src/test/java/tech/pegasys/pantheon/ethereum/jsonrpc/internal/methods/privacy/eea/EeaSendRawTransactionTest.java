@@ -23,11 +23,9 @@ import tech.pegasys.pantheon.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
@@ -117,13 +115,8 @@ public class EeaSendRawTransactionTest {
 
   @Mock private PrivateTransactionHandler privateTxHandler;
 
-  @Mock private BlockchainQueries blockchainQueries;
-
-  @Mock private PendingTransactions pendingTransactions;
-
   @Before
   public void before() {
-    when(transactionPool.getPendingTransactions()).thenReturn(pendingTransactions);
     method = new EeaSendRawTransaction(privateTxHandler, transactionPool, parameter);
   }
 

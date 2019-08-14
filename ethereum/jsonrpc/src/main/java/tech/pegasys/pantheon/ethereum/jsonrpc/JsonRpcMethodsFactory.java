@@ -127,7 +127,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.Set;
 
 public class JsonRpcMethodsFactory {
@@ -382,18 +381,9 @@ public class JsonRpcMethodsFactory {
     if (privacyParameters.getSigningKeyPair().isPresent()) {
       return new FixedKeySigningPrivateMarkerTransactionFactory(
           privateContractAddress,
-          address -> getNonce(address, blockchain, pendingTransactions),
+          new BlockChainNonceProvider(blockchain, pendingTransactions),
           privacyParameters.getSigningKeyPair().get());
     }
     return new RandomSigningPrivateMarkerTransactionFactory(privateContractAddress);
-  }
-
-  private long getNonce(
-      final Address address,
-      final BlockchainQueries blockchain,
-      final PendingTransactions pendingTransactions) {
-    final OptionalLong pendingNonce = pendingTransactions.getNextNonceForSender(address);
-    return pendingNonce.orElseGet(
-        () -> blockchain.getTransactionCount(address, blockchain.headBlockNumber()));
   }
 }

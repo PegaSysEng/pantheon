@@ -17,15 +17,11 @@ import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
+import tech.pegasys.pantheon.ethereum.util.NonceProvider;
 import tech.pegasys.pantheon.util.bytes.BytesValues;
 
 public class FixedKeySigningPrivateMarkerTransactionFactory
     extends PrivateMarkerTransactionFactory {
-
-  @FunctionalInterface
-  public interface NonceProvider {
-    long getNonce(final Address address);
-  }
 
   private final NonceProvider nonceProvider;
   private final KeyPair signingKey;
