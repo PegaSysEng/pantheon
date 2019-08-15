@@ -40,7 +40,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
+public class RocksDBKeyValueStorageTest extends AbstractKeyValueStorageTest {
 
   @Mock private MetricsSystem metricsSystemMock;
   @Mock private LabelledMetric<OperationTimer> labelledMetricOperationTimerMock;

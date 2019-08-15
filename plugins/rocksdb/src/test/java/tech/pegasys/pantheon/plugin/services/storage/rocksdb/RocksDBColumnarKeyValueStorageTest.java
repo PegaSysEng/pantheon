@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rocksdb.ColumnFamilyHandle;
 
-public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
+public class RocksDBColumnarKeyValueStorageTest extends AbstractKeyValueStorageTest {
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
   @Test
@@ -103,7 +103,7 @@ public class ColumnarRocksDbKeyValueStorageTest extends AbstractKeyValueStorageT
   }
 
   private SegmentedKeyValueStorage<ColumnFamilyHandle> createSegmentedStore() throws Exception {
-    return ColumnarRocksDbKeyValueStorage.create(
+    return RocksDBColumnarKeyValueStorage.create(
         RocksDBConfiguration.builder().databaseDir(folder.newFolder().toPath()).build(),
         Arrays.asList(TestSegment.FOO, TestSegment.BAR),
         new NoOpMetricsSystem());

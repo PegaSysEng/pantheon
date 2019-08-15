@@ -49,7 +49,7 @@ import org.rocksdb.TransactionDB;
 import org.rocksdb.TransactionDBOptions;
 import org.rocksdb.WriteOptions;
 
-public class ColumnarRocksDbKeyValueStorage
+public class RocksDBColumnarKeyValueStorage
     implements SegmentedKeyValueStorage<ColumnFamilyHandle>, Closeable {
 
   private static final Logger LOG = LogManager.getLogger();
@@ -62,15 +62,15 @@ public class ColumnarRocksDbKeyValueStorage
   private final Map<String, ColumnFamilyHandle> columnHandlesByName;
   private final RocksDBMetricsHelper rocksDBMetricsHelper;
 
-  public static ColumnarRocksDbKeyValueStorage create(
+  public static RocksDBColumnarKeyValueStorage create(
       final RocksDBConfiguration rocksDbConfiguration,
       final List<Segment> segments,
       final MetricsSystem metricsSystem)
       throws StorageException {
-    return new ColumnarRocksDbKeyValueStorage(rocksDbConfiguration, segments, metricsSystem);
+    return new RocksDBColumnarKeyValueStorage(rocksDbConfiguration, segments, metricsSystem);
   }
 
-  private ColumnarRocksDbKeyValueStorage(
+  private RocksDBColumnarKeyValueStorage(
       final RocksDBConfiguration rocksDbConfiguration,
       final List<Segment> segments,
       final MetricsSystem metricsSystem) {
