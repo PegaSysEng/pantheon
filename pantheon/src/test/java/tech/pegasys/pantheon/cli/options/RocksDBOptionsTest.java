@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.cli.options;
 
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBOptions;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 
 import java.util.Arrays;

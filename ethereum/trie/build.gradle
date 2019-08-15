@@ -32,6 +32,7 @@ dependencies {
 
   implementation 'com.google.guava:guava'
   implementation 'org.bouncycastle:bcprov-jdk15on'
+  implementation 'tech.pegasys.pantheon:plugin-api'
 
   testImplementation project(path: ':ethereum:referencetests', configuration: 'testOutput')
   testImplementation project(':testutil')

@@ -10,16 +10,14 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.cli.options;
-
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
-
-import java.util.Arrays;
-import java.util.List;
+package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import picocli.CommandLine;
 
-public class RocksDBOptions implements CLIOptions<RocksDbConfiguration.Builder> {
+// public class RocksDBOptions implements CLIOptions<RocksDBConfiguration.Builder> {
+// TODO add these CLI option via the plugin architecture
+public class RocksDBOptions {
+
   private static final String MAX_OPEN_FILES_FLAG = "--Xrocksdb-max-open-files";
   private static final String CACHE_CAPACITY_FLAG = "--Xrocksdb-cache-capacity";
   private static final String MAX_BACKGROUND_COMPACTIONS_FLAG =
@@ -64,7 +62,7 @@ public class RocksDBOptions implements CLIOptions<RocksDbConfiguration.Builder> 
     return new RocksDBOptions();
   }
 
-  public static RocksDBOptions fromConfig(final RocksDbConfiguration config) {
+  public static RocksDBOptions fromConfig(final RocksDBConfiguration config) {
     final RocksDBOptions options = create();
     options.maxOpenFiles = config.getMaxOpenFiles();
     options.cacheCapacity = config.getCacheCapacity();
@@ -73,25 +71,25 @@ public class RocksDBOptions implements CLIOptions<RocksDbConfiguration.Builder> 
     return options;
   }
 
-  @Override
-  public RocksDbConfiguration.Builder toDomainObject() {
-    return RocksDbConfiguration.builder()
+  public RocksDBConfiguration.Builder toDomainObject() {
+    return RocksDBConfiguration.builder()
         .maxOpenFiles(maxOpenFiles)
         .cacheCapacity(cacheCapacity)
         .maxBackgroundCompactions(maxBackgroundCompactions)
         .backgroundThreadCount(backgroundThreadCount);
   }
+  /*
+   public List<String> getCLIOptions() {
+     return Arrays.asList(
+         MAX_OPEN_FILES_FLAG,
+         OptionParser.format(maxOpenFiles),
+         CACHE_CAPACITY_FLAG,
+         OptionParser.format(cacheCapacity),
+         MAX_BACKGROUND_COMPACTIONS_FLAG,
+         OptionParser.format(maxBackgroundCompactions),
+         BACKGROUND_THREAD_COUNT_FLAG,
+         OptionParser.format(backgroundThreadCount));
+   }
 
-  @Override
-  public List<String> getCLIOptions() {
-    return Arrays.asList(
-        MAX_OPEN_FILES_FLAG,
-        OptionParser.format(maxOpenFiles),
-        CACHE_CAPACITY_FLAG,
-        OptionParser.format(cacheCapacity),
-        MAX_BACKGROUND_COMPACTIONS_FLAG,
-        OptionParser.format(maxBackgroundCompactions),
-        BACKGROUND_THREAD_COUNT_FLAG,
-        OptionParser.format(backgroundThreadCount));
-  }
+  */
 }

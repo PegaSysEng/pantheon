@@ -24,7 +24,7 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStatePreimageStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -177,7 +177,7 @@ public class PrivacyParameters {
         Path privateDbPath = dataDir.resolve(PRIVATE_DATABASE_PATH);
         StorageProvider privateStorageProvider =
             RocksDbStorageProvider.create(
-                RocksDbConfiguration.builder()
+                RocksDBConfiguration.builder()
                     .databaseDir(privateDbPath)
                     .label("private_state")
                     .build(),
