@@ -23,6 +23,7 @@ import tech.pegasys.pantheon.enclave.types.PrivacyGroup.Type;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
@@ -35,7 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class EeaGetTransactionCountTest {
-  final Address address = Address.fromHexString("55");
+  private final Address address = Address.fromHexString("55");
   private Enclave enclave = mock(Enclave.class);
   private PrivateTransactionHandler privateTransactionHandler =
       mock(PrivateTransactionHandler.class);
@@ -91,6 +92,9 @@ public class EeaGetTransactionCountTest {
 
     final JsonRpcResponse response = method.response(request);
     assertThat(response).isInstanceOf(JsonRpcErrorResponse.class);
+
+    final JsonRpcErrorResponse errorResponse = (JsonRpcErrorResponse) response;
+    assertThat(errorResponse.getError()).isEqualTo(JsonRpcError.FIND_PRIVACY_GROUP_ERROR);
   }
 
   @Test
@@ -104,6 +108,9 @@ public class EeaGetTransactionCountTest {
 
     final JsonRpcResponse response = method.response(request);
     assertThat(response).isInstanceOf(JsonRpcErrorResponse.class);
+
+    final JsonRpcErrorResponse errorResponse = (JsonRpcErrorResponse) response;
+    assertThat(errorResponse.getError()).isEqualTo(JsonRpcError.FIND_PRIVACY_GROUP_ERROR);
   }
 
   @Test
@@ -114,5 +121,8 @@ public class EeaGetTransactionCountTest {
 
     final JsonRpcResponse response = method.response(request);
     assertThat(response).isInstanceOf(JsonRpcErrorResponse.class);
+
+    final JsonRpcErrorResponse errorResponse = (JsonRpcErrorResponse) response;
+    assertThat(errorResponse.getError()).isEqualTo(JsonRpcError.FIND_PRIVACY_GROUP_ERROR);
   }
 }

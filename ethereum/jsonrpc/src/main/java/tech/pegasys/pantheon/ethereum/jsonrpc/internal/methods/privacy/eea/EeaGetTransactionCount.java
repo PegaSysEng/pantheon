@@ -18,10 +18,10 @@ import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.FindPrivacyGroupRequest;
 import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
 import tech.pegasys.pantheon.enclave.types.PrivacyGroup.Type;
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.EeaGetTransactionCountParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
@@ -33,42 +33,11 @@ import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.Logger;
 import org.bouncycastle.util.Arrays;
 
 public class EeaGetTransactionCount implements JsonRpcMethod {
-
-  public static class EeaGetTransactionCountJsonBody {
-
-    final String privateFrom;
-    final String[] privateFor;
-    final Address address;
-
-    @JsonCreator
-    public EeaGetTransactionCountJsonBody(
-        @JsonProperty("privateFrom") final String privateFrom,
-        @JsonProperty("privateFor") final String[] privateFor,
-        @JsonProperty("address") final Address address) {
-      this.privateFrom = privateFrom;
-      this.privateFor = privateFor;
-      this.address = address;
-    }
-
-    public String getPrivateFrom() {
-      return privateFrom;
-    }
-
-    public String[] getPrivateFor() {
-      return privateFor;
-    }
-
-    public Address getAddress() {
-      return address;
-    }
-  }
 
   private static final Logger LOG = getLogger();
 
@@ -95,8 +64,8 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
     if (request.getParamLength() != 1) {
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
     }
-    final EeaGetTransactionCountJsonBody eeaGetTransactionCount =
-        parameters.required(request.getParams(), 0, EeaGetTransactionCountJsonBody.class);
+    final EeaGetTransactionCountParameters eeaGetTransactionCount =
+        parameters.required(request.getParams(), 0, EeaGetTransactionCountParameters.class);
 
     try {
       final long nonce = determineNonce(eeaGetTransactionCount);
@@ -108,7 +77,7 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
     }
   }
 
-  private long determineNonce(final EeaGetTransactionCountJsonBody getTransactionCount)
+  private long determineNonce(final EeaGetTransactionCountParameters getTransactionCount)
       throws Exception {
 
     final String[] groupMembers =
