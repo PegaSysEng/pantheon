@@ -34,7 +34,6 @@ jobs:
       - run:
           name: Assemble
           command: |
-            git submodule update --init --recursive
             ./gradlew --no-daemon --parallel clean compileJava compileTestJava assemble
       - save_cache:
           name: Caching gradle dependencies
@@ -101,6 +100,7 @@ jobs:
       - run:
           name: ReferenceTests
           command: |
+            git submodule update --init --recursive
             ./gradlew --no-daemon --parallel referenceTest
 
   acceptanceTests:
