@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ConsenSys AG.
+ * Copyright 2018 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -17,17 +17,16 @@ import tech.pegasys.pantheon.services.util.RocksDbUtil;
 import java.nio.file.Path;
 
 public class RocksDBConfiguration {
-  public static final int DEFAULT_MAX_OPEN_FILES = 1024;
-  public static final long DEFAULT_CACHE_CAPACITY = 8388608;
-  public static final int DEFAULT_MAX_BACKGROUND_COMPACTIONS = 4;
-  public static final int DEFAULT_BACKGROUND_THREAD_COUNT = 4;
+  private static final int DEFAULT_MAX_OPEN_FILES = 1024;
+  private static final long DEFAULT_CACHE_CAPACITY = 8388608;
+  private static final int DEFAULT_MAX_BACKGROUND_COMPACTIONS = 4;
+  private static final int DEFAULT_BACKGROUND_THREAD_COUNT = 4;
 
   private final Path databaseDir;
   private final int maxOpenFiles;
   private final String label;
   private final int maxBackgroundCompactions;
   private final int backgroundThreadCount;
-  private final boolean useColumns;
   private final long cacheCapacity;
 
   private RocksDBConfiguration(
@@ -35,12 +34,10 @@ public class RocksDBConfiguration {
       final int maxOpenFiles,
       final int maxBackgroundCompactions,
       final int backgroundThreadCount,
-      final boolean useColumns,
       final long cacheCapacity,
       final String label) {
     this.maxBackgroundCompactions = maxBackgroundCompactions;
     this.backgroundThreadCount = backgroundThreadCount;
-    this.useColumns = useColumns;
     RocksDbUtil.loadNativeLibrary();
     this.databaseDir = databaseDir;
     this.maxOpenFiles = maxOpenFiles;
@@ -76,10 +73,6 @@ public class RocksDBConfiguration {
     return label;
   }
 
-  public boolean useColumns() {
-    return useColumns;
-  }
-
   public static class Builder {
 
     Path databaseDir;
@@ -89,7 +82,6 @@ public class RocksDBConfiguration {
     long cacheCapacity = DEFAULT_CACHE_CAPACITY;
     int maxBackgroundCompactions = DEFAULT_MAX_BACKGROUND_COMPACTIONS;
     int backgroundThreadCount = DEFAULT_BACKGROUND_THREAD_COUNT;
-    boolean useColumns = false;
 
     private Builder() {}
 
@@ -123,18 +115,12 @@ public class RocksDBConfiguration {
       return this;
     }
 
-    public Builder useColumns(final boolean useColumns) {
-      this.useColumns = useColumns;
-      return this;
-    }
-
     public RocksDBConfiguration build() {
       return new RocksDBConfiguration(
           databaseDir,
           maxOpenFiles,
           maxBackgroundCompactions,
           backgroundThreadCount,
-          useColumns,
           cacheCapacity,
           label);
     }

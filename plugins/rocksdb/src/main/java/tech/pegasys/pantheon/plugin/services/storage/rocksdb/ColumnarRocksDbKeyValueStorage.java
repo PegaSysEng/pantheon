@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import static java.util.Objects.requireNonNullElse;
+
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
@@ -113,13 +115,12 @@ public class ColumnarRocksDbKeyValueStorage
                   Collectors.toMap(segment -> BytesValue.wrap(segment.getId()), Segment::getName));
 
       final ImmutableMap.Builder<String, ColumnFamilyHandle> builder = ImmutableMap.builder();
-      for (final ColumnFamilyHandle columnHandle : columnHandles) {
-        final String segmentName = segmentsById.get(BytesValue.wrap(columnHandle.getName()));
-        if (segmentName != null) {
-          builder.put(segmentName, columnHandle);
-        } else {
-          builder.put(DEFAULT_COLUMN, columnHandle);
-        }
+
+      for (ColumnFamilyHandle columnHandle : columnHandles) {
+        final String segmentName =
+            requireNonNullElse(
+                segmentsById.get(BytesValue.wrap(columnHandle.getName())), DEFAULT_COLUMN);
+        builder.put(segmentName, columnHandle);
       }
       columnHandlesByName = builder.build();
 

@@ -13,10 +13,21 @@
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.function.LongSupplier;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import tech.pegasys.pantheon.kvstore.AbstractKeyValueStorageTest;
 import tech.pegasys.pantheon.metrics.Counter;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
@@ -25,18 +36,6 @@ import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
-
-import java.util.function.LongSupplier;
-
-import org.assertj.core.api.Assertions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
@@ -47,6 +46,7 @@ public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
   @Mock private OperationTimer operationTimerMock;
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
+  @Override
   protected KeyValueStorage createStore() throws Exception {
     return new RocksDBKeyValueStorage(config(), new NoOpMetricsSystem());
   }
@@ -54,17 +54,12 @@ public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
   @Test
   public void createStoreMustCreateMetrics() throws Exception {
     // Prepare mocks
-    when(labelledMetricOperationTimerMock.labels(ArgumentMatchers.any()))
-        .thenReturn(operationTimerMock);
+    when(labelledMetricOperationTimerMock.labels(any())).thenReturn(operationTimerMock);
     when(metricsSystemMock.createLabelledTimer(
-            ArgumentMatchers.eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
-                ArgumentMatchers.anyString(),
-            ArgumentMatchers.anyString(), ArgumentMatchers.any()))
+            eq(PantheonMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
         .thenReturn(labelledMetricOperationTimerMock);
     when(metricsSystemMock.createLabelledCounter(
-            ArgumentMatchers.eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
-                ArgumentMatchers.anyString(),
-            ArgumentMatchers.anyString(), ArgumentMatchers.any()))
+            eq(PantheonMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
         .thenReturn(labelledMetricCounterMock);
     // Prepare argument captors
     final ArgumentCaptor<String> labelledTimersMetricsNameArgs =
@@ -83,17 +78,17 @@ public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
     assertThat(keyValueStorage).isNotNull();
     verify(metricsSystemMock, times(4))
         .createLabelledTimer(
-            ArgumentMatchers.eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
+            eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
             labelledTimersMetricsNameArgs.capture(),
             labelledTimersHelpArgs.capture(),
-            ArgumentMatchers.any());
-    Assertions.assertThat(labelledTimersMetricsNameArgs.getAllValues())
+            any());
+    assertThat(labelledTimersMetricsNameArgs.getAllValues())
         .containsExactly(
             "read_latency_seconds",
             "remove_latency_seconds",
             "write_latency_seconds",
             "commit_latency_seconds");
-    Assertions.assertThat(labelledTimersHelpArgs.getAllValues())
+    assertThat(labelledTimersHelpArgs.getAllValues())
         .containsExactly(
             "Latency for read from RocksDB.",
             "Latency of remove requests from RocksDB.",
@@ -102,32 +97,29 @@ public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
 
     verify(metricsSystemMock, times(2))
         .createLongGauge(
-            ArgumentMatchers.eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
+            eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
             longGaugesMetricsNameArgs.capture(),
             longGaugesHelpArgs.capture(),
-            ArgumentMatchers.any(LongSupplier.class));
-    Assertions.assertThat(longGaugesMetricsNameArgs.getAllValues())
+            any(LongSupplier.class));
+    assertThat(longGaugesMetricsNameArgs.getAllValues())
         .containsExactly("rocks_db_table_readers_memory_bytes", "rocks_db_files_size_bytes");
-    Assertions.assertThat(longGaugesHelpArgs.getAllValues())
+    assertThat(longGaugesHelpArgs.getAllValues())
         .containsExactly(
             "Estimated memory used for RocksDB index and filter blocks in bytes",
             "Estimated database size in bytes");
 
     verify(metricsSystemMock)
         .createLabelledCounter(
-            ArgumentMatchers.eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
+            eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
             labelledCountersMetricsNameArgs.capture(),
             labelledCountersHelpArgs.capture(),
-            ArgumentMatchers.any());
-    Assertions.assertThat(labelledCountersMetricsNameArgs.getValue()).isEqualTo("rollback_count");
-    Assertions.assertThat(labelledCountersHelpArgs.getValue())
+            any());
+    assertThat(labelledCountersMetricsNameArgs.getValue()).isEqualTo("rollback_count");
+    assertThat(labelledCountersHelpArgs.getValue())
         .isEqualTo("Number of RocksDB transactions rolled back.");
   }
 
   private RocksDBConfiguration config() throws Exception {
-    return RocksDBConfiguration.builder()
-        .databaseDir(folder.newFolder().toPath())
-        .useColumns(false)
-        .build();
+    return RocksDBConfiguration.builder().databaseDir(folder.newFolder().toPath()).build();
   }
 }
