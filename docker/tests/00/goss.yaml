@@ -3,7 +3,7 @@
 
 # ensure there are env vars set in the dockerfile
 file:
-  Dockerfile:
+  /goss/Dockerfile:
     exists: true
     contains:
       - "/ENV PANTHEON_RPC_HTTP_HOST 0.0.0.0/"
