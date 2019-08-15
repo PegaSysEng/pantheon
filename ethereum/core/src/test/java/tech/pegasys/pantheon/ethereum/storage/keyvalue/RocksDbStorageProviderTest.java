@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
 
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -34,7 +34,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class RocksDbStorageProviderTest {
 
-  @Mock private RocksDbConfiguration rocksDbConfiguration;
+  @Mock private RocksDBConfiguration rocksDbConfiguration;
   @Rule public final TemporaryFolder temporaryFolder = new TemporaryFolder();
   private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
 
