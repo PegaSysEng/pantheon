@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.services.kvstore;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 
 import java.io.Closeable;
@@ -95,45 +93,5 @@ public interface SegmentedKeyValueStorage<S> extends Closeable {
     String getName();
 
     byte[] getId();
-  }
-
-  // TODO follow decorator pattern, same as other abstrax
-  abstract class AbstractTransaction<S> implements Transaction<S> {
-
-    private boolean active = true;
-
-    @Override
-    public final void put(final S segment, final byte[] key, final byte[] value) {
-      checkState(active, "Cannot invoke put() on a completed transaction.");
-      doPut(segment, key, value);
-    }
-
-    @Override
-    public final void remove(final S segment, final byte[] key) {
-      checkState(active, "Cannot invoke remove() on a completed transaction.");
-      doRemove(segment, key);
-    }
-
-    @Override
-    public final void commit() throws StorageException {
-      checkState(active, "Cannot commit a completed transaction.");
-      active = false;
-      doCommit();
-    }
-
-    @Override
-    public final void rollback() {
-      checkState(active, "Cannot rollback a completed transaction.");
-      active = false;
-      doRollback();
-    }
-
-    protected abstract void doPut(S segment, byte[] key, byte[] value);
-
-    protected abstract void doRemove(S segment, byte[] key);
-
-    protected abstract void doCommit() throws StorageException;
-
-    protected abstract void doRollback();
   }
 }

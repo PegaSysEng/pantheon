@@ -24,8 +24,8 @@ public class KeyValueStorageTransactionTransitionValidatorDecorator
   private boolean active = true;
 
   public KeyValueStorageTransactionTransitionValidatorDecorator(
-      final KeyValueStorageTransaction transaction) {
-    this.transaction = transaction;
+      final KeyValueStorageTransaction toDecorate) {
+    this.transaction = toDecorate;
   }
 
   @Override

@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
+import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageTransactionTransitionValidatorDecorator;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
@@ -30,7 +31,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.swing.text.Segment;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
@@ -156,7 +156,8 @@ public class ColumnarRocksDbKeyValueStorage
   public Transaction<ColumnFamilyHandle> startTransaction() throws StorageException {
     throwIfClosed();
     final WriteOptions options = new WriteOptions();
-    return new RocksDbTransaction(db.beginTransaction(options), options);
+    return new SegmentedKeyValueStorageTransactionTransitionValidatorDecorator<>(
+        new RocksDbTransaction(db.beginTransaction(options), options));
   }
 
   @Override
@@ -212,7 +213,8 @@ public class ColumnarRocksDbKeyValueStorage
     }
   }
 
-  private class RocksDbTransaction extends AbstractTransaction<ColumnFamilyHandle> {
+  private class RocksDbTransaction implements Transaction<ColumnFamilyHandle> {
+
     private final org.rocksdb.Transaction innerTx;
     private final WriteOptions options;
 
@@ -222,7 +224,7 @@ public class ColumnarRocksDbKeyValueStorage
     }
 
     @Override
-    protected void doPut(final ColumnFamilyHandle segment, final byte[] key, final byte[] value) {
+    public void put(final ColumnFamilyHandle segment, final byte[] key, final byte[] value) {
       try (final OperationTimer.TimingContext ignored =
           rocksDBMetricsHelper.getWriteLatency().startTimer()) {
         innerTx.put(segment, key, value);
@@ -232,7 +234,7 @@ public class ColumnarRocksDbKeyValueStorage
     }
 
     @Override
-    protected void doRemove(final ColumnFamilyHandle segment, final byte[] key) {
+    public void remove(final ColumnFamilyHandle segment, final byte[] key) {
       try (final OperationTimer.TimingContext ignored =
           rocksDBMetricsHelper.getRemoveLatency().startTimer()) {
         innerTx.delete(segment, key);
@@ -242,7 +244,7 @@ public class ColumnarRocksDbKeyValueStorage
     }
 
     @Override
-    protected void doCommit() throws StorageException {
+    public void commit() throws StorageException {
       try (final OperationTimer.TimingContext ignored =
           rocksDBMetricsHelper.getCommitLatency().startTimer()) {
         innerTx.commit();
@@ -254,7 +256,7 @@ public class ColumnarRocksDbKeyValueStorage
     }
 
     @Override
-    protected void doRollback() {
+    public void rollback() {
       try {
         innerTx.rollback();
         rocksDBMetricsHelper.getRollbackCount().inc();
