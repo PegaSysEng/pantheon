@@ -10,9 +10,29 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.cli.subcommands.blocks;
+package tech.pegasys.pantheon.ethereum.trie;
 
-public enum BlockFormat {
-  RLP,
-  JSON
+import tech.pegasys.pantheon.util.bytes.BytesValue;
+
+import java.util.List;
+import java.util.Optional;
+
+public class Proof<V> {
+
+  private final Optional<V> value;
+
+  private final List<BytesValue> proofRelatedNodes;
+
+  public Proof(final Optional<V> value, final List<BytesValue> proofRelatedNodes) {
+    this.value = value;
+    this.proofRelatedNodes = proofRelatedNodes;
+  }
+
+  public Optional<V> getValue() {
+    return value;
+  }
+
+  public List<BytesValue> getProofRelatedNodes() {
+    return proofRelatedNodes;
+  }
 }
