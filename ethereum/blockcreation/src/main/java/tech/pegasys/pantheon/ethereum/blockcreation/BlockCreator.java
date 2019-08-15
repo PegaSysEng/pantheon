@@ -13,7 +13,14 @@
 package tech.pegasys.pantheon.ethereum.blockcreation;
 
 import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
+
+import java.util.List;
 
 public interface BlockCreator {
   Block createBlock(final long timestamp);
+
+  Block createBlock(
+      final List<Transaction> transactions, final List<BlockHeader> ommers, final long timestamp);
 }
