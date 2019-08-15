@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorageTransactionTransitionValidatorDecorator;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
 
 import java.util.Optional;
@@ -125,7 +126,8 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   public KeyValueStorageTransaction startTransaction() throws StorageException {
     throwIfClosed();
     final WriteOptions options = new WriteOptions();
-    return new RocksDBTransaction(db.beginTransaction(options), options, rocksDBMetrics);
+    return new KeyValueStorageTransactionTransitionValidatorDecorator(
+        new RocksDBTransaction(db.beginTransaction(options), options, rocksDBMetrics));
   }
 
   @Override
