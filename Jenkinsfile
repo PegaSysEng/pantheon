@@ -161,7 +161,9 @@ try {
                     }
                 }
             }
-        }, DockerImage: {
+        }
+
+        DockerImage: {
                 def stage_name = 'Docker image node: '
                 def docker_folder = 'docker'
                 def reports_folder = docker_folder + '/reports'
