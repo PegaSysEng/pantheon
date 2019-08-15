@@ -18,12 +18,12 @@ import static java.util.Arrays.asList;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
+import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBColumnarKeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.LimitedInMemoryKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Segment;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
 
 import java.io.IOException;
@@ -37,6 +37,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class RocksDbStorageProvider {
+
+  // TODO move this into the plugin, as it's RocksDB specific
 
   public static long DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE = 5_000L;
   private static final Logger LOG = LogManager.getLogger();
@@ -118,27 +120,16 @@ public class RocksDbStorageProvider {
         new SegmentedKeyValueStorageAdapter<>(RocksDbSegment.PRUNING_STATE, columnarStorage));
   }
 
-  private enum RocksDbSegment implements Segment {
-    BLOCKCHAIN((byte) 1),
-    WORLD_STATE((byte) 2),
-    PRIVATE_TRANSACTIONS((byte) 3),
-    PRIVATE_STATE((byte) 4),
-    PRUNING_STATE((byte) 5);
-
-    private final byte[] id;
-
-    RocksDbSegment(final byte... id) {
-      this.id = id;
-    }
+  private enum RocksDbSegment implements SegmentIdentifier {
+    BLOCKCHAIN,
+    WORLD_STATE,
+    PRIVATE_TRANSACTIONS,
+    PRIVATE_STATE,
+    PRUNING_STATE;
 
     @Override
     public String getName() {
       return name();
-    }
-
-    @Override
-    public byte[] getId() {
-      return id;
     }
   }
 

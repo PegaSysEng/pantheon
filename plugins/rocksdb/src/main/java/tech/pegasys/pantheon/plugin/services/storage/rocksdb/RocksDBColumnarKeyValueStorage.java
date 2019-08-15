@@ -17,6 +17,7 @@ import static java.util.Objects.requireNonNullElse;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
+import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageTransactionTransitionValidatorDecorator;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
@@ -64,7 +65,7 @@ public class RocksDBColumnarKeyValueStorage
 
   public static RocksDBColumnarKeyValueStorage create(
       final RocksDBConfiguration rocksDbConfiguration,
-      final List<Segment> segments,
+      final List<SegmentIdentifier> segments,
       final MetricsSystem metricsSystem)
       throws StorageException {
     return new RocksDBColumnarKeyValueStorage(rocksDbConfiguration, segments, metricsSystem);
@@ -72,13 +73,13 @@ public class RocksDBColumnarKeyValueStorage
 
   private RocksDBColumnarKeyValueStorage(
       final RocksDBConfiguration rocksDbConfiguration,
-      final List<Segment> segments,
+      final List<SegmentIdentifier> segments,
       final MetricsSystem metricsSystem) {
     RocksDbUtil.loadNativeLibrary();
     try {
       final List<ColumnFamilyDescriptor> columnDescriptors =
           segments.stream()
-              .map(segment -> new ColumnFamilyDescriptor(segment.getId()))
+              .map(segment -> new ColumnFamilyDescriptor(getId(segment)))
               .collect(Collectors.toList());
       columnDescriptors.add(
           new ColumnFamilyDescriptor(
@@ -112,7 +113,8 @@ public class RocksDBColumnarKeyValueStorage
       final Map<BytesValue, String> segmentsById =
           segments.stream()
               .collect(
-                  Collectors.toMap(segment -> BytesValue.wrap(segment.getId()), Segment::getName));
+                  Collectors.toMap(
+                      segment -> BytesValue.wrap(getId(segment)), SegmentIdentifier::getName));
 
       final ImmutableMap.Builder<String, ColumnFamilyHandle> builder = ImmutableMap.builder();
 
@@ -135,7 +137,7 @@ public class RocksDBColumnarKeyValueStorage
   }
 
   @Override
-  public ColumnFamilyHandle getSegmentIdentifierByName(final Segment segment) {
+  public ColumnFamilyHandle getSegmentIdentifierByName(final SegmentIdentifier segment) {
     return columnHandlesByName.get(segment.getName());
   }
 
@@ -211,6 +213,10 @@ public class RocksDBColumnarKeyValueStorage
       LOG.error("Attempting to use a closed RocksDbKeyValueStorage");
       throw new IllegalStateException("Storage has been closed");
     }
+  }
+
+  private byte[] getId(final SegmentIdentifier name) {
+    return name.getName().getBytes(StandardCharsets.UTF_8);
   }
 
   private class RocksDbTransaction implements Transaction<ColumnFamilyHandle> {

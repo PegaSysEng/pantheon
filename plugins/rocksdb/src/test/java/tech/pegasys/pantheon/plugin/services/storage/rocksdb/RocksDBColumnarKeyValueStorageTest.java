@@ -18,11 +18,12 @@ import static org.junit.Assert.assertEquals;
 import tech.pegasys.pantheon.kvstore.AbstractKeyValueStorageTest;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
+import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Segment;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Transaction;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -32,6 +33,7 @@ import org.junit.rules.TemporaryFolder;
 import org.rocksdb.ColumnFamilyHandle;
 
 public class RocksDBColumnarKeyValueStorageTest extends AbstractKeyValueStorageTest {
+
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
   @Test
@@ -81,24 +83,19 @@ public class RocksDBColumnarKeyValueStorageTest extends AbstractKeyValueStorageT
     assertEquals(Optional.empty(), store.get(barSegment, bytesOf(6)));
   }
 
-  public enum TestSegment implements Segment {
+  public enum TestSegment implements SegmentIdentifier {
     FOO(new byte[] {1}),
     BAR(new byte[] {2});
 
-    private final byte[] id;
+    private final String nameAsUtf8;
 
     TestSegment(final byte[] id) {
-      this.id = id;
+      this.nameAsUtf8 = new String(id, StandardCharsets.UTF_8);
     }
 
     @Override
     public String getName() {
       return name();
-    }
-
-    @Override
-    public byte[] getId() {
-      return id;
     }
   }
 

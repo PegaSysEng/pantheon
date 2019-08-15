@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.services.kvstore;
 
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
+import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
 import java.io.Closeable;
 import java.util.Optional;
@@ -25,7 +26,7 @@ import java.util.function.Predicate;
  */
 public interface SegmentedKeyValueStorage<S> extends Closeable {
 
-  S getSegmentIdentifierByName(Segment segment);
+  S getSegmentIdentifierByName(SegmentIdentifier segment);
 
   /**
    * @param segment the segment
@@ -86,12 +87,5 @@ public interface SegmentedKeyValueStorage<S> extends Closeable {
      * throw exceptions if modifications are attempted.
      */
     void rollback();
-  }
-
-  // TODO use plugin api segment
-  interface Segment {
-    String getName();
-
-    byte[] getId();
   }
 }

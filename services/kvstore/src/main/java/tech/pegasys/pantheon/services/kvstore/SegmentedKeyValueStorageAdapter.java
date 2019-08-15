@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.services.kvstore;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
-import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Segment;
+import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -27,7 +27,7 @@ public class SegmentedKeyValueStorageAdapter<S> implements KeyValueStorage {
   private final SegmentedKeyValueStorage<S> storage;
 
   public SegmentedKeyValueStorageAdapter(
-      final Segment segment, final SegmentedKeyValueStorage<S> storage) {
+      final SegmentIdentifier segment, final SegmentedKeyValueStorage<S> storage) {
     this.segmentHandle = storage.getSegmentIdentifierByName(segment);
     this.storage = storage;
   }
