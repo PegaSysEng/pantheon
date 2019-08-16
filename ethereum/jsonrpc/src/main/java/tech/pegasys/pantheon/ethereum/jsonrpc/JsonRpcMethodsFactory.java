@@ -95,6 +95,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.Per
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea.EeaGetTransactionCount;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea.EeaGetTransactionReceipt;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea.EeaSendRawTransaction;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea.LegacyNonceProvider;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv.PrivCreatePrivacyGroup;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv.PrivDeletePrivacyGroup;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.priv.PrivFindPrivacyGroup;
@@ -338,7 +339,8 @@ public class JsonRpcMethodsFactory {
             new EeaGetTransactionReceipt(blockchainQueries, enclave, parameter, privacyParameters),
             new EeaSendRawTransaction(
                 blockchainQueries, privateTransactionHandler, transactionPool, parameter),
-            new EeaGetTransactionCount(parameter, enclave, privateTransactionHandler));
+            new EeaGetTransactionCount(
+                parameter, new LegacyNonceProvider(enclave, privateTransactionHandler)));
       }
       if (priv) {
         addMethods(

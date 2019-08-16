@@ -14,10 +14,6 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.types.FindPrivacyGroupRequest;
-import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
-import tech.pegasys.pantheon.enclave.types.PrivacyGroup.Type;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
@@ -28,30 +24,20 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.Quantity;
-import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.google.common.collect.Lists;
 import org.apache.logging.log4j.Logger;
-import org.bouncycastle.util.Arrays;
 
 public class EeaGetTransactionCount implements JsonRpcMethod {
 
   private static final Logger LOG = getLogger();
 
   private final JsonRpcParameter parameters;
-  private final Enclave enclave;
-  private final PrivateTransactionHandler privateTransactionHandler;
+  private final LegacyNonceProvider nonceProvider;
 
   public EeaGetTransactionCount(
-      final JsonRpcParameter parameters,
-      final Enclave enclave,
-      final PrivateTransactionHandler privateTransactionHandler) {
+      final JsonRpcParameter parameters, final LegacyNonceProvider nonceProvider) {
     this.parameters = parameters;
-    this.enclave = enclave;
-    this.privateTransactionHandler = privateTransactionHandler;
+    this.nonceProvider = nonceProvider;
   }
 
   @Override
@@ -68,40 +54,16 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
         parameters.required(request.getParams(), 0, EeaGetTransactionCountParameters.class);
 
     try {
-      final long nonce = determineNonce(eeaGetTransactionCount);
+      final long nonce =
+          nonceProvider.determineNonce(
+              eeaGetTransactionCount.getPrivateFrom(),
+              eeaGetTransactionCount.getPrivateFor(),
+              eeaGetTransactionCount.getAddress());
       return new JsonRpcSuccessResponse(request.getId(), Quantity.create(nonce));
     } catch (final Exception e) {
       LOG.error("Failed to fetch group from Enclave with error " + e.getMessage());
       LOG.error(e);
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.FIND_PRIVACY_GROUP_ERROR);
     }
-  }
-
-  private long determineNonce(final EeaGetTransactionCountParameters getTransactionCount)
-      throws Exception {
-
-    final String[] groupMembers =
-        Arrays.append(getTransactionCount.getPrivateFor(), getTransactionCount.getPrivateFrom());
-
-    final FindPrivacyGroupRequest request = new FindPrivacyGroupRequest(groupMembers);
-    final List<PrivacyGroup> matchingGroups = Lists.newArrayList(enclave.findPrivacyGroup(request));
-
-    final List<PrivacyGroup> legacyGroups =
-        matchingGroups.stream()
-            .filter(group -> group.getType() == Type.LEGACY)
-            .collect(Collectors.toList());
-
-    if (legacyGroups.size() != 1) {
-      final String errorMessage =
-          String.format(
-              "Found invalid number of privacy groups (%d), expected 1.", legacyGroups.size());
-      LOG.error(errorMessage);
-      throw new RuntimeException(errorMessage);
-    }
-
-    final String privacyGroupId = legacyGroups.get(0).getPrivacyGroupId();
-
-    return privateTransactionHandler.getSenderNonce(
-        getTransactionCount.getAddress(), privacyGroupId);
   }
 }
