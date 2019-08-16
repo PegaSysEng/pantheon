@@ -42,7 +42,7 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
 
   @Override
   public String getName() {
-    return RpcMethod.PRIV_GET_LEGACY_TRANSACTION_COUNT.getMethodName();
+    return RpcMethod.EEA_GET_TRANSACTION_COUNT.getMethodName();
   }
 
   @Override
