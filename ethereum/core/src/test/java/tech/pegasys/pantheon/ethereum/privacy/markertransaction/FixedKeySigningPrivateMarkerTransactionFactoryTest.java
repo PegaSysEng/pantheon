@@ -48,7 +48,7 @@ public class FixedKeySigningPrivateMarkerTransactionFactoryTest {
   }
 
   @Test
-  public void nonceInsertedToTransactionIsThatProvidedFromNonceProvider() {
+  public void createsFullyPopulatedPrivateMarkerTransactionUsingProvidedNonce() {
 
     final KeyPair signingKeys = KeyPair.generate();
     final Address precompiledAddress = Address.fromHexString("1");

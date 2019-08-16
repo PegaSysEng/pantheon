@@ -21,12 +21,12 @@ import java.util.OptionalLong;
 
 public class LatestNonceProvider implements NonceProvider {
 
-  final BlockchainQueries blockchain;
-  final PendingTransactions pendingTransactions;
+  private final BlockchainQueries blockchainQueries;
+  private final PendingTransactions pendingTransactions;
 
   public LatestNonceProvider(
-      final BlockchainQueries blockchain, final PendingTransactions pendingTransactions) {
-    this.blockchain = blockchain;
+      final BlockchainQueries blockchainQueries, final PendingTransactions pendingTransactions) {
+    this.blockchainQueries = blockchainQueries;
     this.pendingTransactions = pendingTransactions;
   }
 
@@ -34,6 +34,6 @@ public class LatestNonceProvider implements NonceProvider {
   public long getNonce(final Address address) {
     final OptionalLong pendingNonce = pendingTransactions.getNextNonceForSender(address);
     return pendingNonce.orElseGet(
-        () -> blockchain.getTransactionCount(address, blockchain.headBlockNumber()));
+        () -> blockchainQueries.getTransactionCount(address, blockchainQueries.headBlockNumber()));
   }
 }

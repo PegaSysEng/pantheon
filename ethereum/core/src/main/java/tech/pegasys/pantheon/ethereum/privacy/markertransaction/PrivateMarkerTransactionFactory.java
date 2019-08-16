@@ -26,7 +26,7 @@ public abstract class PrivateMarkerTransactionFactory {
     this.privacyPrecompileAddress = privacyPrecompileAddress;
   }
 
-  protected Address getPrivacyPrecompileAddress() {
+  private Address getPrivacyPrecompileAddress() {
     return privacyPrecompileAddress;
   }
 
