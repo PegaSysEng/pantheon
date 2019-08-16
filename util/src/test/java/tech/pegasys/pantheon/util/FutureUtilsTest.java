@@ -197,13 +197,18 @@ public class FutureUtilsTest {
     final CompletableFuture<String> future1 = new CompletableFuture<>();
     final CompletableFuture<String> future2 = new CompletableFuture<>();
     final CompletableFuture<String> future3 = new CompletableFuture<>();
-    future1.complete("a");
-    future2.complete("b");
-    future3.complete("c");
 
     final CompletableFuture<String> result =
         anyOfMatching(ImmutableList.of(future1, future2, future3), isEqual("a"));
+    assertThat(result).isNotDone();
 
+    future2.complete("b");
+    assertThat(result).isNotDone();
+
+    future3.complete("c");
+    assertThat(result).isNotDone();
+
+    future1.complete("a");
     assertThat(result).isCompletedWithValue("a");
   }
 
@@ -212,12 +217,13 @@ public class FutureUtilsTest {
     final CompletableFuture<String> future1 = new CompletableFuture<>();
     final CompletableFuture<String> future2 = new CompletableFuture<>();
     final CompletableFuture<String> future3 = new CompletableFuture<>();
-    future1.complete("a");
-    future2.complete("ab");
-    future3.complete("abc");
 
     final CompletableFuture<String> result =
         anyOfMatching(ImmutableList.of(future1, future2, future3), v -> v.startsWith("a"));
+
+    future1.complete("a");
+    future2.complete("ab");
+    future3.complete("abc");
 
     assertThat(result).isCompletedWithValue("a");
   }
@@ -227,11 +233,13 @@ public class FutureUtilsTest {
     final CompletableFuture<String> future1 = new CompletableFuture<>();
     final CompletableFuture<String> future2 = new CompletableFuture<>();
     final CompletableFuture<String> future3 = new CompletableFuture<>();
+
+    final CompletableFuture<String> result =
+        anyOfMatching(ImmutableList.of(future1, future2, future3), isEqual("d"));
+
     future1.complete("a");
     future2.complete("ab");
     future3.complete("abc");
-    final CompletableFuture<String> result =
-        anyOfMatching(ImmutableList.of(future1, future2, future3), isEqual("d"));
 
     assertThatThrownBy(result::join).hasRootCauseInstanceOf(NoSuchElementException.class);
   }
