@@ -157,9 +157,7 @@ public class Blake2bfMessageDigest extends BCMessageDigest {
 
       if ((in[212] & 0xFE) != 0) {
         throw new IllegalArgumentException(
-            "F flag has value "
-                + in[212]
-                + " but only 0 or 1 are valid.");
+            "F flag has value " + in[212] + " but only 0 or 1 are valid.");
       }
 
       System.arraycopy(in, offset, buffer, bufferPos, len);
