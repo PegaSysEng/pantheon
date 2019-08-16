@@ -64,12 +64,13 @@ public class EnclaveHandlerTest {
   @Test
   public void sendsDataToUsersOrion() throws Exception {
     final SendRequest sendRequest = new SendRequestPantheon("payload", "from", "privacyGroup");
-    when(enclave1.send(sendRequest)).thenReturn(new SendResponse("abc123"));
+    final SendResponse sendResponse = new SendResponse("abc123");
+    when(enclave1.send(sendRequest)).thenReturn(sendResponse);
 
     assertThat(enclaveHandler.sendData(enclaveUser1, sendRequest))
-        .isEqualToComparingFieldByField(new SendResponse("abc123"));
+        .isEqualToComparingFieldByField(sendResponse);
     verify(enclave1).send(sendRequest);
-    verifyZeroInteractions(enclave2);
+    verifyZeroInteractions(enclave2, enclave3);
   }
 
   @Test
@@ -83,47 +84,45 @@ public class EnclaveHandlerTest {
   @Test
   public void retrievesDataForEnclaveUser() throws Exception {
     final ReceiveRequest receiveRequest = new ReceiveRequest("abc123", "user2PublicKey");
-
-    when(enclave1.receive(any(ReceiveRequest.class))).thenThrow(EnclaveException.class);
-    when(enclave2.receive(any(ReceiveRequest.class))).thenThrow(EnclaveException.class);
+    when(enclave1.receive(any())).thenThrow(EnclaveException.class);
+    when(enclave2.receive(any())).thenThrow(EnclaveException.class);
     when(enclave3.receive(receiveRequest)).thenReturn(new ReceiveResponse(null, "privacyGroup"));
 
     assertThat(enclaveHandler.retrieveData(receiveRequest).getPrivacyGroupId())
         .isEqualTo("privacyGroup");
-    verify(enclave1).receive(any());
-    verify(enclave2).receive(any());
-    verify(enclave3).receive(any());
+    verify(enclave1).receive(receiveRequest);
+    verify(enclave2).receive(receiveRequest);
+    verify(enclave3).receive(receiveRequest);
   }
 
   @Test
   public void retrievesDataEvenWhenSomeEnclavesFail() throws Exception {
+    final ReceiveRequest receiveRequest = new ReceiveRequest("abc123", "user2PublicKey");
     when(enclave1.receive(any())).thenThrow(IOException.class);
-    when(enclave2.receive(any(ReceiveRequest.class)))
-        .thenReturn(new ReceiveResponse(null, "privacyGroup"));
+    when(enclave2.receive(any())).thenReturn(new ReceiveResponse(null, "privacyGroup"));
     when(enclave3.receive(any(ReceiveRequest.class)))
         .thenReturn(new ReceiveResponse(null, "privacyGroup"));
 
-    final ReceiveResponse receiveResponse =
-        enclaveHandler.retrieveData(new ReceiveRequest("abc123", "user2PublicKey"));
+    final ReceiveResponse receiveResponse = enclaveHandler.retrieveData(receiveRequest);
     assertThat(receiveResponse.getPrivacyGroupId()).isEqualTo("privacyGroup");
-    verify(enclave1).receive(any());
-    verify(enclave2).receive(any());
-    verify(enclave3).receive(any());
+    verify(enclave1).receive(receiveRequest);
+    verify(enclave2).receive(receiveRequest);
+    verify(enclave3).receive(receiveRequest);
   }
 
   @Test
   public void retrieveDataShouldFailWhenNoEnclaveContainsData() throws Exception {
+    final ReceiveRequest receiveRequest = new ReceiveRequest("abc123", "user2PublicKey");
     when(enclave1.receive(any())).thenThrow(EnclaveException.class);
     when(enclave2.receive(any())).thenThrow(EnclaveException.class);
     when(enclave3.receive(any())).thenThrow(IOException.class);
 
-    assertThatThrownBy(
-            () -> enclaveHandler.retrieveData(new ReceiveRequest("abc123", "user2PublicKey")))
+    assertThatThrownBy(() -> enclaveHandler.retrieveData(receiveRequest))
         .isInstanceOf(CompletionException.class)
         .hasRootCauseInstanceOf(NoSuchElementException.class);
-    verify(enclave1).receive(any());
-    verify(enclave2).receive(any());
-    verify(enclave3).receive(any());
+    verify(enclave1).receive(receiveRequest);
+    verify(enclave2).receive(receiveRequest);
+    verify(enclave3).receive(receiveRequest);
   }
 
   @Test

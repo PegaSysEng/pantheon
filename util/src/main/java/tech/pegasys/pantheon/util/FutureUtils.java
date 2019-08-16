@@ -138,7 +138,7 @@ public class FutureUtils {
 
   /**
    * Creates a {@link CompletableFuture} that is completed when any of the provided
-   * CompletableFutures completes and matches the supplied predicate.
+   * CompletableFutures complete and matches the supplied predicate.
    *
    * <p>If no successful CompletableFuture matches the predicate then the CompletableFuture will
    * complete with a NoSuchElementException.
