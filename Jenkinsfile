@@ -161,7 +161,9 @@ try {
                     }
                 }
             }
-        }, DockerImage: {
+        }
+
+        parallel DockerImage: {
                 def stage_name = 'Docker image node: '
                 def docker_folder = 'docker'
                 def reports_folder = docker_folder + '/reports'
@@ -225,7 +227,7 @@ try {
                                         additionalTags.add(version.split(/\./)[0..1].join('.'))
                                     }
 
-                                    additional.each { tag ->
+                                    additionalTags.each { tag ->
                                         docker.image(image).push tag.trim()
                                     }
                                 }
@@ -233,12 +235,10 @@ try {
                         }
                     }
                 }
-        }
-
-        if (shouldPublish()) {
-            BintrayPublish: {
-                def stage_name = "Bintray publish node: "
-                node {
+        }, BintrayPublish: {
+            def stage_name = "Bintray publish node: "
+            node {
+                if (shouldPublish()) {
                     checkout scm
 
                     docker.image(docker_image_dind).withRun('--privileged') { d ->
