@@ -155,6 +155,13 @@ public class Blake2bfMessageDigest extends BCMessageDigest {
                 + " byte(s) left to fill");
       }
 
+      if ((in[212] & 0xFE) != 0) {
+        throw new IllegalArgumentException(
+            "F flag has value "
+                + in[212]
+                + " but only 0 or 1 are valid.");
+      }
+
       System.arraycopy(in, offset, buffer, bufferPos, len);
 
       bufferPos += len;
@@ -179,7 +186,7 @@ public class Blake2bfMessageDigest extends BCMessageDigest {
       compress();
 
       for (int i = 0; i < h.length; i++) {
-        System.arraycopy(Pack.longToBigEndian(h[i]), 0, out, i * 8, 8);
+        System.arraycopy(Pack.longToLittleEndian(h[i]), 0, out, i * 8, 8);
       }
 
       reset();
@@ -224,7 +231,7 @@ public class Blake2bfMessageDigest extends BCMessageDigest {
     }
 
     private long bytesToLong(final byte[] bytes) {
-      return Pack.bigEndianToLong(bytes, 0);
+      return Pack.littleEndianToLong(bytes, 0);
     }
 
     /**
