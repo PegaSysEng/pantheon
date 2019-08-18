@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethsigner;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
 import tech.pegasys.ethsigner.testutil.EthSignerTestHarness;
@@ -69,7 +70,7 @@ public class EthSignerClientTest {
     mockServer.createContext(
         "/",
         exchange -> {
-          byte[] response = MOCK_SEND_TRANSACTION_RESPONSE.getBytes();
+          byte[] response = MOCK_SEND_TRANSACTION_RESPONSE.getBytes(UTF_8);
           exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length);
           exchange.getResponseBody().write(response);
           exchange.close();
