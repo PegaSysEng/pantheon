@@ -241,7 +241,7 @@ allprojects {
    */
   test {
     jvmArgs = [
-      '-Xmx1g',
+      '-Xmx4g',
       '-XX:-UseGCOverheadLimit',
       // Mockito and jackson-databind do some strange reflection during tests.
       // This suppresses an illegal access warning.
