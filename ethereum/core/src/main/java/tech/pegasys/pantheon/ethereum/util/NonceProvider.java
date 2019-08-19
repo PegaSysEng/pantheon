@@ -10,23 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.chainimport;
+package tech.pegasys.pantheon.ethereum.util;
 
-import java.util.List;
+import tech.pegasys.pantheon.ethereum.core.Address;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+@FunctionalInterface
+public interface NonceProvider {
 
-public class ChainData {
-
-  private final List<BlockData> blocks;
-
-  @JsonCreator
-  public ChainData(@JsonProperty("blocks") final List<BlockData> blocks) {
-    this.blocks = blocks;
-  }
-
-  public List<BlockData> getBlocks() {
-    return blocks;
-  }
+  long getNonce(final Address address);
 }

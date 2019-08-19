@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.cli.subcommands.blocks;
 
-public enum BlockFormat {
-  RLP,
-  JSON
+public enum BlockExportFormat {
+  RLP
 }
