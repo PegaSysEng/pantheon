@@ -33,6 +33,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RocksDbStorageProviderTest {
+  private static final int DEFAULT_VERSION = 1;
 
   @Mock private RocksDBConfiguration rocksDbConfiguration;
   @Rule public final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -44,7 +45,7 @@ public class RocksDbStorageProviderTest {
     when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
     RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
     assertEquals(
-        RocksDbStorageProvider.DEFAULT_VERSION,
+        DEFAULT_VERSION,
         DatabaseMetadata.fromDirectory(rocksDbConfiguration.getDatabaseDir()).getVersion());
   }
 

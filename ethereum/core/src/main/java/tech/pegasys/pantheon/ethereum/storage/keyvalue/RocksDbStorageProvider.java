@@ -40,9 +40,9 @@ public class RocksDbStorageProvider {
 
   // TODO move this into the plugin, as it's RocksDB specific
 
-  public static long DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE = 5_000L;
+  private static final long DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE = 5_000L;
   private static final Logger LOG = LogManager.getLogger();
-  public static final int DEFAULT_VERSION = 1;
+  private static final int DEFAULT_VERSION = 1;
   /** This key is the version and the value is the function used to create or load the database. */
   private static final TreeMap<Integer, StorageProviderFunction> PROVIDERS_BY_VERSION =
       new TreeMap<>(
