@@ -24,9 +24,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,12 +38,8 @@ public class EeaGetTransactionCountTest {
 
   @Before
   public void setup() {
-    final Map<String, Object> jsonMap = new HashMap<>();
-    jsonMap.put("address", address.toString());
-    jsonMap.put("privateFrom", privateFrom);
-    jsonMap.put("privateFor", privateFor);
-
-    request = new JsonRpcRequest("2.0", "eea_getTransactionCount", new Object[] {jsonMap});
+    final Object[] jsonBody = new Object[] {address.toString(), privateFrom, privateFor};
+    request = new JsonRpcRequest("2.0", "eea_getTransactionCount", jsonBody);
   }
 
   @Test

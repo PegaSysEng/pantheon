@@ -14,10 +14,10 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.EeaGetTransactionCountParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
@@ -47,18 +47,16 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    if (request.getParamLength() != 1) {
+    if (request.getParamLength() != 3) {
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
     }
-    final EeaGetTransactionCountParameters eeaGetTransactionCount =
-        parameters.required(request.getParams(), 0, EeaGetTransactionCountParameters.class);
+
+    final Address address = parameters.required(request.getParams(), 0, Address.class);
+    final String privateFrom = parameters.required(request.getParams(), 1, String.class);
+    final String[] privateFor = parameters.required(request.getParams(), 2, String[].class);
 
     try {
-      final long nonce =
-          nonceProvider.determineNonce(
-              eeaGetTransactionCount.getPrivateFrom(),
-              eeaGetTransactionCount.getPrivateFor(),
-              eeaGetTransactionCount.getAddress());
+      final long nonce = nonceProvider.determineNonce(privateFrom, privateFor, address);
       return new JsonRpcSuccessResponse(request.getId(), Quantity.create(nonce));
     } catch (final Exception e) {
       LOG.error("Failed to fetch group from Enclave with error " + e.getMessage());
