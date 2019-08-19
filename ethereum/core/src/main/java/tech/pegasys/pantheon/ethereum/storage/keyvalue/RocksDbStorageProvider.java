@@ -53,14 +53,6 @@ public class RocksDbStorageProvider {
   public static StorageProvider create(
       final RocksDBConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem)
       throws IOException {
-    return create(rocksDbConfiguration, metricsSystem, DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE);
-  }
-
-  private static StorageProvider create(
-      final RocksDBConfiguration rocksDbConfiguration,
-      final MetricsSystem metricsSystem,
-      final long worldStatePreimageCacheSize)
-      throws IOException {
 
     final Path databaseDir = rocksDbConfiguration.getDatabaseDir();
     final boolean databaseExists = databaseDir.resolve("IDENTITY").toFile().exists();
@@ -87,7 +79,8 @@ public class RocksDbStorageProvider {
                             PROVIDERS_BY_VERSION.navigableKeySet().toString(),
                             DEFAULT_VERSION)));
 
-    return providerFunction.apply(rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
+    return providerFunction.apply(
+        rocksDbConfiguration, metricsSystem, DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE);
   }
 
   private static StorageProvider ofUnsegmented(
