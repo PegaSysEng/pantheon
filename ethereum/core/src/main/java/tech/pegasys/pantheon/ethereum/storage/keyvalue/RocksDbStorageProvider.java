@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.storage.keyvalue;
 import static java.util.AbstractMap.SimpleEntry;
 import static java.util.Arrays.asList;
 
+import tech.pegasys.pantheon.ethereum.storage.SegmentedStorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.ColumnarRocksDbKeyValueStorage;
@@ -87,7 +88,7 @@ public class RocksDbStorageProvider {
     return providerFunction.apply(rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
   }
 
-  private static StorageProvider ofUnsegmented(
+  private static SegmentedStorageProvider ofUnsegmented(
       final RocksDbConfiguration rocksDbConfiguration,
       final MetricsSystem metricsSystem,
       final long worldStatePreimageCacheSize) {

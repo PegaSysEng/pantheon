@@ -42,6 +42,7 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
+import tech.pegasys.pantheon.ethereum.storage.SegmentedStorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.MarkSweepPruner;
@@ -54,10 +55,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Clock;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.OptionalLong;
+import java.util.*;
 import java.util.concurrent.Executors;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -202,28 +200,35 @@ public abstract class PantheonControllerBuilder<C> {
 
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
-    final Pruner pruner =
-        new Pruner(
-            new MarkSweepPruner(
-                protocolContext.getWorldStateArchive().getWorldStateStorage(),
-                storageProvider.createPruningStorage(),
-                metricsSystem),
-            protocolContext.getBlockchain(),
-            Executors.newSingleThreadExecutor(
-                new ThreadFactoryBuilder()
-                    .setDaemon(true)
-                    .setPriority(Thread.MIN_PRIORITY)
-                    .setNameFormat("StatePruning-%d")
-                    .build()),
-            10,
-            1000);
+    final Optional<Pruner> maybePruner =
+        storageProvider.getClass().isInstance(SegmentedStorageProvider.class)
+            ? Optional.of(
+                new Pruner(
+                    new MarkSweepPruner(
+                        protocolContext.getWorldStateArchive().getWorldStateStorage(),
+                        storageProvider.createPruningStorage(),
+                        metricsSystem),
+                    protocolContext.getBlockchain(),
+                    Executors.newSingleThreadExecutor(
+                        new ThreadFactoryBuilder()
+                            .setDaemon(true)
+                            .setPriority(Thread.MIN_PRIORITY)
+                            .setNameFormat("StatePruning-%d")
+                            .build()),
+                    10,
+                    1000))
+            : Optional.empty();
+
     addShutdownAction(
         () -> {
-          try {
-            pruner.stop();
-          } catch (InterruptedException ie) {
-            throw new RuntimeException(ie);
-          }
+          maybePruner.ifPresent(
+              pruner -> {
+                try {
+                  pruner.stop();
+                } catch (InterruptedException ie) {
+                  throw new RuntimeException(ie);
+                }
+              });
         });
 
     final boolean fastSyncEnabled = syncConfig.getSyncMode().equals(SyncMode.FAST);
@@ -237,7 +242,7 @@ public abstract class PantheonControllerBuilder<C> {
             protocolContext,
             protocolContext.getWorldStateArchive().getWorldStateStorage(),
             ethProtocolManager.getBlockBroadcaster(),
-            pruner,
+            maybePruner,
             ethProtocolManager.ethContext(),
             syncState,
             dataDirectory,

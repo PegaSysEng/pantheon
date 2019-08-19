@@ -548,6 +548,26 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
   @Option(
+      names = {"--pruning-enabled"},
+      description =
+          "Enable pruning of world state of blocks older than the retention period (default: ${DEFAULT-VALUE})")
+  private final Boolean isPruningEnabled = false;
+
+  @Option(
+      names = {"--pruning-retention-period"},
+      description =
+          "Number of recent blocks for which to keep entire world state (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  private final Long retentionPeriod = DEFAULT_RETENTION_PERIOD;
+
+  @Option(
+      names = {"--pruning-transient-fork-outliving-period"},
+      description =
+          "Number of confirmations on a block before marking begins (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  private final Long transientForkOutlivingPeriod = DEFAULT_TRANSIENT_FORK_OUTLIVING_PERIOD;
+
+  @Option(
       names = {"--permissions-nodes-config-file-enabled"},
       description = "Enable node level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsNodesEnabled = false;
