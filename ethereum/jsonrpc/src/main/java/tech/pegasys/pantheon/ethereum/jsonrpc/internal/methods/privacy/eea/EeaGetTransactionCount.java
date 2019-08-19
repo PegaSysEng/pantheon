@@ -59,7 +59,7 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
       final long nonce = nonceProvider.determineNonce(privateFrom, privateFor, address);
       return new JsonRpcSuccessResponse(request.getId(), Quantity.create(nonce));
     } catch (final Exception e) {
-      LOG.error("Failed to fetch group from Enclave.", e);
+      LOG.error(e.getMessage(), e);
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.FIND_PRIVACY_GROUP_ERROR);
     }
   }

@@ -42,7 +42,7 @@ public class LegacyNonceProvider {
   }
 
   public long determineNonce(
-      final String privateFrom, final String[] privateFor, final Address address) throws Exception {
+      final String privateFrom, final String[] privateFor, final Address address) {
 
     final String[] groupMembers = Arrays.append(privateFor, privateFrom);
 

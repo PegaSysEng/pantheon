@@ -19,6 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.enclave.Enclave;
+import tech.pegasys.pantheon.enclave.EnclaveException;
 import tech.pegasys.pantheon.enclave.types.FindPrivacyGroupRequest;
 import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
 import tech.pegasys.pantheon.enclave.types.PrivacyGroup.Type;
@@ -40,7 +41,7 @@ public class LegacyNonceProviderTest {
       new LegacyNonceProvider(enclave, privateTransactionHandler);
 
   @Test
-  public void validRequestProducesExpectedNonce() throws Exception {
+  public void validRequestProducesExpectedNonce() {
     final long reportedNonce = 8L;
     PrivacyGroup[] returnedGroups =
         new PrivacyGroup[] {
@@ -62,7 +63,7 @@ public class LegacyNonceProviderTest {
   }
 
   @Test
-  public void moreThanOneMatchingLegacyGroupThrowsException() throws Exception {
+  public void moreThanOneMatchingLegacyGroupThrowsException() {
     PrivacyGroup[] returnedGroups =
         new PrivacyGroup[] {
           new PrivacyGroup("Group1", Type.LEGACY, "Group1_Name", "Group1_Desc", new String[0]),
@@ -79,7 +80,7 @@ public class LegacyNonceProviderTest {
   }
 
   @Test
-  public void noMatchingLegacyGroupsReturnsError() throws Exception {
+  public void noMatchingLegacyGroupsReturnsError() {
     PrivacyGroup[] returnedGroups = new PrivacyGroup[] {};
 
     when(enclave.findPrivacyGroup(any())).thenReturn(returnedGroups);
@@ -92,9 +93,9 @@ public class LegacyNonceProviderTest {
   }
 
   @Test
-  public void enclaveThrowingAnExceptionResultsInErrorResponse() throws Exception {
-    when(enclave.findPrivacyGroup(any())).thenThrow(new Exception("Enclave Failed"));
-    assertThatExceptionOfType(Exception.class)
+  public void enclaveThrowingAnExceptionResultsInErrorResponse() {
+    when(enclave.findPrivacyGroup(any())).thenThrow(new EnclaveException("Enclave Failed"));
+    assertThatExceptionOfType(EnclaveException.class)
         .isThrownBy(
             () ->
                 nonceProvider.determineNonce(
