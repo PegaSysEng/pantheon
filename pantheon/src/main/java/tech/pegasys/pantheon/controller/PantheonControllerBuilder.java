@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.controller;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
@@ -43,12 +42,10 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFact
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.MarkSweepPruner;
 import tech.pegasys.pantheon.ethereum.worldstate.Pruner;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +62,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public abstract class PantheonControllerBuilder<C> {
+
   private static final Logger LOG = LogManager.getLogger();
 
   protected GenesisConfigFile genesisConfig;
@@ -82,13 +80,6 @@ public abstract class PantheonControllerBuilder<C> {
   protected boolean isRevertReasonEnabled;
   private StorageProvider storageProvider;
   private final List<Runnable> shutdownActions = new ArrayList<>();
-  private RocksDbConfiguration rocksDbConfiguration;
-
-  public PantheonControllerBuilder<C> rocksDbConfiguration(
-      final RocksDbConfiguration rocksDbConfiguration) {
-    this.rocksDbConfiguration = rocksDbConfiguration;
-    return this;
-  }
 
   public PantheonControllerBuilder<C> storageProvider(final StorageProvider storageProvider) {
     this.storageProvider = storageProvider;
@@ -164,7 +155,7 @@ public abstract class PantheonControllerBuilder<C> {
     return this;
   }
 
-  public PantheonController<C> build() throws IOException {
+  public PantheonController<C> build() {
     checkNotNull(genesisConfig, "Missing genesis config");
     checkNotNull(syncConfig, "Missing sync config");
     checkNotNull(ethereumWireProtocolConfiguration, "Missing ethereum protocol configuration");
@@ -176,16 +167,7 @@ public abstract class PantheonControllerBuilder<C> {
     checkNotNull(clock, "Mising clock");
     checkNotNull(transactionPoolConfiguration, "Missing transaction pool configuration");
     checkNotNull(nodeKeys, "Missing node keys");
-    checkArgument(
-        storageProvider != null || rocksDbConfiguration != null,
-        "Must supply either a storage provider or RocksDB configuration");
-    checkArgument(
-        storageProvider == null || rocksDbConfiguration == null,
-        "Must supply either storage provider or RocksDB confguration, but not both");
-
-    if (storageProvider == null && rocksDbConfiguration != null) {
-      storageProvider = RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
-    }
+    checkNotNull(storageProvider, "Must supply a storage provider");
 
     prepForBuild();
 

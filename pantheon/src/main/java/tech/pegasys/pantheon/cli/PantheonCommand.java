@@ -19,7 +19,6 @@ import static java.util.Collections.singletonList;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 import static tech.pegasys.pantheon.cli.config.NetworkName.MAINNET;
 import static tech.pegasys.pantheon.cli.util.CommandLineUtils.checkOptionDependencies;
-import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration.DEFAULT_GRAPHQL_HTTP_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
@@ -44,7 +43,6 @@ import tech.pegasys.pantheon.cli.error.PantheonExceptionHandler;
 import tech.pegasys.pantheon.cli.options.EthProtocolOptions;
 import tech.pegasys.pantheon.cli.options.MetricsCLIOptions;
 import tech.pegasys.pantheon.cli.options.NetworkingOptions;
-import tech.pegasys.pantheon.cli.options.RocksDBOptions;
 import tech.pegasys.pantheon.cli.options.SynchronizerOptions;
 import tech.pegasys.pantheon.cli.options.TransactionPoolOptions;
 import tech.pegasys.pantheon.cli.subcommands.PasswordSubCommand;
@@ -94,7 +92,7 @@ import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
+import tech.pegasys.pantheon.services.StorageServiceImpl;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.number.Fraction;
@@ -164,11 +162,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   final SynchronizerOptions synchronizerOptions = SynchronizerOptions.create();
   final EthProtocolOptions ethProtocolOptions = EthProtocolOptions.create();
   final MetricsCLIOptions metricsCLIOptions = MetricsCLIOptions.create();
-  final RocksDBOptions rocksDBOptions = RocksDBOptions.create();
   final TransactionPoolOptions transactionPoolOptions = TransactionPoolOptions.create();
   private final RunnerBuilder runnerBuilder;
   private final PantheonController.Builder controllerBuilderFactory;
   private final PantheonPluginContextImpl pantheonPluginContext;
+  private final StorageServiceImpl storageService = new StorageServiceImpl();
   private final Map<String, String> environment;
 
   protected KeyLoader getKeyLoader() {
@@ -737,7 +735,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             .put("Ethereum Wire Protocol", ethProtocolOptions)
             .put("Metrics", metricsCLIOptions)
             .put("P2P Network", networkingOptions)
-            .put("RocksDB", rocksDBOptions)
             .put("Synchronizer", synchronizerOptions)
             .put("TransactionPool", transactionPoolOptions)
             .build();
@@ -788,6 +785,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     pantheonPluginContext.addService(
         PantheonEvents.class,
         new PantheonEventsImpl((pantheonController.getProtocolManager().getBlockBroadcaster())));
+    pantheonPluginContext.addService(StorageServiceImpl.class, storageService);
     pantheonPluginContext.startPlugins();
     return this;
   }
@@ -889,20 +887,22 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   public PantheonController<?> buildController() {
     try {
       return getControllerBuilder().build();
-    } catch (final IOException e) {
-      throw new ExecutionException(this.commandLine, "Invalid path", e);
     } catch (final Exception e) {
       throw new ExecutionException(this.commandLine, e.getMessage(), e);
     }
   }
 
   public PantheonControllerBuilder<?> getControllerBuilder() {
+
+    // TODO get the storage name, retrieving the factory & pass that in to the builder?
+    // TODO build the provider here & pass it in
+    //    storageService.getByName();
+
     try {
       return controllerBuilderFactory
           .fromEthNetworkConfig(updateNetworkConfig(getNetwork()))
           .synchronizerConfiguration(buildSyncConfig())
           .ethProtocolConfiguration(ethProtocolOptions.toDomainObject())
-          .rocksDbConfiguration(buildRocksDbConfiguration())
           .dataDirectory(dataDir())
           .miningParameters(
               new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
@@ -1167,10 +1167,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         .syncMode(syncMode)
         .fastSyncMinimumPeerCount(fastSyncMinPeerCount)
         .build();
-  }
-
-  private RocksDbConfiguration buildRocksDbConfiguration() {
-    return rocksDBOptions.toDomainObject().databaseDir(dataDir().resolve(DATABASE_PATH)).build();
   }
 
   private TransactionPoolConfiguration buildTransactionPoolConfiguration() {
