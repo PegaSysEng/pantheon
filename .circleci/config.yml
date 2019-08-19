@@ -157,5 +157,9 @@ workflows:
           requires:
             - integrationTests
             - unitTests
+      - ls:
+          requires:
+            - assemble
+
 
 
