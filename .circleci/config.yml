@@ -6,18 +6,18 @@ executors:
       - image: circleci/openjdk:11.0.4-jdk-stretch
     resource_class: medium
     working_directory: ~/project
-    # environment:
-    #   JAVA_TOOL_OPTIONS: -Xmx2048m
-    #   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx2048m
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2
 
   pantheon_executor_xl:
     docker:
       - image: circleci/openjdk:11.0.4-jdk-stretch
     resource_class: xlarge
     working_directory: ~/project
-    # environment:
-    #   JAVA_TOOL_OPTIONS: -Xmx2048m
-    #   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=4
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx2048m
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=8
 
 commands:
   prepare:
