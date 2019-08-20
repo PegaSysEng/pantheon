@@ -12,13 +12,9 @@
  */
 package tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.web3j.crypto.CipherException;
-import org.web3j.crypto.WalletUtils;
+import static net.consensys.cava.io.file.Files.copyResource;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
+
 import tech.pegasys.ethsigner.core.EthSigner;
 import tech.pegasys.ethsigner.core.signing.ConfigurationChainId;
 import tech.pegasys.ethsigner.signer.filebased.CredentialTransactionSigner;
@@ -28,8 +24,13 @@ import java.net.InetAddress;
 import java.nio.file.Path;
 import java.time.Duration;
 
-import static net.consensys.cava.io.file.Files.copyResource;
-import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.web3j.crypto.CipherException;
+import org.web3j.crypto.WalletUtils;
 
 public class EthSignerTestHarnessFactory {
 
@@ -71,9 +72,10 @@ public class EthSignerTestHarnessFactory {
             .get()
             .build();
 
-    waitFor(() -> {
-      client.newCall(request).execute();
-    });
+    waitFor(
+        () -> {
+          client.newCall(request).execute();
+        });
 
     LOG.info("EthSigner port: {}", config.getHttpListenPort());
 

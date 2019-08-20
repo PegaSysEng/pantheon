@@ -15,6 +15,9 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
+import tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil.EthSignerTestHarness;
+import tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil.EthSignerTestHarnessFactory;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -28,8 +31,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil.EthSignerTestHarness;
-import tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil.EthSignerTestHarnessFactory;
 
 public class EthSignerClientTest {
   @ClassRule public static final TemporaryFolder folder = new TemporaryFolder();
