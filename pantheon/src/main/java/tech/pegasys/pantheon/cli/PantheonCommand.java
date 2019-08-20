@@ -850,6 +850,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         !SyncMode.FAST.equals(syncMode),
         singletonList("--fast-sync-min-peers"));
 
+    checkOptionDependencies(
+        logger,
+        commandLine,
+        "--pruning-enabled",
+        !isPruningEnabled,
+        asList("--pruning-retention-period", "--pruning-transient-fork-outliving-period"));
+
     // noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
       throw new ParameterException(

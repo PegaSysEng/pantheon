@@ -23,11 +23,11 @@ public class PruningConfiguration {
     this.retentionPeriodInBlocks = retentionPeriodInBlocks;
   }
 
-  long getRetentionPeriod() {
+  public long getRetentionPeriod() {
     return retentionPeriodInBlocks;
   }
 
-  long getTransientForkOutlivingPeriod() {
+  public long getTransientForkOutlivingPeriod() {
     return transientForkOutlivingPeriod;
   }
 }

@@ -50,6 +50,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.worldstate.PruningConfiguration;
 import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.nat.NatMethod;
@@ -2295,6 +2296,51 @@ public class PantheonCommandTest extends CommandTestAbstract {
     assertThat(miningArg.getValue().getMinTransactionGasPrice()).isEqualTo(Wei.of(15));
     assertThat(miningArg.getValue().getExtraData())
         .isEqualTo(BytesValue.fromHexString(extraDataString));
+  }
+
+  @Test
+  public void pruningIsEnabledWhenSpecified() throws Exception {
+    parseCommand("--pruning-enabled");
+
+    verify(mockControllerBuilder).isPruningEnabled(true);
+    verify(mockControllerBuilder).build();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void pruningOptionsRequiresServiceToBeEnabled() {
+
+    parseCommand(
+        "--pruning-retention-period", "4", "--pruning-transient-fork-outliving-period", "1");
+
+    verifyOptionsConstraintLoggerCall(
+        "--pruning-enabled",
+        "--pruning-retention-period",
+        "--pruning-transient-fork-outliving-period");
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+  }
+
+  @Test
+  public void pruningParametersAreCaptured() throws Exception {
+    parseCommand(
+        "--pruning-enabled",
+        "--pruning-retention-period=15",
+        "--pruning-transient-fork-outliving-period=4");
+
+    final ArgumentCaptor<PruningConfiguration> pruningArg =
+        ArgumentCaptor.forClass(PruningConfiguration.class);
+
+    verify(mockControllerBuilder).pruningConfiguration(pruningArg.capture());
+    verify(mockControllerBuilder).build();
+
+    assertThat(commandOutput.toString()).isEmpty();
+    assertThat(commandErrorOutput.toString()).isEmpty();
+    assertThat(pruningArg.getValue().getRetentionPeriod()).isEqualTo(15);
+    assertThat(pruningArg.getValue().getTransientForkOutlivingPeriod()).isEqualTo(4);
   }
 
   @Test
