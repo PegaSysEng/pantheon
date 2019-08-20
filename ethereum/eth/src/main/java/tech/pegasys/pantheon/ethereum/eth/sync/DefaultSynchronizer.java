@@ -45,7 +45,6 @@ public class DefaultSynchronizer<C> implements Synchronizer {
 
   private static final Logger LOG = LogManager.getLogger();
 
-  private static final boolean PRUNING_ENABLED = false;
   private final Optional<Pruner> maybePruner;
   private final SyncState syncState;
   private final AtomicBoolean running = new AtomicBoolean(false);
@@ -169,9 +168,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
 
   private void startFullSync() {
     fullSyncDownloader.start();
-    if (PRUNING_ENABLED) {
-      maybePruner.ifPresent(Pruner::start);
-    }
+    maybePruner.ifPresent(Pruner::start);
   }
 
   @Override

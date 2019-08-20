@@ -60,7 +60,9 @@ public class PrunerTest {
     final MutableBlockchain blockchain =
         DefaultBlockchain.createMutable(genesisBlock, blockchainStorage, metricsSystem);
 
-    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);
+    final Pruner pruner =
+        new Pruner(
+            markSweepPruner, blockchain, mockExecutorService, new PruningConfiguration(0, 0));
     pruner.start();
 
     final Block block1 = appendBlockWithParent(blockchain, genesisBlock);
@@ -81,7 +83,9 @@ public class PrunerTest {
     final MutableBlockchain blockchain =
         DefaultBlockchain.createMutable(genesisBlock, blockchainStorage, metricsSystem);
 
-    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 1, 2);
+    final Pruner pruner =
+        new Pruner(
+            markSweepPruner, blockchain, mockExecutorService, new PruningConfiguration(1, 2));
     pruner.start();
 
     final Hash markBlockStateRootHash =
@@ -108,7 +112,9 @@ public class PrunerTest {
         DefaultBlockchain.createMutable(genesisBlock, blockchainStorage, metricsSystem);
 
     // start pruner so it can start handling block added events
-    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 1);
+    final Pruner pruner =
+        new Pruner(
+            markSweepPruner, blockchain, mockExecutorService, new PruningConfiguration(0, 1));
     pruner.start();
 
     /*
@@ -142,7 +148,13 @@ public class PrunerTest {
   @Test
   public void shouldRejectInvalidArguments() {
     final Blockchain mockchain = mock(Blockchain.class);
-    assertThatThrownBy(() -> new Pruner(markSweepPruner, mockchain, mockExecutorService, -1, -2))
+    assertThatThrownBy(
+            () ->
+                new Pruner(
+                    markSweepPruner,
+                    mockchain,
+                    mockExecutorService,
+                    new PruningConfiguration(-1, -2)))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -154,7 +166,9 @@ public class PrunerTest {
     final MutableBlockchain blockchain =
         DefaultBlockchain.createMutable(genesisBlock, blockchainStorage, metricsSystem);
 
-    final Pruner pruner = new Pruner(markSweepPruner, blockchain, mockExecutorService, 0, 0);
+    final Pruner pruner =
+        new Pruner(
+            markSweepPruner, blockchain, mockExecutorService, new PruningConfiguration(0, 0));
     pruner.start();
     pruner.stop();
     verify(markSweepPruner).cleanup();

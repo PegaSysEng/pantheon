@@ -34,25 +34,24 @@ public class Pruner {
   private final AtomicReference<State> state = new AtomicReference<>(State.IDLE);
   private volatile long markBlockNumber = 0;
   private volatile BlockHeader markedBlockHeader;
-  private long transientForkThreshold;
+  private long transientForkOutlivingPeriod;
 
   public Pruner(
       final MarkSweepPruner pruningStrategy,
       final Blockchain blockchain,
       final ExecutorService executorService,
-      final long transientForkThreshold,
-      final long retentionPeriodInBlocks) {
+      final PruningConfiguration pruningConfiguration) {
     this.pruningStrategy = pruningStrategy;
     this.executorService = executorService;
     this.blockchain = blockchain;
-    if (transientForkThreshold < 0 || retentionPeriodInBlocks < 0) {
+    this.retentionPeriodInBlocks = pruningConfiguration.getRetentionPeriod();
+    this.transientForkOutlivingPeriod = pruningConfiguration.getTransientForkOutlivingPeriod();
+    if (transientForkOutlivingPeriod < 0 || retentionPeriodInBlocks < 0) {
       throw new IllegalArgumentException(
           String.format(
-              "TransientForkThreshold and RetentionPeriodInBlocks must be non-negative. transientForkThreshold=%d, retentionPeriodInBlocks=%d",
-              transientForkThreshold, retentionPeriodInBlocks));
+              "TransientForkOutlivingPeriod and RetentionPeriodInBlocks must be non-negative. transientForkOutlivingPeriod=%d, retentionPeriodInBlocks=%d",
+                  transientForkOutlivingPeriod, retentionPeriodInBlocks));
     }
-    this.retentionPeriodInBlocks = retentionPeriodInBlocks;
-    this.transientForkThreshold = transientForkThreshold;
   }
 
   public void start() {
@@ -73,7 +72,7 @@ public class Pruner {
     if (state.compareAndSet(State.IDLE, State.TRANSIENT_FORK_OUTLIVING)) {
       pruningStrategy.prepare();
       markBlockNumber = blockNumber;
-    } else if (blockNumber >= markBlockNumber + transientForkThreshold
+    } else if (blockNumber >= markBlockNumber + transientForkOutlivingPeriod
         && state.compareAndSet(State.TRANSIENT_FORK_OUTLIVING, State.MARKING)) {
       markedBlockHeader = blockchain.getBlockHeader(markBlockNumber).get();
       mark(markedBlockHeader);

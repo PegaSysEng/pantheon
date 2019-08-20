@@ -81,6 +81,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfigurat
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.worldstate.PruningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
@@ -931,7 +932,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
-          .isRevertReasonEnabled(isRevertReasonEnabled);
+          .isRevertReasonEnabled(isRevertReasonEnabled)
+          .isPruningEnabled(isPruningEnabled);
     } catch (IOException e) {
       throw new ExecutionException(this.commandLine, "Invalid path", e);
     }
@@ -1199,6 +1201,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         .txPoolMaxSize(txPoolMaxSize)
         .pendingTxRetentionPeriod(pendingTxRetentionPeriod)
         .build();
+  }
+
+  private PruningConfiguration buildPruningConfiguration() {
+    return new PruningConfiguration(retentionPeriod, transientForkOutlivingPeriod);
   }
 
   // Blockchain synchronisation from peers.
