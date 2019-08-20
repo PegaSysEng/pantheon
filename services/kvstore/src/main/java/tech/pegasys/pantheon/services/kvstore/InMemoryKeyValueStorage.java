@@ -33,8 +33,8 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
     this(new HashMap<>());
   }
 
-  public InMemoryKeyValueStorage(final Map<BytesValue, BytesValue> seedHashValueStore) {
-    this.hashValueStore = seedHashValueStore;
+  protected InMemoryKeyValueStorage(final Map<BytesValue, BytesValue> hashValueStore) {
+    this.hashValueStore = hashValueStore;
   }
 
   @Override
