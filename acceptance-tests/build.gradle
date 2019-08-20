@@ -21,7 +21,6 @@ dependencies {
   testImplementation project(':consensus:ibft')
   testImplementation project(':crypto')
   testImplementation project(':enclave')
-  testImplementation project(':ethsigner')
   testImplementation project(':ethereum:blockcreation')
   testImplementation project(':ethereum:core')
   testImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
@@ -52,6 +51,9 @@ dependencies {
   testImplementation 'org.web3j:abi'
   testImplementation 'org.web3j:core'
   testImplementation 'org.web3j:crypto'
+  testImplementation 'tech.pegasys.ethsigner.internal:core'
+  testImplementation 'tech.pegasys.ethsigner.internal:file-based'
+  testImplementation 'tech.pegasys.ethsigner.internal:signing-api'
   testImplementation 'tech.pegasys.pantheon:plugin-api'
 }
 

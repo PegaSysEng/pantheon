@@ -10,16 +10,15 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.ethsigner.testutil;
+package tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil;
 
+import org.apache.logging.log4j.Level;
 import tech.pegasys.ethsigner.core.Config;
 import tech.pegasys.ethsigner.core.signing.ChainIdProvider;
 
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.time.Duration;
-
-import org.apache.logging.log4j.Level;
 
 public class EthSignerConfig implements Config {
   private final Level logLevel;

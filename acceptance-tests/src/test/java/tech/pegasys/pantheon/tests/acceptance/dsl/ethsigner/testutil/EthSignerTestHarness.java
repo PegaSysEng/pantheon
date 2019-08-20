@@ -10,27 +10,19 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.ethsigner.testutil;
-
-import tech.pegasys.ethsigner.core.EthSigner;
+package tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil;
 
 import java.net.URI;
 
 public class EthSignerTestHarness {
   private final EthSignerConfig config;
-  private final EthSigner ethSigner;
 
-  public EthSignerTestHarness(final EthSigner ethSigner, final EthSignerConfig config) {
-    this.ethSigner = ethSigner;
+  public EthSignerTestHarness(final EthSignerConfig config) {
     this.config = config;
   }
 
   public URI getHttpListeningUrl() {
     return URI.create(
         "http://" + config.getHttpListenHost().getHostAddress() + ":" + config.getHttpListenPort());
-  }
-
-  public EthSigner getEthSigner() {
-    return ethSigner;
   }
 }

@@ -10,10 +10,15 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.ethsigner.testutil;
+package tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil;
 
-import static net.consensys.cava.io.file.Files.copyResource;
-
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.web3j.crypto.CipherException;
+import org.web3j.crypto.WalletUtils;
 import tech.pegasys.ethsigner.core.EthSigner;
 import tech.pegasys.ethsigner.core.signing.ConfigurationChainId;
 import tech.pegasys.ethsigner.signer.filebased.CredentialTransactionSigner;
@@ -22,22 +27,14 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
-import io.netty.handler.codec.http.HttpResponseStatus;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.web3j.crypto.CipherException;
-import org.web3j.crypto.WalletUtils;
+import static net.consensys.cava.io.file.Files.copyResource;
+import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 
 public class EthSignerTestHarnessFactory {
 
   private static final Logger LOG = LogManager.getLogger();
-  protected static final String HOST = "127.0.0.1";
+  private static final String HOST = "127.0.0.1";
 
   public static EthSignerTestHarness create(
       final Path tempDir,
@@ -47,7 +44,7 @@ public class EthSignerTestHarnessFactory {
       final long chainId)
       throws IOException, CipherException {
 
-    Path keyFilePath = copyResource(keyPath, tempDir.resolve(keyPath));
+    final Path keyFilePath = copyResource(keyPath, tempDir.resolve(keyPath));
 
     final EthSignerConfig config =
         new EthSignerConfig(
@@ -73,24 +70,13 @@ public class EthSignerTestHarnessFactory {
             .url("http://" + HOST + ":" + ethsignerPort + "/upcheck")
             .get()
             .build();
-    while (true) {
-      try (Response response = client.newCall(request).execute()) {
-        if (response.code() == HttpResponseStatus.OK.code()) {
-          break;
-        }
-      } catch (IOException e) {
-        LOG.warn(e + " - will retry");
-      }
 
-      try {
-        TimeUnit.SECONDS.sleep(1);
-      } catch (InterruptedException e) {
-        LOG.error(e);
-      }
-    }
+    waitFor(() -> {
+      client.newCall(request).execute();
+    });
 
     LOG.info("EthSigner port: {}", config.getHttpListenPort());
 
-    return new EthSignerTestHarness(ethSigner, config);
+    return new EthSignerTestHarness(config);
   }
 }

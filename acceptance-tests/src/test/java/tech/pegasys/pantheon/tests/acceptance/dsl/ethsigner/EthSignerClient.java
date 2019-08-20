@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethsigner;
+package tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -18,7 +18,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.web3j.protocol.Web3jService;
@@ -27,7 +26,6 @@ import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.eea.Eea;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.utils.Numeric;
 
 public class EthSignerClient {
   private static final Logger LOG = LogManager.getLogger();
@@ -84,8 +82,8 @@ public class EthSignerClient {
       final String restriction)
       throws IOException {
 
-    final PrivateTransaction transaction =
-        new PrivateTransaction(
+    final PrivateTransactionRequest transaction =
+        new PrivateTransactionRequest(
             from,
             nonce,
             gasPrice,
@@ -105,87 +103,5 @@ public class EthSignerClient {
             EthSendTransaction.class)
         .send()
         .getTransactionHash();
-  }
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  public static class PrivateTransaction {
-
-    private final String from;
-    private final BigInteger nonce; // nonce field is not present on eth_call/eth_estimateGas
-    private final BigInteger gasPrice;
-    private final BigInteger gas;
-    private final String to;
-    private final BigInteger value;
-    private final String data;
-    private final String privateFrom;
-    private final List<String> privateFor;
-    private final String restriction;
-
-    public PrivateTransaction(
-        final String from,
-        final BigInteger nonce,
-        final BigInteger gasPrice,
-        final BigInteger gasLimit,
-        final String to,
-        final BigInteger value,
-        final String data,
-        final String privateFrom,
-        final List<String> privateFor,
-        final String restriction) {
-      this.from = from;
-      this.to = to;
-      this.gas = gasLimit;
-      this.gasPrice = gasPrice;
-      this.value = value;
-      this.data = data == null ? null : Numeric.prependHexPrefix(data);
-      this.nonce = nonce;
-      this.privateFrom = privateFrom;
-      this.privateFor = privateFor;
-      this.restriction = restriction;
-    }
-
-    public String getFrom() {
-      return from;
-    }
-
-    public String getTo() {
-      return to;
-    }
-
-    public String getGas() {
-      return convert(gas);
-    }
-
-    public String getGasPrice() {
-      return convert(gasPrice);
-    }
-
-    public String getValue() {
-      return convert(value);
-    }
-
-    public String getData() {
-      return data;
-    }
-
-    public String getNonce() {
-      return convert(nonce);
-    }
-
-    private String convert(final BigInteger value) {
-      return value == null ? null : Numeric.encodeQuantity(value);
-    }
-
-    public String getPrivateFrom() {
-      return privateFrom;
-    }
-
-    public List<String> getPrivateFor() {
-      return privateFor;
-    }
-
-    public String getRestriction() {
-      return restriction;
-    }
   }
 }

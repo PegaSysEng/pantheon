@@ -12,14 +12,13 @@
  */
 package tech.pegasys.pantheon.tests.web3j.privacy;
 
-import static tech.pegasys.pantheon.tests.acceptance.dsl.WaitUtils.waitFor;
 import static tech.pegasys.pantheon.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder.EVENT_EMITTER_CONSTRUCTOR;
 import static tech.pegasys.pantheon.tests.web3j.privacy.PrivacyGroup.generatePrivacyGroup;
 
-import tech.pegasys.ethsigner.testutil.EthSignerTestHarness;
-import tech.pegasys.ethsigner.testutil.EthSignerTestHarnessFactory;
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethsigner.EthSignerClient;
+import tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.EthSignerClient;
+import tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil.EthSignerTestHarness;
+import tech.pegasys.pantheon.tests.acceptance.dsl.ethsigner.testutil.EthSignerTestHarnessFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBase;
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyNet;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -68,12 +67,7 @@ public class EthSignerAcceptanceTest extends PrivacyAcceptanceTestBase {
             Collections.emptyList(),
             "restricted");
 
-    waitFor(
-        60,
-        () ->
-            privacyNet
-                .getNode("Alice")
-                .verify(eea.expectSuccessfulTransactionReceipt(transactionHash)));
+    privacyNet.getNode("Alice").verify(eea.expectSuccessfulTransactionReceipt(transactionHash));
 
     final String expectedContractAddress =
         Address.privateContractAddress(
