@@ -934,8 +934,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .clock(Clock.systemUTC())
           .isRevertReasonEnabled(isRevertReasonEnabled)
           .isPruningEnabled(isPruningEnabled)
-          .pruningConfiguration(
-              new PruningConfiguration(transientForkOutlivingPeriod, retentionPeriod));
+          .pruningConfiguration(buildPruningConfiguration());
     } catch (IOException e) {
       throw new ExecutionException(this.commandLine, "Invalid path", e);
     }
