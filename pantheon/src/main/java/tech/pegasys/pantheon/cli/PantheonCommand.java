@@ -550,12 +550,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--pruning-enabled"},
+      hidden = true,
       description =
           "Enable pruning of world state of blocks older than the retention period (default: ${DEFAULT-VALUE})")
   private final Boolean isPruningEnabled = false;
 
   @Option(
       names = {"--pruning-retention-period"},
+      hidden = true,
       description =
           "Number of recent blocks for which to keep entire world state (default: ${DEFAULT-VALUE})",
       arity = "1")
@@ -563,6 +565,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--pruning-transient-fork-outliving-period"},
+      hidden = true,
       description =
           "Number of confirmations on a block before marking begins (default: ${DEFAULT-VALUE})",
       arity = "1")
