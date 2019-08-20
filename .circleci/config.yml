@@ -1,0 +1,179 @@
+---
+version: 2.1
+executors:
+  pantheon_executor_med:
+    docker:
+      - image: circleci/openjdk:11.0.4-jdk-stretch
+    resource_class: medium
+    working_directory: ~/project
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx2048m
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2
+
+  pantheon_executor_xl:
+    docker:
+      - image: circleci/openjdk:11.0.4-jdk-stretch
+    resource_class: xlarge
+    working_directory: ~/project
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx2048m
+      GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=4
+
+commands:
+  prepare:
+    description: "Prepare"
+    steps:
+      - checkout
+      - run:
+          name: Install Packages - LibSodium
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y libsodium18 libsodium-dev apt-transport-https
+      - restore_cache:
+          name: Restore cached gradle dependencies
+          keys:
+            - deps-{{ checksum "build.gradle" }}-{{ .Branch }}-{{ .Revision }}
+            - deps-{{ checksum "build.gradle" }}
+            - deps-
+
+jobs:
+  assemble:
+    executor: pantheon_executor_med
+    steps:
+      - prepare
+      - run:
+          name: Assemble
+          command: |
+            ./gradlew --no-daemon --parallel clean compileJava compileTestJava assemble
+      - save_cache:
+          name: Caching gradle dependencies
+          key: deps-{{ checksum "build.gradle" }}-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - .gradle
+            - ~/.gradle
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - ./
+
+  ls:
+    executor: pantheon_executor_med
+    steps:
+      - run:
+          name: Install Packages
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y tree
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Build
+          command: |
+            tree -L 10 .
+
+  unitTests:
+    executor: pantheon_executor_xl
+    steps:
+      - prepare
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: Build
+          no_output_timeout: 20m
+          command: |
+            ./gradlew --no-daemon --parallel build
+
+  integrationTests:
+    executor: pantheon_executor_med
+    steps:
+      - prepare
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: IntegrationTests
+          command: |
+            ./gradlew --no-daemon --parallel integrationTest
+      - run:
+          name: Javadoc
+          command: |
+            ./gradlew --no-daemon --parallel javadoc
+      - run:
+          name: CompileJmh
+          command: |
+            ./gradlew --no-daemon --parallel compileJmh
+
+  referenceTests:
+    executor: pantheon_executor_xl
+    steps:
+      - prepare
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: ReferenceTests
+          no_output_timeout: 20m
+          command: |
+            git submodule update --init --recursive
+            ./gradlew --no-daemon --parallel referenceTest
+
+  acceptanceTests:
+    executor: pantheon_executor_xl
+    steps:
+      - prepare
+      - attach_workspace:
+          at: ~/project
+      - run:
+          name: AcceptanceTests
+          no_output_timeout: 40m
+          command: |
+            ./gradlew --no-daemon --parallel acceptanceTest
+
+  docker:
+    executor: pantheon_executor_med
+    steps:
+      - prepare
+      - attach_workspace:
+          at: ~/project
+      - setup_remote_docker
+      - run:
+          name: hadoLint
+          command: |
+            docker run --rm -i hadolint/hadolint < docker/Dockerfile
+      - run:
+          name: build image
+          command: |
+            ./gradlew --no-daemon distDocker
+      - run:
+          name: goss tests
+          command: |
+            mkdir -p docker/reports
+            cd docker && bash test.sh pegasyseng/pantheon:develop
+
+workflows:
+  version: 2
+  default:
+    jobs:
+      - assemble
+      - unitTests:
+          requires:
+            - assemble
+      - referenceTests:
+          requires:
+            - assemble
+      - integrationTests:
+          requires:
+            - assemble
+      - acceptanceTests:
+          requires:
+            - assemble
+      - docker:
+          requires:
+            - integrationTests
+            - unitTests
+            - acceptanceTests
+            - referenceTests
+      - ls:
+          requires:
+            - integrationTests
+            - unitTests
+            - acceptanceTests
+            - referenceTests
