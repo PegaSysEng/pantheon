@@ -76,7 +76,9 @@ public class Runner implements AutoCloseable {
   public void start() {
     try {
       LOG.info("Starting Ethereum main loop ... ");
-      natManager.ifPresent(UpnpNatManager::start);
+      if (natManager.isPresent()) {
+        natManager.get().start();
+      }
       networkRunner.start();
       if (networkRunner.getNetwork().isP2pEnabled()) {
         pantheonController.getSynchronizer().start();
@@ -124,7 +126,9 @@ public class Runner implements AutoCloseable {
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.stop()));
       metrics.ifPresent(service -> waitForServiceToStop("metrics", service.stop()));
 
-      natManager.ifPresent(UpnpNatManager::stop);
+      if (natManager.isPresent()) {
+        natManager.get().stop();
+      }
     } finally {
       try {
         vertx.close();
