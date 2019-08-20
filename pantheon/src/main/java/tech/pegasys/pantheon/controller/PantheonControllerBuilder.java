@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.controller;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
@@ -218,27 +219,32 @@ public abstract class PantheonControllerBuilder<C> {
 
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
-    final Optional<Pruner> maybePruner =
-        isPruningEnabled && storageProvider instanceof SegmentedStorageProvider
-            ? Optional.of(
-                new Pruner(
-                    new MarkSweepPruner(
-                        protocolContext.getWorldStateArchive().getWorldStateStorage(),
-                        storageProvider.createPruningStorage(),
-                        metricsSystem),
-                    protocolContext.getBlockchain(),
-                    Executors.newSingleThreadExecutor(
-                        new ThreadFactoryBuilder()
-                            .setDaemon(true)
-                            .setPriority(Thread.MIN_PRIORITY)
-                            .setNameFormat("StatePruning-%d")
-                            .build()),
-                    pruningConfiguration))
-            : Optional.empty();
+    Optional<Pruner> maybePruner = Optional.empty();
+    if (isPruningEnabled) {
+      checkState(
+          storageProvider instanceof SegmentedStorageProvider,
+          "Cannot enable pruning with current database version. Resync to get the latest version.");
+      maybePruner =
+          Optional.of(
+              new Pruner(
+                  new MarkSweepPruner(
+                      protocolContext.getWorldStateArchive().getWorldStateStorage(),
+                      storageProvider.createPruningStorage(),
+                      metricsSystem),
+                  protocolContext.getBlockchain(),
+                  Executors.newSingleThreadExecutor(
+                      new ThreadFactoryBuilder()
+                          .setDaemon(true)
+                          .setPriority(Thread.MIN_PRIORITY)
+                          .setNameFormat("StatePruning-%d")
+                          .build()),
+                  pruningConfiguration));
+    }
 
+    Optional<Pruner> finalMaybePruner = maybePruner;
     addShutdownAction(
         () ->
-            maybePruner.ifPresent(
+            finalMaybePruner.ifPresent(
                 pruner -> {
                   try {
                     pruner.stop();
