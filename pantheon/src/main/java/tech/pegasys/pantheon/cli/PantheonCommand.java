@@ -1205,7 +1205,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private PruningConfiguration buildPruningConfiguration() {
-    return new PruningConfiguration(retentionPeriod, transientForkOutlivingPeriod);
+    return new PruningConfiguration(transientForkOutlivingPeriod, retentionPeriod);
   }
 
   // Blockchain synchronisation from peers.
