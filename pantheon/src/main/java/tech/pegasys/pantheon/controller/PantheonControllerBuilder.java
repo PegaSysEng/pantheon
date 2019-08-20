@@ -215,7 +215,7 @@ public abstract class PantheonControllerBuilder<C> {
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
 
     final Optional<Pruner> maybePruner =
-        isPruningEnabled && storageProvider.getClass().isInstance(SegmentedStorageProvider.class)
+        isPruningEnabled && storageProvider instanceof SegmentedStorageProvider
             ? Optional.of(
                 new Pruner(
                     new MarkSweepPruner(
