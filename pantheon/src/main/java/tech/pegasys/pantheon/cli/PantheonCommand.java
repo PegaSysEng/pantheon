@@ -79,6 +79,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfigurat
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
@@ -623,6 +625,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Integer pendingTxRetentionPeriod =
       TransactionPoolConfiguration.DEFAULT_TX_RETENTION_HOURS;
 
+  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
+  @Option(
+      names = {"--key-value-storage"},
+      description = "Identity for the key-value storage to be used,",
+      arity = "1")
+  private String keyValueStorageName = KEY_VALUE_STORAGE_NAME;
+
   private EthNetworkConfig ethNetworkConfig;
   private JsonRpcConfiguration jsonRpcConfiguration;
   private GraphQLConfiguration graphQLConfiguration;
@@ -893,10 +902,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   public PantheonControllerBuilder<?> getControllerBuilder() {
-
-    // TODO get the storage name, retrieving the factory & pass that in to the builder?
-    // TODO build the provider here & pass it in
-    //    storageService.getByName();
+    final KeyValueStorageProvider storageProvider =
+        new KeyValueStorageProviderBuilder()
+            .withStorageFactory(storageService.getByName(keyValueStorageName))
+            .build();
 
     try {
       return controllerBuilderFactory
@@ -911,7 +920,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .metricsSystem(metricsSystem.get())
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
-          .isRevertReasonEnabled(isRevertReasonEnabled);
+          .isRevertReasonEnabled(isRevertReasonEnabled)
+          .storageProvider(storageProvider);
     } catch (IOException e) {
       throw new ExecutionException(this.commandLine, "Invalid path", e);
     }

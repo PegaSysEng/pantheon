@@ -50,6 +50,7 @@ public class RocksDbStorageProvider {
               new SimpleEntry<>(0, RocksDbStorageProvider::ofUnsegmented),
               new SimpleEntry<>(1, RocksDbStorageProvider::ofSegmented)));
 
+  // TODO move this into the Factory, parts are made redundany by KeyValueStorageProviderBuilder
   public static StorageProvider create(
       final RocksDBConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem)
       throws IOException {
@@ -113,6 +114,7 @@ public class RocksDbStorageProvider {
         new SegmentedKeyValueStorageAdapter<>(RocksDbSegment.PRUNING_STATE, columnarStorage));
   }
 
+  // TODO made redundant by KeyValueSegmentIdentifier
   private enum RocksDbSegment implements SegmentIdentifier {
     BLOCKCHAIN,
     WORLD_STATE,
