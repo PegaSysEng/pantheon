@@ -43,7 +43,6 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.config.SubProtocolConfiguration;
-import tech.pegasys.pantheon.ethereum.storage.SegmentedStorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.MarkSweepPruner;
@@ -222,7 +221,7 @@ public abstract class PantheonControllerBuilder<C> {
     Optional<Pruner> maybePruner = Optional.empty();
     if (isPruningEnabled) {
       checkState(
-          storageProvider instanceof SegmentedStorageProvider,
+          storageProvider.isWorldStateIterable(),
           "Cannot enable pruning with current database version. Resync to get the latest version.");
       maybePruner =
           Optional.of(

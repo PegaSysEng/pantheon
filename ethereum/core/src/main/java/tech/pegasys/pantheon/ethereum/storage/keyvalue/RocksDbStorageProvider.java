@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.storage.keyvalue;
 import static java.util.AbstractMap.SimpleEntry;
 import static java.util.Arrays.asList;
 
-import tech.pegasys.pantheon.ethereum.storage.SegmentedStorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.services.kvstore.ColumnarRocksDbKeyValueStorage;
@@ -88,14 +87,14 @@ public class RocksDbStorageProvider {
     return providerFunction.apply(rocksDbConfiguration, metricsSystem, worldStatePreimageCacheSize);
   }
 
-  private static SegmentedStorageProvider ofUnsegmented(
+  private static StorageProvider ofUnsegmented(
       final RocksDbConfiguration rocksDbConfiguration,
       final MetricsSystem metricsSystem,
       final long worldStatePreimageCacheSize) {
     final KeyValueStorage kv = RocksDbKeyValueStorage.create(rocksDbConfiguration, metricsSystem);
     final KeyValueStorage preimageKv =
         new LimitedInMemoryKeyValueStorage(worldStatePreimageCacheSize);
-    return new KeyValueStorageProvider(kv, kv, preimageKv, kv, kv, kv);
+    return new KeyValueStorageProvider(kv, kv, preimageKv, kv, kv, kv, false);
   }
 
   private static StorageProvider ofSegmented(
@@ -115,7 +114,8 @@ public class RocksDbStorageProvider {
         preimageStorage,
         new SegmentedKeyValueStorageAdapter<>(RocksDbSegment.PRIVATE_TRANSACTIONS, columnarStorage),
         new SegmentedKeyValueStorageAdapter<>(RocksDbSegment.PRIVATE_STATE, columnarStorage),
-        new SegmentedKeyValueStorageAdapter<>(RocksDbSegment.PRUNING_STATE, columnarStorage));
+        new SegmentedKeyValueStorageAdapter<>(RocksDbSegment.PRUNING_STATE, columnarStorage),
+        true);
   }
 
   private enum RocksDbSegment implements Segment {
