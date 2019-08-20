@@ -50,7 +50,7 @@ public class Pruner {
       throw new IllegalArgumentException(
           String.format(
               "TransientForkOutlivingPeriod and RetentionPeriodInBlocks must be non-negative. transientForkOutlivingPeriod=%d, retentionPeriodInBlocks=%d",
-                  transientForkOutlivingPeriod, retentionPeriodInBlocks));
+              transientForkOutlivingPeriod, retentionPeriodInBlocks));
     }
   }
 
