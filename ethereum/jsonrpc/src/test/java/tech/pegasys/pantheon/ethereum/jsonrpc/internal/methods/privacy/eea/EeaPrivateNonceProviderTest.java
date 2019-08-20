@@ -30,15 +30,15 @@ import com.google.common.collect.Lists;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-public class LegacyNonceProviderTest {
+public class EeaPrivateNonceProviderTest {
 
   private final Address address = Address.fromHexString("55");
   private Enclave enclave = mock(Enclave.class);
   private PrivateTransactionHandler privateTransactionHandler =
       mock(PrivateTransactionHandler.class);
 
-  private final LegacyNonceProvider nonceProvider =
-      new LegacyNonceProvider(enclave, privateTransactionHandler);
+  private final EeaPrivateNonceProvider nonceProvider =
+      new EeaPrivateNonceProvider(enclave, privateTransactionHandler);
 
   @Test
   public void validRequestProducesExpectedNonce() {

@@ -28,14 +28,14 @@ import com.google.common.collect.Lists;
 import org.apache.logging.log4j.Logger;
 import org.bouncycastle.util.Arrays;
 
-public class LegacyNonceProvider {
+public class EeaPrivateNonceProvider {
 
   private static final Logger LOG = getLogger();
 
   private final Enclave enclave;
   private final PrivateTransactionHandler privateTransactionHandler;
 
-  public LegacyNonceProvider(
+  public EeaPrivateNonceProvider(
       final Enclave enclave, final PrivateTransactionHandler privateTransactionHandler) {
     this.enclave = enclave;
     this.privateTransactionHandler = privateTransactionHandler;

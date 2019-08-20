@@ -32,10 +32,10 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
   private static final Logger LOG = getLogger();
 
   private final JsonRpcParameter parameters;
-  private final LegacyNonceProvider nonceProvider;
+  private final EeaPrivateNonceProvider nonceProvider;
 
   public EeaGetTransactionCount(
-      final JsonRpcParameter parameters, final LegacyNonceProvider nonceProvider) {
+      final JsonRpcParameter parameters, final EeaPrivateNonceProvider nonceProvider) {
     this.parameters = parameters;
     this.nonceProvider = nonceProvider;
   }

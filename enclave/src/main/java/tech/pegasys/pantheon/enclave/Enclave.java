@@ -90,9 +90,7 @@ public class Enclave {
     try {
       body = RequestBody.create(mediaType, objectMapper.writeValueAsString(content));
     } catch (final JsonProcessingException e) {
-      final String errorMessage = "Failed to serialise request to json body.";
-      LOG.error(errorMessage);
-      throw new EnclaveException(errorMessage);
+      throw new EnclaveException("Failed to serialise request to json body.");
     }
     final String url = enclaveUri.resolve(endpoint).toString();
     return new Request.Builder().url(url).post(body).build();

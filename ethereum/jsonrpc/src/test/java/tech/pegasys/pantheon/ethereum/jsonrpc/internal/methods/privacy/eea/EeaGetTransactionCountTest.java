@@ -29,7 +29,7 @@ import org.junit.Test;
 
 public class EeaGetTransactionCountTest {
 
-  private LegacyNonceProvider nonceProvider = mock(LegacyNonceProvider.class);
+  private EeaPrivateNonceProvider nonceProvider = mock(EeaPrivateNonceProvider.class);
   private JsonRpcRequest request;
 
   private final String privateFrom = "thePrivateFromKey";
