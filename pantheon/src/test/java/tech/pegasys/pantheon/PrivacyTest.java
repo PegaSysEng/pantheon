@@ -85,6 +85,7 @@ public class PrivacyTest {
             .getByBlockNumber(1)
             .getPrecompileContractRegistry()
             .get(privacyContractAddress, Account.DEFAULT_VERSION);
+
     assertThat(precompiledContract.getName()).isEqualTo("Privacy");
   }
 }
