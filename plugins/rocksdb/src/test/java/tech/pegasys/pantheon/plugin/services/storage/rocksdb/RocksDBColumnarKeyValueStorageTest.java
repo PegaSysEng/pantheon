@@ -95,7 +95,7 @@ public class RocksDBColumnarKeyValueStorageTest extends AbstractKeyValueStorageT
 
     @Override
     public String getName() {
-      return name();
+      return nameAsUtf8;
     }
   }
 
@@ -106,6 +106,7 @@ public class RocksDBColumnarKeyValueStorageTest extends AbstractKeyValueStorageT
         new NoOpMetricsSystem());
   }
 
+  @Override
   protected KeyValueStorage createStore() throws Exception {
     return new SegmentedKeyValueStorageAdapter<>(TestSegment.FOO, createSegmentedStore());
   }

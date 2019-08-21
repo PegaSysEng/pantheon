@@ -17,6 +17,7 @@ import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 
 public class InMemoryKeyValueStorageTest extends AbstractKeyValueStorageTest {
 
+  @Override
   protected KeyValueStorage createStore() {
     return new InMemoryKeyValueStorage();
   }
