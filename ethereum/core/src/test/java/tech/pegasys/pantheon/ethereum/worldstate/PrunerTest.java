@@ -75,7 +75,7 @@ public class PrunerTest {
   }
 
   @Test
-  public void shouldOnlySweepAfterTransientForkPeriodAndRetentionPeriodEnds()
+  public void shouldOnlySweepAfterBlockConfirmationPeriodAndRetentionPeriodEnds()
       throws InterruptedException {
     final BlockchainStorage blockchainStorage =
         new KeyValueStoragePrefixedKeyBlockchainStorage(

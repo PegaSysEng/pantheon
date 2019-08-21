@@ -2312,13 +2312,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void pruningOptionsRequiresServiceToBeEnabled() {
 
-    parseCommand(
-        "--pruning-retention-period", "4", "--pruning-transient-fork-outliving-period", "1");
+    parseCommand("--pruning-blocks-retained", "4", "--pruning-block-confirmations", "1");
 
     verifyOptionsConstraintLoggerCall(
-        "--pruning-enabled",
-        "--pruning-retention-period",
-        "--pruning-transient-fork-outliving-period");
+        "--pruning-enabled", "--pruning-blocks-retained", "--pruning-block-confirmations");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -2327,9 +2324,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   @Test
   public void pruningParametersAreCaptured() throws Exception {
     parseCommand(
-        "--pruning-enabled",
-        "--pruning-retention-period=15",
-        "--pruning-transient-fork-outliving-period=4");
+        "--pruning-enabled", "--pruning-blocks-retained=15", "--pruning-block-confirmations=4");
 
     final ArgumentCaptor<PruningConfiguration> pruningArg =
         ArgumentCaptor.forClass(PruningConfiguration.class);
@@ -2339,8 +2334,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
-    assertThat(pruningArg.getValue().getRetentionPeriod()).isEqualTo(15);
-    assertThat(pruningArg.getValue().getTransientForkOutlivingPeriod()).isEqualTo(4);
+    assertThat(pruningArg.getValue().getBlocksRetained()).isEqualTo(15);
+    assertThat(pruningArg.getValue().getBlockConfirmations()).isEqualTo(4);
   }
 
   @Test

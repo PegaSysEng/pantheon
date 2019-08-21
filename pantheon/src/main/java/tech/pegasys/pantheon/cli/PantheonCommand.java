@@ -556,20 +556,20 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Boolean isPruningEnabled = false;
 
   @Option(
-      names = {"--pruning-retention-period"},
+      names = {"--pruning-blocks-retained"},
       hidden = true,
       description =
           "Number of recent blocks for which to keep entire world state (default: ${DEFAULT-VALUE})",
       arity = "1")
-  private final Long retentionPeriod = DEFAULT_RETENTION_PERIOD;
+  private final Long pruningBlocksRetained = DEFAULT_PRUNING_BLOCKS_RETAINED;
 
   @Option(
-      names = {"--pruning-transient-fork-outliving-period"},
+      names = {"--pruning-block-confirmations"},
       hidden = true,
       description =
           "Number of confirmations on a block before marking begins (default: ${DEFAULT-VALUE})",
       arity = "1")
-  private final Long transientForkOutlivingPeriod = DEFAULT_TRANSIENT_FORK_OUTLIVING_PERIOD;
+  private final Long pruningBlockConfirmations = DEFAULT_PRUNING_BLOCK_CONFIRMATIONS;
 
   @Option(
       names = {"--permissions-nodes-config-file-enabled"},
@@ -858,7 +858,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         commandLine,
         "--pruning-enabled",
         !isPruningEnabled,
-        asList("--pruning-retention-period", "--pruning-transient-fork-outliving-period"));
+        asList("--pruning-block-confirmations", "--pruning-blocks-retained"));
 
     // noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
@@ -1215,7 +1215,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private PruningConfiguration buildPruningConfiguration() {
-    return new PruningConfiguration(transientForkOutlivingPeriod, retentionPeriod);
+    return new PruningConfiguration(pruningBlockConfirmations, pruningBlocksRetained);
   }
 
   // Blockchain synchronisation from peers.

@@ -14,20 +14,20 @@ package tech.pegasys.pantheon.ethereum.worldstate;
 
 public class PruningConfiguration {
 
-  private final long retentionPeriodInBlocks;
-  private final long transientForkOutlivingPeriod;
+  private final long blocksRetainedBeforeSweeping;
+  private final long blockConfirmationsBeforeMarking;
 
   public PruningConfiguration(
-      final long transientForkOutlivingPeriod, final long retentionPeriodInBlocks) {
-    this.transientForkOutlivingPeriod = transientForkOutlivingPeriod;
-    this.retentionPeriodInBlocks = retentionPeriodInBlocks;
+      final long blockConfirmationsBeforeMarking, final long blocksRetainedBeforeSweeping) {
+    this.blockConfirmationsBeforeMarking = blockConfirmationsBeforeMarking;
+    this.blocksRetainedBeforeSweeping = blocksRetainedBeforeSweeping;
   }
 
-  public long getRetentionPeriod() {
-    return retentionPeriodInBlocks;
+  public long getBlocksRetained() {
+    return blocksRetainedBeforeSweeping;
   }
 
-  public long getTransientForkOutlivingPeriod() {
-    return transientForkOutlivingPeriod;
+  public long getBlockConfirmations() {
+    return blockConfirmationsBeforeMarking;
   }
 }
