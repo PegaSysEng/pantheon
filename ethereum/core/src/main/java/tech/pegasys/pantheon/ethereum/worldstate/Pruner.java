@@ -101,7 +101,7 @@ public class Pruner {
     LOG.info("Begin sweeping unused nodes for pruning. Retention period: {}", blocksRetained);
     execute(
         () -> {
-          pruningStrategy.sweep();
+          pruningStrategy.sweepBefore(markBlockNumber);
           state.compareAndSet(State.SWEEPING, State.IDLE);
         });
   }
