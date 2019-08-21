@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.storage.keyvalue;
+package tech.pegasys.pantheon.services.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,12 +23,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class DatabaseMetadata {
-  static final String METADATA_FILENAME = "DATABASE_METADATA.json";
+  private static final String METADATA_FILENAME = "DATABASE_METADATA.json";
   private static ObjectMapper MAPPER = new ObjectMapper();
   private final int version;
 
   @JsonCreator
-  DatabaseMetadata(@JsonProperty("version") final int version) {
+  public DatabaseMetadata(@JsonProperty("version") final int version) {
     this.version = version;
   }
 
@@ -36,7 +36,7 @@ public class DatabaseMetadata {
     return version;
   }
 
-  static DatabaseMetadata fromDirectory(final Path databaseDir) throws IOException {
+  public static DatabaseMetadata fromDirectory(final Path databaseDir) throws IOException {
     final File metadataFile = getDefaultMetadataFile(databaseDir);
     try {
       return MAPPER.readValue(metadataFile, DatabaseMetadata.class);
@@ -48,7 +48,7 @@ public class DatabaseMetadata {
     }
   }
 
-  void writeToDirectory(final Path databaseDir) throws IOException {
+  public void writeToDirectory(final Path databaseDir) throws IOException {
     MAPPER.writeValue(getDefaultMetadataFile(databaseDir), this);
   }
 

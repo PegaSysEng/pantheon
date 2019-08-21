@@ -10,10 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.cli.options;
-
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBOptions;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
+package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import java.util.Arrays;
 import java.util.List;

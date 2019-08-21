@@ -10,19 +10,23 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.storage.keyvalue;
+package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.exception.StorageException;
+import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
+import tech.pegasys.pantheon.services.util.DatabaseMetadata;
 
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,18 +36,25 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class RocksDbStorageProviderTest {
+public class RocksDBKeyValueStorageFactoryTest {
+
+  private static final String METADATA_FILENAME = "DATABASE_METADATA.json";
   private static final int DEFAULT_VERSION = 1;
 
   @Mock private RocksDBConfiguration rocksDbConfiguration;
   @Rule public final TemporaryFolder temporaryFolder = new TemporaryFolder();
   private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
+  private final List<SegmentIdentifier> segments = List.of();
+  @Mock private SegmentIdentifier segment;
 
   @Test
   public void shouldCreateCorrectMetadataFileForLatestVersion() throws Exception {
     final Path tempDatabaseDir = temporaryFolder.newFolder().toPath().resolve("db");
     when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
-    RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
+
+    // Side effect is creation of the Metadata version file
+    new RocksDBKeyValueStorageFactory(rocksDbConfiguration, segments, metricsSystem);
+
     assertEquals(
         DEFAULT_VERSION,
         DatabaseMetadata.fromDirectory(rocksDbConfiguration.getDatabaseDir()).getVersion());
@@ -55,7 +66,11 @@ public class RocksDbStorageProviderTest {
     Files.createDirectories(tempDatabaseDir);
     tempDatabaseDir.resolve("IDENTITY").toFile().createNewFile();
     when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
-    RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
+    final RocksDBKeyValueStorageFactory storageFactory =
+        new RocksDBKeyValueStorageFactory(rocksDbConfiguration, segments, metricsSystem);
+
+    storageFactory.create(segment);
+
     assertEquals(0, DatabaseMetadata.fromDirectory(tempDatabaseDir).getVersion());
   }
 
@@ -64,10 +79,14 @@ public class RocksDbStorageProviderTest {
     final Path tempDatabaseDir = temporaryFolder.newFolder().toPath().resolve("db");
     Files.createDirectories(tempDatabaseDir);
     tempDatabaseDir.resolve("IDENTITY").toFile().createNewFile();
-    new DatabaseMetadata(1).writeToDirectory(tempDatabaseDir);
+    new DatabaseMetadata(DEFAULT_VERSION).writeToDirectory(tempDatabaseDir);
     when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
-    RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem);
-    assertEquals(1, DatabaseMetadata.fromDirectory(tempDatabaseDir).getVersion());
+
+    final RocksDBKeyValueStorageFactory storageFactory =
+        new RocksDBKeyValueStorageFactory(rocksDbConfiguration, segments, metricsSystem);
+
+    assertEquals(DEFAULT_VERSION, DatabaseMetadata.fromDirectory(tempDatabaseDir).getVersion());
+    assertTrue(storageFactory.isSegmentIsolationSupported());
   }
 
   @Test
@@ -77,8 +96,10 @@ public class RocksDbStorageProviderTest {
     tempDatabaseDir.resolve("IDENTITY").toFile().createNewFile();
     new DatabaseMetadata(-1).writeToDirectory(tempDatabaseDir);
     when(rocksDbConfiguration.getDatabaseDir()).thenReturn(tempDatabaseDir);
-    assertThatThrownBy(() -> RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem))
-        .isInstanceOf(IllegalStateException.class);
+
+    assertThatThrownBy(
+            () -> new RocksDBKeyValueStorageFactory(rocksDbConfiguration, segments, metricsSystem))
+        .isInstanceOf(StorageException.class);
   }
 
   @Test
@@ -90,16 +111,18 @@ public class RocksDbStorageProviderTest {
 
     final String badVersion = "{\"🦄\":1}";
     Files.write(
-        tempDatabaseDir.resolve(DatabaseMetadata.METADATA_FILENAME),
-        badVersion.getBytes(Charset.defaultCharset()));
-    assertThatThrownBy(() -> RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem))
+        tempDatabaseDir.resolve(METADATA_FILENAME), badVersion.getBytes(Charset.defaultCharset()));
+
+    assertThatThrownBy(
+            () -> new RocksDBKeyValueStorageFactory(rocksDbConfiguration, segments, metricsSystem))
         .isInstanceOf(IllegalStateException.class);
 
     final String badValue = "{\"version\":\"iomedae\"}";
     Files.write(
-        tempDatabaseDir.resolve(DatabaseMetadata.METADATA_FILENAME),
-        badValue.getBytes(Charset.defaultCharset()));
-    assertThatThrownBy(() -> RocksDbStorageProvider.create(rocksDbConfiguration, metricsSystem))
+        tempDatabaseDir.resolve(METADATA_FILENAME), badValue.getBytes(Charset.defaultCharset()));
+
+    assertThatThrownBy(
+            () -> new RocksDBKeyValueStorageFactory(rocksDbConfiguration, segments, metricsSystem))
         .isInstanceOf(IllegalStateException.class);
   }
 }

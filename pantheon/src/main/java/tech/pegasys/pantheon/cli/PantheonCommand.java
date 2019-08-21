@@ -1165,9 +1165,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       }
       privacyParametersBuilder.setPrivacyAddress(privacyPrecompiledAddress);
       privacyParametersBuilder.setMetricsSystem(metricsSystem.get());
-      privacyParametersBuilder.setDataDir(dataDir());
       privacyParametersBuilder.setPrivateKeyPath(privacyMarkerTransactionSigningKeyPath);
+
+      final KeyValueStorageProvider storageProvider =
+          new KeyValueStorageProviderBuilder()
+              .withStorageFactory(storageService.getByName(keyValueStorageName + "_Privacy"))
+              .build();
+      privacyParametersBuilder.setStorageProvider(storageProvider);
     }
+
     return privacyParametersBuilder.build();
   }
 

@@ -35,6 +35,12 @@ public class KeyValueStorageProviderBuilder {
     return this;
   }
 
+  public KeyValueStorageProviderBuilder withWorldStatePreimageCacheSize(
+      final long worldStatePreimageCacheSize) {
+    this.worldStatePreimageCacheSize = worldStatePreimageCacheSize;
+    return this;
+  }
+
   public KeyValueStorageProvider build() {
     final KeyValueStorage worldStatePreImageStorage =
         new LimitedInMemoryKeyValueStorage(worldStatePreimageCacheSize);

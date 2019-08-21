@@ -19,13 +19,11 @@ import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionStorage;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStatePreimageStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -144,10 +142,10 @@ public class PrivacyParameters {
     private URI enclaveUrl;
     private Integer privacyAddress = Address.PRIVACY;
     private MetricsSystem metricsSystem = new NoOpMetricsSystem();
-    private Path dataDir;
     private File enclavePublicKeyFile;
     private String enclavePublicKey;
     private Path privateKeyPath;
+    private StorageProvider storageProvider;
 
     public Builder setPrivacyAddress(final Integer privacyAddress) {
       this.privacyAddress = privacyAddress;
@@ -169,8 +167,8 @@ public class PrivacyParameters {
       return this;
     }
 
-    public Builder setDataDir(final Path dataDir) {
-      this.dataDir = dataDir;
+    public Builder setStorageProvider(final StorageProvider privateStorageProvider) {
+      this.storageProvider = privateStorageProvider;
       return this;
     }
 
@@ -180,32 +178,23 @@ public class PrivacyParameters {
     }
 
     public PrivacyParameters build() throws IOException {
-      PrivacyParameters config = new PrivacyParameters();
+      final PrivacyParameters config = new PrivacyParameters();
       if (enabled) {
-        Path privateDbPath = dataDir.resolve(PRIVATE_DATABASE_PATH);
-        StorageProvider privateStorageProvider =
-            RocksDbStorageProvider.create(
-                RocksDBConfiguration.builder()
-                    .databaseDir(privateDbPath)
-                    .label("private_state")
-                    .build(),
-                metricsSystem);
-        WorldStateStorage privateWorldStateStorage =
-            privateStorageProvider.createWorldStateStorage();
-        WorldStatePreimageStorage privatePreimageStorage =
-            privateStorageProvider.createWorldStatePreimageStorage();
-        WorldStateArchive privateWorldStateArchive =
+        final WorldStateStorage privateWorldStateStorage =
+            storageProvider.createWorldStateStorage();
+        final WorldStatePreimageStorage privatePreimageStorage =
+            storageProvider.createWorldStatePreimageStorage();
+        final WorldStateArchive privateWorldStateArchive =
             new WorldStateArchive(privateWorldStateStorage, privatePreimageStorage);
 
-        PrivateTransactionStorage privateTransactionStorage =
-            privateStorageProvider.createPrivateTransactionStorage();
-        PrivateStateStorage privateStateStorage =
-            privateStorageProvider.createPrivateStateStorage();
+        final PrivateTransactionStorage privateTransactionStorage =
+            storageProvider.createPrivateTransactionStorage();
+        final PrivateStateStorage privateStateStorage = storageProvider.createPrivateStateStorage();
 
         config.setPrivateWorldStateArchive(privateWorldStateArchive);
         config.setEnclavePublicKey(enclavePublicKey);
         config.setEnclavePublicKeyFile(enclavePublicKeyFile);
-        config.setPrivateStorageProvider(privateStorageProvider);
+        config.setPrivateStorageProvider(storageProvider);
         config.setPrivateTransactionStorage(privateTransactionStorage);
         config.setPrivateStateStorage(privateStateStorage);
         if (privateKeyPath != null) {
