@@ -22,8 +22,6 @@ import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStatePreimageStorage;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -136,12 +134,9 @@ public class PrivacyParameters {
   }
 
   public static class Builder {
-    private final String PRIVATE_DATABASE_PATH = "private";
-
     private boolean enabled;
     private URI enclaveUrl;
     private Integer privacyAddress = Address.PRIVACY;
-    private MetricsSystem metricsSystem = new NoOpMetricsSystem();
     private File enclavePublicKeyFile;
     private String enclavePublicKey;
     private Path privateKeyPath;
@@ -159,11 +154,6 @@ public class PrivacyParameters {
 
     public Builder setEnabled(final boolean enabled) {
       this.enabled = enabled;
-      return this;
-    }
-
-    public Builder setMetricsSystem(final MetricsSystem metricsSystem) {
-      this.metricsSystem = metricsSystem;
       return this;
     }
 

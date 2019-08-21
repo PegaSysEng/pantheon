@@ -48,8 +48,11 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageFactory;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
+import tech.pegasys.pantheon.services.StorageServiceImpl;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.ByteArrayOutputStream;
@@ -104,6 +107,9 @@ public abstract class CommandTestAbstract {
   @Mock protected RlpBlockExporter rlpBlockExporter;
   @Mock protected JsonBlockImporter<?> jsonBlockImporter;
   @Mock protected RlpBlockImporter rlpBlockImporter;
+  @Mock protected StorageServiceImpl storageService;
+  @Mock protected KeyValueStorageFactory rocksDBStorageFactory;
+  @Mock protected KeyValueStorageFactory rocksDBSPrivacyStorageFactory;
 
   @Mock protected Logger mockLogger;
   @Mock protected PantheonPluginContextImpl mockPantheonPluginContext;
@@ -120,6 +126,7 @@ public abstract class CommandTestAbstract {
   @Captor protected ArgumentCaptor<GraphQLConfiguration> graphQLConfigArgumentCaptor;
   @Captor protected ArgumentCaptor<WebSocketConfiguration> wsRpcConfigArgumentCaptor;
   @Captor protected ArgumentCaptor<MetricsConfiguration> metricsConfigArgumentCaptor;
+  @Captor protected ArgumentCaptor<StorageProvider> storageProviderArgumentCaptor;
 
   @Captor
   protected ArgumentCaptor<PermissioningConfiguration> permissioningConfigurationArgumentCaptor;
@@ -150,6 +157,7 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.privacyParameters(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.clock(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.isRevertReasonEnabled(false)).thenReturn(mockControllerBuilder);
+    when(mockControllerBuilder.storageProvider(any())).thenReturn(mockControllerBuilder);
 
     // doReturn used because of generic PantheonController
     doReturn(mockController).when(mockControllerBuilder).build();
@@ -182,6 +190,8 @@ public abstract class CommandTestAbstract {
     when(mockRunnerBuilder.metricsConfiguration(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.staticNodes(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.build()).thenReturn(mockRunner);
+
+    when(storageService.getByName("RocksDB")).thenReturn(rocksDBStorageFactory);
   }
 
   // Display outputs for debug purpose
@@ -234,7 +244,8 @@ public abstract class CommandTestAbstract {
             mockControllerBuilderFactory,
             keyLoader,
             mockPantheonPluginContext,
-            environment);
+            environment,
+            storageService);
 
     // parse using Ansi.OFF to be able to assert on non formatted output results
     pantheonCommand.parse(
@@ -265,7 +276,8 @@ public abstract class CommandTestAbstract {
         final PantheonController.Builder controllerBuilderFactory,
         final KeyLoader keyLoader,
         final PantheonPluginContextImpl pantheonPluginContext,
-        final Map<String, String> environment) {
+        final Map<String, String> environment,
+        final StorageServiceImpl storageService) {
       super(
           mockLogger,
           mockBlockImporter,
@@ -274,7 +286,8 @@ public abstract class CommandTestAbstract {
           mockRunnerBuilder,
           controllerBuilderFactory,
           pantheonPluginContext,
-          environment);
+          environment,
+          storageService);
       this.keyLoader = keyLoader;
     }
 

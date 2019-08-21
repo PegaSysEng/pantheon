@@ -20,6 +20,7 @@ import tech.pegasys.pantheon.chainimport.RlpBlockImporter;
 import tech.pegasys.pantheon.cli.PantheonCommand;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
+import tech.pegasys.pantheon.services.StorageServiceImpl;
 
 import org.apache.logging.log4j.Logger;
 import picocli.CommandLine.RunLast;
@@ -42,7 +43,8 @@ public final class Pantheon {
             new RunnerBuilder(),
             new PantheonController.Builder(),
             new PantheonPluginContextImpl(),
-            System.getenv());
+            System.getenv(),
+            new StorageServiceImpl());
 
     pantheonCommand.parse(
         new RunLast().andExit(SUCCESS_EXIT_CODE),

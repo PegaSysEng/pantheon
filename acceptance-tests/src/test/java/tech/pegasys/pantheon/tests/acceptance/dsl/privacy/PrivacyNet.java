@@ -262,11 +262,13 @@ public class PrivacyNet {
 
     private PrivacyParameters generatePrivacyParameters(final OrionTestHarness testHarness)
         throws IOException {
+      // TODO needs some way of getting `setDataDir(temporaryFolder.newFolder().toPath())` into the
+      // RocksDBFactory
+
       return new PrivacyParameters.Builder()
           .setEnabled(true)
           .setEnclaveUrl(testHarness.clientUrl())
           .setEnclavePublicKeyUsingFile(testHarness.getConfig().publicKeys().get(0).toFile())
-          .setDataDir(temporaryFolder.newFolder().toPath())
           .build();
     }
 

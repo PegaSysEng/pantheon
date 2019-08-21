@@ -40,7 +40,6 @@ public class MarkSweepPruner {
   private static final int DEFAULT_OPS_PER_TRANSACTION = 1000;
   private static final Logger LOG = LogManager.getLogger();
   private static final byte[] IN_USE = BytesValue.of(1).getArrayUnsafe();
-  private static final int MARKS_PER_TRANSACTION = 1000;
 
   private final int operationsPerTransaction;
   private final WorldStateStorage worldStateStorage;

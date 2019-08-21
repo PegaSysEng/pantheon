@@ -33,7 +33,6 @@ import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +47,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.google.common.io.Files;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -102,7 +100,9 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     final EthNetworkConfig ethNetworkConfig = networkConfigBuilder.build();
     final PantheonControllerBuilder<?> builder =
         new PantheonController.Builder().fromEthNetworkConfig(ethNetworkConfig);
-    final Path tempDir = Files.createTempDir().toPath();
+
+    // TODO need some way of getting `databaseDir(tempDir)` into the RocksDBFactory
+    // final Path tempDir = Files.createTempDir().toPath();
 
     final PantheonController<?> pantheonController;
     try {
@@ -115,7 +115,6 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .nodePrivateKeyFile(KeyPairUtil.getDefaultKeyFile(node.homeDirectory()))
               .metricsSystem(noOpMetricsSystem)
               .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
-              .rocksDbConfiguration(RocksDbConfiguration.builder().databaseDir(tempDir).build())
               .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
               .clock(Clock.systemUTC())
               .isRevertReasonEnabled(node.isRevertReasonEnabled())

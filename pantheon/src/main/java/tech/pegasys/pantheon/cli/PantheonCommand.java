@@ -168,7 +168,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final RunnerBuilder runnerBuilder;
   private final PantheonController.Builder controllerBuilderFactory;
   private final PantheonPluginContextImpl pantheonPluginContext;
-  private final StorageServiceImpl storageService = new StorageServiceImpl();
+  private final StorageServiceImpl storageService;
   private final Map<String, String> environment;
 
   protected KeyLoader getKeyLoader() {
@@ -640,7 +640,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private Optional<PermissioningConfiguration> permissioningConfiguration;
   private Collection<EnodeURL> staticNodes;
   private PantheonController<?> pantheonController;
-
+  private StandaloneCommand standaloneCommands;
   private final Supplier<MetricsSystem> metricsSystem =
       Suppliers.memoize(() -> PrometheusMetricsSystem.init(metricsConfiguration()));
 
@@ -652,7 +652,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final RunnerBuilder runnerBuilder,
       final PantheonController.Builder controllerBuilderFactory,
       final PantheonPluginContextImpl pantheonPluginContext,
-      final Map<String, String> environment) {
+      final Map<String, String> environment,
+      final StorageServiceImpl storageService) {
     this.logger = logger;
     this.rlpBlockImporter = rlpBlockImporter;
     this.rlpBlockExporterFactory = rlpBlockExporterFactory;
@@ -661,9 +662,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     this.controllerBuilderFactory = controllerBuilderFactory;
     this.pantheonPluginContext = pantheonPluginContext;
     this.environment = environment;
+    this.storageService = storageService;
   }
-
-  private StandaloneCommand standaloneCommands;
 
   public void parse(
       final AbstractParseResultHandler<List<Object>> resultHandler,
@@ -1164,7 +1164,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             commandLine, "Please specify Enclave public key file path to enable privacy");
       }
       privacyParametersBuilder.setPrivacyAddress(privacyPrecompiledAddress);
-      privacyParametersBuilder.setMetricsSystem(metricsSystem.get());
       privacyParametersBuilder.setPrivateKeyPath(privacyMarkerTransactionSigningKeyPath);
 
       final KeyValueStorageProvider storageProvider =

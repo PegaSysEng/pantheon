@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.cli.config.NetworkName.DEV;
 import static tech.pegasys.pantheon.cli.config.NetworkName.GOERLI;
 import static tech.pegasys.pantheon.cli.config.NetworkName.MAINNET;
@@ -90,7 +91,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   private final String ENCLAVE_PUBLIC_KEY = "A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo=";
   private final String VALID_NODE_ID =
       "6f8a80d14311c39f35f516fa664deaaaa13e85b2f7493f37f6144d86991ec012937307647bd3b9a82abe2974e1407241d54947bbb39763a4cac9f77166ad92a0";
-  static final String PERMISSIONING_CONFIG_TOML = "/permissioning_config.toml";
+  private static final String PERMISSIONING_CONFIG_TOML = "/permissioning_config.toml";
 
   private static final JsonRpcConfiguration defaultJsonRpcConfiguration;
   private static final GraphQLConfiguration DEFAULT_GRAPH_QL_CONFIGURATION;
@@ -173,8 +174,10 @@ public class PantheonCommandTest extends CommandTestAbstract {
     verify(mockControllerBuilder).dataDirectory(isNotNull());
     verify(mockControllerBuilder).miningParameters(miningArg.capture());
     verify(mockControllerBuilder).nodePrivateKeyFile(isNotNull());
+    verify(mockControllerBuilder).storageProvider(storageProviderArgumentCaptor.capture());
     verify(mockControllerBuilder).build();
 
+    assertThat(storageProviderArgumentCaptor.getValue()).isNotNull();
     assertThat(syncConfigurationCaptor.getValue().getSyncMode()).isEqualTo(SyncMode.FULL);
     assertThat(commandErrorOutput.toString()).isEmpty();
     assertThat(miningArg.getValue().getCoinbase()).isEqualTo(Optional.empty());
@@ -2432,7 +2435,8 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void mustUseEnclaveUriAndOptions() throws IOException {
+  public void mustUseEnclaveUriAndOptions() {
+    when(storageService.getByName("RocksDB_Privacy")).thenReturn(rocksDBSPrivacyStorageFactory);
     final URL configFile = this.getClass().getResource("/orion_publickey.pub");
 
     parseCommand(
@@ -2481,7 +2485,7 @@ public class PantheonCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void mustVerifyPrivacyIsDisabled() throws IOException {
+  public void mustVerifyPrivacyIsDisabled() {
     parseCommand();
 
     final ArgumentCaptor<PrivacyParameters> enclaveArg =

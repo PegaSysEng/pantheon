@@ -12,11 +12,8 @@
  */
 package tech.pegasys.pantheon.services;
 
-import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
-
-import com.google.common.collect.ImmutableMap;
 
 public class PantheonEventsImpl implements PantheonEvents {
   private final BlockBroadcaster blockBroadcaster;
@@ -27,8 +24,10 @@ public class PantheonEventsImpl implements PantheonEvents {
 
   @Override
   public Object addNewBlockPropagatedListener(final NewBlockPropagatedListener listener) {
-    return blockBroadcaster.subscribePropagateNewBlocks(
-        block -> dispatchNewBlockPropagatedMessage(block, listener));
+    // TODO temp fix to get code compiling
+    //    return blockBroadcaster.subscribePropagateNewBlocks(
+    //        block -> dispatchNewBlockPropagatedMessage(block, listener));
+    return null;
   }
 
   @Override
@@ -46,20 +45,20 @@ public class PantheonEventsImpl implements PantheonEvents {
   }
 
   @Override
-  public void removeNewTransactionAddedListener(Object listenerIdentifier) {
+  public void removeNewTransactionAddedListener(final Object listenerIdentifier) {
     // TODO temp fix to get code compiling
   }
 
-  private void dispatchNewBlockPropagatedMessage(
-      final Block block, final NewBlockPropagatedListener listener) {
-    final ImmutableMap<Object, Object> result =
-        new ImmutableMap.Builder<>()
-            .put("type", "NewBlock")
-            .put("blockHash", block.getHash().toString())
-            .put("blockNumber", block.getHeader().getNumber())
-            .put("timestamp", block.getHeader().getTimestamp())
-            .build();
-    // TODO temp fix to get code compiling
-    // listener.newBlockPropagated(Json.encode(result));
-  }
+  // TODO temp fix to get code compiling
+  //  private void dispatchNewBlockPropagatedMessage(
+  //      final Block block, final NewBlockPropagatedListener listener) {
+  //    final ImmutableMap<Object, Object> result =
+  //        new ImmutableMap.Builder<>()
+  //            .put("type", "NewBlock")
+  //            .put("blockHash", block.getHash().toString())
+  //            .put("blockNumber", block.getHeader().getNumber())
+  //            .put("timestamp", block.getHeader().getTimestamp())
+  //            .build();
+  // listener.newBlockPropagated(Json.encode(result));
+  //  }
 }

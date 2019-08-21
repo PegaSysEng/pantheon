@@ -52,12 +52,12 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     }
 
     if (isSegmentIsolationSupported) {
-      this.unsegmentedStorage = new RocksDBKeyValueStorage(configuration, metricsSystem);
-      this.segmentedStorage = null;
-    } else {
       this.unsegmentedStorage = null;
       this.segmentedStorage =
           RocksDBColumnarKeyValueStorage.create(configuration, segments, metricsSystem);
+    } else {
+      this.unsegmentedStorage = new RocksDBKeyValueStorage(configuration, metricsSystem);
+      this.segmentedStorage = null;
     }
   }
 

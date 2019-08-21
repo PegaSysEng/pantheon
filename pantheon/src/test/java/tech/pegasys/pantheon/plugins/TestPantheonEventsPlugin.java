@@ -16,12 +16,7 @@ import tech.pegasys.pantheon.plugin.PantheonContext;
 import tech.pegasys.pantheon.plugin.PantheonPlugin;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Collections;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.auto.service.AutoService;
 import org.apache.logging.log4j.LogManager;
@@ -34,14 +29,14 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
   private PantheonContext context;
 
   private Optional<Object> subscriptionId;
-  private final AtomicInteger blockCounter = new AtomicInteger();
-  private File callbackDir;
+  //  private final AtomicInteger blockCounter = new AtomicInteger();
+  //  private File callbackDir;
 
   @Override
   public void register(final PantheonContext context) {
     this.context = context;
     LOG.info("Registered");
-    callbackDir = new File(System.getProperty("pantheon.plugins.dir", "plugins"));
+    //  callbackDir = new File(System.getProperty("pantheon.plugins.dir", "plugins"));
   }
 
   // TODO temp fix to get code compiling, awaiting EventPlugin code drop
@@ -64,19 +59,20 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
     LOG.info("No longer listening with ID#" + subscriptionId);
   }
 
-  private void onBlockAnnounce(final String json) {
-    final int blockCount = blockCounter.incrementAndGet();
-    LOG.info("I got a new block! (I've seen {}) - {}", blockCount, json);
-    try {
-      final File callbackFile = new File(callbackDir, "newBlock." + blockCount);
-      if (!callbackFile.getParentFile().exists()) {
-        callbackFile.getParentFile().mkdirs();
-        callbackFile.getParentFile().deleteOnExit();
-      }
-      Files.write(callbackFile.toPath(), Collections.singletonList(json));
-      callbackFile.deleteOnExit();
-    } catch (final IOException ioe) {
-      throw new RuntimeException(ioe);
-    }
-  }
+  // TODO temp fix to get code compiling, awaiting EventPlugin code drop
+  //  private void onBlockAnnounce(final String json) {
+  //    final int blockCount = blockCounter.incrementAndGet();
+  //    LOG.info("I got a new block! (I've seen {}) - {}", blockCount, json);
+  //    try {
+  //      final File callbackFile = new File(callbackDir, "newBlock." + blockCount);
+  //      if (!callbackFile.getParentFile().exists()) {
+  //        callbackFile.getParentFile().mkdirs();
+  //        callbackFile.getParentFile().deleteOnExit();
+  //      }
+  //      Files.write(callbackFile.toPath(), Collections.singletonList(json));
+  //      callbackFile.deleteOnExit();
+  //    } catch (final IOException ioe) {
+  //      throw new RuntimeException(ioe);
+  //    }
+  //  }
 }
