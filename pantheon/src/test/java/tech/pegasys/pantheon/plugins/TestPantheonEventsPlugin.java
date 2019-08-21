@@ -44,13 +44,14 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
     callbackDir = new File(System.getProperty("pantheon.plugins.dir", "plugins"));
   }
 
+  // TODO temp fix to get code compiling, awaiting EventPlugin code drop
   @Override
   public void start() {
-    subscriptionId =
-        context
-            .getService(PantheonEvents.class)
-            .map(events -> events.addNewBlockPropagatedListener(this::onBlockAnnounce));
-    LOG.info("Listening with ID#" + subscriptionId);
+    //    subscriptionId =
+    //        context
+    //            .getService(PantheonEvents.class)
+    //            .map(events -> events.addNewBlockPropagatedListener(this::onBlockAnnounce));
+    //    LOG.info("Listening with ID#" + subscriptionId);
   }
 
   @Override

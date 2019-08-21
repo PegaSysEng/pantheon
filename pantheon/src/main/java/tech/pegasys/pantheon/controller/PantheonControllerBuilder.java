@@ -188,9 +188,10 @@ public abstract class PantheonControllerBuilder<C> {
         new Pruner(
             new MarkSweepPruner(
                 protocolContext.getWorldStateArchive().getWorldStateStorage(),
+                blockchain,
                 storageProvider.createPruningStorage(),
                 metricsSystem),
-            protocolContext.getBlockchain(),
+            blockchain,
             Executors.newSingleThreadExecutor(
                 new ThreadFactoryBuilder()
                     .setDaemon(true)

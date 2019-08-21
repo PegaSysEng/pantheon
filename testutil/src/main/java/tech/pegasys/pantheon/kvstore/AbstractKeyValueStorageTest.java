@@ -12,9 +12,8 @@
  */
 package tech.pegasys.pantheon.kvstore;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
@@ -50,7 +49,7 @@ public abstract class AbstractKeyValueStorageTest {
     tx.commit();
 
     final Optional<byte[]> result = store2.get(key);
-    assertEquals(Optional.empty(), result);
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -63,12 +62,28 @@ public abstract class AbstractKeyValueStorageTest {
     KeyValueStorageTransaction tx = store.startTransaction();
     tx.put(key, firstValue);
     tx.commit();
-    assertArrayEquals(firstValue, store.get(key).get());
+    assertThat(store.get(key)).contains(firstValue);
 
     tx = store.startTransaction();
     tx.put(key, secondValue);
     tx.commit();
-    assertArrayEquals(secondValue, store.get(key).get());
+    assertThat(store.get(key)).contains(secondValue);
+  }
+
+  @Test
+  public void removeUnless() throws Exception {
+    final KeyValueStorage store = createStore();
+    final KeyValueStorageTransaction tx = store.startTransaction();
+    tx.put(bytesFromHexString("0F"), bytesFromHexString("0ABC"));
+    tx.put(bytesFromHexString("10"), bytesFromHexString("0ABC"));
+    tx.put(bytesFromHexString("11"), bytesFromHexString("0ABC"));
+    tx.put(bytesFromHexString("12"), bytesFromHexString("0ABC"));
+    tx.commit();
+    store.removeAllKeysUnless(bv -> BytesValue.wrap(bv).toString().contains("1"));
+    assertThat(store.containsKey(bytesFromHexString("0F"))).isFalse();
+    assertThat(store.containsKey(bytesFromHexString("10"))).isTrue();
+    assertThat(store.containsKey(bytesFromHexString("11"))).isTrue();
+    assertThat(store.containsKey(bytesFromHexString("12"))).isTrue();
   }
 
   @Test
@@ -77,13 +92,13 @@ public abstract class AbstractKeyValueStorageTest {
     final byte[] key = bytesFromHexString("ABCD");
     final byte[] value = bytesFromHexString("DEFF");
 
-    assertFalse(store.containsKey(key));
+    assertThat(store.containsKey(key)).isFalse();
 
     final KeyValueStorageTransaction transaction = store.startTransaction();
     transaction.put(key, value);
     transaction.commit();
 
-    assertTrue(store.containsKey(key));
+    assertThat(store.containsKey(key)).isTrue();
   }
 
   @Test
@@ -99,8 +114,7 @@ public abstract class AbstractKeyValueStorageTest {
     tx = store.startTransaction();
     tx.remove(key);
     tx.commit();
-
-    assertEquals(Optional.empty(), store.get(key));
+    assertThat(store.get(key)).isEmpty();
   }
 
   @Test
@@ -113,8 +127,7 @@ public abstract class AbstractKeyValueStorageTest {
     tx.put(key, value);
     tx.remove(key);
     tx.commit();
-
-    assertEquals(Optional.empty(), store.get(key));
+    assertThat(store.get(key)).isEmpty();
   }
 
   @Test
@@ -125,8 +138,7 @@ public abstract class AbstractKeyValueStorageTest {
     KeyValueStorageTransaction tx = store.startTransaction();
     tx.remove(key);
     tx.commit();
-
-    assertEquals(Optional.empty(), store.get(key));
+    assertThat(store.get(key)).isEmpty();
   }
 
   @Test
@@ -185,18 +197,18 @@ public abstract class AbstractKeyValueStorageTest {
     tx.put(bytesOf(4), bytesOf(8));
 
     // Check values before committing have not changed
-    assertArrayEquals(bytesOf(1), store.get(bytesOf(1)).get());
-    assertArrayEquals(bytesOf(2), store.get(bytesOf(2)).get());
-    assertArrayEquals(bytesOf(3), store.get(bytesOf(3)).get());
-    assertEquals(Optional.empty(), store.get(bytesOf(4)));
+    assertThat(store.get(bytesOf(1))).contains(bytesOf(1));
+    assertThat(store.get(bytesOf(2))).contains(bytesOf(2));
+    assertThat(store.get(bytesOf(3))).contains(bytesOf(3));
+    assertThat(store.get(bytesOf(4))).isEmpty();
 
     tx.commit();
 
     // Check that values have been updated after commit
-    assertArrayEquals(bytesOf(1), store.get(bytesOf(1)).get());
-    assertArrayEquals(bytesOf(4), store.get(bytesOf(2)).get());
-    assertEquals(Optional.empty(), store.get(bytesOf(3)));
-    assertArrayEquals(bytesOf(8), store.get(bytesOf(4)).get());
+    assertThat(store.get(bytesOf(1))).contains(bytesOf(1));
+    assertThat(store.get(bytesOf(2))).contains(bytesOf(4));
+    assertThat(store.get(bytesOf(3))).isEmpty();
+    assertThat(store.get(bytesOf(4))).contains(bytesOf(8));
   }
 
   @Test
@@ -217,18 +229,18 @@ public abstract class AbstractKeyValueStorageTest {
     tx.put(bytesOf(4), bytesOf(8));
 
     // Check values before committing have not changed
-    assertArrayEquals(bytesOf(1), store.get(bytesOf(1)).get());
-    assertArrayEquals(bytesOf(2), store.get(bytesOf(2)).get());
-    assertArrayEquals(bytesOf(3), store.get(bytesOf(3)).get());
-    assertEquals(Optional.empty(), store.get(bytesOf(4)));
+    assertThat(store.get(bytesOf(1))).contains(bytesOf(1));
+    assertThat(store.get(bytesOf(2))).contains(bytesOf(2));
+    assertThat(store.get(bytesOf(3))).contains(bytesOf(3));
+    assertThat(store.get(bytesOf(4))).isEmpty();
 
     tx.rollback();
 
     // Check that values have not changed after rollback
-    assertArrayEquals(bytesOf(1), store.get(bytesOf(1)).get());
-    assertArrayEquals(bytesOf(2), store.get(bytesOf(2)).get());
-    assertArrayEquals(bytesOf(3), store.get(bytesOf(3)).get());
-    assertEquals(Optional.empty(), store.get(bytesOf(4)));
+    assertThat(store.get(bytesOf(1))).contains(bytesOf(1));
+    assertThat(store.get(bytesOf(2))).contains(bytesOf(2));
+    assertThat(store.get(bytesOf(3))).contains(bytesOf(3));
+    assertThat(store.get(bytesOf(4))).isEmpty();
   }
 
   @Test
@@ -322,8 +334,8 @@ public abstract class AbstractKeyValueStorageTest {
     tx1.commit();
     tx2.commit();
 
-    assertArrayEquals(bytesOf(1), store.get(bytesOf(1)).get());
-    assertArrayEquals(bytesOf(2), store.get(bytesOf(2)).get());
+    assertThat(store.get(bytesOf(1))).contains(bytesOf(1));
+    assertThat(store.get(bytesOf(2))).contains(bytesOf(2));
   }
 
   @Test

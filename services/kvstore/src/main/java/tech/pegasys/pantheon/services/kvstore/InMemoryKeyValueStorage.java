@@ -17,7 +17,6 @@ import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,8 +29,16 @@ import java.util.function.Predicate;
 
 public class InMemoryKeyValueStorage implements KeyValueStorage {
 
-  private final Map<BytesValue, byte[]> hashValueStore = new HashMap<>();
+  private final Map<BytesValue, byte[]> hashValueStore;
   private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+
+  public InMemoryKeyValueStorage() {
+    this(new HashMap<>());
+  }
+
+  protected InMemoryKeyValueStorage(final Map<BytesValue, byte[]> hashValueStore) {
+    this.hashValueStore = hashValueStore;
+  }
 
   @Override
   public void clear() {
@@ -68,8 +75,9 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
 
   @Override
   public long removeAllKeysUnless(final Predicate<byte[]> retainCondition) throws StorageException {
+    long initialSize = hashValueStore.keySet().size();
     hashValueStore.keySet().removeIf(key -> !retainCondition.test(key.getArrayUnsafe()));
-    return 0;
+    return initialSize - hashValueStore.keySet().size();
   }
 
   @Override
@@ -81,7 +89,7 @@ public class InMemoryKeyValueStorage implements KeyValueStorage {
   }
 
   public Set<BytesValue> keySet() {
-    return Collections.unmodifiableSet(new HashSet<>(hashValueStore.keySet()));
+    return Set.copyOf(hashValueStore.keySet());
   }
 
   private class InMemoryTransaction implements KeyValueStorageTransaction {
