@@ -27,12 +27,14 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.RocksDbStorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValueStorageFactory;
 import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
 import tech.pegasys.pantheon.services.tasks.FlatFileTaskCollection;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -41,6 +43,7 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -88,10 +91,15 @@ public class WorldStateDownloaderBenchmark {
     peer = EthProtocolManagerTestUtil.createPeer(ethProtocolManager, blockHeader.getNumber());
 
     final EthContext ethContext = ethProtocolManager.ethContext();
-    storageProvider =
-        RocksDbStorageProvider.create(
-            RocksDbConfiguration.builder().databaseDir(tempDir.resolve("database")).build(),
-            metricsSystem);
+
+    final KeyValueStorageProvider storageProvider =
+        new KeyValueStorageProviderBuilder()
+            .withStorageFactory(
+                new RocksDBKeyValueStorageFactory(
+                    RocksDBConfiguration.builder().databaseDir(tempDir.resolve("database")).build(),
+                    List.of(),
+                    metricsSystem))
+            .build();
     worldStateStorage = storageProvider.createWorldStateStorage();
 
     pendingRequests =

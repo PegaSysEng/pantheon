@@ -32,12 +32,14 @@ dependencies {
   implementation project(':ethereum:trie')
   implementation project(':ethereum:permissioning')
   implementation project(':metrics:core')
+  implementation project(':plugins:rocksdb')
   implementation project(':services:kvstore')
   implementation project(':services:pipeline')
   implementation project(':services:tasks')
 
   implementation 'io.vertx:vertx-core'
   implementation 'com.google.guava:guava'
+  implementation 'tech.pegasys.pantheon:plugin-api'
 
   compileOnly 'org.openjdk.jmh:jmh-generator-annprocess'
 
@@ -54,6 +56,7 @@ dependencies {
   testImplementation 'org.assertj:assertj-core'
   testImplementation 'org.awaitility:awaitility'
   testImplementation 'org.mockito:mockito-core'
+
   jmhImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
 
   integrationTestImplementation project(path: ':config', configuration: 'testSupportArtifacts')
