@@ -62,7 +62,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
   private final Map<Node, PantheonPluginContextImpl> pantheonPluginContextMap = new HashMap<>();
 
   private PantheonPluginContextImpl buildPluginContext(final PantheonNode node) {
-    PantheonPluginContextImpl pantheonPluginContext = new PantheonPluginContextImpl();
+    final PantheonPluginContextImpl pantheonPluginContext = new PantheonPluginContextImpl();
     final Path pluginsPath = node.homeDirectory().resolve("plugins");
     final File pluginsDirFile = pluginsPath.toFile();
     if (!pluginsDirFile.isDirectory()) {
@@ -125,7 +125,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     final RunnerBuilder runnerBuilder = new RunnerBuilder();
     if (node.getPermissioningConfiguration().isPresent()) {
-      PermissioningConfiguration permissioningConfiguration =
+      final PermissioningConfiguration permissioningConfiguration =
           node.getPermissioningConfiguration().get();
 
       runnerBuilder.permissioningConfiguration(permissioningConfiguration);
@@ -133,7 +133,9 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     pantheonPluginContext.addService(
         PantheonEvents.class,
-        new PantheonEventsImpl(pantheonController.getProtocolManager().getBlockBroadcaster()));
+        new PantheonEventsImpl(
+            pantheonController.getProtocolManager().getBlockBroadcaster(),
+            pantheonController.getTransactionPool()));
     pantheonPluginContext.startPlugins();
 
     final Runner runner =
@@ -166,7 +168,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
   @Override
   public void stopNode(final PantheonNode node) {
-    PantheonPluginContextImpl pluginContext = pantheonPluginContextMap.remove(node);
+    final PantheonPluginContextImpl pluginContext = pantheonPluginContextMap.remove(node);
     if (pluginContext != null) {
       pluginContext.stopPlugins();
     }

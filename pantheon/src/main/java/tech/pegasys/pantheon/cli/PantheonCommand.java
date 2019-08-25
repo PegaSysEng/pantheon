@@ -81,6 +81,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBu
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
+import tech.pegasys.pantheon.ethereum.worldstate.PruningConfiguration;
 import tech.pegasys.pantheon.metrics.MetricCategory;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
@@ -548,6 +549,29 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final BytesValue extraData = DEFAULT_EXTRA_DATA;
 
   @Option(
+      names = {"--pruning-enabled"},
+      hidden = true,
+      description =
+          "Enable pruning of world state of blocks older than the retention period (default: ${DEFAULT-VALUE})")
+  private final Boolean isPruningEnabled = false;
+
+  @Option(
+      names = {"--pruning-blocks-retained"},
+      hidden = true,
+      description =
+          "Number of recent blocks for which to keep entire world state (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  private final Long pruningBlocksRetained = DEFAULT_PRUNING_BLOCKS_RETAINED;
+
+  @Option(
+      names = {"--pruning-block-confirmations"},
+      hidden = true,
+      description =
+          "Number of confirmations on a block before marking begins (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  private final Long pruningBlockConfirmations = DEFAULT_PRUNING_BLOCK_CONFIRMATIONS;
+
+  @Option(
       names = {"--permissions-nodes-config-file-enabled"},
       description = "Enable node level permissions (default: ${DEFAULT-VALUE})")
   private final Boolean permissionsNodesEnabled = false;
@@ -793,8 +817,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private PantheonCommand startPlugins() {
     pantheonPluginContext.addService(
         PantheonEvents.class,
-        new PantheonEventsImpl((pantheonController.getProtocolManager().getBlockBroadcaster())));
-    pantheonPluginContext.addService(StorageServiceImpl.class, storageService);
+        new PantheonEventsImpl(
+            (pantheonController.getProtocolManager().getBlockBroadcaster()),
+            pantheonController.getTransactionPool()));
     pantheonPluginContext.startPlugins();
     return this;
   }
@@ -835,6 +860,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         "--sync-mode",
         !SyncMode.FAST.equals(syncMode),
         singletonList("--fast-sync-min-peers"));
+
+    checkOptionDependencies(
+        logger,
+        commandLine,
+        "--pruning-enabled",
+        !isPruningEnabled,
+        asList("--pruning-block-confirmations", "--pruning-blocks-retained"));
 
     // noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
@@ -921,7 +953,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
           .isRevertReasonEnabled(isRevertReasonEnabled)
-          .storageProvider(storageProvider);
+          .storageProvider(storageProvider)
+          .isPruningEnabled(isPruningEnabled)
+          .pruningConfiguration(buildPruningConfiguration());
     } catch (IOException e) {
       throw new ExecutionException(this.commandLine, "Invalid path", e);
     }
@@ -1190,6 +1224,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         .txPoolMaxSize(txPoolMaxSize)
         .pendingTxRetentionPeriod(pendingTxRetentionPeriod)
         .build();
+  }
+
+  private PruningConfiguration buildPruningConfiguration() {
+    return new PruningConfiguration(pruningBlockConfirmations, pruningBlocksRetained);
   }
 
   // Blockchain synchronisation from peers.

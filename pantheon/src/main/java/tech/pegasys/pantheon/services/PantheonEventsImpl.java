@@ -12,22 +12,26 @@
  */
 package tech.pegasys.pantheon.services;
 
+import tech.pegasys.pantheon.ethereum.core.Block;
+import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
+import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 
 public class PantheonEventsImpl implements PantheonEvents {
   private final BlockBroadcaster blockBroadcaster;
+  private final TransactionPool transactionPool;
 
-  public PantheonEventsImpl(final BlockBroadcaster blockBroadcaster) {
+  public PantheonEventsImpl(
+      final BlockBroadcaster blockBroadcaster, final TransactionPool transactionPool) {
     this.blockBroadcaster = blockBroadcaster;
+    this.transactionPool = transactionPool;
   }
 
   @Override
   public Object addNewBlockPropagatedListener(final NewBlockPropagatedListener listener) {
-    // TODO temp fix to get code compiling
-    //    return blockBroadcaster.subscribePropagateNewBlocks(
-    //        block -> dispatchNewBlockPropagatedMessage(block, listener));
-    return null;
+    return blockBroadcaster.subscribePropagateNewBlocks(
+        block -> dispatchNewBlockPropagatedMessage(block, listener));
   }
 
   @Override
@@ -37,28 +41,26 @@ public class PantheonEventsImpl implements PantheonEvents {
     }
   }
 
+  private void dispatchNewBlockPropagatedMessage(
+      final Block block, final NewBlockPropagatedListener listener) {
+    listener.newBlockPropagated(block.getHeader());
+  }
+
   @Override
-  public Object addNewTransactionAddedListener(
-      final NewTransactionAddedListener newTransactionAddedListener) {
-    // TODO temp fix to get code compiling
-    return null;
+  public Object addNewTransactionAddedListener(final NewTransactionAddedListener listener) {
+    return transactionPool.subscribePendingTransactions(
+        transaction -> dispatchTransactionAddedMessage(transaction, listener));
   }
 
   @Override
   public void removeNewTransactionAddedListener(final Object listenerIdentifier) {
-    // TODO temp fix to get code compiling
+    if (listenerIdentifier instanceof Long) {
+      transactionPool.unsubscribePendingTransactions((Long) listenerIdentifier);
+    }
   }
 
-  // TODO temp fix to get code compiling
-  //  private void dispatchNewBlockPropagatedMessage(
-  //      final Block block, final NewBlockPropagatedListener listener) {
-  //    final ImmutableMap<Object, Object> result =
-  //        new ImmutableMap.Builder<>()
-  //            .put("type", "NewBlock")
-  //            .put("blockHash", block.getHash().toString())
-  //            .put("blockNumber", block.getHeader().getNumber())
-  //            .put("timestamp", block.getHeader().getTimestamp())
-  //            .build();
-  // listener.newBlockPropagated(Json.encode(result));
-  //  }
+  private void dispatchTransactionAddedMessage(
+      final Transaction transaction, final NewTransactionAddedListener listener) {
+    listener.newTransactionAdded(transaction);
+  }
 }
