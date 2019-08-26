@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.storage.keyvalue;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier.BLOCKCHAIN;
 import static tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier.PRIVATE_STATE;
 import static tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier.PRIVATE_TRANSACTIONS;
@@ -42,6 +43,8 @@ public class KeyValueStorageProviderBuilder {
   }
 
   public KeyValueStorageProvider build() {
+    checkNotNull(storageFactory, "Cannot build a storage provider without a storage factory.");
+
     final KeyValueStorage worldStatePreImageStorage =
         new LimitedInMemoryKeyValueStorage(worldStatePreimageCacheSize);
 
@@ -51,6 +54,7 @@ public class KeyValueStorageProviderBuilder {
         worldStatePreImageStorage,
         storageFactory.create(PRIVATE_TRANSACTIONS),
         storageFactory.create(PRIVATE_STATE),
-        storageFactory.create(PRUNING_STATE));
+        storageFactory.create(PRUNING_STATE),
+        storageFactory.isSegmentIsolationSupported());
   }
 }
