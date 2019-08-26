@@ -12,24 +12,21 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import tech.pegasys.pantheon.plugin.services.exception.StorageException;
+import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
+
 import org.rocksdb.RocksDBException;
 import org.rocksdb.Transaction;
 import org.rocksdb.WriteOptions;
-import tech.pegasys.pantheon.plugin.services.exception.StorageException;
-import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
 
 public class RocksDBTransaction implements KeyValueStorageTransaction {
 
-  private final KeyValueStorageMetrics metrics;
   private final Transaction innerTx;
   private final WriteOptions options;
 
-  RocksDBTransaction(
-      final Transaction innerTx, final WriteOptions options, final KeyValueStorageMetrics metrics) {
+  RocksDBTransaction(final Transaction innerTx, final WriteOptions options) {
     this.innerTx = innerTx;
     this.options = options;
-    this.metrics = metrics;
   }
 
   @Override
@@ -65,7 +62,6 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
   public void rollback() {
     try {
       innerTx.rollback();
-      metrics.getRollbackCount().inc();
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     } finally {

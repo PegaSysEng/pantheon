@@ -10,24 +10,24 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.storage.keyvalue;
+package tech.pegasys.pantheon.services.kvstore;
 
-import java.io.IOException;
-import java.util.Optional;
-import java.util.function.Predicate;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
+
+import java.io.IOException;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class KeyValueStorageMetricsDecorator implements KeyValueStorage {
 
   private final KeyValueStorageMetrics metrics;
   private final KeyValueStorage storage;
 
-  public KeyValueStorageMetricsDecorator(final KeyValueStorage storage,
-      final KeyValueStorageMetrics metrics) {
+  public KeyValueStorageMetricsDecorator(
+      final KeyValueStorage storage, final KeyValueStorageMetrics metrics) {
     this.storage = storage;
     this.metrics = metrics;
   }
@@ -43,19 +43,19 @@ public class KeyValueStorageMetricsDecorator implements KeyValueStorage {
   }
 
   @Override
-  public boolean containsKey(byte[] key) throws StorageException {
+  public boolean containsKey(final byte[] key) throws StorageException {
     return storage.containsKey(key);
   }
 
   @Override
-  public Optional<byte[]> get(byte[] key) throws StorageException {
+  public Optional<byte[]> get(final byte[] key) throws StorageException {
     try (final OperationTimer.TimingContext ignored = metrics.getReadLatency().startTimer()) {
       return storage.get(key);
     }
   }
 
   @Override
-  public long removeAllKeysUnless(Predicate<byte[]> retainCondition) throws StorageException {
+  public long removeAllKeysUnless(final Predicate<byte[]> retainCondition) throws StorageException {
     return storage.removeAllKeysUnless(retainCondition);
   }
 
@@ -74,14 +74,14 @@ public class KeyValueStorageMetricsDecorator implements KeyValueStorage {
     }
 
     @Override
-    public void put(byte[] key, byte[] value) {
+    public void put(final byte[] key, final byte[] value) {
       try (final OperationTimer.TimingContext ignored = metrics.getWriteLatency().startTimer()) {
         transaction.put(key, value);
       }
     }
 
     @Override
-    public void remove(byte[] key) {
+    public void remove(final byte[] key) {
       try (final OperationTimer.TimingContext ignored = metrics.getRemoveLatency().startTimer()) {
         transaction.remove(key);
       }
@@ -97,6 +97,7 @@ public class KeyValueStorageMetricsDecorator implements KeyValueStorage {
     @Override
     public void rollback() {
       transaction.rollback();
+      metrics.getRollbackCount().inc();
     }
   }
 }

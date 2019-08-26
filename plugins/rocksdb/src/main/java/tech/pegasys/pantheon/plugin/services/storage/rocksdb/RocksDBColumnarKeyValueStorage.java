@@ -14,8 +14,6 @@ package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import static java.util.Objects.requireNonNullElse;
 
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
@@ -61,20 +59,15 @@ public class RocksDBColumnarKeyValueStorage
   private final TransactionDB db;
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final Map<String, ColumnFamilyHandle> columnHandlesByName;
-  private final RocksDBMetricsHelper rocksDBMetricsHelper;
 
   public static RocksDBColumnarKeyValueStorage create(
-      final RocksDBConfiguration rocksDbConfiguration,
-      final List<SegmentIdentifier> segments,
-      final MetricsSystem metricsSystem)
+      final RocksDBConfiguration rocksDbConfiguration, final List<SegmentIdentifier> segments)
       throws StorageException {
-    return new RocksDBColumnarKeyValueStorage(rocksDbConfiguration, segments, metricsSystem);
+    return new RocksDBColumnarKeyValueStorage(rocksDbConfiguration, segments);
   }
 
   private RocksDBColumnarKeyValueStorage(
-      final RocksDBConfiguration rocksDbConfiguration,
-      final List<SegmentIdentifier> segments,
-      final MetricsSystem metricsSystem) {
+      final RocksDBConfiguration rocksDbConfiguration, final List<SegmentIdentifier> segments) {
     RocksDbUtil.loadNativeLibrary();
     try {
       final List<ColumnFamilyDescriptor> columnDescriptors =
@@ -108,8 +101,6 @@ public class RocksDBColumnarKeyValueStorage
               rocksDbConfiguration.getDatabaseDir().toString(),
               columnDescriptors,
               columnHandles);
-      rocksDBMetricsHelper =
-          RocksDBMetricsHelper.of(metricsSystem, rocksDbConfiguration, db, stats);
       final Map<BytesValue, String> segmentsById =
           segments.stream()
               .collect(
@@ -146,8 +137,7 @@ public class RocksDBColumnarKeyValueStorage
       throws StorageException {
     throwIfClosed();
 
-    try (final OperationTimer.TimingContext ignored =
-        rocksDBMetricsHelper.getReadLatency().startTimer()) {
+    try {
       return Optional.ofNullable(db.get(segment, key));
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -219,7 +209,7 @@ public class RocksDBColumnarKeyValueStorage
     return name.getName().getBytes(StandardCharsets.UTF_8);
   }
 
-  private class RocksDbTransaction implements Transaction<ColumnFamilyHandle> {
+  private static class RocksDbTransaction implements Transaction<ColumnFamilyHandle> {
 
     private final org.rocksdb.Transaction innerTx;
     private final WriteOptions options;
@@ -231,8 +221,7 @@ public class RocksDBColumnarKeyValueStorage
 
     @Override
     public void put(final ColumnFamilyHandle segment, final byte[] key, final byte[] value) {
-      try (final OperationTimer.TimingContext ignored =
-          rocksDBMetricsHelper.getWriteLatency().startTimer()) {
+      try {
         innerTx.put(segment, key, value);
       } catch (final RocksDBException e) {
         throw new StorageException(e);
@@ -241,8 +230,7 @@ public class RocksDBColumnarKeyValueStorage
 
     @Override
     public void remove(final ColumnFamilyHandle segment, final byte[] key) {
-      try (final OperationTimer.TimingContext ignored =
-          rocksDBMetricsHelper.getRemoveLatency().startTimer()) {
+      try {
         innerTx.delete(segment, key);
       } catch (final RocksDBException e) {
         throw new StorageException(e);
@@ -251,8 +239,7 @@ public class RocksDBColumnarKeyValueStorage
 
     @Override
     public void commit() throws StorageException {
-      try (final OperationTimer.TimingContext ignored =
-          rocksDBMetricsHelper.getCommitLatency().startTimer()) {
+      try {
         innerTx.commit();
       } catch (final RocksDBException e) {
         throw new StorageException(e);
@@ -265,7 +252,6 @@ public class RocksDBColumnarKeyValueStorage
     public void rollback() {
       try {
         innerTx.rollback();
-        rocksDBMetricsHelper.getRollbackCount().inc();
       } catch (final RocksDBException e) {
         throw new StorageException(e);
       } finally {

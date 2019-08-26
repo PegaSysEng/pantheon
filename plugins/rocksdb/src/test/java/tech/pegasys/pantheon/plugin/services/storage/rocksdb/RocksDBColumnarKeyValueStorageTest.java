@@ -16,7 +16,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import tech.pegasys.pantheon.kvstore.AbstractKeyValueStorageTest;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
@@ -102,8 +101,7 @@ public class RocksDBColumnarKeyValueStorageTest extends AbstractKeyValueStorageT
   private SegmentedKeyValueStorage<ColumnFamilyHandle> createSegmentedStore() throws Exception {
     return RocksDBColumnarKeyValueStorage.create(
         RocksDBConfiguration.builder().databaseDir(folder.newFolder().toPath()).build(),
-        Arrays.asList(TestSegment.FOO, TestSegment.BAR),
-        new NoOpMetricsSystem());
+        Arrays.asList(TestSegment.FOO, TestSegment.BAR));
   }
 
   @Override

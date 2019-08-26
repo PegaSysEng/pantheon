@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
 import java.nio.file.Path;
@@ -24,10 +23,8 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
   private static final String PRIVATE_DATABASE_PATH = "private";
 
   public RocksDBKeyValuePrivacyStorageFactory(
-      final Path dataDir,
-      final List<SegmentIdentifier> segments,
-      final MetricsSystem metricsSystem) {
-    super(getPrivacyConfiguration(dataDir), segments, metricsSystem);
+      final Path dataDir, final List<SegmentIdentifier> segments) {
+    super(getPrivacyConfiguration(dataDir), segments);
   }
 
   @Override

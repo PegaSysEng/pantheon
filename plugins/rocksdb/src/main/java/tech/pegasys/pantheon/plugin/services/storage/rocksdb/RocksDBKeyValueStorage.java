@@ -12,12 +12,10 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorageTransactionTransitionValidatorDecorator;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
 
 import java.util.Optional;
@@ -44,10 +42,8 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   private final TransactionDBOptions txOptions;
   private final TransactionDB db;
   private final AtomicBoolean closed = new AtomicBoolean(false);
-  private final KeyValueStorageMetrics metrics;
 
-  public RocksDBKeyValueStorage(
-      final RocksDBConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem) {
+  public RocksDBKeyValueStorage(final RocksDBConfiguration rocksDbConfiguration) {
     RocksDbUtil.loadNativeLibrary();
     try {
       final Statistics stats = new Statistics();
@@ -62,7 +58,6 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
 
       txOptions = new TransactionDBOptions();
       db = TransactionDB.open(options, txOptions, rocksDbConfiguration.getDatabaseDir().toString());
-      metrics = RocksDBMetrics.of(metricsSystem, rocksDbConfiguration, db, stats);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }
@@ -126,7 +121,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
     throwIfClosed();
     final WriteOptions options = new WriteOptions();
     return new KeyValueStorageTransactionTransitionValidatorDecorator(
-        new RocksDBTransaction(db.beginTransaction(options), options, metrics));
+        new RocksDBTransaction(db.beginTransaction(options), options));
   }
 
   @Override

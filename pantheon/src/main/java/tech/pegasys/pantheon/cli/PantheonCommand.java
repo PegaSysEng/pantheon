@@ -936,7 +936,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   public PantheonControllerBuilder<?> getControllerBuilder() {
 
-    //TODO get the metrics provider
+    // TODO get the metrics provider
     final KeyValueStorageMetrics metrics = null;
 
     final KeyValueStorageProvider storageProvider =
@@ -1206,13 +1206,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       privacyParametersBuilder.setPrivacyAddress(privacyPrecompiledAddress);
       privacyParametersBuilder.setPrivateKeyPath(privacyMarkerTransactionSigningKeyPath);
 
-
-      //TODO get the metrics provider
+      // TODO get the metrics provider
       final KeyValueStorageMetrics metrics = null;
 
       final KeyValueStorageProvider storageProvider =
           new KeyValueStorageProviderBuilder()
-              .withStorageFactory(storageService.getByName(keyValueStorageName + "_Privacy")).withMetrics(metrics)
+              .withStorageFactory(storageService.getByName(keyValueStorageName + "_Privacy"))
+              .withMetrics(metrics)
               .build();
       privacyParametersBuilder.setStorageProvider(storageProvider);
     }

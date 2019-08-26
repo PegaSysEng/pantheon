@@ -21,8 +21,9 @@ import static tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIde
 
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageFactory;
-import tech.pegasys.pantheon.services.kvstore.LimitedInMemoryKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetricsDecorator;
+import tech.pegasys.pantheon.services.kvstore.LimitedInMemoryKeyValueStorage;
 
 public class KeyValueStorageProviderBuilder {
 
@@ -66,7 +67,7 @@ public class KeyValueStorageProviderBuilder {
         storageFactory.isSegmentIsolationSupported());
   }
 
-  private KeyValueStorage addMetrics(final KeyValueStorage storage){
+  private KeyValueStorage addMetrics(final KeyValueStorage storage) {
     return metrics == null ? storage : new KeyValueStorageMetricsDecorator(storage, metrics);
   }
 }
