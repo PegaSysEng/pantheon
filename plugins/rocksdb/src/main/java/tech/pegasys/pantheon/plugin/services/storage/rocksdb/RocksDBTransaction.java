@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
+import tech.pegasys.pantheon.services.util.KeyValueStorageMetrics;
 
 import org.rocksdb.RocksDBException;
 import org.rocksdb.Transaction;
@@ -22,12 +23,12 @@ import org.rocksdb.WriteOptions;
 
 public class RocksDBTransaction implements KeyValueStorageTransaction {
 
-  private final RocksDBMetrics metrics;
+  private final KeyValueStorageMetrics metrics;
   private final Transaction innerTx;
   private final WriteOptions options;
 
   RocksDBTransaction(
-      final Transaction innerTx, final WriteOptions options, final RocksDBMetrics metrics) {
+      final Transaction innerTx, final WriteOptions options, final KeyValueStorageMetrics metrics) {
     this.innerTx = innerTx;
     this.options = options;
     this.metrics = metrics;

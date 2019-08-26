@@ -36,14 +36,15 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   private static final int DEFAULT_VERSION = 1;
   private static final Set<Integer> SUPPORTED_VERSION = Set.of(0, 1);
 
+  private final boolean isSegmentIsolationSupported;
   private final SegmentedKeyValueStorage<?> segmentedStorage;
   private final KeyValueStorage unsegmentedStorage;
-  private final boolean isSegmentIsolationSupported;
 
   public RocksDBKeyValueStorageFactory(
       final RocksDBConfiguration configuration,
       final List<SegmentIdentifier> segments,
       final MetricsSystem metricsSystem) {
+
     try {
       this.isSegmentIsolationSupported = databaseVersion(configuration) == DEFAULT_VERSION;
     } catch (final IOException e) {

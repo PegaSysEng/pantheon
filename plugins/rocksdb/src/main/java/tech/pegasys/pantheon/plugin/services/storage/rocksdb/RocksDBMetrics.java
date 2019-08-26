@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.rocksdb.RocksDBStats;
+import tech.pegasys.pantheon.services.util.KeyValueStorageMetrics;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +26,7 @@ import org.rocksdb.RocksDBException;
 import org.rocksdb.Statistics;
 import org.rocksdb.TransactionDB;
 
-public class RocksDBMetrics {
+public class RocksDBMetrics implements KeyValueStorageMetrics {
   private static final Logger LOG = LogManager.getLogger();
 
   private final OperationTimer readLatency;
@@ -47,7 +48,7 @@ public class RocksDBMetrics {
     this.rollbackCount = rollbackCount;
   }
 
-  public static RocksDBMetrics of(
+  public static KeyValueStorageMetrics of(
       final MetricsSystem metricsSystem,
       final RocksDBConfiguration rocksDbConfiguration,
       final TransactionDB db,
@@ -128,22 +129,27 @@ public class RocksDBMetrics {
         readLatency, removeLatency, writeLatency, commitLatency, rollbackCount);
   }
 
+  @Override
   public OperationTimer getReadLatency() {
     return readLatency;
   }
 
+  @Override
   public OperationTimer getRemoveLatency() {
     return removeLatency;
   }
 
+  @Override
   public OperationTimer getWriteLatency() {
     return writeLatency;
   }
 
+  @Override
   public OperationTimer getCommitLatency() {
     return commitLatency;
   }
 
+  @Override
   public Counter getRollbackCount() {
     return rollbackCount;
   }

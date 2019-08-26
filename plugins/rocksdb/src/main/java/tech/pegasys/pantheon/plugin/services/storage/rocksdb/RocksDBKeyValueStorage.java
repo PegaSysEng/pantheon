@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorageTransactionTransitionValidatorDecorator;
+import tech.pegasys.pantheon.services.util.KeyValueStorageMetrics;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
 
 import java.util.Optional;
@@ -44,7 +45,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   private final TransactionDBOptions txOptions;
   private final TransactionDB db;
   private final AtomicBoolean closed = new AtomicBoolean(false);
-  private final RocksDBMetrics rocksDBMetrics;
+  private final KeyValueStorageMetrics metrics;
 
   public RocksDBKeyValueStorage(
       final RocksDBConfiguration rocksDbConfiguration, final MetricsSystem metricsSystem) {
@@ -62,7 +63,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
 
       txOptions = new TransactionDBOptions();
       db = TransactionDB.open(options, txOptions, rocksDbConfiguration.getDatabaseDir().toString());
-      rocksDBMetrics = RocksDBMetrics.of(metricsSystem, rocksDbConfiguration, db, stats);
+      metrics = RocksDBMetrics.of(metricsSystem, rocksDbConfiguration, db, stats);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }
@@ -95,8 +96,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   public Optional<byte[]> get(final byte[] key) throws StorageException {
     throwIfClosed();
 
-    try (final OperationTimer.TimingContext ignored =
-        rocksDBMetrics.getReadLatency().startTimer()) {
+    try (final OperationTimer.TimingContext ignored = metrics.getReadLatency().startTimer()) {
       return Optional.ofNullable(db.get(key));
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -127,7 +127,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
     throwIfClosed();
     final WriteOptions options = new WriteOptions();
     return new KeyValueStorageTransactionTransitionValidatorDecorator(
-        new RocksDBTransaction(db.beginTransaction(options), options, rocksDBMetrics));
+        new RocksDBTransaction(db.beginTransaction(options), options, metrics));
   }
 
   @Override
