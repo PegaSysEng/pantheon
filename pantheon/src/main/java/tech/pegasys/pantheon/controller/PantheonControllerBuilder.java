@@ -171,7 +171,7 @@ public abstract class PantheonControllerBuilder<C> {
     return this;
   }
 
-  public PantheonController<C> build() throws IOException {
+  public PantheonController<C> build() {
     checkNotNull(genesisConfig, "Missing genesis config");
     checkNotNull(syncConfig, "Missing sync config");
     checkNotNull(ethereumWireProtocolConfiguration, "Missing ethereum protocol configuration");
