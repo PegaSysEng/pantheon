@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-
 import tech.pegasys.pantheon.enclave.Enclave;
 import tech.pegasys.pantheon.enclave.types.FindPrivacyGroupRequest;
 import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
@@ -25,12 +23,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import org.apache.logging.log4j.Logger;
 import org.bouncycastle.util.Arrays;
 
 public class EeaPrivateNonceProvider {
-
-  private static final Logger LOG = getLogger();
 
   private final Enclave enclave;
   private final PrivateTransactionHandler privateTransactionHandler;
@@ -55,11 +50,9 @@ public class EeaPrivateNonceProvider {
             .collect(Collectors.toList());
 
     if (legacyGroups.size() != 1) {
-      final String errorMessage =
+      throw new RuntimeException(
           String.format(
-              "Found invalid number of privacy groups (%d), expected 1.", legacyGroups.size());
-      LOG.error(errorMessage);
-      throw new RuntimeException(errorMessage);
+              "Found invalid number of privacy groups (%d), expected 1.", legacyGroups.size()));
     }
 
     final String privacyGroupId = legacyGroups.get(0).getPrivacyGroupId();
