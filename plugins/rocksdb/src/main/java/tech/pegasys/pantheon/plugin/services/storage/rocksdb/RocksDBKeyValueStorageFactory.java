@@ -49,10 +49,9 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
       throw new StorageException(e.getMessage(), e);
     }
 
-    // TODO move these - lazy init?
     if (isSegmentIsolationSupported) {
       this.unsegmentedStorage = null;
-      this.segmentedStorage = RocksDBColumnarKeyValueStorage.create(configuration, segments);
+      this.segmentedStorage = new RocksDBColumnarKeyValueStorage(configuration, segments);
     } else {
       this.unsegmentedStorage = new RocksDBKeyValueStorage(configuration);
       this.segmentedStorage = null;

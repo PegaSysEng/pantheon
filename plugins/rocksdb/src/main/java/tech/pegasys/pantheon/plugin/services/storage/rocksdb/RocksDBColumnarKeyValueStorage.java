@@ -59,14 +59,9 @@ public class RocksDBColumnarKeyValueStorage
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final Map<String, ColumnFamilyHandle> columnHandlesByName;
 
-  public static RocksDBColumnarKeyValueStorage create(
+  public RocksDBColumnarKeyValueStorage(
       final RocksDBConfiguration rocksDbConfiguration, final List<SegmentIdentifier> segments)
       throws StorageException {
-    return new RocksDBColumnarKeyValueStorage(rocksDbConfiguration, segments);
-  }
-
-  private RocksDBColumnarKeyValueStorage(
-      final RocksDBConfiguration rocksDbConfiguration, final List<SegmentIdentifier> segments) {
     RocksDbUtil.loadNativeLibrary();
     try {
       final List<ColumnFamilyDescriptor> columnDescriptors =
