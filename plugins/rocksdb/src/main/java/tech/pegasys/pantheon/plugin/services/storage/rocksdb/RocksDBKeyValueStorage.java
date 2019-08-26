@@ -13,12 +13,11 @@
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorageTransactionTransitionValidatorDecorator;
-import tech.pegasys.pantheon.services.util.KeyValueStorageMetrics;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
 import tech.pegasys.pantheon.services.util.RocksDbUtil;
 
 import java.util.Optional;
@@ -96,7 +95,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   public Optional<byte[]> get(final byte[] key) throws StorageException {
     throwIfClosed();
 
-    try (final OperationTimer.TimingContext ignored = metrics.getReadLatency().startTimer()) {
+    try {
       return Optional.ofNullable(db.get(key));
     } catch (final RocksDBException e) {
       throw new StorageException(e);

@@ -18,7 +18,7 @@ import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.rocksdb.RocksDBStats;
-import tech.pegasys.pantheon.services.util.KeyValueStorageMetrics;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

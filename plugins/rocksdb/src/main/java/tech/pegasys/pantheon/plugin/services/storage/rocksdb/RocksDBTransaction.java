@@ -12,14 +12,12 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.metrics.OperationTimer;
-import tech.pegasys.pantheon.plugin.services.exception.StorageException;
-import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
-import tech.pegasys.pantheon.services.util.KeyValueStorageMetrics;
-
 import org.rocksdb.RocksDBException;
 import org.rocksdb.Transaction;
 import org.rocksdb.WriteOptions;
+import tech.pegasys.pantheon.plugin.services.exception.StorageException;
+import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
 
 public class RocksDBTransaction implements KeyValueStorageTransaction {
 
@@ -36,7 +34,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
 
   @Override
   public void put(final byte[] key, final byte[] value) {
-    try (final OperationTimer.TimingContext ignored = metrics.getWriteLatency().startTimer()) {
+    try {
       innerTx.put(key, value);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -45,7 +43,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
 
   @Override
   public void remove(final byte[] key) {
-    try (final OperationTimer.TimingContext ignored = metrics.getRemoveLatency().startTimer()) {
+    try {
       innerTx.delete(key);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -54,7 +52,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
 
   @Override
   public void commit() throws StorageException {
-    try (final OperationTimer.TimingContext ignored = metrics.getCommitLatency().startTimer()) {
+    try {
       innerTx.commit();
     } catch (final RocksDBException e) {
       throw new StorageException(e);
