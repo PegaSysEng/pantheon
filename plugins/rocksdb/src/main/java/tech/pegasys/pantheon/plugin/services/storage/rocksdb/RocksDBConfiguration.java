@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.services.util.RocksDbUtil;
-
 import java.nio.file.Path;
 
 public class RocksDBConfiguration {
