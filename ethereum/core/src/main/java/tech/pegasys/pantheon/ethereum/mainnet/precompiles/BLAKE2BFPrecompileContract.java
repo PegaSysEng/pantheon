@@ -50,10 +50,10 @@ public class BLAKE2BFPrecompileContract extends AbstractPrecompiledContract {
   @Override
   public BytesValue compute(final BytesValue input, final MessageFrame messageFrame) {
     if (input.size() != MESSAGE_LENGTH_BYTES) {
-      return BytesValue.EMPTY;
+      return null;
     }
     if ((input.get(212) & 0xFE) != 0) {
-      return BytesValue.EMPTY;
+      return null;
     }
     return Hash.blake2bf(input);
   }
