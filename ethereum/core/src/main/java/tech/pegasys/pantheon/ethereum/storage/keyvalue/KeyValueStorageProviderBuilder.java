@@ -57,6 +57,8 @@ public class KeyValueStorageProviderBuilder {
     final KeyValueStorage worldStatePreImageStorage =
         new LimitedInMemoryKeyValueStorage(worldStatePreimageCacheSize);
 
+    // TODO If/else for creating the kv metrics (variable reuse)
+
     return new KeyValueStorageProvider(
         addMetrics(storageFactory.create(BLOCKCHAIN)),
         addMetrics(storageFactory.create(WORLD_STATE)),

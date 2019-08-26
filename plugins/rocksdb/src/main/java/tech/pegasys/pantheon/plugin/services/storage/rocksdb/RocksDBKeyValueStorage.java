@@ -12,9 +12,11 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorageTransactionTransitionValidatorDecorator;
 
 import java.util.Optional;
@@ -41,25 +43,34 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   private final TransactionDBOptions txOptions;
   private final TransactionDB db;
   private final AtomicBoolean closed = new AtomicBoolean(false);
+  private final Statistics stats;
+  private final RocksDBConfiguration configuration;
 
-  public RocksDBKeyValueStorage(final RocksDBConfiguration rocksDbConfiguration) {
+  public RocksDBKeyValueStorage(final RocksDBConfiguration configuration) {
     RocksDbUtil.loadNativeLibrary();
+
+    this.configuration = configuration;
     try {
-      final Statistics stats = new Statistics();
+      stats = new Statistics();
       options =
           new Options()
               .setCreateIfMissing(true)
-              .setMaxOpenFiles(rocksDbConfiguration.getMaxOpenFiles())
-              .setTableFormatConfig(createBlockBasedTableConfig(rocksDbConfiguration))
-              .setMaxBackgroundCompactions(rocksDbConfiguration.getMaxBackgroundCompactions())
+              .setMaxOpenFiles(configuration.getMaxOpenFiles())
+              .setTableFormatConfig(createBlockBasedTableConfig(configuration))
+              .setMaxBackgroundCompactions(configuration.getMaxBackgroundCompactions())
               .setStatistics(stats);
-      options.getEnv().setBackgroundThreads(rocksDbConfiguration.getBackgroundThreadCount());
+      options.getEnv().setBackgroundThreads(configuration.getBackgroundThreadCount());
 
       txOptions = new TransactionDBOptions();
-      db = TransactionDB.open(options, txOptions, rocksDbConfiguration.getDatabaseDir().toString());
+      db = TransactionDB.open(options, txOptions, configuration.getDatabaseDir().toString());
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }
+  }
+
+  // TODO call this method in levels above? then abstract?
+  public KeyValueStorageMetrics createMetrics(final MetricsSystem metricsSystem) {
+    return RocksDBMetrics.of(metricsSystem, configuration, db, stats);
   }
 
   @Override

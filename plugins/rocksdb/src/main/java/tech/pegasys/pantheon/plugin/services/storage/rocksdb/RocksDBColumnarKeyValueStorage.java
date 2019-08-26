@@ -14,8 +14,10 @@ package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import static java.util.Objects.requireNonNullElse;
 
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
+import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageTransactionTransitionValidatorDecorator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -58,11 +60,15 @@ public class RocksDBColumnarKeyValueStorage
   private final TransactionDB db;
   private final AtomicBoolean closed = new AtomicBoolean(false);
   private final Map<String, ColumnFamilyHandle> columnHandlesByName;
+  private final RocksDBConfiguration configuration;
+  private final Statistics stats;
 
   public RocksDBColumnarKeyValueStorage(
-      final RocksDBConfiguration rocksDbConfiguration, final List<SegmentIdentifier> segments)
+      final RocksDBConfiguration configuration, final List<SegmentIdentifier> segments)
       throws StorageException {
     RocksDbUtil.loadNativeLibrary();
+
+    this.configuration = configuration;
     try {
       final List<ColumnFamilyDescriptor> columnDescriptors =
           segments.stream()
@@ -72,19 +78,18 @@ public class RocksDBColumnarKeyValueStorage
           new ColumnFamilyDescriptor(
               DEFAULT_COLUMN.getBytes(StandardCharsets.UTF_8),
               new ColumnFamilyOptions()
-                  .setTableFormatConfig(createBlockBasedTableConfig(rocksDbConfiguration))));
+                  .setTableFormatConfig(createBlockBasedTableConfig(configuration))));
 
-      final Statistics stats = new Statistics();
+      stats = new Statistics();
       options =
           new DBOptions()
               .setCreateIfMissing(true)
-              .setMaxOpenFiles(rocksDbConfiguration.getMaxOpenFiles())
-              .setMaxBackgroundCompactions(rocksDbConfiguration.getMaxBackgroundCompactions())
+              .setMaxOpenFiles(configuration.getMaxOpenFiles())
+              .setMaxBackgroundCompactions(configuration.getMaxBackgroundCompactions())
               .setStatistics(stats)
               .setCreateMissingColumnFamilies(true)
               .setEnv(
-                  Env.getDefault()
-                      .setBackgroundThreads(rocksDbConfiguration.getBackgroundThreadCount()));
+                  Env.getDefault().setBackgroundThreads(configuration.getBackgroundThreadCount()));
 
       txOptions = new TransactionDBOptions();
       final List<ColumnFamilyHandle> columnHandles = new ArrayList<>(columnDescriptors.size());
@@ -92,7 +97,7 @@ public class RocksDBColumnarKeyValueStorage
           TransactionDB.open(
               options,
               txOptions,
-              rocksDbConfiguration.getDatabaseDir().toString(),
+              configuration.getDatabaseDir().toString(),
               columnDescriptors,
               columnHandles);
       final Map<BytesValue, String> segmentsById =
@@ -114,6 +119,11 @@ public class RocksDBColumnarKeyValueStorage
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }
+  }
+
+  // TODO call this method in levels above? then abstract?
+  public KeyValueStorageMetrics createMetrics(final MetricsSystem metricsSystem) {
+    return RocksDBMetrics.of(metricsSystem, configuration, db, stats);
   }
 
   private BlockBasedTableConfig createBlockBasedTableConfig(final RocksDBConfiguration config) {
