@@ -43,7 +43,7 @@ public class EeaGetTransactionCountTest {
   }
 
   @Test
-  public void validRequestProducesExpectedNonce() throws Exception {
+  public void validRequestProducesExpectedNonce() {
     final long reportedNonce = 8L;
     final EeaGetTransactionCount method =
         new EeaGetTransactionCount(new JsonRpcParameter(), nonceProvider);
@@ -59,7 +59,7 @@ public class EeaGetTransactionCountTest {
   }
 
   @Test
-  public void nonceProviderThrowsRuntimeExceptionProducesErrorResponse() throws Exception {
+  public void nonceProviderThrowsRuntimeExceptionProducesErrorResponse() {
     final EeaGetTransactionCount method =
         new EeaGetTransactionCount(new JsonRpcParameter(), nonceProvider);
 
@@ -70,11 +70,12 @@ public class EeaGetTransactionCountTest {
     assertThat(response).isInstanceOf(JsonRpcErrorResponse.class);
 
     final JsonRpcErrorResponse errorResponse = (JsonRpcErrorResponse) response;
-    assertThat(errorResponse.getError()).isEqualTo(JsonRpcError.FIND_PRIVACY_GROUP_ERROR);
+    assertThat(errorResponse.getError())
+        .isEqualTo(JsonRpcError.GET_PRIVATE_TRANSACTION_NONCE_ERROR);
   }
 
   @Test
-  public void nonceProviderThrowsAnExceptionProducesErrorResponse() throws Exception {
+  public void nonceProviderThrowsAnExceptionProducesErrorResponse() {
     final EeaGetTransactionCount method =
         new EeaGetTransactionCount(new JsonRpcParameter(), nonceProvider);
 
@@ -85,6 +86,7 @@ public class EeaGetTransactionCountTest {
     assertThat(response).isInstanceOf(JsonRpcErrorResponse.class);
 
     final JsonRpcErrorResponse errorResponse = (JsonRpcErrorResponse) response;
-    assertThat(errorResponse.getError()).isEqualTo(JsonRpcError.FIND_PRIVACY_GROUP_ERROR);
+    assertThat(errorResponse.getError())
+        .isEqualTo(JsonRpcError.GET_PRIVATE_TRANSACTION_NONCE_ERROR);
   }
 }

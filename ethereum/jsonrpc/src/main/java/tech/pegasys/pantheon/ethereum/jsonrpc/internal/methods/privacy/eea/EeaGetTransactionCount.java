@@ -60,7 +60,8 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
       return new JsonRpcSuccessResponse(request.getId(), Quantity.create(nonce));
     } catch (final Exception e) {
       LOG.error(e.getMessage(), e);
-      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.FIND_PRIVACY_GROUP_ERROR);
+      return new JsonRpcErrorResponse(
+          request.getId(), JsonRpcError.GET_PRIVATE_TRANSACTION_NONCE_ERROR);
     }
   }
 }
