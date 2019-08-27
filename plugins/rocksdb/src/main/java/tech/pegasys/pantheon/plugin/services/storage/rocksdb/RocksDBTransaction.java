@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
 
@@ -21,17 +22,20 @@ import org.rocksdb.WriteOptions;
 
 public class RocksDBTransaction implements KeyValueStorageTransaction {
 
+  private final RocksDBMetrics metrics;
   private final Transaction innerTx;
   private final WriteOptions options;
 
-  RocksDBTransaction(final Transaction innerTx, final WriteOptions options) {
+  RocksDBTransaction(
+      final Transaction innerTx, final WriteOptions options, final RocksDBMetrics metrics) {
     this.innerTx = innerTx;
     this.options = options;
+    this.metrics = metrics;
   }
 
   @Override
   public void put(final byte[] key, final byte[] value) {
-    try {
+    try (final OperationTimer.TimingContext ignored = metrics.getWriteLatency().startTimer()) {
       innerTx.put(key, value);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -40,7 +44,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
 
   @Override
   public void remove(final byte[] key) {
-    try {
+    try (final OperationTimer.TimingContext ignored = metrics.getRemoveLatency().startTimer()) {
       innerTx.delete(key);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -49,7 +53,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
 
   @Override
   public void commit() throws StorageException {
-    try {
+    try (final OperationTimer.TimingContext ignored = metrics.getCommitLatency().startTimer()) {
       innerTx.commit();
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -62,6 +66,7 @@ public class RocksDBTransaction implements KeyValueStorageTransaction {
   public void rollback() {
     try {
       innerTx.rollback();
+      metrics.getRollbackCount().inc();
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     } finally {

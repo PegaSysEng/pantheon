@@ -21,8 +21,6 @@ import static tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIde
 
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageFactory;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetricsDecorator;
 import tech.pegasys.pantheon.services.kvstore.LimitedInMemoryKeyValueStorage;
 
 public class KeyValueStorageProviderBuilder {
@@ -32,16 +30,9 @@ public class KeyValueStorageProviderBuilder {
   private long worldStatePreimageCacheSize = DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE;
   private KeyValueStorageFactory storageFactory;
 
-  private KeyValueStorageMetrics metrics;
-
   public KeyValueStorageProviderBuilder withStorageFactory(
       final KeyValueStorageFactory storageFactory) {
     this.storageFactory = storageFactory;
-    return this;
-  }
-
-  public KeyValueStorageProviderBuilder withMetrics(final KeyValueStorageMetrics metrics) {
-    this.metrics = metrics;
     return this;
   }
 
@@ -57,19 +48,13 @@ public class KeyValueStorageProviderBuilder {
     final KeyValueStorage worldStatePreImageStorage =
         new LimitedInMemoryKeyValueStorage(worldStatePreimageCacheSize);
 
-    // TODO If/else for creating the kv metrics (variable reuse)
-
     return new KeyValueStorageProvider(
-        addMetrics(storageFactory.create(BLOCKCHAIN)),
-        addMetrics(storageFactory.create(WORLD_STATE)),
-        addMetrics(worldStatePreImageStorage),
-        addMetrics(storageFactory.create(PRIVATE_TRANSACTIONS)),
-        addMetrics(storageFactory.create(PRIVATE_STATE)),
-        addMetrics(storageFactory.create(PRUNING_STATE)),
+        storageFactory.create(BLOCKCHAIN),
+        storageFactory.create(WORLD_STATE),
+        worldStatePreImageStorage,
+        storageFactory.create(PRIVATE_TRANSACTIONS),
+        storageFactory.create(PRIVATE_STATE),
+        storageFactory.create(PRUNING_STATE),
         storageFactory.isSegmentIsolationSupported());
-  }
-
-  private KeyValueStorage addMetrics(final KeyValueStorage storage) {
-    return metrics == null ? storage : new KeyValueStorageMetricsDecorator(storage, metrics);
   }
 }

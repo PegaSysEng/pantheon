@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageFactory;
@@ -40,7 +41,9 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   private final KeyValueStorage unsegmentedStorage;
 
   public RocksDBKeyValueStorageFactory(
-      final RocksDBConfiguration configuration, final List<SegmentIdentifier> segments) {
+      final RocksDBConfiguration configuration,
+      final List<SegmentIdentifier> segments,
+      final MetricsSystem metricsSystem) {
 
     try {
       this.isSegmentIsolationSupported = databaseVersion(configuration) == DEFAULT_VERSION;
@@ -51,9 +54,10 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
     if (isSegmentIsolationSupported) {
       this.unsegmentedStorage = null;
-      this.segmentedStorage = new RocksDBColumnarKeyValueStorage(configuration, segments);
+      this.segmentedStorage =
+          new RocksDBColumnarKeyValueStorage(configuration, segments, metricsSystem);
     } else {
-      this.unsegmentedStorage = new RocksDBKeyValueStorage(configuration);
+      this.unsegmentedStorage = new RocksDBKeyValueStorage(configuration, metricsSystem);
       this.segmentedStorage = null;
     }
   }

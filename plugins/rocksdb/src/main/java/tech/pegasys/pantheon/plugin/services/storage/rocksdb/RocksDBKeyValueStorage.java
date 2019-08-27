@@ -13,10 +13,10 @@
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorageTransactionTransitionValidatorDecorator;
 
 import java.util.Optional;
@@ -43,15 +43,14 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   private final TransactionDBOptions txOptions;
   private final TransactionDB db;
   private final AtomicBoolean closed = new AtomicBoolean(false);
-  private final Statistics stats;
-  private final RocksDBConfiguration configuration;
+  private final RocksDBMetrics rocksDBMetrics;
 
-  public RocksDBKeyValueStorage(final RocksDBConfiguration configuration) {
+  public RocksDBKeyValueStorage(
+      final RocksDBConfiguration configuration, final MetricsSystem metricsSystem) {
     RocksDbUtil.loadNativeLibrary();
 
-    this.configuration = configuration;
     try {
-      stats = new Statistics();
+      final Statistics stats = new Statistics();
       options =
           new Options()
               .setCreateIfMissing(true)
@@ -63,14 +62,10 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
 
       txOptions = new TransactionDBOptions();
       db = TransactionDB.open(options, txOptions, configuration.getDatabaseDir().toString());
+      rocksDBMetrics = RocksDBMetrics.of(metricsSystem, configuration, db, stats);
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }
-  }
-
-  // TODO call this method in levels above? then abstract?
-  public KeyValueStorageMetrics createMetrics(final MetricsSystem metricsSystem) {
-    return RocksDBMetrics.of(metricsSystem, configuration, db, stats);
   }
 
   @Override
@@ -100,7 +95,8 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   public Optional<byte[]> get(final byte[] key) throws StorageException {
     throwIfClosed();
 
-    try {
+    try (final OperationTimer.TimingContext ignored =
+        rocksDBMetrics.getReadLatency().startTimer()) {
       return Optional.ofNullable(db.get(key));
     } catch (final RocksDBException e) {
       throw new StorageException(e);
@@ -131,7 +127,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
     throwIfClosed();
     final WriteOptions options = new WriteOptions();
     return new KeyValueStorageTransactionTransitionValidatorDecorator(
-        new RocksDBTransaction(db.beginTransaction(options), options));
+        new RocksDBTransaction(db.beginTransaction(options), options, rocksDBMetrics));
   }
 
   @Override

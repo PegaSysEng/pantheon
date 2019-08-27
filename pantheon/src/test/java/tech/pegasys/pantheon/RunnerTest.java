@@ -336,7 +336,8 @@ public final class RunnerTest {
         .withStorageFactory(
             new RocksDBKeyValueStorageFactory(
                 RocksDBConfiguration.builder().databaseDir(dbAhead).build(),
-                Arrays.asList(KeyValueSegmentIdentifier.values())))
+                Arrays.asList(KeyValueSegmentIdentifier.values()),
+                new NoOpMetricsSystem()))
         .build();
   }
 

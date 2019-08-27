@@ -50,7 +50,9 @@ public class PrivacyTest {
     final Path dataDir = folder.newFolder().toPath();
     final KeyValueStorageProvider storageProvider =
         new KeyValueStorageProviderBuilder()
-            .withStorageFactory(new RocksDBKeyValuePrivacyStorageFactory(dataDir, List.of()))
+            .withStorageFactory(
+                new RocksDBKeyValuePrivacyStorageFactory(
+                    dataDir, List.of(), new NoOpMetricsSystem()))
             .build();
 
     final PrivacyParameters privacyParameters =

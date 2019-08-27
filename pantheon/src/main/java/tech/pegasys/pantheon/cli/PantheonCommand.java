@@ -96,7 +96,6 @@ import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
 import tech.pegasys.pantheon.services.StorageServiceImpl;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorageMetrics;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.number.Fraction;
@@ -935,15 +934,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   public PantheonControllerBuilder<?> getControllerBuilder() {
-
-    // TODO get the metrics provider
-    // metricsSystem.get()
-    final KeyValueStorageMetrics metrics = null;
-
     final KeyValueStorageProvider storageProvider =
         new KeyValueStorageProviderBuilder()
             .withStorageFactory(storageService.getByName(keyValueStorageName))
-            .withMetrics(metrics)
             .build();
 
     try {
@@ -1207,14 +1200,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       privacyParametersBuilder.setPrivacyAddress(privacyPrecompiledAddress);
       privacyParametersBuilder.setPrivateKeyPath(privacyMarkerTransactionSigningKeyPath);
 
-      // TODO get the metrics provider
-      // metricsSystem.get()
-      final KeyValueStorageMetrics metrics = null;
-
       final KeyValueStorageProvider storageProvider =
           new KeyValueStorageProviderBuilder()
               .withStorageFactory(storageService.getByName(keyValueStorageName + "_Privacy"))
-              .withMetrics(metrics)
               .build();
       privacyParametersBuilder.setStorageProvider(storageProvider);
     }
