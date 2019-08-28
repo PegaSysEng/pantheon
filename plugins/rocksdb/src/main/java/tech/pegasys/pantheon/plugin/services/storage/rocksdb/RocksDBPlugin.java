@@ -33,13 +33,13 @@ public class RocksDBPlugin implements PantheonPlugin {
   private static final Logger LOG = LogManager.getLogger();
   private static final String NAME = "rocksdb";
 
-  private final RocksDBOptions options;
+  private final RocksDBCLIOptions options;
   private PantheonContext context;
   private RocksDBKeyValueStorageFactory factory;
   private RocksDBKeyValuePrivacyStorageFactory privacyFactory;
 
   public RocksDBPlugin() {
-    this.options = RocksDBOptions.create();
+    this.options = RocksDBCLIOptions.create();
   }
 
   @Override

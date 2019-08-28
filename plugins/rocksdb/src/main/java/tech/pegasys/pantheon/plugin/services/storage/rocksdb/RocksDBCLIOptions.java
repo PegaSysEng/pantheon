@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 import com.google.common.base.MoreObjects;
 import picocli.CommandLine;
 
-public class RocksDBOptions {
+public class RocksDBCLIOptions {
 
   private static final String MAX_OPEN_FILES_FLAG = "--Xrocksdb-max-open-files";
   private static final String CACHE_CAPACITY_FLAG = "--Xrocksdb-cache-capacity";
@@ -55,14 +55,14 @@ public class RocksDBOptions {
       description = "Number of RocksDB background threads (default: ${DEFAULT-VALUE})")
   int backgroundThreadCount;
 
-  private RocksDBOptions() {}
+  private RocksDBCLIOptions() {}
 
-  public static RocksDBOptions create() {
-    return new RocksDBOptions();
+  public static RocksDBCLIOptions create() {
+    return new RocksDBCLIOptions();
   }
 
-  public static RocksDBOptions fromConfig(final RocksDBConfiguration config) {
-    final RocksDBOptions options = create();
+  public static RocksDBCLIOptions fromConfig(final RocksDBConfiguration config) {
+    final RocksDBCLIOptions options = create();
     options.maxOpenFiles = config.getMaxOpenFiles();
     options.cacheCapacity = config.getCacheCapacity();
     options.maxBackgroundCompactions = config.getMaxBackgroundCompactions();
