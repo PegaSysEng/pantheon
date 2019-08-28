@@ -90,9 +90,11 @@ import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
 import tech.pegasys.pantheon.nat.NatMethod;
+import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.plugin.services.StorageService;
+import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
@@ -840,6 +842,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private PantheonCommand startPlugins() {
     pantheonPluginContext.addService(
+        PantheonConfiguration.class, new PantheonConfigurationImpl(dataDir()));
+    pantheonPluginContext.addService(
         PantheonEvents.class,
         new PantheonEventsImpl(
             (pantheonController.getProtocolManager().getBlockBroadcaster()),
@@ -973,7 +977,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
           .isRevertReasonEnabled(isRevertReasonEnabled)
-          .storageProvider(getKeyStorageProvider(keyValueStorageName))
+          .storageProvider(keyStorageProvider(keyValueStorageName))
           .isPruningEnabled(isPruningEnabled)
           .pruningConfiguration(buildPruningConfiguration());
     } catch (IOException e) {
@@ -1220,13 +1224,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       privacyParametersBuilder.setPrivacyAddress(privacyPrecompiledAddress);
       privacyParametersBuilder.setPrivateKeyPath(privacyMarkerTransactionSigningKeyPath);
       privacyParametersBuilder.setStorageProvider(
-          getKeyStorageProvider(keyValueStorageName + "-privacy"));
+          keyStorageProvider(keyValueStorageName + "-privacy"));
     }
 
     return privacyParametersBuilder.build();
   }
 
-  private KeyValueStorageProvider getKeyStorageProvider(final String name) {
+  private KeyValueStorageProvider keyStorageProvider(final String name) {
     return new KeyValueStorageProviderBuilder()
         .withStorageFactory(storageService.getByName(name))
         .build();
