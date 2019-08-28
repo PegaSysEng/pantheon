@@ -79,6 +79,15 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     return isSegmentIsolationSupported;
   }
 
+  public void close() throws IOException {
+    if (segmentedStorage != null) {
+      segmentedStorage.close();
+    }
+    if (unsegmentedStorage != null) {
+      unsegmentedStorage.close();
+    }
+  }
+
   private int databaseVersion(final RocksDBConfiguration configuration) throws IOException {
     final Path databaseDir = configuration.getDatabaseDir();
     final boolean databaseExists = databaseDir.resolve("IDENTITY").toFile().exists();

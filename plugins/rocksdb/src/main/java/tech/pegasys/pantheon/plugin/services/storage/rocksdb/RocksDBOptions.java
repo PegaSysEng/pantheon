@@ -12,10 +12,9 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import com.google.common.base.MoreObjects;
 import picocli.CommandLine;
 
-// public class RocksDBOptions implements CLIOptions<RocksDBConfiguration.Builder> {
-// TODO add these CLI option via the plugin architecture
 public class RocksDBOptions {
 
   private static final String MAX_OPEN_FILES_FLAG = "--Xrocksdb-max-open-files";
@@ -78,18 +77,14 @@ public class RocksDBOptions {
         .maxBackgroundCompactions(maxBackgroundCompactions)
         .backgroundThreadCount(backgroundThreadCount);
   }
-  /*
-   public List<String> getCLIOptions() {
-     return Arrays.asList(
-         MAX_OPEN_FILES_FLAG,
-         OptionParser.format(maxOpenFiles),
-         CACHE_CAPACITY_FLAG,
-         OptionParser.format(cacheCapacity),
-         MAX_BACKGROUND_COMPACTIONS_FLAG,
-         OptionParser.format(maxBackgroundCompactions),
-         BACKGROUND_THREAD_COUNT_FLAG,
-         OptionParser.format(backgroundThreadCount));
-   }
 
-  */
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("maxOpenFiles", maxOpenFiles)
+        .add("cacheCapacity", cacheCapacity)
+        .add("maxBackgroundCompactions", maxBackgroundCompactions)
+        .add("backgroundThreadCount", backgroundThreadCount)
+        .toString();
+  }
 }
