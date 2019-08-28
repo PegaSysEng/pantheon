@@ -193,7 +193,7 @@ public abstract class CommandTestAbstract {
     when(mockRunnerBuilder.staticNodes(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.build()).thenReturn(mockRunner);
 
-    when(storageService.getByName("RocksDB")).thenReturn(rocksDBStorageFactory);
+    when(storageService.getByName("rocksdb")).thenReturn(rocksDBStorageFactory);
   }
 
   // Display outputs for debug purpose

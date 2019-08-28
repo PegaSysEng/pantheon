@@ -92,6 +92,7 @@ import tech.pegasys.pantheon.metrics.vertx.VertxMetricsAdapterFactory;
 import tech.pegasys.pantheon.nat.NatMethod;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
+import tech.pegasys.pantheon.plugin.services.StorageService;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
@@ -120,6 +121,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
@@ -676,6 +678,28 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       final RunnerBuilder runnerBuilder,
       final PantheonController.Builder controllerBuilderFactory,
       final PantheonPluginContextImpl pantheonPluginContext,
+      final Map<String, String> environment) {
+    this(
+        logger,
+        rlpBlockImporter,
+        jsonBlockImporterFactory,
+        rlpBlockExporterFactory,
+        runnerBuilder,
+        controllerBuilderFactory,
+        pantheonPluginContext,
+        environment,
+        new StorageServiceImpl());
+  }
+
+  @VisibleForTesting
+  protected PantheonCommand(
+      final Logger logger,
+      final RlpBlockImporter rlpBlockImporter,
+      final JsonBlockImporterFactory jsonBlockImporterFactory,
+      final RlpBlockExporterFactory rlpBlockExporterFactory,
+      final RunnerBuilder runnerBuilder,
+      final PantheonController.Builder controllerBuilderFactory,
+      final PantheonPluginContextImpl pantheonPluginContext,
       final Map<String, String> environment,
       final StorageServiceImpl storageService) {
     this.logger = logger;
@@ -820,6 +844,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         new PantheonEventsImpl(
             (pantheonController.getProtocolManager().getBlockBroadcaster()),
             pantheonController.getTransactionPool()));
+    pantheonPluginContext.addService(StorageService.class, storageService);
     pantheonPluginContext.startPlugins();
     return this;
   }
@@ -934,11 +959,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   public PantheonControllerBuilder<?> getControllerBuilder() {
-    final KeyValueStorageProvider storageProvider =
-        new KeyValueStorageProviderBuilder()
-            .withStorageFactory(storageService.getByName(keyValueStorageName))
-            .build();
-
     try {
       return controllerBuilderFactory
           .fromEthNetworkConfig(updateNetworkConfig(getNetwork()))
@@ -953,7 +973,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .privacyParameters(privacyParameters())
           .clock(Clock.systemUTC())
           .isRevertReasonEnabled(isRevertReasonEnabled)
-          .storageProvider(storageProvider)
+          .storageProvider(getKeyStorageProvider(keyValueStorageName))
           .isPruningEnabled(isPruningEnabled)
           .pruningConfiguration(buildPruningConfiguration());
     } catch (IOException e) {
@@ -1199,15 +1219,17 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       }
       privacyParametersBuilder.setPrivacyAddress(privacyPrecompiledAddress);
       privacyParametersBuilder.setPrivateKeyPath(privacyMarkerTransactionSigningKeyPath);
-
-      final KeyValueStorageProvider storageProvider =
-          new KeyValueStorageProviderBuilder()
-              .withStorageFactory(storageService.getByName(keyValueStorageName + "_Privacy"))
-              .build();
-      privacyParametersBuilder.setStorageProvider(storageProvider);
+      privacyParametersBuilder.setStorageProvider(
+          getKeyStorageProvider(keyValueStorageName + "-privacy"));
     }
 
     return privacyParametersBuilder.build();
+  }
+
+  private KeyValueStorageProvider getKeyStorageProvider(final String name) {
+    return new KeyValueStorageProviderBuilder()
+        .withStorageFactory(storageService.getByName(name))
+        .build();
   }
 
   private SynchronizerConfiguration buildSyncConfig() {

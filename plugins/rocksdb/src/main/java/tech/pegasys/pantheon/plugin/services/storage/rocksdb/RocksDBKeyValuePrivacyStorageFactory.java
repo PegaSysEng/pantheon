@@ -32,7 +32,7 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
 
   @Override
   public String getName() {
-    return "RocksDB_Privacy";
+    return "rocksdb-privacy";
   }
 
   private static RocksDBConfiguration getPrivacyConfiguration(final Path dataDir) {

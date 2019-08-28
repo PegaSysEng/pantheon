@@ -202,7 +202,8 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
             });
     params.addAll(node.getExtraCLIOptions());
 
-    // TODO add storage to the params?
+    params.add("--key-value-storage");
+    params.add("rocksdb");
 
     LOG.info("Creating pantheon process with params {}", params);
     final ProcessBuilder processBuilder =

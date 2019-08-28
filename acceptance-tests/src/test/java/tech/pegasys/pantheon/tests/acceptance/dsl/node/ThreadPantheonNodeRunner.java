@@ -107,7 +107,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         new PantheonController.Builder().fromEthNetworkConfig(ethNetworkConfig);
     final KeyValueStorageProvider storageProvider =
         new KeyValueStorageProviderBuilder()
-            .withStorageFactory(storageService.getByName("RocksDB"))
+            .withStorageFactory(storageService.getByName("rocksdb"))
             .build();
 
     final PantheonController<?> pantheonController;
