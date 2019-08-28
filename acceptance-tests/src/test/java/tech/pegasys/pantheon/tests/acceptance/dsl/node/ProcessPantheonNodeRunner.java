@@ -202,6 +202,8 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
             });
     params.addAll(node.getExtraCLIOptions());
 
+    // TODO add storage to the params?
+
     LOG.info("Creating pantheon process with params {}", params);
     final ProcessBuilder processBuilder =
         new ProcessBuilder(params)

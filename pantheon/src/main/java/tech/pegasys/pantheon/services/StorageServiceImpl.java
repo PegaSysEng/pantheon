@@ -57,6 +57,7 @@ public class StorageServiceImpl implements StorageService {
 
   public KeyValueStorageFactory getByName(final String name) {
     return Optional.ofNullable(factories.get(name))
-        .orElseThrow(() -> new StorageException("No key found for: " + name));
+        .orElseThrow(
+            () -> new StorageException("No KeyValueStorageFactory found for key: " + name));
   }
 }
