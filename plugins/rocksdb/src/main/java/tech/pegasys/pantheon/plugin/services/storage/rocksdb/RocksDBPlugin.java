@@ -25,9 +25,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import com.google.auto.service.AutoService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@AutoService(PantheonPlugin.class)
 public class RocksDBPlugin implements PantheonPlugin {
 
   private static final Logger LOG = LogManager.getLogger();
