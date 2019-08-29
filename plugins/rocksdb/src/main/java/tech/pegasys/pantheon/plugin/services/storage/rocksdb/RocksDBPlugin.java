@@ -77,7 +77,7 @@ public class RocksDBPlugin implements PantheonPlugin {
         privacyFactory.close();
       }
     } catch (final IOException e) {
-      LOG.error("Failed to stop plugin: " + e.getMessage(), e);
+      LOG.error("Failed to stop plugin: {}", e.getMessage(), e);
     }
   }
 
