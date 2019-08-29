@@ -35,7 +35,7 @@ import tech.pegasys.pantheon.testutil.TestClock;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collections;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class PrivacyTest {
         new KeyValueStorageProviderBuilder()
             .withStorageFactory(
                 new RocksDBKeyValuePrivacyStorageFactory(
-                    dataDir, List.of(), new NoOpMetricsSystem()))
+                    dataDir, Collections.emptyList(), new NoOpMetricsSystem()))
             .build();
 
     final PrivacyParameters privacyParameters =
