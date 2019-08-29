@@ -107,4 +107,4 @@ Xincoming-tx-messages-keep-alive-seconds=60
 revert-reason-enabled=false
 
 # Storage plugin to use
-key-value-storage="RocksDB"
+key-value-storage="rocksdb"
