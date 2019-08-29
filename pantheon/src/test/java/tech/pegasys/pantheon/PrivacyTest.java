@@ -33,6 +33,7 @@ import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValuePriv
 import tech.pegasys.pantheon.testutil.TestClock;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -68,7 +69,7 @@ public class PrivacyTest {
             .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
             .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
             .storageProvider(new InMemoryStorageProvider())
-            .networkId(1)
+            .networkId(BigInteger.ONE)
             .miningParameters(new MiningParametersTestBuilder().enabled(false).build())
             .nodeKeys(KeyPair.generate())
             .metricsSystem(new NoOpMetricsSystem())

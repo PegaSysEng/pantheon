@@ -36,4 +36,5 @@ dependencies {
   implementation 'org.assertj:assertj-core'
   implementation 'org.mockito:mockito-core'
   implementation 'tech.pegasys.pantheon:plugin-api'
+  implementation 'org.web3j:core'
 }
