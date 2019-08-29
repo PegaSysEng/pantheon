@@ -15,12 +15,16 @@ package tech.pegasys.pantheon.tests.acceptance.dsl.privacy;
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValuePrivacyStorageFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.privacy.PrivacyPantheonNodeFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.rules.TemporaryFolder;
 
 public class PrivacyNet {
+
   private static final Logger LOG = LogManager.getLogger();
 
   private static final String PANTHEON_KEYPAIR_NODE_1 = "key";
@@ -80,9 +85,10 @@ public class PrivacyNet {
   }
 
   public void startPrivacyNet() {
-    if (nodes == null)
+    if (nodes == null) {
       throw new IllegalStateException(
           "Cannot start network nodes.  init method was never called to initialize the nodes");
+    }
     cluster.start(nodes.values().toArray(new PrivacyNode[0]));
     verifyAllOrionNetworkConnections();
   }
@@ -101,7 +107,9 @@ public class PrivacyNet {
   }
 
   private void stopOrionNodes() {
-    if (nodes == null) return; // Never started
+    if (nodes == null) {
+      return; // Never started
+    }
     for (PrivacyNode node : nodes.values()) {
       try {
         node.orion.getOrion().stop();
@@ -153,6 +161,7 @@ public class PrivacyNet {
   }
 
   public static class Builder {
+
     private TemporaryFolder temporaryFolder;
     private PrivacyPantheonNodeFactory pantheonNodeFactory;
     private Cluster cluster;
@@ -262,13 +271,18 @@ public class PrivacyNet {
 
     private PrivacyParameters generatePrivacyParameters(final OrionTestHarness testHarness)
         throws IOException {
-      // TODO needs some way of getting `setDataDir(temporaryFolder.newFolder().toPath())` into the
-      // RocksDBFactory
+      final RocksDBKeyValuePrivacyStorageFactory factory =
+          new RocksDBKeyValuePrivacyStorageFactory(
+              temporaryFolder.newFolder().toPath(),
+              Collections.emptyList(),
+              new NoOpMetricsSystem());
 
       return new PrivacyParameters.Builder()
           .setEnabled(true)
           .setEnclaveUrl(testHarness.clientUrl())
           .setEnclavePublicKeyUsingFile(testHarness.getConfig().publicKeys().get(0).toFile())
+          .setStorageProvider(
+              new KeyValueStorageProviderBuilder().withStorageFactory(factory).build())
           .build();
     }
 
