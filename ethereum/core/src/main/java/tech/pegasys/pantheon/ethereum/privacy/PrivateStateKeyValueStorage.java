@@ -32,9 +32,11 @@ public class PrivateStateKeyValueStorage implements PrivateStateStorage {
   public Optional<Hash> getPrivateAccountState(final BytesValue privacyId) {
     final byte[] id = privacyId.getArrayUnsafe();
 
-    if (keyValueStorage.get(id).isPresent())
+    if (keyValueStorage.get(id).isPresent()) {
       return Optional.of(Hash.wrap(Bytes32.wrap(keyValueStorage.get(id).get())));
-    else return Optional.empty();
+    } else {
+      return Optional.empty();
+    }
   }
 
   @Override
@@ -48,6 +50,7 @@ public class PrivateStateKeyValueStorage implements PrivateStateStorage {
   }
 
   public static class Updater implements PrivateStateStorage.Updater {
+
     private final KeyValueStorageTransaction transaction;
 
     private Updater(final KeyValueStorageTransaction transaction) {
