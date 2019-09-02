@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.eth.sync;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.util.List;
 import java.util.Objects;

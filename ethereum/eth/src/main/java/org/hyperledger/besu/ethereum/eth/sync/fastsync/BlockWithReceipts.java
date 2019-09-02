@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 
 import java.util.List;
 import java.util.Objects;

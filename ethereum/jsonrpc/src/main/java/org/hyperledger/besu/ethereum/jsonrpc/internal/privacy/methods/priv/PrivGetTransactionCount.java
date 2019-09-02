@@ -13,16 +13,16 @@
 package org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.priv;
 
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.privacy.PrivateTransactionHandler;
 
 public class PrivGetTransactionCount implements JsonRpcMethod {
 

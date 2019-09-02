@@ -14,7 +14,7 @@ package org.hyperledger.besu.tests.acceptance.dsl.node;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import tech.pegasys.pantheon.cli.options.NetworkingOptions;
+import org.hyperledger.besu.cli.options.NetworkingOptions;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;

@@ -13,18 +13,18 @@
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.debug.TraceOptions;
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.debug.TraceOptions;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.BlockParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.TraceTypeParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockTrace;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockTracer;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransactionTrace;
-import tech.pegasys.pantheon.ethereum.vm.DebugOperationTracer;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.TraceTypeParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTrace;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTracer;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.TransactionTrace;
+import org.hyperledger.besu.ethereum.vm.DebugOperationTracer;
 
 import java.util.List;
 import java.util.stream.Collectors;

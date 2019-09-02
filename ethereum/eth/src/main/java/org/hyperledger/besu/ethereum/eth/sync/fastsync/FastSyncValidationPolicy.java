@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import org.hyperledger.besu.ethereum.eth.sync.ValidationPolicy;
-import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
+import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 

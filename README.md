@@ -41,3 +41,5 @@ Instructions for how to get started with developing on the Pantheon codebase. Pl
 ## Release Notes
 
 [Release Notes](CHANGELOG.md)
+
+egrep -lRZ 'foo' . | xargs -0 -l sed -i -e 's/import tech.pegasys.pantheon/import org.hyperledger.besu/g'

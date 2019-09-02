@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import tech.pegasys.pantheon.ethereum.BlockValidator;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.core.BlockImporter;
-import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
-import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
-import tech.pegasys.pantheon.ethereum.vm.EVM;
+import org.hyperledger.besu.ethereum.BlockValidator;
+import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
+import org.hyperledger.besu.ethereum.core.BlockImporter;
+import org.hyperledger.besu.ethereum.core.TransactionFilter;
+import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
+import org.hyperledger.besu.ethereum.vm.EVM;
 
 /** A protocol specification. */
 public class ProtocolSpec<C> {

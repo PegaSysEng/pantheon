@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.hyperledger.besu.ethereum.eth.messages.LimitedTransactionsMessages.LIMIT;
 
 import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.HashSet;

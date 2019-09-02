@@ -30,7 +30,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.transaction.miner.MinerRequestF
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.CustomRequestFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivRequestFactory;
-import tech.pegasys.pantheon.controller.KeyPairUtil;
+import org.hyperledger.besu.controller.KeyPairUtil;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;

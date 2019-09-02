@@ -14,7 +14,7 @@ package org.hyperledger.besu.util;
 
 import static org.junit.Assert.assertNotNull;
 
-import tech.pegasys.pantheon.controller.KeyPairUtil;
+import org.hyperledger.besu.controller.KeyPairUtil;
 
 import java.io.File;
 

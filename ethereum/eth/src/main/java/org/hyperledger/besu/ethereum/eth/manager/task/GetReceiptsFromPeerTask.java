@@ -14,13 +14,13 @@ package org.hyperledger.besu.ethereum.eth.manager.task;
 
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.toList;
-import static tech.pegasys.pantheon.ethereum.mainnet.BodyValidation.receiptsRoot;
+import static org.hyperledger.besu.ethereum.mainnet.BodyValidation.receiptsRoot;
 
 import org.hyperledger.besu.ethereum.eth.messages.EthPV63;
 import org.hyperledger.besu.ethereum.eth.messages.ReceiptsMessage;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.PendingPeerRequest;

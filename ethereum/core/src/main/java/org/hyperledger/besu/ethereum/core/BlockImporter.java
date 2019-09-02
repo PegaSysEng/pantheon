@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 
 import java.util.List;
 

@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager.task;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.PendingPeerRequest;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.MetricsSystem;
 
 import com.google.common.annotations.VisibleForTesting;

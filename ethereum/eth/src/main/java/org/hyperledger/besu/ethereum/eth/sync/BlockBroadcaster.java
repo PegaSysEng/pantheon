@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.eth.sync;
 
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.messages.NewBlockMessage;
-import tech.pegasys.pantheon.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.uint.UInt256;

@@ -12,17 +12,17 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
-import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.DETACHED_ONLY;
-import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.FULL;
-import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT;
-import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT_DETACHED_ONLY;
-import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT_SKIP_DETACHED;
-import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.SKIP_DETACHED;
+import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.DETACHED_ONLY;
+import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.FULL;
+import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.LIGHT;
+import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.LIGHT_DETACHED_ONLY;
+import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.LIGHT_SKIP_DETACHED;
+import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.SKIP_DETACHED;
 
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.sync.CheckpointHeaderFetcher;
 import org.hyperledger.besu.ethereum.eth.sync.CheckpointHeaderValidationStep;
 import org.hyperledger.besu.ethereum.eth.sync.CheckpointRangeSource;
@@ -31,7 +31,7 @@ import org.hyperledger.besu.ethereum.eth.sync.DownloadHeadersStep;
 import org.hyperledger.besu.ethereum.eth.sync.DownloadPipelineFactory;
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncTarget;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;

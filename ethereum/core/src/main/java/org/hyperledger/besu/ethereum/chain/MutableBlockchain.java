@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.chain;
 
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 
 import java.util.List;
 

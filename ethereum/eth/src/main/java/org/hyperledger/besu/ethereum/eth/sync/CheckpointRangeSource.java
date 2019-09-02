@@ -18,7 +18,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.time.Duration;
 import java.util.ArrayDeque;

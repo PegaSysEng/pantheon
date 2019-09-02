@@ -12,16 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.AncestryValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.CalculatedDifficultyValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.ConstantFieldValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.ExtraDataMaxLengthValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.GasLimitRangeAndDeltaValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.GasUsageValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.ProofOfWorkValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.TimestampBoundedByFutureParameter;
-import tech.pegasys.pantheon.ethereum.mainnet.headervalidationrules.TimestampMoreRecentThanParent;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.mainnet.headervalidationrules.AncestryValidationRule;
+import org.hyperledger.besu.ethereum.mainnet.headervalidationrules.CalculatedDifficultyValidationRule;
+import org.hyperledger.besu.ethereum.mainnet.headervalidationrules.ConstantFieldValidationRule;
+import org.hyperledger.besu.ethereum.mainnet.headervalidationrules.ExtraDataMaxLengthValidationRule;
+import org.hyperledger.besu.ethereum.mainnet.headervalidationrules.GasLimitRangeAndDeltaValidationRule;
+import org.hyperledger.besu.ethereum.mainnet.headervalidationrules.GasUsageValidationRule;
+import org.hyperledger.besu.ethereum.mainnet.headervalidationrules.ProofOfWorkValidationRule;
+import org.hyperledger.besu.ethereum.mainnet.headervalidationrules.TimestampBoundedByFutureParameter;
+import org.hyperledger.besu.ethereum.mainnet.headervalidationrules.TimestampMoreRecentThanParent;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 public final class MainnetBlockHeaderValidator {

@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage.Updater;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage.Updater;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Optional;

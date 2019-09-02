@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.chain;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.util.uint.UInt256;
 
 /** Head of a blockchain. */
