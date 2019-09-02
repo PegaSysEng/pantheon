@@ -14,7 +14,7 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.perm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor;
+import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 

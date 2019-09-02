@@ -14,7 +14,7 @@
 apply plugin: 'java-library'
 
 jar {
-  baseName 'pantheon-trie'
+  baseName 'besu-trie'
   manifest {
     attributes(
       'Specification-Title': baseName,

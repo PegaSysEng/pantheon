@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import static org.hyperledger.besu.crypto.Hash.keccak256;
 
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.DelegatingBytes32;

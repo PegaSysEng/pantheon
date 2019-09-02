@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.consensus.ibft.ibftevent;
 
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
 
 /** Static helper functions for producing and working with IbftEvent objects */
 public class IbftEvents {

@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.cli;
 
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.eth.sync.SyncMode;
-import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;
+import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
 import org.hyperledger.besu.nat.NatMethod;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

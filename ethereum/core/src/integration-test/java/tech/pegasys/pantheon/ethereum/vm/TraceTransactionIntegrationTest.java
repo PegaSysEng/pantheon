@@ -31,7 +31,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor.Result;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidationParams;
-import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
+import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;

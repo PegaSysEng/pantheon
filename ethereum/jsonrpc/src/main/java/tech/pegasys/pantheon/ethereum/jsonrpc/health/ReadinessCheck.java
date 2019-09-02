@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.health.HealthService.HealthCheck;
 import tech.pegasys.pantheon.ethereum.jsonrpc.health.HealthService.ParamSource;
-import tech.pegasys.pantheon.ethereum.p2p.network.P2PNetwork;
+import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

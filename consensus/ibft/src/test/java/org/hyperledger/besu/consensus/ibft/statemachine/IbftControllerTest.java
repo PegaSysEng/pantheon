@@ -45,8 +45,8 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.DefaultMessage;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.DefaultMessage;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
 
 import java.util.List;
 

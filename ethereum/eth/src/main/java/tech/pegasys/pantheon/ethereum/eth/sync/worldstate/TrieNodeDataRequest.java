@@ -13,8 +13,8 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.trie.Node;
-import tech.pegasys.pantheon.ethereum.trie.TrieNodeDecoder;
+import org.hyperledger.besu.ethereum.trie.Node;
+import org.hyperledger.besu.ethereum.trie.TrieNodeDecoder;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.List;

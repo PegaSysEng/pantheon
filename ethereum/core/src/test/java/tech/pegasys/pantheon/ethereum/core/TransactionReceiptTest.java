@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import static org.junit.Assert.assertEquals;
 
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import org.junit.Test;

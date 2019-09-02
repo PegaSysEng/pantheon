@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.util;
 
-import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
 
 import java.net.URI;
 import java.net.URISyntaxException;

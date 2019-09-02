@@ -22,8 +22,8 @@ import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAUL
 import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.cli.custom.JsonRPCWhitelistHostsProperty;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.retesteth.RetestethConfiguration;
-import tech.pegasys.pantheon.ethereum.retesteth.RetestethService;
+import org.hyperledger.besu.ethereum.retesteth.RetestethConfiguration;
+import org.hyperledger.besu.ethereum.retesteth.RetestethService;
 
 import java.net.InetAddress;
 import java.nio.file.Path;

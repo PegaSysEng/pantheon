@@ -13,7 +13,7 @@
 package org.hyperledger.besu.consensus.ibft.messagedata;
 
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Commit;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class CommitMessageData extends AbstractIbftMessageData {

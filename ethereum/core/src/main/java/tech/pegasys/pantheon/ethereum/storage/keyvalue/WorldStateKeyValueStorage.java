@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.storage.keyvalue;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.trie.MerklePatriciaTrie;
+import org.hyperledger.besu.ethereum.trie.MerklePatriciaTrie;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;
 import org.hyperledger.besu.util.Subscribers;

@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.proof;
 
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.ethereum.trie.Proof;
+import org.hyperledger.besu.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.trie.Proof;
 import tech.pegasys.pantheon.ethereum.worldstate.StateTrieAccountValue;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;

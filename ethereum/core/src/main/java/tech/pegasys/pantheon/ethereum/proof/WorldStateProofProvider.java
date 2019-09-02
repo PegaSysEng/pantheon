@@ -14,10 +14,10 @@ package tech.pegasys.pantheon.ethereum.proof;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.ethereum.trie.MerklePatriciaTrie;
-import tech.pegasys.pantheon.ethereum.trie.Proof;
-import tech.pegasys.pantheon.ethereum.trie.StoredMerklePatriciaTrie;
+import org.hyperledger.besu.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.trie.MerklePatriciaTrie;
+import org.hyperledger.besu.ethereum.trie.Proof;
+import org.hyperledger.besu.ethereum.trie.StoredMerklePatriciaTrie;
 import tech.pegasys.pantheon.ethereum.worldstate.StateTrieAccountValue;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.util.bytes.Bytes32;

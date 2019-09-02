@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.tests.acceptance.permissioning;
 
-import static tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
+import static org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
 
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
