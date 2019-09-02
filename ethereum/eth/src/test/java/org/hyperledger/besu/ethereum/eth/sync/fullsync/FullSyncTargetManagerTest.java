@@ -21,7 +21,7 @@ import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.BlockchainSetupUtil;
+import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;

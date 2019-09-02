@@ -24,7 +24,7 @@ import static tech.pegasys.pantheon.ethereum.vm.TestBlockchain.generateTestBlock
 
 import org.hyperledger.besu.ethereum.eth.manager.ethtaskutils.PeerMessageTaskTest;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;

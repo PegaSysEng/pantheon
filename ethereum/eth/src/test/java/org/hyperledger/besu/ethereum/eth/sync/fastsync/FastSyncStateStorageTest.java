@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.ethereum.eth.sync.fastsync.FastSyncState.EMPTY_SYNC_STATE;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 
 import java.io.File;

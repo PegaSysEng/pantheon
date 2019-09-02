@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
 import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;

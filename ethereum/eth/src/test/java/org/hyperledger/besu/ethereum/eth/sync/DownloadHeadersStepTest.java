@@ -22,7 +22,7 @@ import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockchainSetupUtil;
+import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;

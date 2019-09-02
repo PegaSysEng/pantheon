@@ -16,7 +16,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import org.hyperledger.besu.consensus.clique.CliqueBlockInterface;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 
 import java.util.Arrays;
 import java.util.Collection;

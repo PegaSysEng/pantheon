@@ -24,7 +24,7 @@ import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.eth.manager.ChainState;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;

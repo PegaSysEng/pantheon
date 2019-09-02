@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc;
 
-import tech.pegasys.pantheon.ethereum.core.BlockchainSetupUtil;
+import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.TraceReplayBlockTransactions;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;

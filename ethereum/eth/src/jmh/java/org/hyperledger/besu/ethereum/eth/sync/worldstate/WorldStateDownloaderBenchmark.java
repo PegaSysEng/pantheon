@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
-import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
+import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;

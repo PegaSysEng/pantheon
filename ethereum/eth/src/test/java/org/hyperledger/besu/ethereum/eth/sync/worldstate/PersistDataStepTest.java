@@ -19,9 +19,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
+import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.services.tasks.Task;
 import org.hyperledger.besu.util.bytes.BytesValue;

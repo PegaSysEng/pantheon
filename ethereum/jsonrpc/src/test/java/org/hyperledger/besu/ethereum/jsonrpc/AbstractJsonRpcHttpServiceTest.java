@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import org.hyperledger.besu.ethereum.blockcreation.EthHashMiningCoordinator;
-import tech.pegasys.pantheon.ethereum.core.BlockchainSetupUtil;
+import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.core.Transaction;

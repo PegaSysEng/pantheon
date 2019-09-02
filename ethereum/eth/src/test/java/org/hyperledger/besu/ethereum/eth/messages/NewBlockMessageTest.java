@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;

@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.blockcreation;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
-import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
+import org.hyperledger.besu.ethereum.core.MiningParametersTestBuilder;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
 import org.hyperledger.besu.metrics.MetricsSystem;

@@ -24,7 +24,7 @@ import tech.pegasys.pantheon.ethereum.chain.MinedBlockObserver;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.MutableProtocolSchedule;

@@ -24,7 +24,7 @@ import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockImporter;
 import org.hyperledger.besu.ethereum.eth.sync.ValidationPolicy;
 import org.hyperledger.besu.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;

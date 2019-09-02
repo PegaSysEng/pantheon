@@ -13,8 +13,8 @@
 package org.hyperledger.besu.ethereum.eth.manager;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
-import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
+import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
+import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
 import org.hyperledger.besu.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;

@@ -18,7 +18,7 @@ import static tech.pegasys.pantheon.ethereum.core.Hash.EMPTY_TRIE_HASH;
 
 import org.hyperledger.besu.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
 

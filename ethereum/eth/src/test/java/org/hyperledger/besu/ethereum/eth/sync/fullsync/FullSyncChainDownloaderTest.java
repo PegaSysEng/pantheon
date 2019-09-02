@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.eth.sync.fullsync;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
+import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
@@ -23,9 +23,9 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockchainSetupUtil;
+import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;

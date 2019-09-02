@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.debug.TraceFrame;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;

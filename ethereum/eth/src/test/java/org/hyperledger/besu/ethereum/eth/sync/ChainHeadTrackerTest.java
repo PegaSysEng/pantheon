@@ -19,7 +19,7 @@ import org.hyperledger.besu.config.GenesisConfigFile;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.BlockchainSetupUtil;
+import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.difficulty.fixed.FixedDifficultyProtocolSchedule;
 import org.hyperledger.besu.ethereum.eth.manager.ChainState;

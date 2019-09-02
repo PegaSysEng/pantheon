@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockchainSetupUtil;
+import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.AbstractJsonRpcHttpServiceTest;

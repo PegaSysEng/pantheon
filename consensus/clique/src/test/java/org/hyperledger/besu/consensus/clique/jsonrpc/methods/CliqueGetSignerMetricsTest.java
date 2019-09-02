@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;

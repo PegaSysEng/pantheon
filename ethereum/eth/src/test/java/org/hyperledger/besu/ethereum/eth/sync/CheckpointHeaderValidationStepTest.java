@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.DETACHED_ONLY;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;

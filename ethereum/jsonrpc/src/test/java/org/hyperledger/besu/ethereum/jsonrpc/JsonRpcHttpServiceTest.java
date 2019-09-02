@@ -23,7 +23,7 @@ import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import org.hyperledger.besu.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogsBloomFilter;

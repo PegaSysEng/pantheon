@@ -18,8 +18,8 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
-import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
 import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;

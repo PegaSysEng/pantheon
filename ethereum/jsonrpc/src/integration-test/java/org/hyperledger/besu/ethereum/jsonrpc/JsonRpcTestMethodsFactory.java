@@ -13,8 +13,8 @@
 package org.hyperledger.besu.ethereum.jsonrpc;
 
 import static org.mockito.Mockito.mock;
-import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
-import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
+import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
+import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
 import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;

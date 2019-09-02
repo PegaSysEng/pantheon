@@ -16,7 +16,7 @@ import static java.util.Collections.singletonList;
 
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
-import tech.pegasys.pantheon.ethereum.core.MiningParametersTestBuilder;
+import org.hyperledger.besu.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;

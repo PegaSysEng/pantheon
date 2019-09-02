@@ -16,7 +16,7 @@ import static java.util.Arrays.copyOfRange;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.consensus.ibft.network.MockPeerFactory;
-import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
+import org.hyperledger.besu.ethereum.core.AddressHelpers;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.DefaultMessage;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;

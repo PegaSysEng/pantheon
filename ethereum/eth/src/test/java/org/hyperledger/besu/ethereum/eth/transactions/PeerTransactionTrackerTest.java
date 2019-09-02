@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.eth.transactions;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 

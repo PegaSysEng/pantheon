@@ -18,7 +18,7 @@ import org.hyperledger.besu.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
+import org.hyperledger.besu.ethereum.core.ExecutionContextTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.MutableWorldState;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;

@@ -25,7 +25,7 @@ import static org.hyperledger.besu.ethereum.eth.sync.fastsync.FastSyncState.EMPT
 
 import org.assertj.core.api.Assertions;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.eth.sync.ChainDownloader;
 import org.hyperledger.besu.ethereum.eth.sync.TrailingPeerRequirements;
 import org.hyperledger.besu.ethereum.eth.sync.worldstate.NodeDataRequest;

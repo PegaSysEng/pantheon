@@ -19,7 +19,7 @@ import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.TestHelpers;
 import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
-import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
+import org.hyperledger.besu.ethereum.core.AddressHelpers;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLP;

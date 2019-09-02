@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 import static org.hyperledger.besu.ethereum.eth.sync.PipelineChainDownloader.PAUSE_AFTER_ERROR_DURATION;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;

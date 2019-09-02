@@ -15,8 +15,8 @@ package org.hyperledger.besu.ethereum.eth.peervalidation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
-import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator.BlockOptions;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator.BlockOptions;
 import org.hyperledger.besu.ethereum.eth.manager.DeterministicEthScheduler.TimeoutPolicy;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;

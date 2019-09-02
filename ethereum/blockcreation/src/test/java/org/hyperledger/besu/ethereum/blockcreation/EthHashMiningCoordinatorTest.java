@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.core.ExecutionContextTestFixture;
+import org.hyperledger.besu.ethereum.core.ExecutionContextTestFixture;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolution;
