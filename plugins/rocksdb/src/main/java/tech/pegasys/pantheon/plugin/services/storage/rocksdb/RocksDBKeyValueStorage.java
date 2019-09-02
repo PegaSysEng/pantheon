@@ -71,16 +71,16 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   @Override
   public void clear() throws StorageException {
     try (final RocksIterator rocksIterator = db.newIterator()) {
-      if (!rocksIterator.isValid()) {
-        return;
-      }
       rocksIterator.seekToFirst();
-      final byte[] firstKey = rocksIterator.key();
-      rocksIterator.seekToLast();
-      if (!rocksIterator.isValid()) {
-        return;
+      if (rocksIterator.isValid()) {
+        final byte[] firstKey = rocksIterator.key();
+        rocksIterator.seekToLast();
+        if (rocksIterator.isValid()) {
+          final byte[] lastKey = rocksIterator.key();
+          db.deleteRange(firstKey, lastKey);
+          db.delete(lastKey);
+        }
       }
-      db.deleteRange(firstKey, rocksIterator.key());
     } catch (final RocksDBException e) {
       throw new StorageException(e);
     }

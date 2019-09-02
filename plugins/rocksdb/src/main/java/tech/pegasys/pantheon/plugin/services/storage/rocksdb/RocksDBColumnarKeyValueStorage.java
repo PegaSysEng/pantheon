@@ -180,7 +180,9 @@ public class RocksDBColumnarKeyValueStorage
         final byte[] firstKey = rocksIterator.key();
         rocksIterator.seekToLast();
         if (rocksIterator.isValid()) {
-          db.deleteRange(segmentHandle, firstKey, rocksIterator.key());
+          final byte[] lastKey = rocksIterator.key();
+          db.deleteRange(segmentHandle, firstKey, lastKey);
+          db.delete(segmentHandle, lastKey);
         }
       }
     } catch (final RocksDBException e) {
