@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.trie;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 interface PathNodeVisitor<V> {
 

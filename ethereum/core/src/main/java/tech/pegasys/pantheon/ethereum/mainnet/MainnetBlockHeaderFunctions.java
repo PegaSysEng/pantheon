@@ -17,7 +17,7 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.ParsedExtraData;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /** Implements the block hashing algorithm for MainNet as per the yellow paper. */
 public class MainnetBlockHeaderFunctions implements BlockHeaderFunctions {

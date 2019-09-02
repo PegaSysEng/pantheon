@@ -35,7 +35,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.DebugTraceTransac
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.StructLog;
 import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor.Result;
 import tech.pegasys.pantheon.ethereum.vm.ExceptionalHaltReason;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Collections;
 import java.util.EnumSet;

@@ -19,7 +19,7 @@ import org.hyperledger.besu.consensus.ibft.payload.RoundSpecific;
 import org.hyperledger.besu.consensus.ibft.payload.SignedData;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.StringJoiner;
 

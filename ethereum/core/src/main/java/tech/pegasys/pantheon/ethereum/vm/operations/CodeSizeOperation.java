@@ -17,7 +17,7 @@ import tech.pegasys.pantheon.ethereum.vm.AbstractOperation;
 import tech.pegasys.pantheon.ethereum.vm.Code;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.util.uint.UInt256Bytes;
+import org.hyperledger.besu.util.uint.UInt256Bytes;
 
 public class CodeSizeOperation extends AbstractOperation {
 

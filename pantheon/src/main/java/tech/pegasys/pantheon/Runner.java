@@ -18,8 +18,8 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketService;
 import tech.pegasys.pantheon.ethereum.p2p.network.NetworkRunner;
 import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.metrics.prometheus.MetricsService;
-import tech.pegasys.pantheon.nat.upnp.UpnpNatManager;
+import org.hyperledger.besu.metrics.prometheus.MetricsService;
+import org.hyperledger.besu.nat.upnp.UpnpNatManager;
 
 import java.io.File;
 import java.io.FileOutputStream;

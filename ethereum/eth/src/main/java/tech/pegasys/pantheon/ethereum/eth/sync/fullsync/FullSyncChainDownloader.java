@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.ethereum.eth.sync.PipelineChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.MetricsSystem;
 
 public class FullSyncChainDownloader {
   private FullSyncChainDownloader() {}

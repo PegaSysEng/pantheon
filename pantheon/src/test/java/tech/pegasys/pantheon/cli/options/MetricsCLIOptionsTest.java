@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.cli.options;
 
-import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 
 public class MetricsCLIOptionsTest
     extends AbstractCLIOptionsTest<MetricsConfiguration.Builder, MetricsCLIOptions> {

@@ -49,8 +49,8 @@ import tech.pegasys.pantheon.ethereum.worldstate.MarkSweepPruner;
 import tech.pegasys.pantheon.ethereum.worldstate.Pruner;
 import tech.pegasys.pantheon.ethereum.worldstate.PruningConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
 
 import java.io.File;
 import java.io.IOException;

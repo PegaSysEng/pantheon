@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.vm.AbstractOperation;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.util.uint.Int256;
+import org.hyperledger.besu.util.uint.Int256;
 
 public class SDivOperation extends AbstractOperation {
 

@@ -12,9 +12,9 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager.bounded;
 
-import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.Counter;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 import java.util.concurrent.LinkedBlockingDeque;
 

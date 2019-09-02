@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.vm;
 
-import tech.pegasys.pantheon.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 import java.util.Arrays;
 

@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 import tech.pegasys.pantheon.ethereum.mainnet.SpuriousDragonGasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 import java.util.Arrays;
 

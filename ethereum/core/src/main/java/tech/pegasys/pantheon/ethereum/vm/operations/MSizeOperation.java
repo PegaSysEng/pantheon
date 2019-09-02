@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.vm.AbstractOperation;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.util.uint.UInt256Bytes;
+import org.hyperledger.besu.util.uint.UInt256Bytes;
 
 public class MSizeOperation extends AbstractOperation {
 

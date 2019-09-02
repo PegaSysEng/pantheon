@@ -15,7 +15,7 @@ package tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import org.hyperledger.besu.crypto.SECP256K1;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.math.BigInteger;
 

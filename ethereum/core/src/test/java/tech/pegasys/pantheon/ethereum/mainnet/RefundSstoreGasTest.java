@@ -15,13 +15,13 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static tech.pegasys.pantheon.util.uint.UInt256.ONE;
-import static tech.pegasys.pantheon.util.uint.UInt256.ZERO;
+import static org.hyperledger.besu.util.uint.UInt256.ONE;
+import static org.hyperledger.besu.util.uint.UInt256.ZERO;
 
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import org.junit.Before;
 import org.junit.Test;

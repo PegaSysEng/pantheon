@@ -20,8 +20,8 @@ import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.GetReceiptsForHeadersTask;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.util.FutureUtils;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.util.FutureUtils;
 
 import java.util.List;
 import java.util.Map;

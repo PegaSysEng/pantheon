@@ -22,7 +22,7 @@ import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.DefaultMessage;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.RawMessage;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.List;
 import java.util.stream.Collectors;

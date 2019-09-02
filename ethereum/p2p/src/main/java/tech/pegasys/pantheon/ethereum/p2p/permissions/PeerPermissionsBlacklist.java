@@ -13,9 +13,9 @@
 package tech.pegasys.pantheon.ethereum.p2p.permissions;
 
 import tech.pegasys.pantheon.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.util.LimitedSet;
-import tech.pegasys.pantheon.util.LimitedSet.Mode;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.LimitedSet;
+import org.hyperledger.besu.util.LimitedSet.Mode;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Collections;
 import java.util.Optional;

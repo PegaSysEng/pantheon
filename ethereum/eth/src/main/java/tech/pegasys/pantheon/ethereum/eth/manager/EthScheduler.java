@@ -16,12 +16,12 @@ import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newB
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newCachedThreadPool;
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newFixedThreadPool;
 import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
-import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
+import static org.hyperledger.besu.util.FutureUtils.propagateResult;
 
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.services.pipeline.Pipeline;
-import tech.pegasys.pantheon.util.ExceptionUtils;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.services.pipeline.Pipeline;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 import java.time.Duration;
 import java.util.Collection;

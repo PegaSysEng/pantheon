@@ -35,8 +35,8 @@ import tech.pegasys.pantheon.ethereum.vm.operations.MStoreOperation;
 import tech.pegasys.pantheon.ethereum.vm.operations.SLoadOperation;
 import tech.pegasys.pantheon.ethereum.vm.operations.SelfDestructOperation;
 import tech.pegasys.pantheon.ethereum.vm.operations.Sha3Operation;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 /**
  * Provides various gas cost lookups and calculations used during block processing.

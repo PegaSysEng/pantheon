@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.cli.util;
 
-import tech.pegasys.pantheon.util.StringUtils;
+import org.hyperledger.besu.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;

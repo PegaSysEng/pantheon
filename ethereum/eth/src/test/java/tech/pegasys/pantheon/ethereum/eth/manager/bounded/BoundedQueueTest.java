@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.eth.manager.bounded;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import org.junit.Test;
 

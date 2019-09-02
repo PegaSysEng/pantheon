@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.pojoadapter;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.ArrayList;
 import java.util.List;

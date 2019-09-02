@@ -17,7 +17,7 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.graphql.internal.BlockchainQuery;
 import tech.pegasys.pantheon.ethereum.graphql.internal.TransactionWithMetadata;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.ArrayList;
 import java.util.List;

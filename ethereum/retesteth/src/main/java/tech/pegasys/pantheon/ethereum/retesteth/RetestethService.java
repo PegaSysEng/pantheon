@@ -35,7 +35,7 @@ import tech.pegasys.pantheon.ethereum.retesteth.methods.TestMineBlocks;
 import tech.pegasys.pantheon.ethereum.retesteth.methods.TestModifyTimestamp;
 import tech.pegasys.pantheon.ethereum.retesteth.methods.TestRewindToBlock;
 import tech.pegasys.pantheon.ethereum.retesteth.methods.TestSetChainParams;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import java.util.HashMap;
 import java.util.Map;

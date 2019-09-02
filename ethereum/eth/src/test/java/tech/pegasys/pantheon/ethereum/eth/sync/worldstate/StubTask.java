@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.services.tasks.Task;
+import org.hyperledger.besu.services.tasks.Task;
 
 public class StubTask implements Task<NodeDataRequest> {
 

@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.BlockParameter
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.UInt256Parameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class EthGetStorageAt extends AbstractBlockParameterMethod {
 

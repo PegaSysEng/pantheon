@@ -13,8 +13,8 @@
 package org.hyperledger.besu.tests.web3j.privacy;
 
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNet;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 import java.util.ArrayList;
 import java.util.Arrays;

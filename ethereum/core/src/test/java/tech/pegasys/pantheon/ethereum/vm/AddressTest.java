@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.vm;
 
 import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import org.junit.Assert;
 import org.junit.Test;

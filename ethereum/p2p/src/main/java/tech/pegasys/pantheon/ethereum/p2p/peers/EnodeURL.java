@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.ethereum.p2p.peers;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import tech.pegasys.pantheon.util.NetworkUtility;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.NetworkUtility;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.net.InetAddress;
 import java.net.URI;

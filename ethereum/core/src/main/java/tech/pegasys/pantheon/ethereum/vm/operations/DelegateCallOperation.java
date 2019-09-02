@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.ethereum.vm.AbstractCallOperation;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.ethereum.vm.Words;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class DelegateCallOperation extends AbstractCallOperation {
 

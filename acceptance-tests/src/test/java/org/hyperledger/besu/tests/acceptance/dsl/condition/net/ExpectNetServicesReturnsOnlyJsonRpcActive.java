@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetServicesTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import tech.pegasys.pantheon.util.NetworkUtility;
+import org.hyperledger.besu.util.NetworkUtility;
 
 import java.util.Collections;
 import java.util.Map;

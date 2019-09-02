@@ -30,7 +30,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.results.DebugTraceTransac
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 import tech.pegasys.pantheon.ethereum.vm.DebugOperationTracer;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Collection;
 

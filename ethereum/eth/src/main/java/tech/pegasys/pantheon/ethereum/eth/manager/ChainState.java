@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.ethereum.eth.manager;
 import tech.pegasys.pantheon.ethereum.chain.ChainHead;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.util.Subscribers;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.Subscribers;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import com.google.common.base.MoreObjects;
 

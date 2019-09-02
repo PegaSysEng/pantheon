@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import static org.junit.Assert.assertEquals;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.ArrayList;
 import java.util.List;

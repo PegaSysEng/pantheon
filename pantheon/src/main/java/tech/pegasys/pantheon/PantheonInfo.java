@@ -1,6 +1,6 @@
 package tech.pegasys.pantheon;
 
-import tech.pegasys.pantheon.util.PlatformDetector;
+import org.hyperledger.besu.util.PlatformDetector;
 
 // This file is generated via a gradle task and should not be edited directly.
 public final class PantheonInfo {

@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal;
 
 import tech.pegasys.pantheon.ethereum.core.LogTopic;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.ArrayList;
 import java.util.List;

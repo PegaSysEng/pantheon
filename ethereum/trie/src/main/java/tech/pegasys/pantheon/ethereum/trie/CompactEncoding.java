@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.ethereum.trie;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
 
 abstract class CompactEncoding {
   private CompactEncoding() {}

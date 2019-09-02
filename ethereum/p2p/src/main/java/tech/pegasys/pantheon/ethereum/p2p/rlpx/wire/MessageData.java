@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.rlpx.wire;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /** A P2P Network Message's Data. */
 public interface MessageData {

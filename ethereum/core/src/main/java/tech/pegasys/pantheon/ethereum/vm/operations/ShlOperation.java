@@ -12,15 +12,15 @@
  */
 package tech.pegasys.pantheon.ethereum.vm.operations;
 
-import static tech.pegasys.pantheon.util.uint.UInt256s.greaterThanOrEqualTo256;
+import static org.hyperledger.besu.util.uint.UInt256s.greaterThanOrEqualTo256;
 
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.vm.AbstractOperation;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.Bytes32s;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32s;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class ShlOperation extends AbstractOperation {
 

@@ -22,8 +22,8 @@ import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractPeerTask.PeerTask
 import tech.pegasys.pantheon.ethereum.eth.manager.task.GetHeadersFromPeerByHashTask;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.DownloadHeaderSequenceTask;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.util.FutureUtils;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.util.FutureUtils;
 
 import java.util.ArrayList;
 import java.util.List;

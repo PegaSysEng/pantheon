@@ -18,7 +18,7 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_FILE_FORM
 
 import tech.pegasys.pantheon.cli.PantheonCommand;
 import tech.pegasys.pantheon.cli.subcommands.rlp.RLPSubCommand.EncodeSubCommand;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.cli.converter;
 
 import tech.pegasys.pantheon.cli.converter.exception.PercentageConversionException;
-import tech.pegasys.pantheon.util.number.Percentage;
+import org.hyperledger.besu.util.number.Percentage;
 
 import picocli.CommandLine;
 

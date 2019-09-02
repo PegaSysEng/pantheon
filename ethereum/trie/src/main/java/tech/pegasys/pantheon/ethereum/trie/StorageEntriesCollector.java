@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.trie;
 
 import tech.pegasys.pantheon.ethereum.trie.TrieIterator.State;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 import java.util.Map;
 import java.util.TreeMap;

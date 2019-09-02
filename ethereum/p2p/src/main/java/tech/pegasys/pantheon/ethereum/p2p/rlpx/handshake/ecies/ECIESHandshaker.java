@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies;
 
 import static com.google.common.base.Preconditions.checkState;
 import static org.hyperledger.besu.crypto.Hash.keccak256;
-import static tech.pegasys.pantheon.util.bytes.Bytes32s.xor;
-import static tech.pegasys.pantheon.util.bytes.BytesValues.concatenate;
+import static org.hyperledger.besu.util.bytes.Bytes32s.xor;
+import static org.hyperledger.besu.util.bytes.BytesValues.concatenate;
 
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
@@ -23,8 +23,8 @@ import org.hyperledger.besu.crypto.SecureRandomProvider;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.HandshakeException;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.HandshakeSecrets;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.Handshaker;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.security.SecureRandom;
 import java.util.Optional;

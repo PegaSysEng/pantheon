@@ -14,7 +14,7 @@ package org.hyperledger.besu.consensus.ibft.messagedata;
 
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class PrepareMessageData extends AbstractIbftMessageData {
 

@@ -16,9 +16,9 @@ import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.vm.AbstractOperation;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.util.uint.Counter;
-import tech.pegasys.pantheon.util.uint.UInt256;
-import tech.pegasys.pantheon.util.uint.UInt256Value;
+import org.hyperledger.besu.util.uint.Counter;
+import org.hyperledger.besu.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256Value;
 
 public class ByteOperation extends AbstractOperation {
 

@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.ethereum.mainnet;
 
 import static org.hyperledger.besu.crypto.Hash.keccak256;
-import static tech.pegasys.pantheon.util.bytes.BytesValues.trimLeadingZeros;
+import static org.hyperledger.besu.util.bytes.BytesValues.trimLeadingZeros;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.Hash;
@@ -23,8 +23,8 @@ import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.trie.MerklePatriciaTrie;
 import tech.pegasys.pantheon.ethereum.trie.SimpleMerklePatriciaTrie;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.List;
 

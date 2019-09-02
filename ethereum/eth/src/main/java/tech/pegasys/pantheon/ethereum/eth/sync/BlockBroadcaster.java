@@ -16,8 +16,8 @@ import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.messages.NewBlockMessage;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
-import tech.pegasys.pantheon.util.Subscribers;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.Subscribers;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.function.Consumer;
 
