@@ -40,7 +40,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.testutil.TestClock;
+import org.hyperledger.besu.testutil.TestClock;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.time.Instant;

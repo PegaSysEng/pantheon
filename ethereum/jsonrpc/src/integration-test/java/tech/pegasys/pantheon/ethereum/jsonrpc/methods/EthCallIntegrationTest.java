@@ -26,7 +26,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResp
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
-import tech.pegasys.pantheon.testutil.BlockTestUtil;
+import org.hyperledger.besu.testutil.BlockTestUtil;
 
 import java.util.Map;
 

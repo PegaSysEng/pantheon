@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.util.RawBlockIterator;
-import tech.pegasys.pantheon.testutil.BlockTestUtil;
+import org.hyperledger.besu.testutil.BlockTestUtil;
 
 import java.io.IOException;
 import java.nio.file.Path;

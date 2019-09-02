@@ -31,7 +31,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStoragePrefixedKeyBlockchainStorage;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
-import tech.pegasys.pantheon.testutil.MockExecutorService;
+import org.hyperledger.besu.testutil.MockExecutorService;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

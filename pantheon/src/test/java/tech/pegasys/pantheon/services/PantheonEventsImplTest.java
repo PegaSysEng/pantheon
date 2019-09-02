@@ -43,7 +43,7 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.data.BlockHeader;
 import tech.pegasys.pantheon.plugin.data.Transaction;
-import tech.pegasys.pantheon.testutil.TestClock;
+import org.hyperledger.besu.testutil.TestClock;
 import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.Collections;

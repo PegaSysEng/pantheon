@@ -33,8 +33,8 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.util.RawBlockIterator;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.testutil.BlockTestUtil;
-import tech.pegasys.pantheon.testutil.TestClock;
+import org.hyperledger.besu.testutil.BlockTestUtil;
+import org.hyperledger.besu.testutil.TestClock;
 
 import java.io.File;
 import java.io.IOException;

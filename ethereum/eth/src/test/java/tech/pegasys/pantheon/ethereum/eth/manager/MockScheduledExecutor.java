@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.eth.manager;
 
-import tech.pegasys.pantheon.testutil.MockExecutorService;
+import org.hyperledger.besu.testutil.MockExecutorService;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Delayed;

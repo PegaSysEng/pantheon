@@ -28,7 +28,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionValidator;
 import tech.pegasys.pantheon.ethereum.vm.ehalt.ExceptionalHaltException;
 import tech.pegasys.pantheon.ethereum.worldstate.DefaultMutableWorldState;
-import tech.pegasys.pantheon.testutil.JsonTestParameters;
+import org.hyperledger.besu.testutil.JsonTestParameters;
 
 import java.math.BigInteger;
 import java.util.ArrayDeque;
