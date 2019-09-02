@@ -18,11 +18,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.EnclaveException;
-import tech.pegasys.pantheon.enclave.types.FindPrivacyGroupRequest;
-import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
-import tech.pegasys.pantheon.enclave.types.PrivacyGroup.Type;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.EnclaveException;
+import org.hyperledger.besu.enclave.types.FindPrivacyGroupRequest;
+import org.hyperledger.besu.enclave.types.PrivacyGroup;
+import org.hyperledger.besu.enclave.types.PrivacyGroup.Type;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.eea.EeaPrivateNonceProvider;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;

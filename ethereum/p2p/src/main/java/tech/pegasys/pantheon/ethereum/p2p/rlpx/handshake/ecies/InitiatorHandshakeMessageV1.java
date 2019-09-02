@@ -13,15 +13,15 @@
 package tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies;
 
 import static com.google.common.base.Preconditions.checkState;
-import static tech.pegasys.pantheon.crypto.SECP256K1.calculateKeyAgreement;
+import static org.hyperledger.besu.crypto.SECP256K1.calculateKeyAgreement;
 import static tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies.ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH;
 import static tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies.ECIESHandshaker.NONCE_LENGTH;
 import static tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies.ECIESHandshaker.PUBKEY_LENGTH;
 import static tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies.ECIESHandshaker.SIGNATURE_LENGTH;
 import static tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies.ECIESHandshaker.TOKEN_FLAG_LENGTH;
 
-import tech.pegasys.pantheon.crypto.Hash;
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.Hash;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.Bytes32s;
 import tech.pegasys.pantheon.util.bytes.BytesValue;

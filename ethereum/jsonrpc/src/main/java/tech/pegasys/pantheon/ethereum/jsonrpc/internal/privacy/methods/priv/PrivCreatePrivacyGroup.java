@@ -14,9 +14,9 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.types.CreatePrivacyGroupRequest;
-import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.types.CreatePrivacyGroupRequest;
+import org.hyperledger.besu.enclave.types.PrivacyGroup;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;

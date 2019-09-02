@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet.precompiles;
 
-import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
-import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
+import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
+import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;

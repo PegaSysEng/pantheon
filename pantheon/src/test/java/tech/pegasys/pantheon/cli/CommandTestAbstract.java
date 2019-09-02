@@ -38,7 +38,7 @@ import tech.pegasys.pantheon.cli.subcommands.blocks.BlocksSubCommand.JsonBlockIm
 import tech.pegasys.pantheon.cli.subcommands.blocks.BlocksSubCommand.RlpBlockExporterFactory;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;

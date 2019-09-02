@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.peers;
 
-import tech.pegasys.pantheon.crypto.Hash;
+import org.hyperledger.besu.crypto.Hash;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 

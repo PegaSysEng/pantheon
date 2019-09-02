@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.core;
 
-import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
+import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetMessageCallProcessor;
 import tech.pegasys.pantheon.ethereum.mainnet.PrecompileContractRegistry;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;

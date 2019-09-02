@@ -16,8 +16,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toSet;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SecureRandomProvider;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SecureRandomProvider;
 import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.Bytes32;

@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionStorage;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;

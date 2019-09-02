@@ -21,8 +21,8 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
-import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
+import org.hyperledger.besu.config.GenesisConfigFile;
+import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.chain.GenesisState;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;

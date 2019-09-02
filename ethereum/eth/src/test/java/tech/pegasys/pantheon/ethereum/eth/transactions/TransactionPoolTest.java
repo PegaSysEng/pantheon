@@ -25,15 +25,13 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.EXCEEDS_BLOCK_GAS_LIMIT;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.GAS_PRICE_TOO_LOW;
 import static tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
 import static tech.pegasys.pantheon.ethereum.mainnet.ValidationResult.valid;
 
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
 import tech.pegasys.pantheon.ethereum.core.Account;

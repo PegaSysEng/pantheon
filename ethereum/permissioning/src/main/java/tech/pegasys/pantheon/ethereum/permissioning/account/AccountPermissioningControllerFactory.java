@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.permissioning.account;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.Wei;

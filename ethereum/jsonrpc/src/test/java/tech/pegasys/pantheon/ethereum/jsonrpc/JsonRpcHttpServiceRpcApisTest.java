@@ -19,8 +19,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.config.StubGenesisConfigOptions;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;

@@ -13,9 +13,9 @@
 package tech.pegasys.pantheon.ethereum.core;
 
 import static com.google.common.base.Preconditions.checkState;
-import static tech.pegasys.pantheon.crypto.Hash.keccak256;
+import static org.hyperledger.besu.crypto.Hash.keccak256;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;

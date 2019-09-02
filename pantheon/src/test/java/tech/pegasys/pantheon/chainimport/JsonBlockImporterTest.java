@@ -16,10 +16,10 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import tech.pegasys.pantheon.config.GenesisConfigFile;
-import tech.pegasys.pantheon.config.JsonUtil;
+import org.hyperledger.besu.config.GenesisConfigFile;
+import org.hyperledger.besu.config.JsonUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;

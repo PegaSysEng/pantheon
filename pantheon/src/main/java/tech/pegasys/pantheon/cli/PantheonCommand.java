@@ -58,7 +58,7 @@ import tech.pegasys.pantheon.cli.subcommands.operator.OperatorSubCommand;
 import tech.pegasys.pantheon.cli.subcommands.rlp.RLPSubCommand;
 import tech.pegasys.pantheon.cli.util.ConfigOptionSearchAndRunHandler;
 import tech.pegasys.pantheon.cli.util.VersionProvider;
-import tech.pegasys.pantheon.config.GenesisConfigFile;
+import org.hyperledger.besu.config.GenesisConfigFile;
 import tech.pegasys.pantheon.controller.KeyPairUtil;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.controller.PantheonControllerBuilder;

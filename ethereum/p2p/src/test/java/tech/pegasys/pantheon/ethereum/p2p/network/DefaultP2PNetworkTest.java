@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.p2p.peers.PeerTestHelper.createPeer;
 import static tech.pegasys.pantheon.ethereum.p2p.peers.PeerTestHelper.enode;
 
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.config.RlpxConfiguration;

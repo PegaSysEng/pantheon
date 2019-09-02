@@ -13,9 +13,9 @@
 package tech.pegasys.pantheon.ethereum.mainnet.precompiles;
 
 import static java.util.Arrays.copyOfRange;
-import static tech.pegasys.pantheon.crypto.Blake2bfMessageDigest.Blake2bfDigest.MESSAGE_LENGTH_BYTES;
+import static org.hyperledger.besu.crypto.Blake2bfMessageDigest.Blake2bfDigest.MESSAGE_LENGTH_BYTES;
 
-import tech.pegasys.pantheon.crypto.Hash;
+import org.hyperledger.besu.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;

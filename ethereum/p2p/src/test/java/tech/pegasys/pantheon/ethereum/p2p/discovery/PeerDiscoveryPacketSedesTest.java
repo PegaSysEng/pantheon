@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
 import static org.junit.Assert.assertNotNull;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.FindNeighborsPacketData;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.NeighborsPacketData;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.Packet;

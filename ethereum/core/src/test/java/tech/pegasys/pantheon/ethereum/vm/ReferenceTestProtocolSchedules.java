@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.vm;
 
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
-import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
+import org.hyperledger.besu.config.GenesisConfigOptions;
+import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;

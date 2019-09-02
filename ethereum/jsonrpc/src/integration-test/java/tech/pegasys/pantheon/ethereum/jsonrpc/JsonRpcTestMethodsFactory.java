@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
-import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
+import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.blockcreation.EthHashMiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;

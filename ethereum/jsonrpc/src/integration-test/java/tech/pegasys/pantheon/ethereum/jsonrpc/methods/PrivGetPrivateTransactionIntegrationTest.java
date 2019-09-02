@@ -20,11 +20,11 @@ import static org.mockito.Mockito.when;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.types.SendRequest;
-import tech.pegasys.pantheon.enclave.types.SendRequestLegacy;
-import tech.pegasys.pantheon.enclave.types.SendResponse;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.types.SendRequest;
+import org.hyperledger.besu.enclave.types.SendRequestLegacy;
+import org.hyperledger.besu.enclave.types.SendResponse;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;

@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods;
 
-import tech.pegasys.pantheon.crypto.Hash;
+import org.hyperledger.besu.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;

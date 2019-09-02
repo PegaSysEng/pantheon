@@ -20,10 +20,10 @@ import static tech.pegasys.pantheon.cli.DefaultCommandValues.MANDATORY_PATH_FORM
 import static tech.pegasys.pantheon.cli.subcommands.operator.OperatorSubCommand.COMMAND_NAME;
 
 import tech.pegasys.pantheon.cli.PantheonCommand;
-import tech.pegasys.pantheon.config.JsonGenesisConfigOptions;
-import tech.pegasys.pantheon.config.JsonUtil;
-import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.config.JsonGenesisConfigOptions;
+import org.hyperledger.besu.config.JsonUtil;
+import org.hyperledger.besu.consensus.ibft.IbftExtraData;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.util.bytes.BytesValue;

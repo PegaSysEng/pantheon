@@ -12,11 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet.precompiles.privacy;
 
-import static tech.pegasys.pantheon.crypto.Hash.keccak256;
+import static org.hyperledger.besu.crypto.Hash.keccak256;
 
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
-import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.types.ReceiveRequest;
+import org.hyperledger.besu.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.LogSeries;

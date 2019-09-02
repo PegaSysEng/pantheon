@@ -14,9 +14,9 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.eea;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
-import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.types.ReceiveRequest;
+import org.hyperledger.besu.enclave.types.ReceiveResponse;
 import tech.pegasys.pantheon.ethereum.chain.TransactionLocation;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockBody;
@@ -118,7 +118,7 @@ public class EeaGetTransactionReceipt implements JsonRpcMethod {
     LOG.trace("Calculated contractAddress: {}", contractAddress);
 
     BytesValue rlpEncoded = RLP.encode(privateTransaction::writeTo);
-    Bytes32 txHash = tech.pegasys.pantheon.crypto.Hash.keccak256(rlpEncoded);
+    Bytes32 txHash = org.hyperledger.besu.crypto.Hash.keccak256(rlpEncoded);
 
     LOG.trace("Calculated private transaction hash: {}", txHash);
 

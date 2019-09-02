@@ -14,15 +14,12 @@ package tech.pegasys.pantheon.ethereum.trie;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static tech.pegasys.pantheon.ethereum.trie.CompactEncoding.bytesToPath;
 
-import tech.pegasys.pantheon.crypto.Hash;
+import org.hyperledger.besu.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.trie.TrieIterator.LeafHandler;
 import tech.pegasys.pantheon.ethereum.trie.TrieIterator.State;
 import tech.pegasys.pantheon.util.bytes.Bytes32;

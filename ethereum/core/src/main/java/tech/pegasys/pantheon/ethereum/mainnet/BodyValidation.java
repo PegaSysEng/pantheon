@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
-import static tech.pegasys.pantheon.crypto.Hash.keccak256;
+import static org.hyperledger.besu.crypto.Hash.keccak256;
 import static tech.pegasys.pantheon.util.bytes.BytesValues.trimLeadingZeros;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;

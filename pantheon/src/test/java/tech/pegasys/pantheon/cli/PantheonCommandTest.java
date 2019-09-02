@@ -21,7 +21,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static tech.pegasys.pantheon.cli.config.NetworkName.DEV;
 import static tech.pegasys.pantheon.cli.config.NetworkName.GOERLI;
 import static tech.pegasys.pantheon.cli.config.NetworkName.MAINNET;
@@ -35,7 +34,7 @@ import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.M
 
 import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
-import tech.pegasys.pantheon.config.GenesisConfigFile;
+import org.hyperledger.besu.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.MiningParameters;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;

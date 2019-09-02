@@ -12,13 +12,13 @@
  */
 package tech.pegasys.pantheon.ethereum.privacy;
 
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.types.ReceiveRequest;
-import tech.pegasys.pantheon.enclave.types.ReceiveResponse;
-import tech.pegasys.pantheon.enclave.types.SendRequest;
-import tech.pegasys.pantheon.enclave.types.SendRequestLegacy;
-import tech.pegasys.pantheon.enclave.types.SendRequestPantheon;
-import tech.pegasys.pantheon.enclave.types.SendResponse;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.types.ReceiveRequest;
+import org.hyperledger.besu.enclave.types.ReceiveResponse;
+import org.hyperledger.besu.enclave.types.SendRequest;
+import org.hyperledger.besu.enclave.types.SendRequestLegacy;
+import org.hyperledger.besu.enclave.types.SendRequestPantheon;
+import org.hyperledger.besu.enclave.types.SendResponse;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;

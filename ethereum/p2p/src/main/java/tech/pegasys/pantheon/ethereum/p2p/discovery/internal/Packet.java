@@ -13,13 +13,13 @@
 package tech.pegasys.pantheon.ethereum.p2p.discovery.internal;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static tech.pegasys.pantheon.crypto.Hash.keccak256;
+import static org.hyperledger.besu.crypto.Hash.keccak256;
 import static tech.pegasys.pantheon.util.Preconditions.checkGuard;
 import static tech.pegasys.pantheon.util.bytes.BytesValues.asUnsignedBigInteger;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
-import tech.pegasys.pantheon.crypto.SECP256K1.Signature;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
+import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryPacketDecodingException;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;

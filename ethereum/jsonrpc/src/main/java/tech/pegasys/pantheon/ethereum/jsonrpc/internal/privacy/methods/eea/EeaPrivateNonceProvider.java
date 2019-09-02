@@ -12,10 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.eea;
 
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.types.FindPrivacyGroupRequest;
-import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
-import tech.pegasys.pantheon.enclave.types.PrivacyGroup.Type;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.types.FindPrivacyGroupRequest;
+import org.hyperledger.besu.enclave.types.PrivacyGroup;
+import org.hyperledger.besu.enclave.types.PrivacyGroup.Type;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionHandler;
 
