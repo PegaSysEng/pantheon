@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
+import org.hyperledger.besu.ethereum.vm.MessageFrame;
 
 @FunctionalInterface
 public interface ContractValidationRule {

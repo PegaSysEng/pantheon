@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import tech.pegasys.pantheon.ethereum.core.Gas;
+import org.hyperledger.besu.ethereum.core.Gas;
 
 public class HomesteadGasCalculator extends FrontierGasCalculator {
 

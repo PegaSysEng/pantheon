@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNet;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
 

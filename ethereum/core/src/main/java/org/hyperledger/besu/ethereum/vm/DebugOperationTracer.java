@@ -14,10 +14,10 @@ package org.hyperledger.besu.ethereum.vm;
 
 import static org.hyperledger.besu.util.uint.UInt256.U_32;
 
-import tech.pegasys.pantheon.ethereum.core.Gas;
-import tech.pegasys.pantheon.ethereum.debug.TraceFrame;
-import tech.pegasys.pantheon.ethereum.debug.TraceOptions;
-import tech.pegasys.pantheon.ethereum.vm.ehalt.ExceptionalHaltException;
+import org.hyperledger.besu.ethereum.core.Gas;
+import org.hyperledger.besu.ethereum.debug.TraceFrame;
+import org.hyperledger.besu.ethereum.debug.TraceOptions;
+import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltException;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.UInt256;
 

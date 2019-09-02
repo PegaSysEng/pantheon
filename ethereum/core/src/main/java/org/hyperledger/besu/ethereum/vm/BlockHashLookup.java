@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.ProcessableBlockHeader;
-import tech.pegasys.pantheon.ethereum.vm.operations.BlockHashOperation;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.ProcessableBlockHeader;
+import org.hyperledger.besu.ethereum.vm.operations.BlockHashOperation;
 
 import java.util.HashMap;
 import java.util.Map;

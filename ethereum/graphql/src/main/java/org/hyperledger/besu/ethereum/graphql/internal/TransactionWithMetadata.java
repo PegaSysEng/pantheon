@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Transaction;
 
 import java.util.Optional;
 

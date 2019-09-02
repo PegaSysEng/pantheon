@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;

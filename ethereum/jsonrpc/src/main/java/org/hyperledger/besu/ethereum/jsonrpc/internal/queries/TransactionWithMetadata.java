@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.queries;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Transaction;
 
 public class TransactionWithMetadata {
 

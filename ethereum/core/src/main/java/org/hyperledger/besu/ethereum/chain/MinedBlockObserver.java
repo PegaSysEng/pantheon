@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.chain;
 
-import tech.pegasys.pantheon.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Block;
 
 public interface MinedBlockObserver {
   void blockMined(Block block);

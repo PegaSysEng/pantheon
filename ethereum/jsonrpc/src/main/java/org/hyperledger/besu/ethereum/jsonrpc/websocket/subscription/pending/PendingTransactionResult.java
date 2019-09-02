@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.pending;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
 
 import com.fasterxml.jackson.annotation.JsonValue;

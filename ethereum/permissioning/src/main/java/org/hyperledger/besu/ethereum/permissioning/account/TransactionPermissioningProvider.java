@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.permissioning.account;
 
-import tech.pegasys.pantheon.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.Transaction;
 
 @FunctionalInterface
 public interface TransactionPermissioningProvider {

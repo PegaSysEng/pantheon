@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.cli;
 
-import tech.pegasys.pantheon.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.eth.sync.SyncMode;
 import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
 import org.hyperledger.besu.nat.NatMethod;

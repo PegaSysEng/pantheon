@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.storage.keyvalue;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.trie.MerklePatriciaTrie;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.bytes.Bytes32;

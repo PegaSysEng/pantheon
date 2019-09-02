@@ -13,7 +13,7 @@
 package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.consensus.ibft.ibftevent.BlockTimerExpiry;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.time.Clock;
 import java.util.Optional;

@@ -20,7 +20,7 @@ import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLErrorRespo
 import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLJsonRequest;
 import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLResponse;
 import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLSuccessResponse;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponseType;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLResponseType;
 import org.hyperledger.besu.util.NetworkUtility;
 
 import java.net.InetSocketAddress;

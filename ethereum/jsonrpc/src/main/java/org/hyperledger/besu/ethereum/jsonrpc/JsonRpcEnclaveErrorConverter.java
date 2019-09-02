@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 
 import java.util.Arrays;
 import java.util.List;

@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import tech.pegasys.pantheon.ethereum.mainnet.TransactionReceiptType;
+import org.hyperledger.besu.ethereum.mainnet.TransactionReceiptType;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;

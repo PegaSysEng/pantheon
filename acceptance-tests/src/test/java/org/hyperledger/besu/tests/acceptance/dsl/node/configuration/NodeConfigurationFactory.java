@@ -21,7 +21,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.Gene
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 
 import java.util.ArrayList;

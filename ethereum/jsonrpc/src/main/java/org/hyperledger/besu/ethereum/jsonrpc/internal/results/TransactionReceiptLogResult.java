@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Log;
-import tech.pegasys.pantheon.ethereum.core.LogTopic;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Log;
+import org.hyperledger.besu.ethereum.core.LogTopic;
 
 import java.util.ArrayList;
 import java.util.List;

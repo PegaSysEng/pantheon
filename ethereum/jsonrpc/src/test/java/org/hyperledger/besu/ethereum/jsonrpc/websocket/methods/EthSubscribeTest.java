@@ -18,15 +18,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.InvalidSubscriptionRequestException;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionRequestMapper;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.InvalidSubscriptionRequestException;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionRequestMapper;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 
 import io.vertx.core.json.Json;
 import org.junit.Before;

@@ -12,22 +12,22 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.LogTopic;
-import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.core.WorldState;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.LogTopic;
+import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.core.WorldState;
 import org.hyperledger.besu.ethereum.graphql.GraphQLDataFetcherContext;
 import org.hyperledger.besu.ethereum.graphql.internal.BlockWithMetadata;
 import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
 import org.hyperledger.besu.ethereum.graphql.internal.LogWithMetadata;
 import org.hyperledger.besu.ethereum.graphql.internal.LogsQuery;
 import org.hyperledger.besu.ethereum.graphql.internal.TransactionWithMetadata;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
-import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
-import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.transaction.CallParameter;
+import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
+import org.hyperledger.besu.ethereum.transaction.TransactionSimulatorResult;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;

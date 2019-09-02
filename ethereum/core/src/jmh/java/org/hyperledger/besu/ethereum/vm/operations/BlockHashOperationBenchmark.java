@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.vm.operations;
 
-import tech.pegasys.pantheon.ethereum.mainnet.ConstantinopleFixGasCalculator;
-import tech.pegasys.pantheon.ethereum.vm.BlockHashLookup;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
+import org.hyperledger.besu.ethereum.mainnet.ConstantinopleFixGasCalculator;
+import org.hyperledger.besu.ethereum.vm.BlockHashLookup;
+import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.UInt256;
 

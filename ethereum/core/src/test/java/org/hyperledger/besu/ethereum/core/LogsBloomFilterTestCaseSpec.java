@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import tech.pegasys.pantheon.ethereum.vm.LogMock;
+import org.hyperledger.besu.ethereum.vm.LogMock;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.List;

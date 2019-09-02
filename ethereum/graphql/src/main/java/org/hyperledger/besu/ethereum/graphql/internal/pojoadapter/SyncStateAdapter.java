@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
-import tech.pegasys.pantheon.ethereum.core.SyncStatus;
+import org.hyperledger.besu.ethereum.core.SyncStatus;
 
 import java.util.Optional;
 

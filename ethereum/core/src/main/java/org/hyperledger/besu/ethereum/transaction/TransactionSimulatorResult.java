@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.transaction;
 
-import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor.Result;
-import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
-import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor.Result;
+import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
+import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Objects;

@@ -12,19 +12,19 @@
  */
 package org.hyperledger.besu.ethereum.blockcreation;
 
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderBuilder;
-import tech.pegasys.pantheon.ethereum.core.SealableBlockHeader;
-import tech.pegasys.pantheon.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeaderBuilder;
+import org.hyperledger.besu.ethereum.core.SealableBlockHeader;
+import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
-import tech.pegasys.pantheon.ethereum.mainnet.EthHash;
-import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolution;
-import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolver;
-import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolver.EthHashSolverJob;
-import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolverInputs;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.EthHash;
+import org.hyperledger.besu.ethereum.mainnet.EthHashSolution;
+import org.hyperledger.besu.ethereum.mainnet.EthHashSolver;
+import org.hyperledger.besu.ethereum.mainnet.EthHashSolver.EthHashSolverJob;
+import org.hyperledger.besu.ethereum.mainnet.EthHashSolverInputs;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.util.bytes.BytesValues;
 import org.hyperledger.besu.util.uint.UInt256;
 

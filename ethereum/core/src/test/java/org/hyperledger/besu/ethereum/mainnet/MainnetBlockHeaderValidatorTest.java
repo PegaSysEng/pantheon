@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.mainnet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.ProtocolContext;
 
 import org.junit.Test;
 

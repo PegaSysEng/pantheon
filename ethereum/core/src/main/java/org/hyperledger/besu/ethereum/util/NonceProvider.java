@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.util;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 @FunctionalInterface
 public interface NonceProvider {

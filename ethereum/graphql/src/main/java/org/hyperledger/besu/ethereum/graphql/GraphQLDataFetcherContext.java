@@ -14,11 +14,11 @@ package org.hyperledger.besu.ethereum.graphql;
 
 import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 
 public class GraphQLDataFetcherContext {
 

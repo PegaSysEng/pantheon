@@ -12,19 +12,19 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import tech.pegasys.pantheon.ethereum.core.Account;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.AltBN128AddPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.AltBN128MulPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.AltBN128PairingPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.BLAKE2BFPrecompileContract;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.BigIntegerModularExponentiationPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.ECRECPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.IDPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.RIPEMD160PrecompiledContract;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.SHA256PrecompiledContract;
-import tech.pegasys.pantheon.ethereum.mainnet.precompiles.privacy.PrivacyPrecompiledContract;
-import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
+import org.hyperledger.besu.ethereum.core.Account;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.AltBN128AddPrecompiledContract;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.AltBN128MulPrecompiledContract;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.AltBN128PairingPrecompiledContract;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.BLAKE2BFPrecompileContract;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.BigIntegerModularExponentiationPrecompiledContract;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.ECRECPrecompiledContract;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.IDPrecompiledContract;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.RIPEMD160PrecompiledContract;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.SHA256PrecompiledContract;
+import org.hyperledger.besu.ethereum.mainnet.precompiles.privacy.PrivacyPrecompiledContract;
+import org.hyperledger.besu.ethereum.vm.GasCalculator;
 
 /** Provides the various precompiled contracts used on mainnet hard forks. */
 public abstract class MainnetPrecompiledContractRegistries {

@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.transaction;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Objects;

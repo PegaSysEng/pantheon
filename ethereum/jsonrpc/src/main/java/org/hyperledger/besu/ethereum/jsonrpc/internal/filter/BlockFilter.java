@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 import java.util.ArrayList;
 import java.util.List;

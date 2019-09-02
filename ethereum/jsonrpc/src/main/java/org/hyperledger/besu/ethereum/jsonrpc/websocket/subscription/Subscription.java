@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 
 import java.util.Objects;
 

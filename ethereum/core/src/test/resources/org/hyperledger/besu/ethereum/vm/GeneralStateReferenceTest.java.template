@@ -1,9 +1,9 @@
-package tech.pegasys.pantheon.ethereum.vm.generalstate;
+package org.hyperledger.besu.ethereum.vm.generalstate;
 
-import static tech.pegasys.pantheon.ethereum.vm.GeneralStateReferenceTestTools.executeTest;
-import static tech.pegasys.pantheon.ethereum.vm.GeneralStateReferenceTestTools.generateTestParametersForConfig;
+import static org.hyperledger.besu.ethereum.vm.GeneralStateReferenceTestTools.executeTest;
+import static org.hyperledger.besu.ethereum.vm.GeneralStateReferenceTestTools.generateTestParametersForConfig;
 
-import tech.pegasys.pantheon.ethereum.vm.GeneralStateTestCaseEipSpec;
+import org.hyperledger.besu.ethereum.vm.GeneralStateTestCaseEipSpec;
 
 import java.util.Collection;
 

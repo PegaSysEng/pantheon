@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.mainnet.headervalidationrules;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.mainnet.DetachedBlockHeaderValidationRule;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.mainnet.DetachedBlockHeaderValidationRule;
 
 import java.util.function.Function;
 

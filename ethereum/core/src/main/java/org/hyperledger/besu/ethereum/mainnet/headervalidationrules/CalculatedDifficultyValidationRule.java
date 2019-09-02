@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.mainnet.headervalidationrules;
 
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.mainnet.AttachedBlockHeaderValidationRule;
-import tech.pegasys.pantheon.ethereum.mainnet.DifficultyCalculator;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.mainnet.AttachedBlockHeaderValidationRule;
+import org.hyperledger.besu.ethereum.mainnet.DifficultyCalculator;
 
 import java.math.BigInteger;
 

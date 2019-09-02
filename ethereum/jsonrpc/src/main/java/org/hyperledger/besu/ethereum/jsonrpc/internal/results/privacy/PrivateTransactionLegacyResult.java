@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results.privacy;
 
-import tech.pegasys.pantheon.ethereum.privacy.PrivateTransaction;
+import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
 import org.hyperledger.besu.util.bytes.BytesValues;
 
 import java.util.List;

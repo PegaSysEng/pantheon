@@ -15,7 +15,7 @@ package org.hyperledger.besu.consensus.clique.headervalidationrules;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import org.hyperledger.besu.consensus.clique.CliqueBlockInterface;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 
 import java.util.Arrays;

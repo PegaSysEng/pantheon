@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.health;
 
-import tech.pegasys.pantheon.ethereum.core.SyncStatus;
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
+import org.hyperledger.besu.ethereum.core.SyncStatus;
+import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 
 import org.apache.logging.log4j.LogManager;

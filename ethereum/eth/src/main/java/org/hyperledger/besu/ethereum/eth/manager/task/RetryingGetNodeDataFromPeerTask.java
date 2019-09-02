@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager.task;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.metrics.MetricsSystem;

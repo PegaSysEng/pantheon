@@ -72,7 +72,7 @@ public abstract class PeerDiscoveryAgent {
   private final BytesValue id;
   protected final DiscoveryConfiguration config;
 
-  /* This is the {@link tech.pegasys.pantheon.ethereum.p2p.Peer} object representing our local node.
+  /* This is the {@link org.hyperledger.besu.ethereum.p2p.Peer} object representing our local node.
    * This value is empty on construction, and is set after the discovery agent is started.
    */
   private Optional<DiscoveryPeer> localNode = Optional.empty();

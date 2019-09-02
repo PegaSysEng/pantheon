@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;

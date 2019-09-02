@@ -18,9 +18,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.core.ExecutionContextTestFixture;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolution;
+import org.hyperledger.besu.ethereum.mainnet.EthHashSolution;
 import org.hyperledger.besu.util.bytes.Bytes32;
 
 import java.util.Optional;

@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.consensus.ibft.ibftevent.BlockTimerExpiry;
 import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvent;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 
 import java.time.Clock;

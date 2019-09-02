@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
-import tech.pegasys.pantheon.ethereum.core.LogTopic;
+import org.hyperledger.besu.ethereum.core.LogTopic;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.ArrayList;

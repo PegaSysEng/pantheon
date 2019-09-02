@@ -14,11 +14,11 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.jsonrpc.AbstractJsonRpcHttpServiceTest;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.jsonrpc.AbstractJsonRpcHttpServiceTest;
 
 import java.io.IOException;
 

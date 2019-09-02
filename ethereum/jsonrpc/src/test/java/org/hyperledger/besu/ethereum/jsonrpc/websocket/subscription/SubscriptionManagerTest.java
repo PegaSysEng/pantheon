@@ -19,11 +19,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.blockheaders.NewBlockHeadersSubscription;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.blockheaders.NewBlockHeadersSubscription;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import java.util.List;

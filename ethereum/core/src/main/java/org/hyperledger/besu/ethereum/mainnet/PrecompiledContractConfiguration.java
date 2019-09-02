@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
+import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.ethereum.vm.GasCalculator;
 
 public class PrecompiledContractConfiguration {
   private GasCalculator gasCalculator;

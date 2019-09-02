@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.graphql;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
-import tech.pegasys.pantheon.ethereum.graphql.internal.pojoadapter.NormalBlockAdapter;
+import org.hyperledger.besu.ethereum.graphql.internal.pojoadapter.NormalBlockAdapter;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 
 import java.util.Optional;

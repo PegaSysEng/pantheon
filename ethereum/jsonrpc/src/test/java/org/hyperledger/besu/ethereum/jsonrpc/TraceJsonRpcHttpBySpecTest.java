@@ -15,9 +15,9 @@ package org.hyperledger.besu.ethereum.jsonrpc;
 import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.TraceReplayBlockTransactions;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockReplay;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockTracer;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockReplay;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTracer;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 
 import java.net.URL;

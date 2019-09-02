@@ -30,7 +30,7 @@ if (!JavaVersion.current().java11Compatible) {
   "  Detected version ${JavaVersion.current()}")
 }
 
-group = 'tech.pegasys.pantheon'
+group = 'org.hyperledger.besu'
 
 defaultTasks 'build', 'checkLicenses', 'javadoc'
 
@@ -222,7 +222,7 @@ allprojects {
    * The properties passed are:
    * - 'test.ethereum.include': allows to run a single Ethereum reference tests. For instance,
    *   running a single general state test can be done with:
-   *    ./gradlew :ethereum:tech.pegasys.pantheon.ethereum.vm:test -Dtest.single=GeneralStateTest -Dtest.ethereum.include=callcodecallcallcode_101-Frontier
+   *    ./gradlew :ethereum:org.hyperledger.besu.ethereum.vm:test -Dtest.single=GeneralStateTest -Dtest.ethereum.include=callcodecallcallcode_101-Frontier
    *   The meaning being that will be run only the tests for which the value passed as "include"
    *   (which can be a java pattern) matches parts of the test name. Knowing that tests names for
    *   reference tests are of the form:
@@ -233,7 +233,7 @@ allprojects {
    *   multiple variant of that test are run. The variant is a simple number.
    * - 'test.ethereum.state.eip': for general state tests, allows to only run tests for the
    *   milestone specified by this value. So for instance,
-   *    ./gradlew :ethereum:tech.pegasys.pantheon.ethereum.vm:test -Dtest.single=GeneralStateTest -Dtest.ethereum.state.eip=Frontier
+   *    ./gradlew :ethereum:org.hyperledger.besu.ethereum.vm:test -Dtest.single=GeneralStateTest -Dtest.ethereum.state.eip=Frontier
    *   only run general state tests for Frontier. Note that this behavior could be achieved as well
    *   with the 'include' option above since it is a pattern, but this is a slightly more convenient
    *   option.
@@ -283,7 +283,7 @@ subprojects {
     publishing {
       publications {
         mavenJava(MavenPublication) {
-          groupId "tech.pegasys.pantheon.internal"
+          groupId "org.hyperledger.besu.internal"
           version "${project.version}"
           from components.java
           artifact sourcesJar
@@ -405,7 +405,7 @@ subprojects {
 jar { enabled = false }
 
 apply plugin: 'application'
-mainClassName = 'tech.pegasys.pantheon.Pantheon'
+mainClassName = 'org.hyperledger.besu.Besu'
 applicationDefaultJvmArgs = [
   '-Dvertx.disableFileCPResolving=true',
   '-Dpantheon.home=PANTHEON_HOME',

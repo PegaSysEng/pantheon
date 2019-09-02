@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.pending;
 
-import tech.pegasys.pantheon.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
 import org.hyperledger.besu.util.bytes.BytesValue;

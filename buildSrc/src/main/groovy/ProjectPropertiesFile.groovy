@@ -77,7 +77,7 @@ class ProjectPropertiesFile extends DefaultTask {
         String[] methodDeclarations = properties.stream().map({p -> p.methodDeclaration()}).toArray()
         return """package ${destPackage};
 
-import tech.pegasys.pantheon.util.PlatformDetector;
+import org.hyperledger.besu.util.PlatformDetector;
 
 // This file is generated via a gradle task and should not be edited directly.
 public final class ${filename} {

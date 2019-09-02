@@ -14,8 +14,8 @@ package org.hyperledger.besu.consensus.clique.headervalidationrules;
 
 import org.hyperledger.besu.consensus.clique.CliqueBlockInterface;
 import org.hyperledger.besu.consensus.common.EpochManager;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.mainnet.DetachedBlockHeaderValidationRule;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.mainnet.DetachedBlockHeaderValidationRule;
 
 public class CoinbaseHeaderValidationRule implements DetachedBlockHeaderValidationRule {
 

@@ -74,7 +74,7 @@ dependencies {
 }
 
 task writeInfoFile(type: ProjectPropertiesFile) {
-  destPackage = "tech.pegasys.pantheon"
+  destPackage = "org.hyperledger.besu"
   addString("clientIdentity", rootProject.name)
   addVersion("version", "clientIdentity")
 }

@@ -16,9 +16,9 @@ import static junit.framework.TestCase.fail;
 import static org.mockito.Mockito.mock;
 
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.response.SubscriptionResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.response.SubscriptionResponse;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import java.util.UUID;

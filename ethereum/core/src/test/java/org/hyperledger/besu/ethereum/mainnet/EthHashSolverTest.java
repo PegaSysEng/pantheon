@@ -18,8 +18,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.mainnet.EthHashSolver.EthHashSolverJob;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.mainnet.EthHashSolver.EthHashSolverJob;
 import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.Arrays;

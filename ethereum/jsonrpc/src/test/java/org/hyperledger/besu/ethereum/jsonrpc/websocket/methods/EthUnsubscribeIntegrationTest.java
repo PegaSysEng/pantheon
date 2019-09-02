@@ -15,10 +15,10 @@ package org.hyperledger.besu.ethereum.jsonrpc.websocket.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketRequestHandler;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketRequestHandler;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import java.util.HashMap;

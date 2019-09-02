@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.storage;
 
-import tech.pegasys.pantheon.ethereum.chain.BlockchainStorage;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.privacy.PrivateStateStorage;
-import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionStorage;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStatePreimageStorage;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
+import org.hyperledger.besu.ethereum.chain.BlockchainStorage;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.privacy.PrivateStateStorage;
+import org.hyperledger.besu.ethereum.privacy.PrivateTransactionStorage;
+import org.hyperledger.besu.ethereum.worldstate.WorldStatePreimageStorage;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;
 
 import java.io.Closeable;

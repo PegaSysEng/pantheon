@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.util.bytes;
 
-import tech.pegasys.pantheon.plugin.data.BinaryData;
+import org.hyperledger.besu.plugin.data.BinaryData;
 
 /** Base interface for a value whose content is stored as bytes. */
 public interface BytesBacked extends BinaryData {

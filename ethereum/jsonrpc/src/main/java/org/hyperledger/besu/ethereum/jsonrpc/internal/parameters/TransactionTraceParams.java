@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
-import tech.pegasys.pantheon.ethereum.debug.TraceOptions;
+import org.hyperledger.besu.ethereum.debug.TraceOptions;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

@@ -16,12 +16,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.hyperledger.besu.crypto.Hash;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.permissioning.account.TransactionPermissioningProvider;
-import tech.pegasys.pantheon.ethereum.transaction.CallParameter;
-import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulator;
-import tech.pegasys.pantheon.ethereum.transaction.TransactionSimulatorResult;
+import org.hyperledger.besu.ethereum.transaction.CallParameter;
+import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
+import org.hyperledger.besu.ethereum.transaction.TransactionSimulatorResult;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
@@ -107,7 +107,7 @@ public class TransactionSmartContractPermissioningController
    */
   @Override
   public boolean isPermitted(final Transaction transaction) {
-    final tech.pegasys.pantheon.ethereum.core.Hash transactionHash = transaction.hash();
+    final org.hyperledger.besu.ethereum.core.Hash transactionHash = transaction.hash();
     final Address sender = transaction.getSender();
 
     LOG.trace("Account permissioning - Smart Contract : Checking transaction {}", transactionHash);

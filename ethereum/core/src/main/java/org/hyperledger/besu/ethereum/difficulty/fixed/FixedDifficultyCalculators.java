@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.difficulty.fixed;
 
 import org.hyperledger.besu.config.GenesisConfigOptions;
-import tech.pegasys.pantheon.ethereum.mainnet.DifficultyCalculator;
+import org.hyperledger.besu.ethereum.mainnet.DifficultyCalculator;
 
 import java.math.BigInteger;
 

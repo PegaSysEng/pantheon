@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.storage.keyvalue;
 import static java.util.AbstractMap.SimpleEntry;
 import static java.util.Arrays.asList;
 
-import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import org.hyperledger.besu.ethereum.storage.StorageProvider;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.services.kvstore.ColumnarRocksDbKeyValueStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;

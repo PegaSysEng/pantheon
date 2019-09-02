@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.trie.Node;
 import org.hyperledger.besu.ethereum.trie.TrieNodeDecoder;
 import org.hyperledger.besu.util.bytes.BytesValue;

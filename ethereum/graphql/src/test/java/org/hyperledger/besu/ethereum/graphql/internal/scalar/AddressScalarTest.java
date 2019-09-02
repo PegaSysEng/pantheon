@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.graphql.internal.scalar;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.graphql.internal.Scalars;
 
 import graphql.language.StringValue;

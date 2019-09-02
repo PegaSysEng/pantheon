@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import tech.pegasys.pantheon.ethereum.core.SyncStatus;
+import org.hyperledger.besu.ethereum.core.SyncStatus;
 
 import java.util.Objects;
 

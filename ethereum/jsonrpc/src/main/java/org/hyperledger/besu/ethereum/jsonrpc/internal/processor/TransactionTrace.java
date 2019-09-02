@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.processor;
 
-import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.debug.TraceFrame;
-import tech.pegasys.pantheon.ethereum.mainnet.TransactionProcessor.Result;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.debug.TraceFrame;
+import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor.Result;
 
 import java.util.List;
 

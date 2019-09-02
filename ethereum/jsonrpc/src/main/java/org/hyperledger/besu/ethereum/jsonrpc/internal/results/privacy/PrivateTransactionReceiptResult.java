@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results.privacy;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Log;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Log;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionReceiptLogResult;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

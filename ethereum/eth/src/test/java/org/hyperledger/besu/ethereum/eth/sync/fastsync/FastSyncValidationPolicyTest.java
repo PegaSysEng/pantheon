@@ -14,11 +14,11 @@ package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
-import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.FULL;
-import static tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode.LIGHT;
+import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.FULL;
+import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.LIGHT;
 import static org.hyperledger.besu.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_1_COUNTER;
 
-import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
+import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 
 import org.junit.Test;
 

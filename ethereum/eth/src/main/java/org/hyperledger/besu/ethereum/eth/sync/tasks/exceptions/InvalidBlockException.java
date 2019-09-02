@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.tasks.exceptions;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 public class InvalidBlockException extends RuntimeException {
 

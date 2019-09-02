@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import tech.pegasys.pantheon.ethereum.debug.TraceFrame;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransactionTrace;
+import org.hyperledger.besu.ethereum.debug.TraceFrame;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.TransactionTrace;
 
 import java.util.Collection;
 import java.util.List;

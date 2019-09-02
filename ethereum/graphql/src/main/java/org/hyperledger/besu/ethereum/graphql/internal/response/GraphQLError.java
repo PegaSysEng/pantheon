@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.response;
 
-import tech.pegasys.pantheon.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
+import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonGetter;

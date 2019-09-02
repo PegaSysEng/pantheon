@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.permissioning;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 public class SmartContractPermissioningConfiguration {
   private boolean smartContractNodeWhitelistEnabled;

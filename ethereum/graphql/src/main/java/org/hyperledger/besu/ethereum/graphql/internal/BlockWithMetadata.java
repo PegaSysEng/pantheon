@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.List;

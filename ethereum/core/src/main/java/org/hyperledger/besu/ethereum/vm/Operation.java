@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import tech.pegasys.pantheon.ethereum.core.Gas;
-import tech.pegasys.pantheon.ethereum.vm.ehalt.ExceptionalHaltPredicate;
+import org.hyperledger.besu.ethereum.core.Gas;
+import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltPredicate;
 
 import java.util.EnumSet;
 import java.util.Optional;

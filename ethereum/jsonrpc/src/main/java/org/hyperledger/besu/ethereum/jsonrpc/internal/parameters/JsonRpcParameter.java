@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

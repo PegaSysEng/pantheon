@@ -13,9 +13,9 @@
 package org.hyperledger.besu.ethereum.jsonrpc;
 
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
-import tech.pegasys.pantheon.ethereum.util.NonceProvider;
+import org.hyperledger.besu.ethereum.util.NonceProvider;
 
 import java.util.OptionalLong;
 

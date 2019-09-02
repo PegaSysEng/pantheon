@@ -15,7 +15,7 @@ package org.hyperledger.besu;
 import org.hyperledger.besu.controller.PantheonController;
 import org.hyperledger.besu.ethereum.graphql.GraphQLHttpService;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcHttpService;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketService;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketService;
 import org.hyperledger.besu.ethereum.p2p.network.NetworkRunner;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.metrics.prometheus.MetricsService;

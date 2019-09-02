@@ -20,7 +20,7 @@ import static org.hyperledger.besu.metrics.PantheonMetricCategory.PEERS;
 import static org.hyperledger.besu.metrics.PantheonMetricCategory.RPC;
 
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.Observation;
 

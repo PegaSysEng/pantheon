@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.util.Objects;
 

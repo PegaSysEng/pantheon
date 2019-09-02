@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationService;
-import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationUtils;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationService;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationUtils;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcUnauthorizedResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.methods.WebSocketRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcUnauthorizedResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.methods.WebSocketRpcRequest;
 
 import java.util.Map;
 import java.util.Optional;

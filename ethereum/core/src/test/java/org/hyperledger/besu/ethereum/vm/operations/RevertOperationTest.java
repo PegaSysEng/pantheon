@@ -15,8 +15,8 @@ package org.hyperledger.besu.ethereum.vm.operations;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.mainnet.ConstantinopleGasCalculator;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
+import org.hyperledger.besu.ethereum.mainnet.ConstantinopleGasCalculator;
+import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;

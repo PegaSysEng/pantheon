@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.jsonrpc.authentication;
 
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;

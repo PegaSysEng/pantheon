@@ -14,10 +14,10 @@ package org.hyperledger.besu.ethereum.mainnet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.core.Gas;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.Gas;
+import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
+import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Arrays;

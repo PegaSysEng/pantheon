@@ -13,7 +13,7 @@
 package org.hyperledger.besu.consensus.ibft.validation;
 
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

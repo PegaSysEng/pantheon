@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.vm.ehalt;
 
-import tech.pegasys.pantheon.ethereum.vm.ExceptionalHaltReason;
+import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
 
 import java.util.EnumSet;
 

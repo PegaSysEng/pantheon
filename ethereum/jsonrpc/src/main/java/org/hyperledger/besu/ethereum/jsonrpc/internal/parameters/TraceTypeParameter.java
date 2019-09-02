@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
 import static java.util.Objects.isNull;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 
 import java.util.List;
 import java.util.Objects;

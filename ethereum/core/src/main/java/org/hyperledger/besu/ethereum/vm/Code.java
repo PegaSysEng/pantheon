@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import tech.pegasys.pantheon.ethereum.vm.operations.JumpDestOperation;
+import org.hyperledger.besu.ethereum.vm.operations.JumpDestOperation;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
 

@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.eth.sync.state;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 
 import java.util.Arrays;

@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import tech.pegasys.pantheon.ethereum.core.TransactionFilter;
+import org.hyperledger.besu.ethereum.core.TransactionFilter;
 
 import java.math.BigInteger;
 import java.util.Optional;

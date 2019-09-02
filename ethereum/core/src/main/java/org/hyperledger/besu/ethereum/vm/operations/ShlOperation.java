@@ -14,10 +14,10 @@ package org.hyperledger.besu.ethereum.vm.operations;
 
 import static org.hyperledger.besu.util.uint.UInt256s.greaterThanOrEqualTo256;
 
-import tech.pegasys.pantheon.ethereum.core.Gas;
-import tech.pegasys.pantheon.ethereum.vm.AbstractOperation;
-import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
+import org.hyperledger.besu.ethereum.core.Gas;
+import org.hyperledger.besu.ethereum.vm.AbstractOperation;
+import org.hyperledger.besu.ethereum.vm.GasCalculator;
+import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.Bytes32s;
 import org.hyperledger.besu.util.uint.UInt256;

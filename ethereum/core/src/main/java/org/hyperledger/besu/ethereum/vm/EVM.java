@@ -13,12 +13,12 @@
 package org.hyperledger.besu.ethereum.vm;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
-import static tech.pegasys.pantheon.ethereum.vm.ExceptionalHaltReason.INSUFFICIENT_STACK_ITEMS;
+import static org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason.INSUFFICIENT_STACK_ITEMS;
 
-import tech.pegasys.pantheon.ethereum.core.Gas;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame.State;
-import tech.pegasys.pantheon.ethereum.vm.ehalt.ExceptionalHaltException;
-import tech.pegasys.pantheon.ethereum.vm.ehalt.ExceptionalHaltManager;
+import org.hyperledger.besu.ethereum.core.Gas;
+import org.hyperledger.besu.ethereum.vm.MessageFrame.State;
+import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltException;
+import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltManager;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.EnumSet;

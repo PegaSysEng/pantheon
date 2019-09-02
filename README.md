@@ -42,4 +42,10 @@ Instructions for how to get started with developing on the Pantheon codebase. Pl
 
 [Release Notes](CHANGELOG.md)
 
-egrep -lRZ 'foo' . | xargs -0 -l sed -i -e 's/import tech.pegasys.pantheon/import org.hyperledger.besu/g'
+
+find . -type f -name "*.java" -print0 | xargs -0 -l sed -i -e 's/import tech.pegasys.pantheon/import org.hyperledger.besu/g'
+find . -type f -name "*.java" -print0 | xargs -0 -l sed -i -e 's/import static tech.pegasys.pantheon/import static org.hyperledger.besu/g'
+
+find . -type f -name "*.java.template" -print0 | xargs -0 -l sed -i -e 's/import tech.pegasys.pantheon/import org.hyperledger.besu/g'
+find . -type f -name "*.java.template" -print0 | xargs -0 -l sed -i -e 's/import static tech.pegasys.pantheon/import static org.hyperledger.besu/g'
+find . -type f -name "*.java.template" -print0 | xargs -0 -l sed -i -e 's/package tech.pegasys.pantheon/package org.hyperledger.besu/g'

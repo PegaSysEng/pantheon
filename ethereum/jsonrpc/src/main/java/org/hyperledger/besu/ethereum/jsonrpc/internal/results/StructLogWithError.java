@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import tech.pegasys.pantheon.ethereum.debug.TraceFrame;
-import tech.pegasys.pantheon.ethereum.vm.ExceptionalHaltReason;
+import org.hyperledger.besu.ethereum.debug.TraceFrame;
+import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 

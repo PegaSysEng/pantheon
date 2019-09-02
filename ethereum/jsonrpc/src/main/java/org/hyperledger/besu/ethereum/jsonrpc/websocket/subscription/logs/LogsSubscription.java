@@ -13,9 +13,9 @@
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.logs;
 
 import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.LogsQuery;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.FilterParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.Subscription;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.FilterParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.Subscription;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 
 public class LogsSubscription extends Subscription {
 

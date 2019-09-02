@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.storage.keyvalue;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStatePreimageStorage;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.worldstate.WorldStatePreimageStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage.Transaction;
 import org.hyperledger.besu.util.bytes.Bytes32;

@@ -15,12 +15,12 @@ package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.FilterParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.blockheaders.NewBlockHeadersSubscription;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.logs.LogsSubscription;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.FilterParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.blockheaders.NewBlockHeadersSubscription;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.logs.LogsSubscription;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
 
 import java.util.function.Function;
 

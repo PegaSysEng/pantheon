@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.util.RawBlockIterator;
+import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderFunctions;
+import org.hyperledger.besu.ethereum.util.RawBlockIterator;
 import org.hyperledger.besu.testutil.BlockTestUtil;
 
 import java.io.IOException;

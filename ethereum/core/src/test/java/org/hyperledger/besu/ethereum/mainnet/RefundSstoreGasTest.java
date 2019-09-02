@@ -18,9 +18,9 @@ import static org.mockito.Mockito.when;
 import static org.hyperledger.besu.util.uint.UInt256.ONE;
 import static org.hyperledger.besu.util.uint.UInt256.ZERO;
 
-import tech.pegasys.pantheon.ethereum.core.Account;
-import tech.pegasys.pantheon.ethereum.core.Gas;
-import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
+import org.hyperledger.besu.ethereum.core.Account;
+import org.hyperledger.besu.ethereum.core.Gas;
+import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.util.uint.UInt256;
 
 import org.junit.Before;

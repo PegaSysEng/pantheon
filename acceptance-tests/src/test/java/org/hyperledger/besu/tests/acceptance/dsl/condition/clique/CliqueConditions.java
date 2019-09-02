@@ -13,14 +13,14 @@
 package org.hyperledger.besu.tests.acceptance.dsl.condition.clique;
 
 import static java.util.Collections.emptyList;
-import static tech.pegasys.pantheon.ethereum.core.Hash.fromHexString;
+import static org.hyperledger.besu.ethereum.core.Hash.fromHexString;
 
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import org.hyperledger.besu.config.CliqueConfigOptions;
 import org.hyperledger.besu.config.GenesisConfigFile;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;

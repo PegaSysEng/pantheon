@@ -33,14 +33,14 @@ import static org.hyperledger.besu.ethereum.jsonrpc.JsonRpcResponseKey.TRANSACTI
 
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionResult;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.jsonrpc.BlockchainImporter;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcResponseKey;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcResponseUtils;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcTestMethodsFactory;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.testutil.BlockTestUtil;
 
 import java.util.EnumMap;

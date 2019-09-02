@@ -14,9 +14,9 @@ package org.hyperledger.besu.ethereum.jsonrpc.websocket;
 
 import static com.google.common.collect.Streams.stream;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationService;
-import tech.pegasys.pantheon.ethereum.jsonrpc.authentication.AuthenticationUtils;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationService;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationUtils;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;

@@ -16,7 +16,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.Cluster;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyPantheonNodeFactory;
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 
 import java.io.IOException;
 import java.nio.file.Path;

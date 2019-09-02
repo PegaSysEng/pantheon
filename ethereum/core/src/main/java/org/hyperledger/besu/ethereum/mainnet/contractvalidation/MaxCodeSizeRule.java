@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.mainnet.contractvalidation;
 
-import tech.pegasys.pantheon.ethereum.mainnet.ContractValidationRule;
-import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
+import org.hyperledger.besu.ethereum.mainnet.ContractValidationRule;
+import org.hyperledger.besu.ethereum.vm.MessageFrame;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

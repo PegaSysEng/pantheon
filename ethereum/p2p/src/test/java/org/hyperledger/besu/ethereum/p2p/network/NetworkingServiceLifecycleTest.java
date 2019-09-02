@@ -132,7 +132,7 @@ public class NetworkingServiceLifecycleTest {
           assertThat(e).hasCauseExactlyInstanceOf(PeerDiscoveryServiceException.class);
           assertThat(e)
               .hasMessageStartingWith(
-                  "tech.pegasys.pantheon.ethereum.p2p.discovery."
+                  "org.hyperledger.besu.ethereum.p2p.discovery."
                       + "PeerDiscoveryServiceException: Failed to bind Ethereum UDP discovery listener to 0.0.0.0:");
           assertThat(e).hasMessageContaining("Address already in use");
         } finally {

@@ -15,7 +15,7 @@ package org.hyperledger.besu.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import tech.pegasys.pantheon.plugin.PantheonPlugin;
+import org.hyperledger.besu.plugin.PantheonPlugin;
 import org.hyperledger.besu.plugins.TestPicoCLIPlugin;
 
 import java.io.File;

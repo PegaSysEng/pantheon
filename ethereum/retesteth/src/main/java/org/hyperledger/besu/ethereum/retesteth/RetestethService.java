@@ -27,7 +27,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.EthGetTransactionC
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.EthSendRawTransaction;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResultFactory;
 import org.hyperledger.besu.ethereum.retesteth.methods.TestGetLogHash;
 import org.hyperledger.besu.ethereum.retesteth.methods.TestImportRawBlock;

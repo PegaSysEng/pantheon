@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.BlockParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcRequestException;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcRequestException;
 
 import java.math.BigInteger;
 import java.util.Objects;

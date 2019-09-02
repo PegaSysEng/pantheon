@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import static tech.pegasys.pantheon.ethereum.mainnet.EthHash.EPOCH_LENGTH;
+import static org.hyperledger.besu.ethereum.mainnet.EthHash.EPOCH_LENGTH;
 
 import org.hyperledger.besu.crypto.Hash;
 import org.hyperledger.besu.crypto.MessageDigestFactory;

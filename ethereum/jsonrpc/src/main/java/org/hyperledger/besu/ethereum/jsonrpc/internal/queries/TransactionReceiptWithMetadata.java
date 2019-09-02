@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.queries;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 
 public class TransactionReceiptWithMetadata {
   private final TransactionReceipt receipt;

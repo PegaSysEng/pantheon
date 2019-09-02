@@ -14,7 +14,7 @@ package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy;
 
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationFactory;
 import tech.pegasys.orion.testutil.OrionTestHarness;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfigurationFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonFactoryConfigurationBuilder;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNode;

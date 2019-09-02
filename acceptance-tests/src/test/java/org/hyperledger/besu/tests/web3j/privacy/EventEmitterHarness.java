@@ -15,7 +15,7 @@ package org.hyperledger.besu.tests.web3j.privacy;
 import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 import static org.hyperledger.besu.tests.web3j.privacy.PrivacyGroup.generatePrivacyGroup;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.EeaCondition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.EeaConditions;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNet;
