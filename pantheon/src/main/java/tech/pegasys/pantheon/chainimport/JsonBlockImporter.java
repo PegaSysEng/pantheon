@@ -16,7 +16,7 @@ import tech.pegasys.pantheon.chainimport.internal.BlockData;
 import tech.pegasys.pantheon.chainimport.internal.ChainData;
 import org.hyperledger.besu.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;

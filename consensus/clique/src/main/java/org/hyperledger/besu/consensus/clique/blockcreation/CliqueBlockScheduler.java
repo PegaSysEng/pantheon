@@ -14,7 +14,7 @@ package org.hyperledger.besu.consensus.clique.blockcreation;
 
 import org.hyperledger.besu.consensus.common.ValidatorProvider;
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
-import tech.pegasys.pantheon.ethereum.blockcreation.DefaultBlockScheduler;
+import org.hyperledger.besu.ethereum.blockcreation.DefaultBlockScheduler;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 

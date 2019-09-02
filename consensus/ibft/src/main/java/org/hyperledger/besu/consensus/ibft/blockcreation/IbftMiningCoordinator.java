@@ -17,7 +17,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import org.hyperledger.besu.consensus.ibft.IbftEventQueue;
 import org.hyperledger.besu.consensus.ibft.IbftProcessor;
 import org.hyperledger.besu.consensus.ibft.ibftevent.NewChainHead;
-import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
+import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
 import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;

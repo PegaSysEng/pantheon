@@ -18,10 +18,10 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.consensus.ibft.IbftBlockInterface;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.BlockParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 
 import java.util.Collections;
 import java.util.List;

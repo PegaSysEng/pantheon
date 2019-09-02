@@ -13,7 +13,7 @@
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.priv;
 
 import org.hyperledger.besu.enclave.types.PrivacyGroup;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.parameters.CreatePrivacyGroupParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.parameters.CreatePrivacyGroupParameter;
 
 import java.util.Collections;
 import java.util.List;

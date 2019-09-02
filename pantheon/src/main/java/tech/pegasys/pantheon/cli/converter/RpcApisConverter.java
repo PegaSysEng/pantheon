@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.cli.converter;
 import tech.pegasys.pantheon.cli.converter.exception.RpcApisConversionException;
 import org.hyperledger.besu.consensus.clique.jsonrpc.CliqueRpcApis;
 import org.hyperledger.besu.consensus.ibft.jsonrpc.IbftRpcApis;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
 
 import java.util.Optional;
 import java.util.function.Function;

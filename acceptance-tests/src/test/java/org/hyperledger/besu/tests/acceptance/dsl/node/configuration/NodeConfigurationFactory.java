@@ -18,9 +18,9 @@ import static org.hyperledger.besu.consensus.clique.jsonrpc.CliqueRpcApis.CLIQUE
 import static org.hyperledger.besu.consensus.ibft.jsonrpc.IbftRpcApis.IBFT;
 
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 

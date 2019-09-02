@@ -13,8 +13,8 @@
 package tech.pegasys.pantheon;
 
 import tech.pegasys.pantheon.controller.PantheonController;
-import tech.pegasys.pantheon.ethereum.graphql.GraphQLHttpService;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
+import org.hyperledger.besu.ethereum.graphql.GraphQLHttpService;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketService;
 import org.hyperledger.besu.ethereum.p2p.network.NetworkRunner;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
