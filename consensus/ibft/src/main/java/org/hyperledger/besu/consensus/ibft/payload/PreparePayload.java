@@ -34,7 +34,7 @@ public class PreparePayload implements Payload {
   public static PreparePayload readFrom(final RLPInput rlpInput) {
     rlpInput.enterList();
     final ConsensusRoundIdentifier roundIdentifier = ConsensusRoundIdentifier.readFrom(rlpInput);
-    final Hash digest = readDigest(rlpInput);
+    final Hash digest = Payload.readDigest(rlpInput);
     rlpInput.leaveList();
     return new PreparePayload(roundIdentifier, digest);
   }

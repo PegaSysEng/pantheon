@@ -15,8 +15,6 @@ package org.hyperledger.besu.ethereum.mainnet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INTRINSIC_GAS_EXCEEDS_GAS_LIMIT;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW;
@@ -24,6 +22,10 @@ import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.Transac
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.UPFRONT_COST_EXCEEDS_BALANCE;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.core.Account;

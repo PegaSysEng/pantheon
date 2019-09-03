@@ -28,7 +28,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 public class AccountSmartContractPermissioningIsAllowedTransaction implements Transaction<Boolean> {
 
   private static final BytesValue IS_ACCOUNT_ALLOWED_SIGNATURE =
-      Hash.keccak256(
+          org.hyperledger.besu.crypto.Hash.keccak256(
               BytesValue.of("whitelistContains(address)".getBytes(UTF_8)))
           .slice(0, 4);
 

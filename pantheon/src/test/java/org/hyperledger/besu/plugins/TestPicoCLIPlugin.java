@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.plugins;
 
-import org.hyperledger.besu.plugin.PantheonContext;
-import org.hyperledger.besu.plugin.PantheonPlugin;
-import org.hyperledger.besu.plugin.services.PicoCLIOptions;
+import tech.pegasys.pantheon.plugin.PantheonContext;
+import tech.pegasys.pantheon.plugin.PantheonPlugin;
+import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 
 import java.io.File;
 import java.io.IOException;

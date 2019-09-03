@@ -31,6 +31,7 @@ import static org.hyperledger.besu.ethereum.jsonrpc.RpcApis.NET;
 import static org.hyperledger.besu.ethereum.jsonrpc.RpcApis.PERM;
 import static org.hyperledger.besu.ethereum.jsonrpc.RpcApis.WEB3;
 import static org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration.MAINNET_BOOTSTRAP_NODES;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.hyperledger.besu.PantheonInfo;
 import org.hyperledger.besu.cli.config.EthNetworkConfig;

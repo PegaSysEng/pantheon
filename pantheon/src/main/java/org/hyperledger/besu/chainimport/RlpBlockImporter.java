@@ -175,7 +175,7 @@ public class RlpBlockImporter {
       final BlockHeader header,
       final ProtocolSpec<C> protocolSpec) {
     try {
-      final tech.pegasys.pantheon.ethereum.core.BlockImporter<C> blockImporter =
+      final org.hyperledger.besu.ethereum.core.BlockImporter<C> blockImporter =
           protocolSpec.getBlockImporter();
       final boolean blockImported =
           blockImporter.importBlock(context, block, HeaderValidationMode.SKIP_DETACHED);

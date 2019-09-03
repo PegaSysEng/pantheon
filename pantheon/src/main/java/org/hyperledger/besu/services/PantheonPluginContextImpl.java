@@ -15,8 +15,8 @@ package org.hyperledger.besu.services;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.hyperledger.besu.plugin.PantheonContext;
-import org.hyperledger.besu.plugin.PantheonPlugin;
+import tech.pegasys.pantheon.plugin.PantheonContext;
+import tech.pegasys.pantheon.plugin.PantheonPlugin;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

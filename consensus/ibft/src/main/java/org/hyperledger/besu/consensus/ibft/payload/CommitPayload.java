@@ -40,7 +40,7 @@ public class CommitPayload implements Payload {
   public static CommitPayload readFrom(final RLPInput rlpInput) {
     rlpInput.enterList();
     final ConsensusRoundIdentifier roundIdentifier = ConsensusRoundIdentifier.readFrom(rlpInput);
-    final Hash digest = readDigest(rlpInput);
+    final Hash digest = Payload.readDigest(rlpInput);
     final Signature commitSeal = rlpInput.readBytesValue(Signature::decode);
     rlpInput.leaveList();
 

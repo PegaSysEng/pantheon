@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.services;
 
-import org.hyperledger.besu.plugin.services.PicoCLIOptions;
+import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 
 import picocli.CommandLine;
 

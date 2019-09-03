@@ -17,8 +17,13 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hyperledger.besu.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static org.hyperledger.besu.metrics.PantheonMetricCategory.NETWORK;
+import static org.hyperledger.besu.metrics.PantheonMetricCategory.PEERS;
+import static org.hyperledger.besu.metrics.PantheonMetricCategory.RPC;
+import static org.hyperledger.besu.metrics.StandardMetricCategory.JVM;
 
-import org.hyperledger.besu.metrics.*;
+import org.hyperledger.besu.metrics.OperationTimer.TimingContext;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
@@ -165,10 +170,10 @@ public class PrometheusMetricsSystemTest {
 
   @Test
   public void shouldCreateObservationFromGauge() {
-    metricsSystem.createGauge(StandardMetricCategory.JVM, "myValue", "Help", () -> 7d);
+    metricsSystem.createGauge(JVM, "myValue", "Help", () -> 7d);
 
     assertThat(metricsSystem.streamObservations())
-        .containsExactlyInAnyOrder(new Observation(StandardMetricCategory.JVM, "myValue", 7d, emptyList()));
+        .containsExactlyInAnyOrder(new Observation(JVM, "myValue", 7d, emptyList()));
   }
 
   @Test
@@ -176,8 +181,8 @@ public class PrometheusMetricsSystemTest {
     // Gauges have a reference to the source of their data so creating it twice will still only
     // pull data from the first instance, possibly leaking memory and likely returning the wrong
     // results.
-    metricsSystem.createGauge(StandardMetricCategory.JVM, "myValue", "Help", () -> 7d);
-    assertThatThrownBy(() -> metricsSystem.createGauge(StandardMetricCategory.JVM, "myValue", "Help", () -> 7d))
+    metricsSystem.createGauge(JVM, "myValue", "Help", () -> 7d);
+    assertThatThrownBy(() -> metricsSystem.createGauge(JVM, "myValue", "Help", () -> 7d))
         .isInstanceOf(IllegalArgumentException.class);
   }
 
