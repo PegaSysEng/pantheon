@@ -70,6 +70,7 @@ public class RocksDBPlugin implements PantheonPlugin {
   @Override
   public void start() {
     LOG.info("Starting plugin.");
+    //TODO should this be called twice
     LOG.debug("Applied configuration: {}", options.toString());
     context
         .getService(StorageService.class)
