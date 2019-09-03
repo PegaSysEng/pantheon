@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.junit.Test;
 
 // These tests prove the ibft_proposeValidatorVote and ibft_getValidatorsByBlockNumber (implicitly)
@@ -26,14 +26,11 @@ public class Ibft2ProposeRpcAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void validatorsCanBeAddedAndThenRemoved() throws IOException {
     final String[] validators = {"validator1", "validator2", "validator3"};
-    final PantheonNode validator1 =
-        pantheon.createIbft2NodeWithValidators("validator1", validators);
-    final PantheonNode validator2 =
-        pantheon.createIbft2NodeWithValidators("validator2", validators);
-    final PantheonNode validator3 =
-        pantheon.createIbft2NodeWithValidators("validator3", validators);
-    final PantheonNode nonValidatorNode =
-        pantheon.createIbft2NodeWithValidators("non-validator", validators);
+    final BesuNode validator1 = besu.createIbft2NodeWithValidators("validator1", validators);
+    final BesuNode validator2 = besu.createIbft2NodeWithValidators("validator2", validators);
+    final BesuNode validator3 = besu.createIbft2NodeWithValidators("validator3", validators);
+    final BesuNode nonValidatorNode =
+        besu.createIbft2NodeWithValidators("non-validator", validators);
     cluster.start(validator1, validator2, validator3, nonValidatorNode);
 
     cluster.verify(ibftTwo.validatorsEqual(validator1, validator2, validator3));

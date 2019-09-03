@@ -19,9 +19,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.metrics.RunnableCounter;
 import org.hyperledger.besu.services.tasks.Task;
 
@@ -44,14 +44,14 @@ public class CompleteTaskStep {
     completedRequestsCounter =
         new RunnableCounter(
             metricsSystem.createCounter(
-                PantheonMetricCategory.SYNCHRONIZER,
+                BesuMetricCategory.SYNCHRONIZER,
                 "world_state_completed_requests_total",
                 "Total number of node data requests completed as part of fast sync world state download"),
             this::displayWorldStateSyncProgress,
             DISPLAY_PROGRESS_STEP);
     retriedRequestsCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.SYNCHRONIZER,
+            BesuMetricCategory.SYNCHRONIZER,
             "world_state_retried_requests_total",
             "Total number of node data requests repeated as part of fast sync world state download");
   }

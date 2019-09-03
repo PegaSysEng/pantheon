@@ -68,7 +68,7 @@ public class GenesisConfigFile {
         // if we get here comments is what broke things, warn and move on.
         LOG.warn(
             "The provided genesis file contains comments. "
-                + "In a future release of Pantheon this will not be supported.");
+                + "In a future release of Besu this will not be supported.");
         return fromConfig(rootNode);
       } else {
         throw re;

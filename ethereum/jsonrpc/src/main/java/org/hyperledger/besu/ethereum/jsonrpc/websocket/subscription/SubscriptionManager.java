@@ -29,10 +29,10 @@ import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.Subs
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.response.SubscriptionResponse;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 /**
  * The SubscriptionManager is responsible for managing subscriptions and sending messages to the
@@ -54,13 +54,13 @@ public class SubscriptionManager extends AbstractVerticle {
   public SubscriptionManager(final MetricsSystem metricsSystem) {
     subscribeCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.RPC,
+            BesuMetricCategory.RPC,
             "subscription_subscribe_total",
             "Total number of subscriptions",
             "type");
     unsubscribeCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.RPC,
+            BesuMetricCategory.RPC,
             "subscription_unsubscribe_total",
             "Total number of unsubscriptions",
             "type");

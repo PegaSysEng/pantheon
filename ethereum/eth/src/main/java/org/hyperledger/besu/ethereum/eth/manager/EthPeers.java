@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.util.Subscribers;
 
 public class EthPeers {
@@ -51,7 +51,7 @@ public class EthPeers {
     this.protocolName = protocolName;
     this.clock = clock;
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.PEERS,
+        BesuMetricCategory.PEERS,
         "pending_peer_requests_current",
         "Number of peer requests currently pending because peers are busy",
         pendingRequests::size);

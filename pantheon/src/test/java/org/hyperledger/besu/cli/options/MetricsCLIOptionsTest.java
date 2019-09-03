@@ -34,7 +34,7 @@ public class MetricsCLIOptionsTest
   }
 
   @Override
-  MetricsCLIOptions getOptionsFromPantheonCommand(final TestBesuCommand pantheonCommand) {
-    return pantheonCommand.getMetricsCLIOptions();
+  MetricsCLIOptions getOptionsFromBesuCommand(final TestBesuCommand besuCommand) {
+    return besuCommand.getMetricsCLIOptions();
   }
 }

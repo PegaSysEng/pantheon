@@ -265,7 +265,7 @@ public class TestContextBuilder {
         IbftProtocolSchedule.create(genesisConfigOptions);
 
     /////////////////////////////////////////////////////////////////////////////////////
-    // From here down is BASICALLY taken from IbftPantheonController
+    // From here down is BASICALLY taken from IbftBesuController
     final EpochManager epochManager = new EpochManager(EPOCH_LENGTH);
 
     final BlockInterface blockInterface = new IbftBlockInterface();
@@ -290,7 +290,7 @@ public class TestContextBuilder {
     final IbftBlockCreatorFactory blockCreatorFactory =
         new IbftBlockCreatorFactory(
             (gasLimit) -> gasLimit,
-            pendingTransactions, // changed from IbftPantheonController
+            pendingTransactions, // changed from IbftBesuController
             protocolContext,
             protocolSchedule,
             miningParams,
@@ -348,7 +348,7 @@ public class TestContextBuilder {
             synchronizerUpdater);
 
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
-    //////////////////////////// END IBFT PantheonController ////////////////////////////
+    //////////////////////////// END IBFTBesuController ////////////////////////////
 
     return new ControllerAndState(ibftController, finalState, eventMultiplexer);
   }

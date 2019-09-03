@@ -71,7 +71,7 @@ import org.hyperledger.besu.ethereum.p2p.config.SubProtocolConfiguration;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.util.Subscribers;
 
-public class IbftPantheonControllerBuilder extends PantheonControllerBuilder<IbftContext> {
+public class IbftBesuControllerBuilder extends BesuControllerBuilder<IbftContext> {
   private static final Logger LOG = LogManager.getLogger();
   private IbftEventQueue ibftEventQueue;
   private IbftConfigOptions ibftConfig;

@@ -47,7 +47,7 @@ import org.jupnp.transport.spi.SOAPActionProcessor;
 import org.jupnp.transport.spi.StreamClient;
 import org.jupnp.transport.spi.StreamServer;
 
-class PantheonUpnpServiceConfiguration implements UpnpServiceConfiguration {
+class BesuUpnpServiceConfiguration implements UpnpServiceConfiguration {
 
   private final ThreadPoolExecutor executorService;
   private final DeviceDescriptorBinder deviceDescriptorBinderUDA10;
@@ -56,13 +56,13 @@ class PantheonUpnpServiceConfiguration implements UpnpServiceConfiguration {
   private final int multicastResponsePort;
   private final Namespace namespace;
 
-  PantheonUpnpServiceConfiguration() {
+  BesuUpnpServiceConfiguration() {
     this(
         NetworkAddressFactoryImpl.DEFAULT_TCP_HTTP_LISTEN_PORT,
         NetworkAddressFactoryImpl.DEFAULT_MULTICAST_RESPONSE_LISTEN_PORT);
   }
 
-  private PantheonUpnpServiceConfiguration(
+  private BesuUpnpServiceConfiguration(
       final int streamListenPort, final int multicastResponsePort) {
     executorService =
         new ThreadPoolExecutor(

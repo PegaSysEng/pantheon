@@ -34,8 +34,8 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.util.InvalidConfigurationException;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.bytes.BytesValues;
@@ -71,12 +71,12 @@ public class DefaultBlockchain implements MutableBlockchain {
     chainHeadOmmerCount = chainHeadBody.getOmmers().size();
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.ETHEREUM,
+        BesuMetricCategory.ETHEREUM,
         "blockchain_height",
         "The current height of the canonical chain",
         this::getChainHeadBlockNumber);
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.BLOCKCHAIN,
+        BesuMetricCategory.BLOCKCHAIN,
         "difficulty_total",
         "Total difficulty of the chainhead",
         () ->
@@ -84,31 +84,31 @@ public class DefaultBlockchain implements MutableBlockchain {
                 .longValue());
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.BLOCKCHAIN,
+        BesuMetricCategory.BLOCKCHAIN,
         "chain_head_timestamp",
         "Timestamp from the current chain head",
         () -> getChainHeadHeader().getTimestamp());
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.BLOCKCHAIN,
+        BesuMetricCategory.BLOCKCHAIN,
         "chain_head_gas_used",
         "Gas used by the current chain head block",
         () -> getChainHeadHeader().getGasUsed());
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.BLOCKCHAIN,
+        BesuMetricCategory.BLOCKCHAIN,
         "chain_head_gas_limit",
         "Block gas limit of the current chain head block",
         () -> getChainHeadHeader().getGasLimit());
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.BLOCKCHAIN,
+        BesuMetricCategory.BLOCKCHAIN,
         "chain_head_transaction_count",
         "Number of transactions in the current chain head block",
         () -> chainHeadTransactionCount);
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.BLOCKCHAIN,
+        BesuMetricCategory.BLOCKCHAIN,
         "chain_head_ommer_count",
         "Number of ommers in the current chain head block",
         () -> chainHeadOmmerCount);

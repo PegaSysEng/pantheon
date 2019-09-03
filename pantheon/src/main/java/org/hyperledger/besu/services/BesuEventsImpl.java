@@ -19,11 +19,11 @@ import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.eth.sync.BlockBroadcaster;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 
-public class PantheonEventsImpl implements PantheonEvents {
+public class BesuEventsImpl implements PantheonEvents {
   private final BlockBroadcaster blockBroadcaster;
   private final TransactionPool transactionPool;
 
-  public PantheonEventsImpl(
+  public BesuEventsImpl(
       final BlockBroadcaster blockBroadcaster, final TransactionPool transactionPool) {
     this.blockBroadcaster = blockBroadcaster;
     this.transactionPool = transactionPool;

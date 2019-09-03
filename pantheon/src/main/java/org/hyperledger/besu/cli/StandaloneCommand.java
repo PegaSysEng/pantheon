@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.cli;
 
-import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultPantheonDataPath;
+import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultBesuDataPath;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -34,7 +34,7 @@ class StandaloneCommand implements DefaultCommandValues {
       names = {"--data-path"},
       paramLabel = MANDATORY_PATH_FORMAT_HELP,
       description = "The path to Besu data directory (default: ${DEFAULT-VALUE})")
-  final Path dataPath = getDefaultPantheonDataPath(this);
+  final Path dataPath = getDefaultBesuDataPath(this);
 
   // Genesis file path with null default option if the option
   // is not defined on command line as this default is handled by Runner

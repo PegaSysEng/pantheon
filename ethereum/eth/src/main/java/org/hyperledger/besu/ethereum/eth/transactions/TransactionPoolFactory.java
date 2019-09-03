@@ -20,8 +20,8 @@ import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.messages.EthPV62;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 public class TransactionPoolFactory {
 
@@ -65,7 +65,7 @@ public class TransactionPoolFactory {
                 transactionTracker,
                 transactionPool,
                 metricsSystem.createCounter(
-                    PantheonMetricCategory.TRANSACTION_POOL,
+                    BesuMetricCategory.TRANSACTION_POOL,
                     "transactions_messages_skipped_total",
                     "Total number of transactions messages skipped by the processor.")),
             transactionPoolConfiguration.getTxMessageKeepAliveSeconds());

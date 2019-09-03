@@ -29,7 +29,7 @@ import picocli.CommandLine.Model.CommandSpec;
 public class RLPSubCommandTest extends CommandTestAbstract {
 
   private static final String EXPECTED_RLP_USAGE =
-      "Usage: pantheon rlp [-hV] [COMMAND]"
+      "Usage: besu rlp [-hV] [COMMAND]"
           + System.lineSeparator()
           + "This command provides RLP data related actions."
           + System.lineSeparator()
@@ -42,7 +42,7 @@ public class RLPSubCommandTest extends CommandTestAbstract {
           + "  encode  This command encodes a JSON typed data into an RLP hex string.";
 
   private static final String EXPECTED_RLP_ENCODE_USAGE =
-      "Usage: pantheon rlp encode [-hV] [--from=<FILE>] [--to=<FILE>] [--type=<type>]"
+      "Usage: besu rlp encode [-hV] [--from=<FILE>] [--to=<FILE>] [--type=<type>]"
           + System.lineSeparator()
           + "This command encodes a JSON typed data into an RLP hex string."
           + System.lineSeparator()

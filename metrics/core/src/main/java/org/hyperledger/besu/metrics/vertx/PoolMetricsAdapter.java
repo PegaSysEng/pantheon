@@ -13,9 +13,9 @@
 package org.hyperledger.besu.metrics.vertx;
 
 import io.vertx.core.spi.metrics.PoolMetrics;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 final class PoolMetricsAdapter implements PoolMetrics<Object> {
 
@@ -28,7 +28,7 @@ final class PoolMetricsAdapter implements PoolMetrics<Object> {
     submittedCounter =
         metricsSystem
             .createLabelledCounter(
-                PantheonMetricCategory.NETWORK,
+                BesuMetricCategory.NETWORK,
                 "vertx_worker_pool_submitted_total",
                 "Total number of tasks submitted to the Vertx worker pool",
                 "poolType",
@@ -38,7 +38,7 @@ final class PoolMetricsAdapter implements PoolMetrics<Object> {
     completedCounter =
         metricsSystem
             .createLabelledCounter(
-                PantheonMetricCategory.NETWORK,
+                BesuMetricCategory.NETWORK,
                 "vertx_worker_pool_completed_total",
                 "Total number of tasks completed by the Vertx worker pool",
                 "poolType",
@@ -48,7 +48,7 @@ final class PoolMetricsAdapter implements PoolMetrics<Object> {
     rejectedCounter =
         metricsSystem
             .createLabelledCounter(
-                PantheonMetricCategory.NETWORK,
+                BesuMetricCategory.NETWORK,
                 "vertx_worker_pool_rejected_total",
                 "Total number of tasks rejected by the Vertx worker pool",
                 "poolType",

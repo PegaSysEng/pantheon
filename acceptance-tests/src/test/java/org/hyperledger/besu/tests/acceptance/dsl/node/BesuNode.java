@@ -71,7 +71,7 @@ import org.web3j.protocol.websocket.WebSocketListener;
 import org.web3j.protocol.websocket.WebSocketService;
 import org.web3j.utils.Async;
 
-public class PantheonNode implements NodeConfiguration, RunnableNode, AutoCloseable {
+public class BesuNode implements NodeConfiguration, RunnableNode, AutoCloseable {
 
   private static final String LOCALHOST = "127.0.0.1";
   private static final Logger LOG = getLogger();
@@ -104,7 +104,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   private final List<String> extraCLIOptions;
   private final List<String> staticNodes;
 
-  public PantheonNode(
+  public BesuNode(
       final String name,
       final MiningParameters miningParameters,
       final PrivacyParameters privacyParameters,
@@ -155,14 +155,14 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
             homeDirectory.resolve("plugins").toFile().mkdirs();
             copyResource(
                 pluginName + ".jar", homeDirectory.resolve("plugins/" + pluginName + ".jar"));
-            PantheonNode.this.plugins.add(pluginName);
+            BesuNode.this.plugins.add(pluginName);
           } catch (final IOException e) {
             LOG.error("Could not find plugin \"{}\" in resources", pluginName);
           }
         });
     this.extraCLIOptions = extraCLIOptions;
     this.staticNodes = staticNodes;
-    LOG.info("Created PantheonNode {}", this.toString());
+    LOG.info("Created BesuNode {}", this.toString());
   }
 
   @Override
@@ -398,7 +398,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   @Override
-  public void start(final PantheonNodeRunner runner) {
+  public void start(final BesuNodeRunner runner) {
     runner.startNode(this);
     loadPortsFile();
   }
@@ -417,7 +417,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
 
   private void loadPortsFile() {
     try (final FileInputStream fis =
-        new FileInputStream(new File(homeDirectory.toFile(), "pantheon.ports"))) {
+        new FileInputStream(new File(homeDirectory.toFile(), "besu.ports"))) {
       portsProperties.load(fis);
       LOG.info("Ports for node {}: {}", name, portsProperties);
     } catch (final IOException e) {

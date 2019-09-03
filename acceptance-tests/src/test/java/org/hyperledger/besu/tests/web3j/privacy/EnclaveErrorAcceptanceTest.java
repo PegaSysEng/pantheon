@@ -40,7 +40,7 @@ public class EnclaveErrorAcceptanceTest extends PrivacyAcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     privacyNet =
-        PrivacyNet.builder(privacy, privacyPantheon, cluster, false).addMinerNode("Alice").build();
+        PrivacyNet.builder(privacy, privacyBesu, cluster, false).addMinerNode("Alice").build();
     privacyNet.startPrivacyNet();
     privacyGroup = PrivacyGroup.generatePrivacyGroup(privacyNet, "Alice");
     eventEmitterHarness =

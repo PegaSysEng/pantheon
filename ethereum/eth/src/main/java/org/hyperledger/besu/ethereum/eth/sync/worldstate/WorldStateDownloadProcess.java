@@ -22,10 +22,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.services.pipeline.Pipe;
 import org.hyperledger.besu.services.pipeline.Pipeline;
 import org.hyperledger.besu.services.pipeline.PipelineBuilder;
@@ -195,7 +195,7 @@ public class WorldStateDownloadProcess {
       final int bufferCapacity = hashCountPerRequest * 2;
       final LabelledMetric<Counter> outputCounter =
           metricsSystem.createLabelledCounter(
-              PantheonMetricCategory.SYNCHRONIZER,
+              BesuMetricCategory.SYNCHRONIZER,
               "world_state_pipeline_processed_total",
               "Number of entries processed by each world state download pipeline stage",
               "step",

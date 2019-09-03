@@ -20,8 +20,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.MetricCategory;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 public class MetricsConfiguration {
   private static final String DEFAULT_METRICS_HOST = "127.0.0.1";
@@ -172,12 +172,12 @@ public class MetricsConfiguration {
     private boolean enabled = false;
     private int port = DEFAULT_METRICS_PORT;
     private String host = DEFAULT_METRICS_HOST;
-    private Set<MetricCategory> metricCategories = PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
+    private Set<MetricCategory> metricCategories = BesuMetricCategory.DEFAULT_METRIC_CATEGORIES;
     private boolean pushEnabled = false;
     private int pushPort = DEFAULT_METRICS_PUSH_PORT;
     private String pushHost = DEFAULT_METRICS_PUSH_HOST;
     private int pushInterval = 15;
-    private String prometheusJob = "pantheon-client";
+    private String prometheusJob = "besu-client";
     private List<String> hostsWhitelist = Arrays.asList("localhost", "127.0.0.1");
     private boolean timersEnabled = DEFAULT_TIMERS_ENABLED;
 

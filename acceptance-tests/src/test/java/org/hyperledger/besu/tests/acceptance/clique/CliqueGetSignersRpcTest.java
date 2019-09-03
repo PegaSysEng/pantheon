@@ -13,7 +13,7 @@
 package org.hyperledger.besu.tests.acceptance.clique;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -21,14 +21,14 @@ import org.junit.Test;
 
 @Ignore
 public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
-  private PantheonNode minerNode1;
-  private PantheonNode minerNode2;
+  private BesuNode minerNode1;
+  private BesuNode minerNode2;
 
   @Before
   public void setUp() throws Exception {
     final String[] validators = {"miner1"};
-    minerNode1 = pantheon.createCliqueNodeWithValidators("miner1", validators);
-    minerNode2 = pantheon.createCliqueNodeWithValidators("miner2", validators);
+    minerNode1 = besu.createCliqueNodeWithValidators("miner1", validators);
+    minerNode2 = besu.createCliqueNodeWithValidators("miner2", validators);
     cluster.start(minerNode1, minerNode2);
   }
 

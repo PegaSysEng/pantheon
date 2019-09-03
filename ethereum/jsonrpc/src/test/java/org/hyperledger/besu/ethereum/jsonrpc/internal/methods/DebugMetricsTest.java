@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.PEERS;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.RPC;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.PEERS;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.RPC;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 

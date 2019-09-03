@@ -25,7 +25,7 @@ import picocli.CommandLine.Model.CommandSpec;
 public class PublicKeySubCommandTest extends CommandTestAbstract {
 
   private static final String EXPECTED_PUBLIC_KEY_USAGE =
-      "Usage: pantheon public-key [-hV] [COMMAND]"
+      "Usage: besu public-key [-hV] [COMMAND]"
           + System.lineSeparator()
           + "This command provides node public key related actions."
           + System.lineSeparator()
@@ -45,7 +45,7 @@ public class PublicKeySubCommandTest extends CommandTestAbstract {
           + System.lineSeparator();
 
   private static final String EXPECTED_PUBLIC_KEY_EXPORT_USAGE =
-      "Usage: pantheon public-key export [-hV] [--to=<FILE>]"
+      "Usage: besu public-key export [-hV] [--to=<FILE>]"
           + System.lineSeparator()
           + "This command outputs the node public key. Default output is standard output."
           + System.lineSeparator()
@@ -57,7 +57,7 @@ public class PublicKeySubCommandTest extends CommandTestAbstract {
           + System.lineSeparator();
 
   private static final String EXPECTED_PUBLIC_KEY_EXPORT_ADDRESS_USAGE =
-      "Usage: pantheon public-key export-address [-hV] [--to=<FILE>]"
+      "Usage: besu public-key export-address [-hV] [--to=<FILE>]"
           + System.lineSeparator()
           + "This command outputs the node's public key address. Default output is standard"
           + System.lineSeparator()

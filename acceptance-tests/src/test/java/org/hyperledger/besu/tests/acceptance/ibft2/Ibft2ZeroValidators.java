@@ -15,7 +15,7 @@ package org.hyperledger.besu.tests.acceptance.ibft2;
 import java.io.IOException;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.junit.Test;
 
 public class Ibft2ZeroValidators extends AcceptanceTestBase {
@@ -23,8 +23,8 @@ public class Ibft2ZeroValidators extends AcceptanceTestBase {
   @Test
   public void zeroValidatorsFormValidCluster() throws IOException {
     final String[] validators = {};
-    final PantheonNode node1 = pantheon.createIbft2NodeWithValidators("node1", validators);
-    final PantheonNode node2 = pantheon.createIbft2NodeWithValidators("node2", validators);
+    final BesuNode node1 = besu.createIbft2NodeWithValidators("node1", validators);
+    final BesuNode node2 = besu.createIbft2NodeWithValidators("node2", validators);
 
     cluster.start(node1, node2);
 

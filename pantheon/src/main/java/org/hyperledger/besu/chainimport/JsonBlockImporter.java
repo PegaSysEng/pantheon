@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.chainimport.internal.BlockData;
 import org.hyperledger.besu.chainimport.internal.ChainData;
 import org.hyperledger.besu.config.GenesisConfigOptions;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Block;
@@ -49,9 +49,9 @@ public class JsonBlockImporter<C> {
   private static final Logger LOG = LogManager.getLogger();
 
   private final ObjectMapper mapper;
-  private final PantheonController<C> controller;
+  private final BesuController<C> controller;
 
-  public JsonBlockImporter(final PantheonController<C> controller) {
+  public JsonBlockImporter(final BesuController<C> controller) {
     this.controller = controller;
     mapper = new ObjectMapper();
     // Jdk8Module allows us to easily parse {@code Optional} values from json

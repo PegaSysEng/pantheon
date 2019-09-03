@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.eea;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 
 public interface EeaCondition {
-  void verify(PantheonNode node, String transactionHash);
+  void verify(BesuNode node, String transactionHash);
 }

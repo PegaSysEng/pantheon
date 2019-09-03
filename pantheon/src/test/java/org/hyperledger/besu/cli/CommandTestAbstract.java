@@ -48,8 +48,8 @@ import org.hyperledger.besu.cli.options.TransactionPoolOptions;
 import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.KeyLoader;
 import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.JsonBlockImporterFactory;
 import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.RlpBlockExporterFactory;
-import org.hyperledger.besu.controller.PantheonController;
-import org.hyperledger.besu.controller.PantheonControllerBuilder;
+import org.hyperledger.besu.controller.BesuController;
+import org.hyperledger.besu.controller.BesuControllerBuilder;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
@@ -62,7 +62,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-import org.hyperledger.besu.services.PantheonPluginContextImpl;
+import org.hyperledger.besu.services.BesuPluginContextImpl;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.After;
 import org.junit.Before;
@@ -93,20 +93,20 @@ public abstract class CommandTestAbstract {
   @Mock protected RunnerBuilder mockRunnerBuilder;
   @Mock protected Runner mockRunner;
 
-  @Mock protected PantheonController.Builder mockControllerBuilderFactory;
+  @Mock protected BesuController.Builder mockControllerBuilderFactory;
 
-  @Mock protected PantheonControllerBuilder<Void> mockControllerBuilder;
+  @Mock protected BesuControllerBuilder<Void> mockControllerBuilder;
   @Mock protected EthProtocolManager mockEthProtocolManager;
   @Mock protected ProtocolSchedule<Object> mockProtocolSchedule;
   @Mock protected ProtocolContext<Object> mockProtocolContext;
   @Mock protected BlockBroadcaster mockBlockBroadcaster;
-  @Mock protected PantheonController<Object> mockController;
+  @Mock protected BesuController<Object> mockController;
   @Mock protected RlpBlockExporter rlpBlockExporter;
   @Mock protected JsonBlockImporter<?> jsonBlockImporter;
   @Mock protected RlpBlockImporter rlpBlockImporter;
 
   @Mock protected Logger mockLogger;
-  @Mock protected PantheonPluginContextImpl mockPantheonPluginContext;
+  @Mock protected BesuPluginContextImpl mockPantheonPluginContext;
 
   @Captor protected ArgumentCaptor<Collection<BytesValue>> bytesValueCollectionCollector;
   @Captor protected ArgumentCaptor<Path> pathArgumentCaptor;
@@ -131,13 +131,13 @@ public abstract class CommandTestAbstract {
   @Before
   @After
   public void resetSystemProps() {
-    System.setProperty("pantheon.docker", "false");
+    System.setProperty("besu.docker", "false");
   }
 
   @Before
   public void initMocks() throws Exception {
 
-    // doReturn used because of generic PantheonController
+    // doReturn used because of generic BesuController
     doReturn(mockControllerBuilder).when(mockControllerBuilderFactory).fromEthNetworkConfig(any());
     when(mockControllerBuilder.synchronizerConfiguration(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.ethProtocolConfiguration(any())).thenReturn(mockControllerBuilder);
@@ -154,7 +154,7 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.isPruningEnabled(anyBoolean())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.pruningConfiguration(any())).thenReturn(mockControllerBuilder);
 
-    // doReturn used because of generic PantheonController
+    // doReturn used because of generic BesuController
     doReturn(mockController).when(mockControllerBuilder).build();
     lenient().when(mockController.getProtocolManager()).thenReturn(mockEthProtocolManager);
     lenient().when(mockController.getProtocolSchedule()).thenReturn(mockProtocolSchedule);
@@ -163,7 +163,7 @@ public abstract class CommandTestAbstract {
     when(mockEthProtocolManager.getBlockBroadcaster()).thenReturn(mockBlockBroadcaster);
 
     when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
+    when(mockRunnerBuilder.besuController(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.discovery(anyBoolean())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.ethNetworkConfig(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.networkingConfiguration(any())).thenReturn(mockRunnerBuilder);
@@ -217,8 +217,7 @@ public abstract class CommandTestAbstract {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> JsonBlockImporter<T> jsonBlockImporterFactory(
-      final PantheonController<T> controller) {
+  private <T> JsonBlockImporter<T> jsonBlockImporterFactory(final BesuController<T> controller) {
     return (JsonBlockImporter<T>) jsonBlockImporter;
   }
 
@@ -264,9 +263,9 @@ public abstract class CommandTestAbstract {
         final JsonBlockImporterFactory jsonBlockImporterFactory,
         final RlpBlockExporterFactory rlpBlockExporterFactory,
         final RunnerBuilder mockRunnerBuilder,
-        final PantheonController.Builder controllerBuilderFactory,
+        final BesuController.Builder controllerBuilderFactory,
         final KeyLoader keyLoader,
-        final PantheonPluginContextImpl pantheonPluginContext,
+        final BesuPluginContextImpl pantheonPluginContext,
         final Map<String, String> environment) {
       super(
           mockLogger,

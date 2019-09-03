@@ -52,7 +52,7 @@ public class TestPicoCLIPlugin implements PantheonPlugin {
             picoCLIOptions ->
                 picoCLIOptions.addPicoCLIOptions("Test PicoCLI Plugin", TestPicoCLIPlugin.this));
 
-    callbackDir = new File(System.getProperty("pantheon.plugins.dir", "plugins"));
+    callbackDir = new File(System.getProperty("besu.plugins.dir", "plugins"));
     writeSignal("registered");
     state = "registered";
   }

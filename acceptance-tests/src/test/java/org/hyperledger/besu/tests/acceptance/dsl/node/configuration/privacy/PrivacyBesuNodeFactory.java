@@ -17,17 +17,17 @@ import tech.pegasys.orion.testutil.OrionTestHarness;
 import java.io.IOException;
 
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuFactoryConfigurationBuilder;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfigurationFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonFactoryConfigurationBuilder;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNode;
 
-public class PrivacyPantheonNodeFactory {
+public class PrivacyBesuNodeFactory {
 
   private final GenesisConfigurationFactory genesis = new GenesisConfigurationFactory();
   private final NodeConfigurationFactory node = new NodeConfigurationFactory();
 
-  private static PrivacyNode create(final PrivacyPantheonFactoryConfiguration config)
+  private static PrivacyNode create(final PrivacyBesuFactoryConfiguration config)
       throws IOException {
     return new PrivacyNode(
         config.getName(),
@@ -57,9 +57,9 @@ public class PrivacyPantheonNodeFactory {
       final OrionTestHarness orionTestHarness)
       throws IOException {
     return create(
-        new PrivacyPantheonFactoryConfigurationBuilder()
+        new PrivacyBesuFactoryConfigurationBuilder()
             .setConfig(
-                new PantheonFactoryConfigurationBuilder()
+                new BesuFactoryConfigurationBuilder()
                     .name(name)
                     .miningEnabled()
                     .jsonRpcEnabled()
@@ -78,9 +78,9 @@ public class PrivacyPantheonNodeFactory {
       final OrionTestHarness orionTestHarness)
       throws IOException {
     return create(
-        new PrivacyPantheonFactoryConfigurationBuilder()
+        new PrivacyBesuFactoryConfigurationBuilder()
             .setConfig(
-                new PantheonFactoryConfigurationBuilder()
+                new BesuFactoryConfigurationBuilder()
                     .name(name)
                     .jsonRpcEnabled()
                     .keyFilePath(keyFilePath)
@@ -98,9 +98,9 @@ public class PrivacyPantheonNodeFactory {
       final OrionTestHarness orionTestHarness)
       throws IOException {
     return create(
-        new PrivacyPantheonFactoryConfigurationBuilder()
+        new PrivacyBesuFactoryConfigurationBuilder()
             .setConfig(
-                new PantheonFactoryConfigurationBuilder()
+                new BesuFactoryConfigurationBuilder()
                     .name(name)
                     .miningEnabled()
                     .jsonRpcConfiguration(node.createJsonRpcWithIbft2EnabledConfig())

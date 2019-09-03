@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigInteger;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 import org.hyperledger.besu.util.bytes.BytesValue;
@@ -33,7 +33,7 @@ public class ExpectValidPrivateContractValuesReturned extends GetValidPrivateTra
   }
 
   @Override
-  public void verify(final PantheonNode node, final String transactionHash) {
+  public void verify(final BesuNode node, final String transactionHash) {
     final EeaRequestFactory.PrivateTransactionReceipt privateTxReceipt =
         getPrivateTransactionReceipt(node, transactionHash);
 

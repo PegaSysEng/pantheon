@@ -24,9 +24,9 @@ import org.hyperledger.besu.ethereum.core.SyncStatus;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningProvider;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 public class SyncStatusNodePermissioningProvider implements NodePermissioningProvider {
 
@@ -50,23 +50,23 @@ public class SyncStatusNodePermissioningProvider implements NodePermissioningPro
         fixedNodes.stream().map(EnodeURL::toURIWithoutDiscoveryPort).collect(Collectors.toSet());
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.PERMISSIONING,
+        BesuMetricCategory.PERMISSIONING,
         "sync_status_node_sync_reached",
         "Whether the sync status permissioning provider has realised sync yet",
         () -> hasReachedSync ? 1 : 0);
     this.checkCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "sync_status_node_check_count",
             "Number of times the sync status permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "sync_status_node_check_count_permitted",
             "Number of times the sync status permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "sync_status_node_check_count_unpermitted",
             "Number of times the sync status permissioning provider has been checked and returned unpermitted");
   }

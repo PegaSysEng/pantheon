@@ -19,7 +19,7 @@ import java.math.BigInteger;
 import java.nio.file.Path;
 
 import org.hyperledger.besu.config.GenesisConfigFile;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -51,8 +51,8 @@ public class PrivacyTest {
             .setDataDir(dataDir)
             .build();
 
-    final PantheonController<?> pantheonController =
-        new PantheonController.Builder()
+    final BesuController<?> besuController =
+        new BesuController.Builder()
             .fromGenesisConfig(GenesisConfigFile.mainnet())
             .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
             .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
@@ -69,7 +69,7 @@ public class PrivacyTest {
 
     final Address privacyContractAddress = Address.privacyPrecompiled(ADDRESS);
     final PrecompiledContract precompiledContract =
-        pantheonController
+        besuController
             .getProtocolSchedule()
             .getByBlockNumber(1)
             .getPrecompileContractRegistry()

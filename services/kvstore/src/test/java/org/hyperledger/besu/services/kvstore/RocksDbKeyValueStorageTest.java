@@ -22,11 +22,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.function.LongSupplier;
 
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.OperationTimer;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,10 +55,10 @@ public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
     // Prepare mocks
     when(labelledMetricOperationTimerMock.labels(any())).thenReturn(operationTimerMock);
     when(metricsSystemMock.createLabelledTimer(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
         .thenReturn(labelledMetricOperationTimerMock);
     when(metricsSystemMock.createLabelledCounter(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
         .thenReturn(labelledMetricCounterMock);
     // Prepare argument captors
     final ArgumentCaptor<String> labelledTimersMetricsNameArgs =
@@ -78,7 +78,7 @@ public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
     assertThat(keyValueStorage).isNotNull();
     verify(metricsSystemMock, times(4))
         .createLabelledTimer(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB),
             labelledTimersMetricsNameArgs.capture(),
             labelledTimersHelpArgs.capture(),
             any());
@@ -97,7 +97,7 @@ public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
 
     verify(metricsSystemMock, times(2))
         .createLongGauge(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB),
             longGaugesMetricsNameArgs.capture(),
             longGaugesHelpArgs.capture(),
             any(LongSupplier.class));
@@ -110,7 +110,7 @@ public class RocksDbKeyValueStorageTest extends AbstractKeyValueStorageTest {
 
     verify(metricsSystemMock)
         .createLabelledCounter(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB),
             labelledCountersMetricsNameArgs.capture(),
             labelledCountersHelpArgs.capture(),
             any());

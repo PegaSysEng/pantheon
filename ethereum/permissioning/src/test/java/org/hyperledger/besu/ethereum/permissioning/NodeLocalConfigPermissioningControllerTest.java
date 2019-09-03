@@ -40,9 +40,9 @@ import java.util.function.Consumer;
 import com.google.common.collect.Lists;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,19 +73,19 @@ public class NodeLocalConfigPermissioningControllerTest {
     bootnodesList.clear();
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "node_local_check_count",
             "Number of times the node local permissioning provider has been checked"))
         .thenReturn(checkCounter);
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "node_local_check_count_permitted",
             "Number of times the node local permissioning provider has been checked and returned permitted"))
         .thenReturn(checkPermittedCounter);
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "node_local_check_count_unpermitted",
             "Number of times the node local permissioning provider has been checked and returned unpermitted"))
         .thenReturn(checkUnpermittedCounter);

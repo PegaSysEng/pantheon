@@ -24,9 +24,9 @@ import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningProvide
 import org.hyperledger.besu.ethereum.transaction.CallParameter;
 import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
 import org.hyperledger.besu.ethereum.transaction.TransactionSimulatorResult;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
 
@@ -77,17 +77,17 @@ public class NodeSmartContractPermissioningController implements NodePermissioni
 
     this.checkCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "node_smart_contract_check_count",
             "Number of times the node smart contract permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "node_smart_contract_check_count_permitted",
             "Number of times the node smart contract permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "node_smart_contract_check_count_unpermitted",
             "Number of times the node smart contract permissioning provider has been checked and returned unpermitted");
   }

@@ -28,7 +28,7 @@ import com.google.common.base.Preconditions;
 import graphql.GraphQL;
 import io.vertx.core.Vertx;
 import org.hyperledger.besu.cli.config.EthNetworkConfig;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
@@ -101,7 +101,7 @@ import org.hyperledger.besu.util.bytes.BytesValue;
 public class RunnerBuilder {
 
   private Vertx vertx;
-  private PantheonController<?> pantheonController;
+  private BesuController<?> besuController;
 
   private NetworkingConfiguration networkingConfiguration = NetworkingConfiguration.create();
   private Collection<BytesValue> bannedNodeIds = new ArrayList<>();
@@ -129,8 +129,8 @@ public class RunnerBuilder {
     return this;
   }
 
-  public RunnerBuilder pantheonController(final PantheonController<?> pantheonController) {
-    this.pantheonController = pantheonController;
+  public RunnerBuilder besuController(final BesuController<?> besuController) {
+    this.besuController = besuController;
     return this;
   }
 
@@ -235,7 +235,7 @@ public class RunnerBuilder {
 
   public Runner build() {
 
-    Preconditions.checkNotNull(pantheonController);
+    Preconditions.checkNotNull(besuController);
 
     final DiscoveryConfiguration discoveryConfiguration;
     if (discovery) {
@@ -254,13 +254,13 @@ public class RunnerBuilder {
       discoveryConfiguration = DiscoveryConfiguration.create().setActive(false);
     }
 
-    final KeyPair keyPair = pantheonController.getLocalNodeKeyPair();
+    final KeyPair keyPair = besuController.getLocalNodeKeyPair();
 
     final SubProtocolConfiguration subProtocolConfiguration =
-        pantheonController.getSubProtocolConfiguration();
+        besuController.getSubProtocolConfiguration();
 
-    final ProtocolSchedule<?> protocolSchedule = pantheonController.getProtocolSchedule();
-    final ProtocolContext<?> context = pantheonController.getProtocolContext();
+    final ProtocolSchedule<?> protocolSchedule = besuController.getProtocolSchedule();
+    final ProtocolContext<?> context = besuController.getProtocolContext();
 
     final List<SubProtocol> subProtocols = subProtocolConfiguration.getSubProtocols();
     final List<ProtocolManager> protocolManagers = subProtocolConfiguration.getProtocolManagers();
@@ -284,7 +284,7 @@ public class RunnerBuilder {
 
     final List<EnodeURL> bootnodes = discoveryConfiguration.getBootnodes();
 
-    final Synchronizer synchronizer = pantheonController.getSynchronizer();
+    final Synchronizer synchronizer = besuController.getSynchronizer();
 
     final TransactionSimulator transactionSimulator =
         new TransactionSimulator(
@@ -330,10 +330,10 @@ public class RunnerBuilder {
             n.setInsufficientPeersPermissioningProvider(
                 new InsufficientPeersPermissioningProvider(network, bootnodes)));
 
-    final TransactionPool transactionPool = pantheonController.getTransactionPool();
-    final MiningCoordinator miningCoordinator = pantheonController.getMiningCoordinator();
+    final TransactionPool transactionPool = besuController.getTransactionPool();
+    final MiningCoordinator miningCoordinator = besuController.getMiningCoordinator();
 
-    final PrivacyParameters privacyParameters = pantheonController.getPrivacyParameters();
+    final PrivacyParameters privacyParameters = besuController.getPrivacyParameters();
     final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
 
     final P2PNetwork peerNetwork = networkRunner.getNetwork();
@@ -347,7 +347,7 @@ public class RunnerBuilder {
 
     final Optional<AccountPermissioningController> accountPermissioningController =
         buildAccountPermissioningController(
-            permissioningConfiguration, pantheonController, transactionSimulator);
+            permissioningConfiguration, besuController, transactionSimulator);
 
     final Optional<AccountLocalConfigPermissioningController>
         accountLocalConfigPermissioningController =
@@ -360,7 +360,7 @@ public class RunnerBuilder {
           jsonRpcMethods(
               context,
               protocolSchedule,
-              pantheonController,
+              besuController,
               peerNetwork,
               synchronizer,
               transactionPool,
@@ -418,7 +418,7 @@ public class RunnerBuilder {
           jsonRpcMethods(
               context,
               protocolSchedule,
-              pantheonController,
+              besuController,
               peerNetwork,
               synchronizer,
               transactionPool,
@@ -464,7 +464,7 @@ public class RunnerBuilder {
         graphQLHttpService,
         webSocketService,
         metricsService,
-        pantheonController,
+        besuController,
         dataDir);
   }
 
@@ -505,7 +505,7 @@ public class RunnerBuilder {
 
   private Optional<AccountPermissioningController> buildAccountPermissioningController(
       final Optional<PermissioningConfiguration> permissioningConfiguration,
-      final PantheonController<?> pantheonController,
+      final BesuController<?> besuController,
       final TransactionSimulator transactionSimulator) {
 
     if (permissioningConfiguration.isPresent()) {
@@ -515,7 +515,7 @@ public class RunnerBuilder {
 
       accountPermissioningController.ifPresent(
           permissioningController ->
-              pantheonController
+              besuController
                   .getProtocolSchedule()
                   .setTransactionFilter(permissioningController::isPermitted));
 
@@ -548,7 +548,7 @@ public class RunnerBuilder {
   private Map<String, JsonRpcMethod> jsonRpcMethods(
       final ProtocolContext<?> context,
       final ProtocolSchedule<?> protocolSchedule,
-      final PantheonController<?> pantheonController,
+      final BesuController<?> besuController,
       final P2PNetwork network,
       final Synchronizer synchronizer,
       final TransactionPool transactionPool,
@@ -568,7 +568,7 @@ public class RunnerBuilder {
             .methods(
                 BesuInfo.version(),
                 ethNetworkConfig.getNetworkId(),
-                pantheonController.getGenesisConfigOptions(),
+                besuController.getGenesisConfigOptions(),
                 network,
                 context.getBlockchain(),
                 context.getWorldStateArchive(),
@@ -586,7 +586,7 @@ public class RunnerBuilder {
                 jsonRpcConfiguration,
                 webSocketConfiguration,
                 metricsConfiguration);
-    methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
+    methods.putAll(besuController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;
   }
 

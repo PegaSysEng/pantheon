@@ -42,11 +42,11 @@ import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor;
 import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonFactoryConfigurationBuilder;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuFactoryConfigurationBuilder;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuNodeFactory;
 
 public class PermissionedNodeBuilder {
 
@@ -152,7 +152,7 @@ public class PermissionedNodeBuilder {
     return this;
   }
 
-  public PantheonNode build() {
+  public BesuNode build() {
     if (name == null) {
       name = "perm_node_" + UUID.randomUUID().toString().substring(0, 8);
     }
@@ -170,7 +170,7 @@ public class PermissionedNodeBuilder {
     final PermissioningConfiguration permissioningConfiguration =
         new PermissioningConfiguration(localPermConfig, smartContractPermConfig);
 
-    final PantheonFactoryConfigurationBuilder builder = new PantheonFactoryConfigurationBuilder();
+    final BesuFactoryConfigurationBuilder builder = new BesuFactoryConfigurationBuilder();
     builder
         .name(name)
         .jsonRpcConfiguration(jsonRpcConfigWithPermApiEnabled())
@@ -191,9 +191,9 @@ public class PermissionedNodeBuilder {
     }
 
     try {
-      return new PantheonNodeFactory().create(builder.build());
+      return new BesuNodeFactory().create(builder.build());
     } catch (IOException e) {
-      throw new RuntimeException("Error creating PantheonNode", e);
+      throw new RuntimeException("Error creating BesuNode", e);
     }
   }
 

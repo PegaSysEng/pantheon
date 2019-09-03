@@ -15,7 +15,7 @@ package org.hyperledger.besu.cli.subcommands;
 import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_HOST_FORMAT_HELP;
 import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_PATH_FORMAT_HELP;
 import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_PORT_FORMAT_HELP;
-import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultPantheonDataPath;
+import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultBesuDataPath;
 import static org.hyperledger.besu.cli.subcommands.RetestethSubCommand.COMMAND_NAME;
 import static org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 
@@ -49,7 +49,7 @@ public class RetestethSubCommand implements Runnable {
       names = {"--data-path"},
       paramLabel = MANDATORY_PATH_FORMAT_HELP,
       description = "The path to Besu data directory (default: ${DEFAULT-VALUE})")
-  final Path dataPath = getDefaultPantheonDataPath(this);
+  final Path dataPath = getDefaultBesuDataPath(this);
 
   @Option(
       names = {"--logging", "-l"},

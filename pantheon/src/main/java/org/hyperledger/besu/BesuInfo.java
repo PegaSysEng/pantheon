@@ -16,7 +16,7 @@ import org.hyperledger.besu.util.PlatformDetector;
 
 // This file is generated via a gradle task and should not be edited directly.
 public final class BesuInfo {
-  private static final String CLIENT_IDENTITY = "pantheon";
+  private static final String CLIENT_IDENTITY = "besu";
   private static final String VERSION =
       CLIENT_IDENTITY
           + "/v"

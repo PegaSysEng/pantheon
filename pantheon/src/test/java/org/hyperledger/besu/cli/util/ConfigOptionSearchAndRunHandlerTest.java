@@ -63,7 +63,7 @@ public class ConfigOptionSearchAndRunHandlerTest {
       new RunLast().useOut(outPrintStream).useAnsi(Ansi.OFF);
   private final DefaultExceptionHandler<List<Object>> exceptionHandler =
       new DefaultExceptionHandler<List<Object>>().useErr(errPrintStream).useAnsi(Ansi.OFF);
-  private final Map<String, String> environment = singletonMap("PANTHEON_LOGGING", "ERROR");
+  private final Map<String, String> environment = singletonMap("BESU_LOGGING", "ERROR");
   private final ConfigOptionSearchAndRunHandler configParsingHandler =
       new ConfigOptionSearchAndRunHandler(
           resultHandler, exceptionHandler, CONFIG_FILE_OPTION_NAME, environment, false);

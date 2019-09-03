@@ -42,7 +42,7 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
   public void register(final PantheonContext context) {
     this.context = context;
     LOG.info("Registered");
-    callbackDir = new File(System.getProperty("pantheon.plugins.dir", "plugins"));
+    callbackDir = new File(System.getProperty("besu.plugins.dir", "plugins"));
   }
 
   @Override

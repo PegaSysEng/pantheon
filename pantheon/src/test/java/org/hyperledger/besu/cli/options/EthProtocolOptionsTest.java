@@ -27,7 +27,7 @@ public class EthProtocolOptionsTest
 
     final TestBesuCommand cmd = parseCommand("--Xewp-max-get-headers", "13");
 
-    final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
+    final EthProtocolOptions options = getOptionsFromBesuCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
     assertThat(config.getMaxGetBlockHeaders()).isEqualTo(13);
     assertThat(commandOutput.toString()).isEmpty();
@@ -48,7 +48,7 @@ public class EthProtocolOptionsTest
   public void parsesValidEwpMaxGetBodiesOptions() {
     final TestBesuCommand cmd = parseCommand("--Xewp-max-get-bodies", "14");
 
-    final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
+    final EthProtocolOptions options = getOptionsFromBesuCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
     assertThat(config.getMaxGetBlockBodies()).isEqualTo(14);
 
@@ -70,7 +70,7 @@ public class EthProtocolOptionsTest
   public void parsesValidEwpMaxGetReceiptsOptions() {
     final TestBesuCommand cmd = parseCommand("--Xewp-max-get-receipts", "15");
 
-    final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
+    final EthProtocolOptions options = getOptionsFromBesuCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
     assertThat(config.getMaxGetReceipts()).isEqualTo(15);
 
@@ -93,7 +93,7 @@ public class EthProtocolOptionsTest
   public void parsesValidEwpMaxGetNodeDataOptions() {
     final TestBesuCommand cmd = parseCommand("--Xewp-max-get-node-data", "16");
 
-    final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
+    final EthProtocolOptions options = getOptionsFromBesuCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
     assertThat(config.getMaxGetNodeData()).isEqualTo(16);
 
@@ -136,7 +136,7 @@ public class EthProtocolOptionsTest
   }
 
   @Override
-  EthProtocolOptions getOptionsFromPantheonCommand(final TestBesuCommand pantheonCommand) {
-    return pantheonCommand.getEthProtocolOptions();
+  EthProtocolOptions getOptionsFromBesuCommand(final TestBesuCommand besuCommand) {
+    return besuCommand.getEthProtocolOptions();
   }
 }

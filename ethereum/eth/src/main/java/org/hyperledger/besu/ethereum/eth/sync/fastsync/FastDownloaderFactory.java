@@ -30,8 +30,8 @@ import org.hyperledger.besu.ethereum.eth.sync.worldstate.WorldStateDownloader;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.services.tasks.CachingTaskCollection;
 import org.hyperledger.besu.services.tasks.FlatFileTaskCollection;
 
@@ -127,13 +127,13 @@ public class FastDownloaderFactory {
             worldStateTaskCacheSize);
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.SYNCHRONIZER,
+        BesuMetricCategory.SYNCHRONIZER,
         "world_state_pending_requests_current",
         "Number of pending requests for fast sync world state download",
         taskCollection::size);
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.SYNCHRONIZER,
+        BesuMetricCategory.SYNCHRONIZER,
         "world_state_pending_requests_cache_size",
         "Pending request cache size for fast sync world state download",
         taskCollection::cacheSize);

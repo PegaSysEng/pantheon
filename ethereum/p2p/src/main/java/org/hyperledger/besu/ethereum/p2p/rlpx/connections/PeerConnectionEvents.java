@@ -22,10 +22,10 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.DefaultMessage;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.util.Subscribers;
 
 public class PeerConnectionEvents implements PeerConnectionEventDispatcher {
@@ -37,7 +37,7 @@ public class PeerConnectionEvents implements PeerConnectionEventDispatcher {
   public PeerConnectionEvents(final MetricsSystem metricsSystem) {
     disconnectCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.PEERS,
+            BesuMetricCategory.PEERS,
             "disconnected_total",
             "Total number of peers disconnected",
             "initiator",

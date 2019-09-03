@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.Resources;
 import org.hyperledger.besu.config.GenesisConfigFile;
 import org.hyperledger.besu.config.JsonUtil;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -76,7 +76,7 @@ public abstract class JsonBlockImporterTest {
 
     @Test
     public void importChain_unsupportedConsensusAlgorithm() throws IOException {
-      final PantheonController<?> controller = createController();
+      final BesuController<?> controller = createController();
       final JsonBlockImporter<?> importer = new JsonBlockImporter<>(controller);
 
       final String jsonData = getFileContents("clique", "blocks-import-valid.json");
@@ -104,7 +104,7 @@ public abstract class JsonBlockImporterTest {
 
     @Test
     public void importChain_validJson_withBlockNumbers() throws IOException {
-      final PantheonController<?> controller = createController();
+      final BesuController<?> controller = createController();
       final JsonBlockImporter<?> importer = new JsonBlockImporter<>(controller);
 
       final String jsonData = getFileContents("blocks-import-valid.json");
@@ -195,7 +195,7 @@ public abstract class JsonBlockImporterTest {
 
     @Test
     public void importChain_validJson_noBlockIdentifiers() throws IOException {
-      final PantheonController<?> controller = createController();
+      final BesuController<?> controller = createController();
       final JsonBlockImporter<?> importer = new JsonBlockImporter<>(controller);
 
       final String jsonData = getFileContents("blocks-import-valid-no-block-identifiers.json");
@@ -286,7 +286,7 @@ public abstract class JsonBlockImporterTest {
 
     @Test
     public void importChain_validJson_withParentHashes() throws IOException {
-      final PantheonController<?> controller = createController();
+      final BesuController<?> controller = createController();
       final JsonBlockImporter<?> importer = new JsonBlockImporter<>(controller);
 
       String jsonData = getFileContents("blocks-import-valid.json");
@@ -337,7 +337,7 @@ public abstract class JsonBlockImporterTest {
 
     @Test
     public void importChain_invalidParent() throws IOException {
-      final PantheonController<?> controller = createController();
+      final BesuController<?> controller = createController();
       final JsonBlockImporter<?> importer = new JsonBlockImporter<>(controller);
 
       final String jsonData = getFileContents("blocks-import-invalid-bad-parent.json");
@@ -349,7 +349,7 @@ public abstract class JsonBlockImporterTest {
 
     @Test
     public void importChain_invalidTransaction() throws IOException {
-      final PantheonController<?> controller = createController();
+      final BesuController<?> controller = createController();
       final JsonBlockImporter<?> importer = new JsonBlockImporter<>(controller);
 
       final String jsonData = getFileContents("blocks-import-invalid-bad-tx.json");
@@ -362,7 +362,7 @@ public abstract class JsonBlockImporterTest {
 
     @Test
     public void importChain_specialFields() throws IOException {
-      final PantheonController<?> controller = createController();
+      final BesuController<?> controller = createController();
       final JsonBlockImporter<?> importer = new JsonBlockImporter<>(controller);
 
       final String jsonData = getFileContents("blocks-import-special-fields.json");
@@ -400,14 +400,14 @@ public abstract class JsonBlockImporterTest {
     return Resources.toString(fileURL, UTF_8);
   }
 
-  protected PantheonController<?> createController() throws IOException {
+  protected BesuController<?> createController() throws IOException {
     return createController(genesisConfigFile);
   }
 
-  protected PantheonController<?> createController(final GenesisConfigFile genesisConfigFile)
+  protected BesuController<?> createController(final GenesisConfigFile genesisConfigFile)
       throws IOException {
     final Path dataDir = folder.newFolder().toPath();
-    return new PantheonController.Builder()
+    return new BesuController.Builder()
         .fromGenesisConfig(genesisConfigFile)
         .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
         .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())

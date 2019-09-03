@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
- * Service provided by pantheon to facilitate persistent data storage.
+ * Service provided by besu to facilitate persistent data storage.
  *
  * @param <S> the segment identifier type
  */

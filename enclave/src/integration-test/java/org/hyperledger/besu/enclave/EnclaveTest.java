@@ -31,8 +31,8 @@ import org.hyperledger.besu.enclave.types.FindPrivacyGroupRequest;
 import org.hyperledger.besu.enclave.types.PrivacyGroup;
 import org.hyperledger.besu.enclave.types.ReceiveRequest;
 import org.hyperledger.besu.enclave.types.ReceiveResponse;
+import org.hyperledger.besu.enclave.types.SendRequestBesu;
 import org.hyperledger.besu.enclave.types.SendRequestLegacy;
-import org.hyperledger.besu.enclave.types.SendRequestPantheon;
 import org.hyperledger.besu.enclave.types.SendResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -95,7 +95,7 @@ public class EnclaveTest {
 
     final SendResponse sr =
         enclave.send(
-            new SendRequestPantheon(
+            new SendRequestBesu(
                 PAYLOAD, publicKeys.get(0), privacyGroupResponse.getPrivacyGroupId()));
     final ReceiveResponse rr = enclave.receive(new ReceiveRequest(sr.getKey(), publicKeys.get(0)));
     assertThat(rr).isNotNull();
@@ -117,7 +117,7 @@ public class EnclaveTest {
     assertThat(privacyGroupResponse.getPrivacyGroupId()).isNotNull();
     assertThat(privacyGroupResponse.getName()).isEqualTo(name);
     assertThat(privacyGroupResponse.getDescription()).isEqualTo(description);
-    assertThat(privacyGroupResponse.getType()).isEqualByComparingTo(PrivacyGroup.Type.PANTHEON);
+    assertThat(privacyGroupResponse.getType()).isEqualByComparingTo(PrivacyGroup.Type.BESU);
 
     final String response =
         enclave.deletePrivacyGroup(
@@ -141,7 +141,7 @@ public class EnclaveTest {
     assertThat(privacyGroupResponse.getPrivacyGroupId()).isNotNull();
     assertThat(privacyGroupResponse.getName()).isEqualTo(name);
     assertThat(privacyGroupResponse.getDescription()).isEqualTo(description);
-    assertThat(privacyGroupResponse.getType()).isEqualTo(PrivacyGroup.Type.PANTHEON);
+    assertThat(privacyGroupResponse.getType()).isEqualTo(PrivacyGroup.Type.BESU);
 
     FindPrivacyGroupRequest findPrivacyGroupRequest =
         new FindPrivacyGroupRequest(publicKeys.toArray(new String[0]));

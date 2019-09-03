@@ -31,7 +31,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethodFacto
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.p2p.config.SubProtocolConfiguration;
 
-public class PantheonController<C> implements java.io.Closeable {
+public class BesuController<C> implements java.io.Closeable {
 
   public static final String DATABASE_PATH = "database";
   private final ProtocolSchedule<C> protocolSchedule;
@@ -48,7 +48,7 @@ public class PantheonController<C> implements java.io.Closeable {
   private final PrivacyParameters privacyParameters;
   private final Runnable close;
 
-  PantheonController(
+  BesuController(
       final ProtocolSchedule<C> protocolSchedule,
       final ProtocolContext<C> protocolContext,
       final EthProtocolManager ethProtocolManager,
@@ -127,24 +127,23 @@ public class PantheonController<C> implements java.io.Closeable {
 
   public static class Builder {
 
-    public PantheonControllerBuilder<?> fromEthNetworkConfig(
-        final EthNetworkConfig ethNetworkConfig) {
+    public BesuControllerBuilder<?> fromEthNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
       return fromGenesisConfig(GenesisConfigFile.fromConfig(ethNetworkConfig.getGenesisConfig()))
           .networkId(ethNetworkConfig.getNetworkId());
     }
 
-    public PantheonControllerBuilder<?> fromGenesisConfig(final GenesisConfigFile genesisConfig) {
+    public BesuControllerBuilder<?> fromGenesisConfig(final GenesisConfigFile genesisConfig) {
       final GenesisConfigOptions configOptions = genesisConfig.getConfigOptions();
-      final PantheonControllerBuilder<?> builder;
+      final BesuControllerBuilder<?> builder;
 
       if (configOptions.isEthHash()) {
-        builder = new MainnetPantheonControllerBuilder();
+        builder = new MainnetBesuControllerBuilder();
       } else if (configOptions.isIbft2()) {
-        builder = new IbftPantheonControllerBuilder();
+        builder = new IbftBesuControllerBuilder();
       } else if (configOptions.isIbftLegacy()) {
-        builder = new IbftLegacyPantheonControllerBuilder();
+        builder = new IbftLegacyBesuControllerBuilder();
       } else if (configOptions.isClique()) {
-        builder = new CliquePantheonControllerBuilder();
+        builder = new CliqueBesuControllerBuilder();
       } else {
         throw new IllegalArgumentException("Unknown consensus mechanism defined");
       }

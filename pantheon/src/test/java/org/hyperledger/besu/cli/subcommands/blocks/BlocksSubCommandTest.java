@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.hyperledger.besu.cli.CommandTestAbstract;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -39,7 +39,7 @@ public class BlocksSubCommandTest extends CommandTestAbstract {
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
   private static final String EXPECTED_BLOCK_USAGE =
-      "Usage: pantheon blocks [-hV] [COMMAND]"
+      "Usage: besu blocks [-hV] [COMMAND]"
           + System.lineSeparator()
           + "This command provides blocks related actions."
           + System.lineSeparator()
@@ -53,8 +53,8 @@ public class BlocksSubCommandTest extends CommandTestAbstract {
           + System.lineSeparator();
 
   private static final String EXPECTED_BLOCK_IMPORT_USAGE =
-      "Usage: pantheon blocks import [-hV] --from=<FILE>"
-          //      "Usage: pantheon blocks import [-hV] [--format=<format>] --from=<FILE>"
+      "Usage: besu blocks import [-hV] --from=<FILE>"
+          //      "Usage: besu blocks import [-hV] [--format=<format>] --from=<FILE>"
           + System.lineSeparator()
           + "This command imports blocks from a file into the database."
           // Hide format for while JSON option is under development
@@ -71,7 +71,7 @@ public class BlocksSubCommandTest extends CommandTestAbstract {
           + System.lineSeparator();
 
   private static final String EXPECTED_BLOCK_EXPORT_USAGE =
-      "Usage: pantheon blocks export [-hV] [--end-block=<LONG>] [--start-block=<LONG>]"
+      "Usage: besu blocks export [-hV] [--end-block=<LONG>] [--start-block=<LONG>]"
           + System.lineSeparator()
           + "                              --to=<FILE>"
           + System.lineSeparator()
@@ -223,7 +223,7 @@ public class BlocksSubCommandTest extends CommandTestAbstract {
         "Chain is empty.  Unable to export blocks from specified data directory: "
             + folder.getRoot().getAbsolutePath()
             + File.separator
-            + PantheonController.DATABASE_PATH;
+            + BesuController.DATABASE_PATH;
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
 
@@ -244,7 +244,7 @@ public class BlocksSubCommandTest extends CommandTestAbstract {
         "Chain is empty.  Unable to export blocks from specified data directory: "
             + folder.getRoot().getAbsolutePath()
             + File.separator
-            + PantheonController.DATABASE_PATH;
+            + BesuController.DATABASE_PATH;
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).startsWith(expectedErrorOutputStart);
 
@@ -401,7 +401,7 @@ public class BlocksSubCommandTest extends CommandTestAbstract {
   }
 
   private void createDbDirectory(final boolean createDataFiles) throws IOException {
-    File dbDir = folder.newFolder(PantheonController.DATABASE_PATH);
+    File dbDir = folder.newFolder(BesuController.DATABASE_PATH);
     if (createDataFiles) {
       Path dataFilePath = Paths.get(dbDir.getAbsolutePath(), "0000001.sst");
       final boolean success = new File(dataFilePath.toString()).createNewFile();

@@ -37,9 +37,9 @@ import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.Runner;
 import org.hyperledger.besu.RunnerBuilder;
 import org.hyperledger.besu.cli.config.EthNetworkConfig;
+import org.hyperledger.besu.controller.BesuController;
+import org.hyperledger.besu.controller.BesuControllerBuilder;
 import org.hyperledger.besu.controller.KeyPairUtil;
-import org.hyperledger.besu.controller.PantheonController;
-import org.hyperledger.besu.controller.PantheonControllerBuilder;
 import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
@@ -48,45 +48,45 @@ import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import org.hyperledger.besu.services.PantheonEventsImpl;
-import org.hyperledger.besu.services.PantheonPluginContextImpl;
+import org.hyperledger.besu.services.BesuEventsImpl;
+import org.hyperledger.besu.services.BesuPluginContextImpl;
 import org.hyperledger.besu.services.PicoCLIOptionsImpl;
 import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
 import picocli.CommandLine;
 import picocli.CommandLine.Model.CommandSpec;
 
-public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
+public class ThreadBesuNodeRunner implements BesuNodeRunner {
 
   private final Logger LOG = LogManager.getLogger();
-  private final Map<String, Runner> pantheonRunners = new HashMap<>();
+  private final Map<String, Runner> besuRunners = new HashMap<>();
   private ExecutorService nodeExecutor = Executors.newCachedThreadPool();
 
-  private final Map<Node, PantheonPluginContextImpl> pantheonPluginContextMap = new HashMap<>();
+  private final Map<Node, BesuPluginContextImpl> besuPluginContextMap = new HashMap<>();
 
-  private PantheonPluginContextImpl buildPluginContext(final PantheonNode node) {
-    final PantheonPluginContextImpl pantheonPluginContext = new PantheonPluginContextImpl();
+  private BesuPluginContextImpl buildPluginContext(final BesuNode node) {
+    final BesuPluginContextImpl besuPluginContext = new BesuPluginContextImpl();
     final Path pluginsPath = node.homeDirectory().resolve("plugins");
     final File pluginsDirFile = pluginsPath.toFile();
     if (!pluginsDirFile.isDirectory()) {
       pluginsDirFile.mkdirs();
       pluginsDirFile.deleteOnExit();
     }
-    System.setProperty("pantheon.plugins.dir", pluginsPath.toString());
-    pantheonPluginContext.registerPlugins(pluginsPath);
-    return pantheonPluginContext;
+    System.setProperty("besu.plugins.dir", pluginsPath.toString());
+    besuPluginContext.registerPlugins(pluginsPath);
+    return besuPluginContext;
   }
 
   @Override
   @SuppressWarnings("UnstableApiUsage")
-  public void startNode(final PantheonNode node) {
+  public void startNode(final BesuNode node) {
     if (nodeExecutor == null || nodeExecutor.isShutdown()) {
       nodeExecutor = Executors.newCachedThreadPool();
     }
 
     final CommandLine commandLine = new CommandLine(CommandSpec.create());
-    final PantheonPluginContextImpl pantheonPluginContext =
-        pantheonPluginContextMap.computeIfAbsent(node, n -> buildPluginContext(node));
-    pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
+    final BesuPluginContextImpl besuPluginContext =
+        besuPluginContextMap.computeIfAbsent(node, n -> buildPluginContext(node));
+    besuPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
 
     commandLine.parseArgs(node.getConfiguration().getExtraCLIOptions().toArray(new String[0]));
 
@@ -100,13 +100,13 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .setBootNodes(bootnodes);
     node.getConfiguration().getGenesisConfig().ifPresent(networkConfigBuilder::setGenesisConfig);
     final EthNetworkConfig ethNetworkConfig = networkConfigBuilder.build();
-    final PantheonControllerBuilder<?> builder =
-        new PantheonController.Builder().fromEthNetworkConfig(ethNetworkConfig);
+    final BesuControllerBuilder<?> builder =
+        new BesuController.Builder().fromEthNetworkConfig(ethNetworkConfig);
     final Path tempDir = Files.createTempDir().toPath();
 
-    final PantheonController<?> pantheonController;
+    final BesuController<?> besuController;
     try {
-      pantheonController =
+      besuController =
           builder
               .synchronizerConfiguration(new SynchronizerConfiguration.Builder().build())
               .dataDirectory(node.homeDirectory())
@@ -121,7 +121,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .isRevertReasonEnabled(node.isRevertReasonEnabled())
               .build();
     } catch (final IOException e) {
-      throw new RuntimeException("Error building PantheonController", e);
+      throw new RuntimeException("Error building BesuController", e);
     }
 
     final RunnerBuilder runnerBuilder = new RunnerBuilder();
@@ -132,17 +132,17 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
       runnerBuilder.permissioningConfiguration(permissioningConfiguration);
     }
 
-    pantheonPluginContext.addService(
+    besuPluginContext.addService(
         PantheonEvents.class,
-        new PantheonEventsImpl(
-            pantheonController.getProtocolManager().getBlockBroadcaster(),
-            pantheonController.getTransactionPool()));
-    pantheonPluginContext.startPlugins();
+        new BesuEventsImpl(
+            besuController.getProtocolManager().getBlockBroadcaster(),
+            besuController.getTransactionPool()));
+    besuPluginContext.startPlugins();
 
     final Runner runner =
         runnerBuilder
             .vertx(Vertx.vertx())
-            .pantheonController(pantheonController)
+            .besuController(besuController)
             .ethNetworkConfig(ethNetworkConfig)
             .discovery(node.isDiscoveryEnabled())
             .p2pAdvertisedHost(node.getHostName())
@@ -164,12 +164,12 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     runner.start();
 
-    pantheonRunners.put(node.getName(), runner);
+    besuRunners.put(node.getName(), runner);
   }
 
   @Override
-  public void stopNode(final PantheonNode node) {
-    final PantheonPluginContextImpl pluginContext = pantheonPluginContextMap.remove(node);
+  public void stopNode(final BesuNode node) {
+    final BesuPluginContextImpl pluginContext = besuPluginContextMap.remove(node);
     if (pluginContext != null) {
       pluginContext.stopPlugins();
     }
@@ -180,11 +180,11 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
   @Override
   public void shutdown() {
     // stop all plugins from pluginContext
-    pantheonPluginContextMap.values().forEach(PantheonPluginContextImpl::stopPlugins);
-    pantheonPluginContextMap.clear();
+    besuPluginContextMap.values().forEach(BesuPluginContextImpl::stopPlugins);
+    besuPluginContextMap.clear();
 
-    // iterate over a copy of the set so that pantheonRunner can be updated when a runner is killed
-    new HashSet<>(pantheonRunners.keySet()).forEach(this::killRunner);
+    // iterate over a copy of the set so that besuRunner can be updated when a runner is killed
+    new HashSet<>(besuRunners.keySet()).forEach(this::killRunner);
     try {
       nodeExecutor.shutdownNow();
       if (!nodeExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
@@ -197,16 +197,16 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
   @Override
   public boolean isActive(final String nodeName) {
-    return pantheonRunners.containsKey(nodeName);
+    return besuRunners.containsKey(nodeName);
   }
 
   private void killRunner(final String name) {
     LOG.info("Killing " + name + " runner");
 
-    if (pantheonRunners.containsKey(name)) {
+    if (besuRunners.containsKey(name)) {
       try {
-        pantheonRunners.get(name).close();
-        pantheonRunners.remove(name);
+        besuRunners.get(name).close();
+        besuRunners.remove(name);
       } catch (final Exception e) {
         throw new RuntimeException("Error shutting down node " + name, e);
       }

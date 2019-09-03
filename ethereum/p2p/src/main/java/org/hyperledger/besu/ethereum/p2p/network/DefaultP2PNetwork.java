@@ -378,11 +378,11 @@ public class DefaultP2PNetwork implements P2PNetwork {
             .requestPortForward(
                 this.config.getDiscovery().getBindPort(),
                 UpnpNatManager.Protocol.UDP,
-                "pantheon-discovery");
+                "besu-discovery");
         this.natManager
             .get()
             .requestPortForward(
-                this.config.getRlpx().getBindPort(), UpnpNatManager.Protocol.TCP, "pantheon-rlpx");
+                this.config.getRlpx().getBindPort(), UpnpNatManager.Protocol.TCP, "besu-rlpx");
       } else {
         LOG.info("No external IP detected within timeout.");
       }

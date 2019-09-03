@@ -14,7 +14,7 @@ package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.EeaConditions;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyPantheonNodeFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyBesuNodeFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder;
 import org.junit.ClassRule;
@@ -27,7 +27,7 @@ public class PrivacyAcceptanceTestBase extends AcceptanceTestBase {
   protected final PrivateTransactions privateTransactions;
   protected final PrivateTransactionBuilder.Builder privateTransactionBuilder;
   protected final PrivateTransactionVerifier privateTransactionVerifier;
-  protected final PrivacyPantheonNodeFactory privacyPantheon;
+  protected final PrivacyBesuNodeFactory privacyBesu;
 
   public PrivacyAcceptanceTestBase() {
     final EeaTransactions eeaTransactions = new EeaTransactions();
@@ -36,6 +36,6 @@ public class PrivacyAcceptanceTestBase extends AcceptanceTestBase {
     eea = new EeaConditions(eeaTransactions);
     privateTransactionBuilder = PrivateTransactionBuilder.builder();
     privateTransactionVerifier = new PrivateTransactionVerifier(eea, eeaTransactions);
-    privacyPantheon = new PrivacyPantheonNodeFactory();
+    privacyBesu = new PrivacyBesuNodeFactory();
   }
 }

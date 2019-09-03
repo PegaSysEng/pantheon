@@ -44,7 +44,7 @@ public class PasswordSubCommandTest extends CommandTestAbstract {
     assertThat(commandErrorOutput.toString())
         .contains("Missing required option '--password=<password>'");
     assertThat(commandErrorOutput.toString())
-        .contains("Usage: pantheon password hash [-hV] --password=<password>");
+        .contains("Usage: besu password hash [-hV] --password=<password>");
     assertThat(commandErrorOutput.toString())
         .contains("This command generates the hash of a given password");
   }

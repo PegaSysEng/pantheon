@@ -34,7 +34,7 @@ public class PrivacyGroupAcceptanceTest extends PrivacyAcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     privacyNet =
-        PrivacyNet.builder(privacy, privacyPantheon, cluster, false)
+        PrivacyNet.builder(privacy, privacyBesu, cluster, false)
             .addMinerNode("Alice")
             .addMinerNode("Bob")
             .addMinerNode("Charlie")

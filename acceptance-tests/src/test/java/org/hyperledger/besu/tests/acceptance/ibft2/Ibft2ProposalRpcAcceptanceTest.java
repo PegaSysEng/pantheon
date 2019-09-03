@@ -15,7 +15,7 @@ package org.hyperledger.besu.tests.acceptance.ibft2;
 import java.io.IOException;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.junit.Test;
 
 public class Ibft2ProposalRpcAcceptanceTest extends AcceptanceTestBase {
@@ -23,12 +23,9 @@ public class Ibft2ProposalRpcAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldReturnProposals() throws IOException {
     final String[] validators = {"validator1", "validator2", "validator3"};
-    final PantheonNode validator1 =
-        pantheon.createIbft2NodeWithValidators("validator1", validators);
-    final PantheonNode validator2 =
-        pantheon.createIbft2NodeWithValidators("validator2", validators);
-    final PantheonNode validator3 =
-        pantheon.createIbft2NodeWithValidators("validator3", validators);
+    final BesuNode validator1 = besu.createIbft2NodeWithValidators("validator1", validators);
+    final BesuNode validator2 = besu.createIbft2NodeWithValidators("validator2", validators);
+    final BesuNode validator3 = besu.createIbft2NodeWithValidators("validator3", validators);
     cluster.start(validator1, validator2, validator3);
 
     cluster.verify(ibftTwo.noProposals());

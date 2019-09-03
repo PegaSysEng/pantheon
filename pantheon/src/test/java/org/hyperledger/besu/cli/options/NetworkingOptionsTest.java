@@ -89,7 +89,7 @@ public class NetworkingOptionsTest
   }
 
   @Override
-  NetworkingOptions getOptionsFromPantheonCommand(final TestBesuCommand pantheonCommand) {
-    return pantheonCommand.getNetworkingOptions();
+  NetworkingOptions getOptionsFromBesuCommand(final TestBesuCommand besuCommand) {
+    return besuCommand.getNetworkingOptions();
   }
 }

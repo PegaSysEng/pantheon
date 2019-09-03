@@ -67,7 +67,7 @@ import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
 
-public abstract class PantheonControllerBuilder<C> {
+public abstract class BesuControllerBuilder<C> {
   private static final Logger LOG = LogManager.getLogger();
 
   protected GenesisConfigFile genesisConfig;
@@ -89,98 +89,98 @@ public abstract class PantheonControllerBuilder<C> {
   private boolean isPruningEnabled;
   private PruningConfiguration pruningConfiguration;
 
-  public PantheonControllerBuilder<C> rocksDbConfiguration(
+  public BesuControllerBuilder<C> rocksDbConfiguration(
       final RocksDbConfiguration rocksDbConfiguration) {
     this.rocksDbConfiguration = rocksDbConfiguration;
     return this;
   }
 
-  public PantheonControllerBuilder<C> storageProvider(final StorageProvider storageProvider) {
+  public BesuControllerBuilder<C> storageProvider(final StorageProvider storageProvider) {
     this.storageProvider = storageProvider;
     return this;
   }
 
-  public PantheonControllerBuilder<C> genesisConfigFile(final GenesisConfigFile genesisConfig) {
+  public BesuControllerBuilder<C> genesisConfigFile(final GenesisConfigFile genesisConfig) {
     this.genesisConfig = genesisConfig;
     return this;
   }
 
-  public PantheonControllerBuilder<C> synchronizerConfiguration(
+  public BesuControllerBuilder<C> synchronizerConfiguration(
       final SynchronizerConfiguration synchronizerConfig) {
     this.syncConfig = synchronizerConfig;
     return this;
   }
 
-  public PantheonControllerBuilder<C> ethProtocolConfiguration(
+  public BesuControllerBuilder<C> ethProtocolConfiguration(
       final EthProtocolConfiguration ethProtocolConfiguration) {
     this.ethereumWireProtocolConfiguration = ethProtocolConfiguration;
     return this;
   }
 
-  public PantheonControllerBuilder<C> networkId(final BigInteger networkId) {
+  public BesuControllerBuilder<C> networkId(final BigInteger networkId) {
     this.networkId = networkId;
     return this;
   }
 
-  public PantheonControllerBuilder<C> miningParameters(final MiningParameters miningParameters) {
+  public BesuControllerBuilder<C> miningParameters(final MiningParameters miningParameters) {
     this.miningParameters = miningParameters;
     return this;
   }
 
-  public PantheonControllerBuilder<C> nodePrivateKeyFile(final File nodePrivateKeyFile)
+  public BesuControllerBuilder<C> nodePrivateKeyFile(final File nodePrivateKeyFile)
       throws IOException {
     this.nodeKeys = loadKeyPair(nodePrivateKeyFile);
     return this;
   }
 
-  public PantheonControllerBuilder<C> nodeKeys(final KeyPair nodeKeys) {
+  public BesuControllerBuilder<C> nodeKeys(final KeyPair nodeKeys) {
     this.nodeKeys = nodeKeys;
     return this;
   }
 
-  public PantheonControllerBuilder<C> metricsSystem(final MetricsSystem metricsSystem) {
+  public BesuControllerBuilder<C> metricsSystem(final MetricsSystem metricsSystem) {
     this.metricsSystem = metricsSystem;
     return this;
   }
 
-  public PantheonControllerBuilder<C> privacyParameters(final PrivacyParameters privacyParameters) {
+  public BesuControllerBuilder<C> privacyParameters(final PrivacyParameters privacyParameters) {
     this.privacyParameters = privacyParameters;
     return this;
   }
 
-  public PantheonControllerBuilder<C> dataDirectory(final Path dataDirectory) {
+  public BesuControllerBuilder<C> dataDirectory(final Path dataDirectory) {
     this.dataDirectory = dataDirectory;
     return this;
   }
 
-  public PantheonControllerBuilder<C> clock(final Clock clock) {
+  public BesuControllerBuilder<C> clock(final Clock clock) {
     this.clock = clock;
     return this;
   }
 
-  public PantheonControllerBuilder<C> transactionPoolConfiguration(
+  public BesuControllerBuilder<C> transactionPoolConfiguration(
       final TransactionPoolConfiguration transactionPoolConfiguration) {
     this.transactionPoolConfiguration = transactionPoolConfiguration;
     return this;
   }
 
-  public PantheonControllerBuilder<C> isRevertReasonEnabled(final boolean isRevertReasonEnabled) {
+  public BesuControllerBuilder<C> isRevertReasonEnabled(final boolean isRevertReasonEnabled) {
     this.isRevertReasonEnabled = isRevertReasonEnabled;
     return this;
   }
 
-  public PantheonControllerBuilder<C> isPruningEnabled(final boolean pruningEnabled) {
+  public BesuControllerBuilder<C> isPruningEnabled(final boolean pruningEnabled) {
     this.isPruningEnabled = pruningEnabled;
     return this;
   }
 
-  public PantheonControllerBuilder<C> pruningConfiguration(
+  public BesuControllerBuilder<C> pruningConfiguration(
       final PruningConfiguration pruningConfiguration) {
     this.pruningConfiguration = pruningConfiguration;
     return this;
   }
 
-  public PantheonController<C> build() throws IOException {
+  public BesuController<C> build() throws IOException {
     checkNotNull(genesisConfig, "Missing genesis config");
     checkNotNull(syncConfig, "Missing sync config");
     checkNotNull(ethereumWireProtocolConfiguration, "Missing ethereum protocol configuration");
@@ -306,7 +306,7 @@ public abstract class PantheonControllerBuilder<C> {
 
     final JsonRpcMethodFactory additionalJsonRpcMethodFactory =
         createAdditionalJsonRpcMethodFactory(protocolContext);
-    return new PantheonController<>(
+    return new BesuController<>(
         protocolSchedule,
         protocolContext,
         ethProtocolManager,

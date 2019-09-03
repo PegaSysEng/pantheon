@@ -37,7 +37,7 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.p2p.config.SubProtocolConfiguration;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 
-public class IbftLegacyPantheonControllerBuilder extends PantheonControllerBuilder<IbftContext> {
+public class IbftLegacyBesuControllerBuilder extends BesuControllerBuilder<IbftContext> {
 
   private static final Logger LOG = LogManager.getLogger();
   private final BlockInterface blockInterface = new IbftLegacyBlockInterface();

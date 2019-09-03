@@ -25,14 +25,14 @@ import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonFactoryConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuFactoryConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 
-public class PrivacyPantheonFactoryConfiguration extends PantheonFactoryConfiguration {
+public class PrivacyBesuFactoryConfiguration extends BesuFactoryConfiguration {
 
   private final OrionTestHarness orion;
 
-  PrivacyPantheonFactoryConfiguration(
+  PrivacyBesuFactoryConfiguration(
       final String name,
       final MiningParameters miningParameters,
       final PrivacyParameters privacyParameters,

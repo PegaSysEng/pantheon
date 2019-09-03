@@ -22,17 +22,17 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.PendingTransactionsStatisticsResult;
 
-public class TxPoolPantheonStatistics implements JsonRpcMethod {
+public class TxPoolBesuStatistics implements JsonRpcMethod {
 
   private final PendingTransactions pendingTransactions;
 
-  public TxPoolPantheonStatistics(final PendingTransactions pendingTransactions) {
+  public TxPoolBesuStatistics(final PendingTransactions pendingTransactions) {
     this.pendingTransactions = pendingTransactions;
   }
 
   @Override
   public String getName() {
-    return RpcMethod.TX_POOL_PANTHEON_STATISTICS.getMethodName();
+    return RpcMethod.TX_POOL_BESU_STATISTICS.getMethodName();
   }
 
   @Override

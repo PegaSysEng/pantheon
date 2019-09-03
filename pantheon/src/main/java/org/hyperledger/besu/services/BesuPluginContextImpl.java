@@ -38,7 +38,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class PantheonPluginContextImpl implements PantheonContext {
+public class BesuPluginContextImpl implements PantheonContext {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -86,7 +86,7 @@ public class PantheonPluginContextImpl implements PantheonContext {
         final URL[] pluginJarURLs =
             pluginFilesList
                 .filter(p -> p.getFileName().toString().endsWith(".jar"))
-                .map(PantheonPluginContextImpl::pathToURIOrNull)
+                .map(BesuPluginContextImpl::pathToURIOrNull)
                 .toArray(URL[]::new);
         final ServiceLoader<PantheonPlugin> serviceLoader =
             ServiceLoader.load(

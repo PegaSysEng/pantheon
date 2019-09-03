@@ -24,8 +24,8 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.services.tasks.CachingTaskCollection;
 
 public class WorldStateDownloader {
@@ -65,13 +65,13 @@ public class WorldStateDownloader {
     this.metricsSystem = metricsSystem;
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.SYNCHRONIZER,
+        BesuMetricCategory.SYNCHRONIZER,
         "world_state_node_requests_since_last_progress_current",
         "Number of world state requests made since the last time new data was returned",
         downloadStateValue(WorldDownloadState::getRequestsSinceLastProgress));
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.SYNCHRONIZER,
+        BesuMetricCategory.SYNCHRONIZER,
         "world_state_inflight_requests_current",
         "Number of in progress requests for world state data",
         downloadStateValue(WorldDownloadState::getOutstandingTaskCount));

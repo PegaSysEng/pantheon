@@ -16,14 +16,14 @@ import java.io.IOException;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.junit.Test;
 
 public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineTransactionsOnSingleNode() throws IOException {
-    final PantheonNode minerNode = pantheon.createCliqueNode("miner1");
+    final BesuNode minerNode = besu.createCliqueNode("miner1");
     cluster.start(minerNode);
 
     final Account sender = accounts.createAccount("account1");
@@ -41,9 +41,9 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldMineTransactionsOnMultipleNodes() throws IOException {
-    final PantheonNode minerNode1 = pantheon.createCliqueNode("miner1");
-    final PantheonNode minerNode2 = pantheon.createCliqueNode("miner2");
-    final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
+    final BesuNode minerNode1 = besu.createCliqueNode("miner1");
+    final BesuNode minerNode2 = besu.createCliqueNode("miner2");
+    final BesuNode minerNode3 = besu.createCliqueNode("miner3");
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     final Account sender = accounts.createAccount("account1");
@@ -61,9 +61,9 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldStallMiningWhenInsufficientValidators() throws IOException {
-    final PantheonNode minerNode1 = pantheon.createCliqueNode("miner1");
-    final PantheonNode minerNode2 = pantheon.createCliqueNode("miner2");
-    final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
+    final BesuNode minerNode1 = besu.createCliqueNode("miner1");
+    final BesuNode minerNode2 = besu.createCliqueNode("miner2");
+    final BesuNode minerNode3 = besu.createCliqueNode("miner3");
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.stopNode(minerNode2);
@@ -74,9 +74,9 @@ public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {
 
   @Test
   public void shouldStillMineWhenANodeFailsAndHasSufficientValidators() throws IOException {
-    final PantheonNode minerNode1 = pantheon.createCliqueNode("miner1");
-    final PantheonNode minerNode2 = pantheon.createCliqueNode("miner2");
-    final PantheonNode minerNode3 = pantheon.createCliqueNode("miner3");
+    final BesuNode minerNode1 = besu.createCliqueNode("miner1");
+    final BesuNode minerNode2 = besu.createCliqueNode("miner2");
+    final BesuNode minerNode3 = besu.createCliqueNode("miner3");
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verifyOnActiveNodes(blockchain.reachesHeight(minerNode1, 1, 85));

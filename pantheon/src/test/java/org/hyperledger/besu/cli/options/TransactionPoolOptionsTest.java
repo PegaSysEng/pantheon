@@ -28,7 +28,7 @@ public class TransactionPoolOptionsTest
             "--Xincoming-tx-messages-keep-alive-seconds",
             String.valueOf(txMessageKeepAliveSeconds));
 
-    final TransactionPoolOptions options = getOptionsFromPantheonCommand(cmd);
+    final TransactionPoolOptions options = getOptionsFromBesuCommand(cmd);
     final TransactionPoolConfiguration config = options.toDomainObject().build();
     assertThat(config.getTxMessageKeepAliveSeconds()).isEqualTo(txMessageKeepAliveSeconds);
 
@@ -54,7 +54,7 @@ public class TransactionPoolOptionsTest
   }
 
   @Override
-  TransactionPoolOptions getOptionsFromPantheonCommand(final TestBesuCommand pantheonCommand) {
-    return pantheonCommand.getTransactionPoolOptions();
+  TransactionPoolOptions getOptionsFromBesuCommand(final TestBesuCommand besuCommand) {
+    return besuCommand.getTransactionPoolOptions();
   }
 }

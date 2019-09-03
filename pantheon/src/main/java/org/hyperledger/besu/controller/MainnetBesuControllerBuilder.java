@@ -33,7 +33,7 @@ import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 
-public class MainnetPantheonControllerBuilder extends PantheonControllerBuilder<Void> {
+public class MainnetBesuControllerBuilder extends BesuControllerBuilder<Void> {
   private static final Logger LOG = LogManager.getLogger();
 
   @Override

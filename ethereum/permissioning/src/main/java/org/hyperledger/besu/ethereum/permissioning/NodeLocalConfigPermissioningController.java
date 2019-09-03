@@ -30,9 +30,9 @@ import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningProvider;
 import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
@@ -79,17 +79,17 @@ public class NodeLocalConfigPermissioningController implements NodePermissioning
 
     this.checkCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "node_local_check_count",
             "Number of times the node local permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "node_local_check_count_permitted",
             "Number of times the node local permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "node_local_check_count_unpermitted",
             "Number of times the node local permissioning provider has been checked and returned unpermitted");
   }

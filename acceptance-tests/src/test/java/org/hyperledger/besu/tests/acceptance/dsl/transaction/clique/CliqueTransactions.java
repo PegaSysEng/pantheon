@@ -13,16 +13,16 @@
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.clique;
 
 import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 
 public class CliqueTransactions {
   public static final String LATEST = "latest";
 
-  public CliquePropose createRemoveProposal(final PantheonNode node) {
+  public CliquePropose createRemoveProposal(final BesuNode node) {
     return propose(node.getAddress().toString(), false);
   }
 
-  public CliquePropose createAddProposal(final PantheonNode node) {
+  public CliquePropose createAddProposal(final BesuNode node) {
     return propose(node.getAddress().toString(), true);
   }
 
@@ -42,7 +42,7 @@ public class CliqueTransactions {
     return new CliqueGetSignersAtHash(blockHash);
   }
 
-  public CliqueDiscard createDiscardProposal(final PantheonNode node) {
+  public CliqueDiscard createDiscardProposal(final BesuNode node) {
     return new CliqueDiscard(node.getAddress().toString());
   }
 }

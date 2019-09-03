@@ -79,7 +79,7 @@ public class BesuEventsImplTest {
   private org.hyperledger.besu.ethereum.core.BlockHeader fakeBlockHeader;
   private TransactionPool transactionPool;
   private BlockBroadcaster blockBroadcaster;
-  private PantheonEventsImpl serviceImpl;
+  private BesuEventsImpl serviceImpl;
 
   @Before
   public void setUp() {
@@ -113,7 +113,7 @@ public class BesuEventsImplTest {
             Wei.ZERO,
             TransactionPoolConfiguration.builder().build());
 
-    serviceImpl = new PantheonEventsImpl(blockBroadcaster, transactionPool);
+    serviceImpl = new BesuEventsImpl(blockBroadcaster, transactionPool);
   }
 
   @Test

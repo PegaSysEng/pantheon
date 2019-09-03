@@ -47,9 +47,9 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.connections.RlpxConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty.NettyConnectionInitializer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.util.FutureUtils;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.bytes.BytesValue;
@@ -96,15 +96,15 @@ public class RlpxAgent {
     // Setup metrics
     connectedPeersCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PEERS, "connected_total", "Total number of peers connected");
+            BesuMetricCategory.PEERS, "connected_total", "Total number of peers connected");
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.ETHEREUM,
+        BesuMetricCategory.ETHEREUM,
         "peer_count",
         "The current number of peers connected",
         this::getConnectionCount);
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.ETHEREUM,
+        BesuMetricCategory.ETHEREUM,
         "peer_limit",
         "The maximum number of peers this node allows to connect",
         () -> maxConnections);

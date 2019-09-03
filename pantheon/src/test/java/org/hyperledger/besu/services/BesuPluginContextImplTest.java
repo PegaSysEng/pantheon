@@ -34,10 +34,10 @@ public class BesuPluginContextImplTest {
 
   @BeforeClass
   public static void createFakePluginDir() throws IOException {
-    if (System.getProperty("pantheon.plugins.dir") == null) {
-      final Path pluginDir = Files.createTempDirectory("pantheonTest");
+    if (System.getProperty("besu.plugins.dir") == null) {
+      final Path pluginDir = Files.createTempDirectory("besuTest");
       pluginDir.toFile().deleteOnExit();
-      System.setProperty("pantheon.plugins.dir", pluginDir.toAbsolutePath().toString());
+      System.setProperty("besu.plugins.dir", pluginDir.toAbsolutePath().toString());
     }
   }
 
@@ -48,7 +48,7 @@ public class BesuPluginContextImplTest {
 
   @Test
   public void verifyEverythingGoesSmoothly() {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
 
     assertThat(contextImpl.getPlugins()).isEmpty();
     contextImpl.registerPlugins(new File(".").toPath());
@@ -68,7 +68,7 @@ public class BesuPluginContextImplTest {
 
   @Test
   public void registrationErrorsHandledSmoothly() {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
     System.setProperty("testPicoCLIPlugin.testOption", "FAILREGISTER");
 
     assertThat(contextImpl.getPlugins()).isEmpty();
@@ -84,7 +84,7 @@ public class BesuPluginContextImplTest {
 
   @Test
   public void startErrorsHandledSmoothly() {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
     System.setProperty("testPicoCLIPlugin.testOption", "FAILSTART");
 
     assertThat(contextImpl.getPlugins()).isEmpty();
@@ -106,7 +106,7 @@ public class BesuPluginContextImplTest {
 
   @Test
   public void stopErrorsHandledSmoothly() {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
     System.setProperty("testPicoCLIPlugin.testOption", "FAILSTOP");
 
     assertThat(contextImpl.getPlugins()).isEmpty();
@@ -127,7 +127,7 @@ public class BesuPluginContextImplTest {
 
   @Test
   public void lifecycleExceptions() throws Throwable {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
     final ThrowableAssert.ThrowingCallable registerPlugins =
         () -> contextImpl.registerPlugins(new File(".").toPath());
 

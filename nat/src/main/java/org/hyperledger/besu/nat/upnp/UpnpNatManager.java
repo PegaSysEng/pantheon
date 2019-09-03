@@ -78,7 +78,7 @@ public class UpnpNatManager {
     //   https://github.com/jupnp/jupnp/pull/117
     // However, this fix has not made it into any releases yet.
     // TODO: once a new release is available, remove this @Override
-    this(new UpnpServiceImpl(new PantheonUpnpServiceConfiguration()));
+    this(new UpnpServiceImpl(new BesuUpnpServiceConfiguration()));
   }
 
   /**
@@ -94,7 +94,7 @@ public class UpnpNatManager {
 
     // registry listener to observe new devices and look for specific services
     registryListener =
-        new PantheonUpnpRegistryListener() {
+        new BesuUpnpRegistryListener() {
           @Override
           public void remoteDeviceAdded(final Registry registry, final RemoteDevice device) {
             LOG.debug("UPnP Device discovered: " + device.getDetails().getFriendlyName());

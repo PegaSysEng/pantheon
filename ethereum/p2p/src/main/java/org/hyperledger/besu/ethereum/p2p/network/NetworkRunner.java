@@ -27,10 +27,10 @@ import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 public class NetworkRunner implements AutoCloseable {
   private static final Logger LOG = LogManager.getLogger();
@@ -54,7 +54,7 @@ public class NetworkRunner implements AutoCloseable {
     this.subProtocols = subProtocols;
     inboundMessageCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.NETWORK,
+            BesuMetricCategory.NETWORK,
             "p2p_messages_inbound",
             "Count of each P2P message received inbound.",
             "protocol",

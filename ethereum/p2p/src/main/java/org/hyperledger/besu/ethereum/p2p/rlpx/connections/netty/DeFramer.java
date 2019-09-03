@@ -48,10 +48,10 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.Di
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.HelloMessage;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.WireMessageCodes;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 final class DeFramer extends ByteToMessageDecoder {
 
@@ -85,7 +85,7 @@ final class DeFramer extends ByteToMessageDecoder {
     this.connectionEventDispatcher = connectionEventDispatcher;
     this.outboundMessagesCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.NETWORK,
+            BesuMetricCategory.NETWORK,
             "p2p_messages_outbound",
             "Count of each P2P message sent outbound.",
             "protocol",

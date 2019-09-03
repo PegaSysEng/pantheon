@@ -16,9 +16,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.services.pipeline.Pipe;
 import org.hyperledger.besu.services.tasks.Task;
 import org.hyperledger.besu.util.bytes.BytesValue;
@@ -33,7 +33,7 @@ public class LoadLocalDataStep {
     this.worldStateStorage = worldStateStorage;
     existingNodeCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.SYNCHRONIZER,
+            BesuMetricCategory.SYNCHRONIZER,
             "world_state_existing_nodes_total",
             "Total number of node data requests completed using existing data");
   }

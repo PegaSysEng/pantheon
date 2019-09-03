@@ -28,9 +28,9 @@ import org.hyperledger.besu.ethereum.core.SyncStatus;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.core.Synchronizer.SyncStatusListener;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,17 +74,17 @@ public class SyncStatusNodePermissioningProviderTest {
         ArgumentCaptor.forClass(IntSupplier.class);
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "sync_status_node_check_count",
             "Number of times the sync status permissioning provider has been checked"))
         .thenReturn(checkCounter);
     when(metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "sync_status_node_check_count_permitted",
             "Number of times the sync status permissioning provider has been checked and returned permitted"))
         .thenReturn(checkPermittedCounter);
     when(metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "sync_status_node_check_count_unpermitted",
             "Number of times the sync status permissioning provider has been checked and returned unpermitted"))
         .thenReturn(checkUnpermittedCounter);
@@ -92,7 +92,7 @@ public class SyncStatusNodePermissioningProviderTest {
     this.syncStatusListener = captor.getValue();
     verify(metricsSystem)
         .createIntegerGauge(
-            eq(PantheonMetricCategory.PERMISSIONING),
+            eq(BesuMetricCategory.PERMISSIONING),
             eq("sync_status_node_sync_reached"),
             eq("Whether the sync status permissioning provider has realised sync yet"),
             syncGaugeCallbackCaptor.capture());

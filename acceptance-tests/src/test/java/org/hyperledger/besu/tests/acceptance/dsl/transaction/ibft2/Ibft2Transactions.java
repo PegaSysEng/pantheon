@@ -13,16 +13,16 @@
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2;
 
 import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 
 public class Ibft2Transactions {
   public static final String LATEST = "latest";
 
-  public Ibft2Propose createRemoveProposal(final PantheonNode node) {
+  public Ibft2Propose createRemoveProposal(final BesuNode node) {
     return propose(node.getAddress().toString(), false);
   }
 
-  public Ibft2Propose createAddProposal(final PantheonNode node) {
+  public Ibft2Propose createAddProposal(final BesuNode node) {
     return propose(node.getAddress().toString(), true);
   }
 
@@ -38,7 +38,7 @@ public class Ibft2Transactions {
     return new Ibft2GetValidatorsAtHash(blockHash);
   }
 
-  public Ibft2Discard createDiscardProposal(final PantheonNode node) {
+  public Ibft2Discard createDiscardProposal(final BesuNode node) {
     return new Ibft2Discard(node.getAddress().toString());
   }
 

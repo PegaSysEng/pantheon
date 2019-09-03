@@ -27,17 +27,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.Cluster;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyPantheonNodeFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyBesuNodeFactory;
 import org.junit.rules.TemporaryFolder;
 
 public class PrivacyNet {
   private static final Logger LOG = LogManager.getLogger();
 
-  private static final String PANTHEON_KEYPAIR_NODE_1 = "key";
-  private static final String PANTHEON_KEYPAIR_NODE_2 = "key1";
-  private static final String PANTHEON_KEYPAIR_NODE_3 = "key2";
+  private static final String BESU_KEYPAIR_NODE_1 = "key";
+  private static final String BESU_KEYPAIR_NODE_2 = "key1";
+  private static final String BESU_KEYPAIR_NODE_3 = "key2";
 
-  private static final Map<String, String> KNOWN_PANTHEON_KEYPAIRS = new HashMap<>();
+  private static final Map<String, String> KNOWN_BESU_KEYPAIRS = new HashMap<>();
 
   private final TemporaryFolder temporaryFolder;
   private Cluster cluster;
@@ -45,9 +45,9 @@ public class PrivacyNet {
   private Map<String, PrivacyNode> nodes;
 
   static {
-    KNOWN_PANTHEON_KEYPAIRS.put("Alice", PANTHEON_KEYPAIR_NODE_1);
-    KNOWN_PANTHEON_KEYPAIRS.put("Bob", PANTHEON_KEYPAIR_NODE_2);
-    KNOWN_PANTHEON_KEYPAIRS.put("Charlie", PANTHEON_KEYPAIR_NODE_3);
+    KNOWN_BESU_KEYPAIRS.put("Alice", BESU_KEYPAIR_NODE_1);
+    KNOWN_BESU_KEYPAIRS.put("Bob", BESU_KEYPAIR_NODE_2);
+    KNOWN_BESU_KEYPAIRS.put("Charlie", BESU_KEYPAIR_NODE_3);
   }
 
   private PrivacyNet(
@@ -61,7 +61,7 @@ public class PrivacyNet {
 
   public static PrivacyNet.Builder builder(
       final TemporaryFolder temporaryFolder,
-      final PrivacyPantheonNodeFactory pantheonNodeFactory,
+      final PrivacyBesuNodeFactory pantheonNodeFactory,
       final Cluster cluster,
       final boolean ibft) {
     return new Builder(temporaryFolder, pantheonNodeFactory, cluster, ibft);
@@ -153,7 +153,7 @@ public class PrivacyNet {
 
   public static class Builder {
     private TemporaryFolder temporaryFolder;
-    private PrivacyPantheonNodeFactory pantheonNodeFactory;
+    private PrivacyBesuNodeFactory pantheonNodeFactory;
     private Cluster cluster;
     private final boolean ibft;
 
@@ -163,7 +163,7 @@ public class PrivacyNet {
 
     private Builder(
         final TemporaryFolder temporaryFolder,
-        final PrivacyPantheonNodeFactory pantheonNodeFactory,
+        final PrivacyBesuNodeFactory pantheonNodeFactory,
         final Cluster cluster,
         final boolean ibft) {
       this.temporaryFolder = temporaryFolder;
@@ -216,7 +216,7 @@ public class PrivacyNet {
       }
 
       final PrivacyNode node;
-      final String keyFilePath = KNOWN_PANTHEON_KEYPAIRS.get(name);
+      final String keyFilePath = KNOWN_BESU_KEYPAIRS.get(name);
       if (isMiningEnabled && !ibft) {
         node =
             pantheonNodeFactory.createPrivateTransactionEnabledMinerNode(

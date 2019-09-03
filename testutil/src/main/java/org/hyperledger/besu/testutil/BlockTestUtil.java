@@ -114,7 +114,7 @@ public final class BlockTestUtil {
       try {
         Paths.get(resource.toURI());
       } catch (final FileSystemNotFoundException e) {
-        final Path target = Files.createTempFile("pantheon", null);
+        final Path target = Files.createTempFile("besu", null);
         target.toFile().deleteOnExit();
         Files.copy(resource.openStream(), target, StandardCopyOption.REPLACE_EXISTING);
         return target.toUri().toURL();

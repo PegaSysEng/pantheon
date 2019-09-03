@@ -24,13 +24,13 @@ import java.util.stream.Stream;
 
 import org.awaitility.Awaitility;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class PicoCLIOptionsPluginTest extends AcceptanceTestBase {
-  private PantheonNode node;
+  private BesuNode node;
 
   // context: https://en.wikipedia.org/wiki/The_Magic_Words_are_Squeamish_Ossifrage
   private static final String MAGIC_WORDS = "Squemish Ossifrage";
@@ -38,7 +38,7 @@ public class PicoCLIOptionsPluginTest extends AcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     node =
-        pantheon.createPluginsNode(
+        besu.createPluginsNode(
             "node1",
             Collections.singletonList("testPlugins"),
             Collections.singletonList("--Xtest-option=" + MAGIC_WORDS));

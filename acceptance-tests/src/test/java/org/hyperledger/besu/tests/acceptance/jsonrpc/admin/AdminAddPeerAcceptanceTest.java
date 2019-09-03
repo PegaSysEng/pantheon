@@ -32,8 +32,8 @@ public class AdminAddPeerAcceptanceTest extends AcceptanceTestBase {
     final ClusterConfiguration clusterConfiguration =
         new ClusterConfigurationBuilder().awaitPeerDiscovery(false).build();
     noDiscoveryCluster = new Cluster(clusterConfiguration, net);
-    nodeA = pantheon.createArchiveNodeWithDiscoveryDisabledAndAdmin("nodeA");
-    nodeB = pantheon.createArchiveNodeWithDiscoveryDisabledAndAdmin("nodeB");
+    nodeA = besu.createArchiveNodeWithDiscoveryDisabledAndAdmin("nodeA");
+    nodeB = besu.createArchiveNodeWithDiscoveryDisabledAndAdmin("nodeB");
     noDiscoveryCluster.start(nodeA, nodeB);
   }
 

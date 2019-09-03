@@ -13,10 +13,10 @@
 package org.hyperledger.besu.tests.acceptance;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNodeRunner;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNodeRunner;
-import org.hyperledger.besu.tests.acceptance.dsl.node.ThreadPantheonNodeRunner;
+import org.hyperledger.besu.tests.acceptance.dsl.node.ThreadBesuNodeRunner;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.Cluster;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
@@ -32,10 +32,10 @@ public class ClusterThreadNodeRunnerAcceptanceTest extends AcceptanceTestBase {
   public void setUp() throws Exception {
     final ClusterConfiguration clusterConfiguration =
         new ClusterConfigurationBuilder().awaitPeerDiscovery(false).build();
-    final PantheonNodeRunner pantheonNodeRunner = new ThreadPantheonNodeRunner();
-    noDiscoveryCluster = new Cluster(clusterConfiguration, net, pantheonNodeRunner);
-    final PantheonNode noDiscoveryNode = pantheon.createNodeWithNoDiscovery("noDiscovery");
-    fullNode = pantheon.createArchiveNode("node2");
+    final BesuNodeRunner besuNodeRunner = new ThreadBesuNodeRunner();
+    noDiscoveryCluster = new Cluster(clusterConfiguration, net, besuNodeRunner);
+    final BesuNode noDiscoveryNode = besu.createNodeWithNoDiscovery("noDiscovery");
+    fullNode = besu.createArchiveNode("node2");
     noDiscoveryCluster.start(noDiscoveryNode, fullNode);
   }
 

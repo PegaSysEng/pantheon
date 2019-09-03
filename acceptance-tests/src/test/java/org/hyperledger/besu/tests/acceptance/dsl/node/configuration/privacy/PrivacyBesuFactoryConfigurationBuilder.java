@@ -14,26 +14,25 @@ package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonFactoryConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuFactoryConfiguration;
 
-public class PrivacyPantheonFactoryConfigurationBuilder {
+public class PrivacyBesuFactoryConfigurationBuilder {
 
-  protected PantheonFactoryConfiguration config;
+  protected BesuFactoryConfiguration config;
   protected OrionTestHarness orion;
 
-  public PrivacyPantheonFactoryConfigurationBuilder setConfig(
-      final PantheonFactoryConfiguration config) {
+  public PrivacyBesuFactoryConfigurationBuilder setConfig(final BesuFactoryConfiguration config) {
     this.config = config;
     return this;
   }
 
-  public PrivacyPantheonFactoryConfigurationBuilder setOrion(final OrionTestHarness orion) {
+  public PrivacyBesuFactoryConfigurationBuilder setOrion(final OrionTestHarness orion) {
     this.orion = orion;
     return this;
   }
 
-  public PrivacyPantheonFactoryConfiguration build() {
-    return new PrivacyPantheonFactoryConfiguration(
+  public PrivacyBesuFactoryConfiguration build() {
+    return new PrivacyBesuFactoryConfiguration(
         config.getName(),
         config.getMiningParameters(),
         config.getPrivacyParameters(),

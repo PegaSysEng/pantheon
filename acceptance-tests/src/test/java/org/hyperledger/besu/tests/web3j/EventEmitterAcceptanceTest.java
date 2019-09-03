@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposable;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.web3j.generated.EventEmitter;
 import org.hyperledger.besu.tests.web3j.generated.EventEmitter.StoredEventResponse;
 import org.junit.Before;
@@ -36,11 +36,11 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
  */
 public class EventEmitterAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode node;
+  private BesuNode node;
 
   @Before
   public void setUp() throws Exception {
-    node = pantheon.createMinerNode("node1");
+    node = besu.createMinerNode("node1");
     cluster.start(node);
   }
 

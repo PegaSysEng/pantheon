@@ -123,7 +123,7 @@ public class BesuCommandTest extends CommandTestAbstract {
   @Test
   public void callingHelpSubCommandMustDisplayUsage() {
     parseCommand("--help");
-    final String expectedOutputStart = String.format("Usage:%n%npantheon [OPTIONS] [COMMAND]");
+    final String expectedOutputStart = String.format("Usage:%n%nbesu [OPTIONS] [COMMAND]");
     assertThat(commandOutput.toString()).startsWith(expectedOutputStart);
     assertThat(commandErrorOutput.toString()).isEmpty();
   }
@@ -136,7 +136,7 @@ public class BesuCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void callingVersionDisplayPantheonInfoVersion() {
+  public void callingVersionDisplayBesuInfoVersion() {
     parseCommand("--version");
     assertThat(commandOutput.toString()).isEqualToIgnoringWhitespace(BesuInfo.version());
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -144,7 +144,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   // Testing default values
   @Test
-  public void callingPantheonCommandWithoutOptionsMustSyncWithDefaultValues() throws Exception {
+  public void callingBesuCommandWithoutOptionsMustSyncWithDefaultValues() throws Exception {
     parseCommand();
 
     final ArgumentCaptor<EthNetworkConfig> ethNetworkArg =
@@ -279,7 +279,7 @@ public class BesuCommandTest extends CommandTestAbstract {
     final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
     final String updatedConfig =
         Resources.toString(configFile, UTF_8)
-            .replace("/opt/pantheon/genesis.json", escapeTomlString(genesisFile.toString()));
+            .replace("/opt/besu/genesis.json", escapeTomlString(genesisFile.toString()));
     final Path toml = createTempFile("toml", updatedConfig.getBytes(UTF_8));
 
     final List<RpcApi> expectedApis = asList(ETH, WEB3);
@@ -331,7 +331,7 @@ public class BesuCommandTest extends CommandTestAbstract {
             .setGenesisConfig(encodeJsonGenesis(GENESIS_VALID_JSON))
             .setBootNodes(nodes)
             .build();
-    verify(mockControllerBuilder).dataDirectory(eq(Paths.get("/opt/pantheon").toAbsolutePath()));
+    verify(mockControllerBuilder).dataDirectory(eq(Paths.get("/opt/besu").toAbsolutePath()));
     verify(mockControllerBuilderFactory).fromEthNetworkConfig(eq(networkConfig));
     verify(mockControllerBuilder).synchronizerConfiguration(syncConfigurationCaptor.capture());
 
@@ -749,7 +749,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
     final String configFile = this.getClass().getResource("/partial_config.toml").getFile();
     final String expectedCoinbase = "0x0000000000000000000000000000000000000004";
-    setEnvironemntVariable("PANTHEON_MINER_COINBASE", expectedCoinbase);
+    setEnvironemntVariable("BESU_MINER_COINBASE", expectedCoinbase);
     parseCommand("--config-file", configFile);
 
     verify(mockControllerBuilder)
@@ -767,7 +767,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
     final String configFile = this.getClass().getResource("/partial_config.toml").getFile();
     final String expectedCoinbase = "0x0000000000000000000000000000000000000006";
-    setEnvironemntVariable("PANTHEON_MINER_COINBASE", "0x0000000000000000000000000000000000000004");
+    setEnvironemntVariable("BESU_MINER_COINBASE", "0x0000000000000000000000000000000000000004");
     parseCommand("--config-file", configFile, "--miner-coinbase", expectedCoinbase);
 
     verify(mockControllerBuilder)
@@ -781,7 +781,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void configOptionDisabledUnderDocker() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
@@ -810,7 +810,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void nodekeyOptionDisabledUnderDocker() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
@@ -826,14 +826,14 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void nodekeyDefaultedUnderDocker() throws Exception {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
     parseCommand();
 
     verify(mockControllerBuilder).nodePrivateKeyFile(fileArgumentCaptor.capture());
-    assertThat(fileArgumentCaptor.getValue()).isEqualTo(new File("/var/lib/pantheon/key"));
+    assertThat(fileArgumentCaptor.getValue()).isEqualTo(new File("/var/lib/besu/key"));
   }
 
   @Test
@@ -857,7 +857,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void dataDirDisabledUnderDocker() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
@@ -870,14 +870,14 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void dataDirDefaultedUnderDocker() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
     parseCommand();
 
     verify(mockControllerBuilder).dataDirectory(pathArgumentCaptor.capture());
-    assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(Paths.get("/var/lib/pantheon"));
+    assertThat(pathArgumentCaptor.getValue()).isEqualByComparingTo(Paths.get("/var/lib/besu"));
   }
 
   @Test
@@ -978,7 +978,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void genesisPathDisabledUnderDocker() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
@@ -2201,14 +2201,13 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsPrometheusJobMustBeUsed() {
-    parseCommand(
-        "--metrics-push-enabled", "--metrics-push-prometheus-job", "pantheon-command-test");
+    parseCommand("--metrics-push-enabled", "--metrics-push-prometheus-job", "besu-command-test");
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();
 
     assertThat(metricsConfigArgumentCaptor.getValue().getPrometheusJob())
-        .isEqualTo("pantheon-command-test");
+        .isEqualTo("besu-command-test");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -2228,7 +2227,7 @@ public class BesuCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void pantheonDoesNotStartInMiningModeIfCoinbaseNotSet() {
+  public void besuDoesNotStartInMiningModeIfCoinbaseNotSet() {
     parseCommand("--miner-enabled");
 
     verifyZeroInteractions(mockControllerBuilder);
@@ -2446,7 +2445,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void fullCLIOptionsNotShownWhenInDockerContainer() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     parseCommand("--help");
 
@@ -2560,7 +2559,7 @@ public class BesuCommandTest extends CommandTestAbstract {
   }
 
   private boolean isFullInstantiation() {
-    return !Boolean.getBoolean("pantheon.docker");
+    return !Boolean.getBoolean("besu.docker");
   }
 
   private static String escapeTomlString(final String s) {
@@ -2595,7 +2594,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void privacyPublicKeyFileOptionDisabledUnderDocker() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
@@ -2608,7 +2607,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void rpcHttpAuthCredentialsFileOptionDisabledUnderDocker() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
@@ -2621,7 +2620,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void rpcWsAuthCredentialsFileOptionDisabledUnderDocker() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
@@ -2634,7 +2633,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void permissionsConfigFileOptionDisabledUnderDocker() {
-    System.setProperty("pantheon.docker", "true");
+    System.setProperty("besu.docker", "true");
 
     assumeFalse(isFullInstantiation());
 
@@ -2719,7 +2718,7 @@ public class BesuCommandTest extends CommandTestAbstract {
     final Path genesisFile = createFakeGenesisFile(GENESIS_VALID_JSON);
     final String updatedConfig =
         Resources.toString(configFile, UTF_8)
-                .replace("/opt/pantheon/genesis.json", escapeTomlString(genesisFile.toString()))
+                .replace("/opt/besu/genesis.json", escapeTomlString(genesisFile.toString()))
                 .replace("rpc-http-api", "rpc-http-apis")
             + System.lineSeparator()
             + "invalid_option=true"

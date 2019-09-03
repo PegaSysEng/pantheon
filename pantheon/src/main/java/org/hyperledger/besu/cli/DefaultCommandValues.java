@@ -33,7 +33,7 @@ public interface DefaultCommandValues {
   String MANDATORY_PATH_FORMAT_HELP = "<PATH>";
   String MANDATORY_FILE_FORMAT_HELP = "<FILE>";
   String MANDATORY_DIRECTORY_FORMAT_HELP = "<DIRECTORY>";
-  String PANTHEON_HOME_PROPERTY_NAME = "pantheon.home";
+  String BESU_HOME_PROPERTY_NAME = "besu.home";
   String DEFAULT_DATA_DIR_PATH = "./build/data";
   String MANDATORY_INTEGER_FORMAT_HELP = "<INTEGER>";
   String MANDATORY_DOUBLE_FORMAT_HELP = "<DOUBLE>";
@@ -47,15 +47,15 @@ public interface DefaultCommandValues {
   BytesValue DEFAULT_EXTRA_DATA = BytesValue.EMPTY;
   long DEFAULT_MAX_REFRESH_DELAY = 3600000;
   long DEFAULT_MIN_REFRESH_DELAY = 1;
-  String DOCKER_GENESIS_LOCATION = "/etc/pantheon/genesis.json";
-  String DOCKER_DATADIR_LOCATION = "/var/lib/pantheon";
-  String DOCKER_PLUGINSDIR_LOCATION = "/etc/pantheon/plugins";
+  String DOCKER_GENESIS_LOCATION = "/etc/besu/genesis.json";
+  String DOCKER_DATADIR_LOCATION = "/var/lib/besu";
+  String DOCKER_PLUGINSDIR_LOCATION = "/etc/besu/plugins";
   String DOCKER_RPC_HTTP_AUTHENTICATION_CREDENTIALS_FILE_LOCATION =
-      "/etc/pantheon/rpc_http_auth_config.toml";
+      "/etc/besu/rpc_http_auth_config.toml";
   String DOCKER_RPC_WS_AUTHENTICATION_CREDENTIALS_FILE_LOCATION =
-      "/etc/pantheon/rpc_ws_auth_config.toml";
-  String DOCKER_PRIVACY_PUBLIC_KEY_FILE = "/etc/pantheon/privacy_public_key";
-  String DOCKER_PERMISSIONS_CONFIG_FILE_LOCATION = "/etc/pantheon/permissions_config.toml";
+      "/etc/besu/rpc_ws_auth_config.toml";
+  String DOCKER_PRIVACY_PUBLIC_KEY_FILE = "/etc/besu/privacy_public_key";
+  String DOCKER_PERMISSIONS_CONFIG_FILE_LOCATION = "/etc/besu/permissions_config.toml";
   String PERMISSIONING_CONFIG_LOCATION = "permissions_config.toml";
   String MANDATORY_HOST_FORMAT_HELP = "<HOST>";
   String MANDATORY_PORT_FORMAT_HELP = "<PORT>";
@@ -68,21 +68,21 @@ public interface DefaultCommandValues {
   float DEFAULT_FRACTION_REMOTE_WIRE_CONNECTIONS_ALLOWED =
       RlpxConfiguration.DEFAULT_FRACTION_REMOTE_CONNECTIONS_ALLOWED;
 
-  static Path getDefaultPantheonDataPath(final Object command) {
+  static Path getDefaultBesuDataPath(final Object command) {
     // this property is retrieved from Gradle tasks or Besu running shell script.
-    final String pantheonHomeProperty = System.getProperty(PANTHEON_HOME_PROPERTY_NAME);
-    final Path pantheonHome;
+    final String besuHomeProperty = System.getProperty(BESU_HOME_PROPERTY_NAME);
+    final Path besuHome;
 
     // If prop is found, then use it
-    if (pantheonHomeProperty != null) {
+    if (besuHomeProperty != null) {
       try {
-        pantheonHome = Paths.get(pantheonHomeProperty);
+        besuHome = Paths.get(besuHomeProperty);
       } catch (final InvalidPathException e) {
         throw new CommandLine.ParameterException(
             new CommandLine(command),
             String.format(
                 "Unable to define default data directory from %s property.",
-                PANTHEON_HOME_PROPERTY_NAME),
+                BESU_HOME_PROPERTY_NAME),
             e);
       }
     } else {
@@ -91,7 +91,7 @@ public interface DefaultCommandValues {
       // the property.
       try {
         final String path = new File(DEFAULT_DATA_DIR_PATH).getCanonicalPath();
-        pantheonHome = Paths.get(path);
+        besuHome = Paths.get(path);
       } catch (final IOException e) {
         throw new CommandLine.ParameterException(
             new CommandLine(command), "Unable to create default data directory.");
@@ -102,20 +102,19 @@ public interface DefaultCommandValues {
     // directory. Otherwise, if it doesn't exist or exists but is already a directory,
     // Runner will use it to store data.
     try {
-      Files.createDirectories(pantheonHome);
+      Files.createDirectories(besuHome);
     } catch (final FileAlreadyExistsException e) {
       // Only thrown if it exists but is not a directory
       throw new CommandLine.ParameterException(
           new CommandLine(command),
-          String.format(
-              "%s: already exists and is not a directory.", pantheonHome.toAbsolutePath()),
+          String.format("%s: already exists and is not a directory.", besuHome.toAbsolutePath()),
           e);
     } catch (final Exception e) {
       throw new CommandLine.ParameterException(
           new CommandLine(command),
-          String.format("Error creating directory %s.", pantheonHome.toAbsolutePath()),
+          String.format("Error creating directory %s.", besuHome.toAbsolutePath()),
           e);
     }
-    return pantheonHome;
+    return besuHome;
   }
 }

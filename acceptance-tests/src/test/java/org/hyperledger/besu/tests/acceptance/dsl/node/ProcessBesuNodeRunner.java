@@ -41,20 +41,20 @@ import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.StaticNodesUtils;
 
-public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
+public class ProcessBesuNodeRunner implements BesuNodeRunner {
 
   private final Logger LOG = LogManager.getLogger();
   private final Logger PROCESS_LOG = LogManager.getLogger("tech.pegasys.pantheon.SubProcessLog");
 
-  private final Map<String, Process> pantheonProcesses = new HashMap<>();
+  private final Map<String, Process> besuProcesses = new HashMap<>();
   private final ExecutorService outputProcessorExecutor = Executors.newCachedThreadPool();
 
-  ProcessPantheonNodeRunner() {
+  ProcessBesuNodeRunner() {
     Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
   }
 
   @Override
-  public void startNode(final PantheonNode node) {
+  public void startNode(final BesuNode node) {
     final Path dataDir = node.homeDirectory();
 
     final List<String> params = new ArrayList<>();
@@ -218,15 +218,15 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     try {
       final Process process = processBuilder.start();
       outputProcessorExecutor.execute(() -> printOutput(node, process));
-      pantheonProcesses.put(node.getName(), process);
+      besuProcesses.put(node.getName(), process);
     } catch (final IOException e) {
-      LOG.error("Error starting PantheonNode process", e);
+      LOG.error("Error starting BesuNode process", e);
     }
 
     waitForPortsFile(dataDir);
   }
 
-  private void printOutput(final PantheonNode node, final Process process) {
+  private void printOutput(final BesuNode node, final Process process) {
     try (final BufferedReader in =
         new BufferedReader(new InputStreamReader(process.getInputStream(), UTF_8))) {
       String line = in.readLine();
@@ -239,7 +239,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     }
   }
 
-  private Path createGenesisFile(final PantheonNode node, final String genesisConfig) {
+  private Path createGenesisFile(final BesuNode node, final String genesisConfig) {
     try {
       final Path genesisFile = Files.createTempFile(node.homeDirectory(), "genesis", "");
       genesisFile.toFile().deleteOnExit();
@@ -250,7 +250,7 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
     }
   }
 
-  private void createStaticNodes(final PantheonNode node) {
+  private void createStaticNodes(final BesuNode node) {
     StaticNodesUtils.createStaticNodesFile(node.homeDirectory(), node.getStaticNodes());
   }
 
@@ -259,18 +259,18 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
   }
 
   @Override
-  public void stopNode(final PantheonNode node) {
+  public void stopNode(final BesuNode node) {
     node.stop();
-    if (pantheonProcesses.containsKey(node.getName())) {
-      final Process process = pantheonProcesses.get(node.getName());
-      killPantheonProcess(node.getName(), process);
+    if (besuProcesses.containsKey(node.getName())) {
+      final Process process = besuProcesses.get(node.getName());
+      killBesuProcess(node.getName(), process);
     }
   }
 
   @Override
   public synchronized void shutdown() {
-    final HashMap<String, Process> localMap = new HashMap<>(pantheonProcesses);
-    localMap.forEach(this::killPantheonProcess);
+    final HashMap<String, Process> localMap = new HashMap<>(besuProcesses);
+    localMap.forEach(this::killBesuProcess);
     outputProcessorExecutor.shutdown();
     try {
       if (!outputProcessorExecutor.awaitTermination(5, TimeUnit.SECONDS)) {
@@ -284,11 +284,11 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 
   @Override
   public boolean isActive(final String nodeName) {
-    final Process process = pantheonProcesses.get(nodeName);
+    final Process process = besuProcesses.get(nodeName);
     return process != null && process.isAlive();
   }
 
-  private void killPantheonProcess(final String name, final Process process) {
+  private void killBesuProcess(final String name, final Process process) {
     LOG.info("Killing " + name + " process");
 
     Awaitility.waitAtMost(30, TimeUnit.SECONDS)
@@ -296,10 +296,10 @@ public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
             () -> {
               if (process.isAlive()) {
                 process.destroy();
-                pantheonProcesses.remove(name);
+                besuProcesses.remove(name);
                 return false;
               } else {
-                pantheonProcesses.remove(name);
+                besuProcesses.remove(name);
                 return true;
               }
             });

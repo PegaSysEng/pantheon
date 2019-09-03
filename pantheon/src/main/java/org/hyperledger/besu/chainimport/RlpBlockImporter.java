@@ -26,7 +26,7 @@ import java.util.concurrent.Semaphore;
 
 import com.google.common.base.MoreObjects;
 import org.apache.logging.log4j.Logger;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.Block;
@@ -54,15 +54,15 @@ public class RlpBlockImporter {
    * storage.
    *
    * @param blocks Path to the file containing the blocks
-   * @param pantheonController the PantheonController that defines blockchain behavior
+   * @param besuController the BesuController that defines blockchain behavior
    * @param <C> the consensus context type
    * @return the import result
    * @throws IOException On Failure
    */
   public <C> RlpBlockImporter.ImportResult importBlockchain(
-      final Path blocks, final PantheonController<C> pantheonController) throws IOException {
-    final ProtocolSchedule<C> protocolSchedule = pantheonController.getProtocolSchedule();
-    final ProtocolContext<C> context = pantheonController.getProtocolContext();
+      final Path blocks, final BesuController<C> besuController) throws IOException {
+    final ProtocolSchedule<C> protocolSchedule = besuController.getProtocolSchedule();
+    final ProtocolContext<C> context = besuController.getProtocolContext();
     final MutableBlockchain blockchain = context.getBlockchain();
     int count = 0;
 
@@ -139,7 +139,7 @@ public class RlpBlockImporter {
       } catch (final Exception e) {
         LOG.error("Error shutting down importExecutor", e);
       }
-      pantheonController.close();
+      besuController.close();
     }
   }
 
