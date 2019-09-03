@@ -3,15 +3,15 @@ import java.security.MessageDigest
 
 apply plugin: 'java-library'
 jar {
-    baseName 'plugin-api'
-    manifest {
+  baseName 'plugin-api'
+  manifest {
     attributes(
       'Specification-Title': baseName,
       'Specification-Version': project.version,
       'Implementation-Title': baseName,
       'Implementation-Version': calculateVersion()
       )
-    }
+  }
 }
 
 
