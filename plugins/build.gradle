@@ -1,0 +1,93 @@
+import net.ltgt.gradle.errorprone.CheckSeverity
+import java.security.MessageDigest
+
+apply plugin: 'java-library'
+jar {
+    baseName 'plugin-api'
+    manifest {
+    attributes(
+      'Specification-Title': baseName,
+      'Specification-Version': project.version,
+      'Implementation-Title': baseName,
+      'Implementation-Version': calculateVersion()
+      )
+    }
+}
+
+
+dependencies {
+}
+
+configurations { testArtifacts }
+artifacts { testSupportArtifacts testSupportJar }
+
+class FileStateChecker extends DefaultTask {
+  Set<File> files
+  String knownHash
+
+  @TaskAction
+  def CheckState() {
+    def digestor = MessageDigest.getInstance("SHA-256")
+
+    this.files.sort().each {
+      digestor.update(it.readBytes())
+    }
+    def currentHash = digestor.digest()encodeBase64().toString()
+    if (this.knownHash != currentHash) {
+      throw new GradleException("""For the Plugin APIs the checksum of the project did not match what was expected.
+
+If this is a deliberate change where you have thought through backwards compatibility,
+then update "Expected" for "Calculated" in the appropriate build.gradle as the knownHash for this task.
+Expected   : ${this.knownHash}
+Calculated : ${currentHash}
+""")
+    }
+  }
+}
+
+tasks.register('checkAPIChanges', FileStateChecker) {
+  description = "Checks that the API for the Plugin-API project does not change without deliberate thought"
+  files = sourceSets.main.allJava.files
+  knownHash = 'PBo0D4R6/1EYXEn+k0nmWHW4TkklUWQbQGNqgWzslfw='
+}
+check.dependsOn('checkAPIChanges')
+
+
+
+// publishing {
+  // publications {
+    // mavenJava(MavenPublication) {
+      // from components.java
+      // artifact sourcesJar
+      // artifact javadocJar
+      // versionMapping {
+        // usage('java-api') { fromResolutionOf('runtimeClasspath') }
+        // usage('java-runtime') { fromResolutionResult() }
+      // }
+      // pom {
+        // name = 'Pantheon Plugins Library'
+        // description = 'Core Plugins Libraries for Pantheon'
+        // url = 'http://github.com/PegaSysEng/pantheon-plugin-api'
+        // licenses {
+          // license {
+            // name = 'The Apache License, Version 2.0'
+            // url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+          // }
+        // }
+        // scm {
+          // connection = 'scm:git:git://github.com/PegaSysEng/pantheon-plugin-api.git'
+          // developerConnection = 'scm:git:ssh://github.com/PegaSysEng/pantheon-plugin-api.git'
+          // url = 'https://github.com/PegaSysEng/pantheon-plugin-api'
+        // }
+      // }
+    // }
+  // }
+  // repositories {
+    // maven {
+      // // change URLs to point to your repos, e.g. http://my.org/repo
+      // def releasesRepoUrl = "$buildDir/repos/releases"
+      // def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+      // url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+    // }
+  // }
+// }
