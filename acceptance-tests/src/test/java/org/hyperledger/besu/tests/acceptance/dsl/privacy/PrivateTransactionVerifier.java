@@ -12,7 +12,6 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.EeaConditions;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.ExpectNoPrivateContractDeployedReceipt;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.ExpectNoValidPrivateContractEventsEmitted;
@@ -21,6 +20,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.ExpectValidPrivat
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.ExpectValidPrivateContractEventsEmitted;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.ExpectValidPrivateContractValuesReturned;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.ExpectValidPrivateTransactionReceipt;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 
 public class PrivateTransactionVerifier {
 

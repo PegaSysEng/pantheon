@@ -14,14 +14,18 @@ package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hyperledger.besu.ethereum.eth.sync.fastsync.FastSyncError.NO_PEERS_AVAILABLE;
+import static org.hyperledger.besu.ethereum.eth.sync.fastsync.FastSyncError.UNEXPECTED_ERROR;
+import static org.hyperledger.besu.ethereum.eth.sync.fastsync.FastSyncState.EMPTY_SYNC_STATE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.eth.sync.fastsync.FastSyncError.NO_PEERS_AVAILABLE;
-import static org.hyperledger.besu.ethereum.eth.sync.fastsync.FastSyncError.UNEXPECTED_ERROR;
-import static org.hyperledger.besu.ethereum.eth.sync.fastsync.FastSyncState.EMPTY_SYNC_STATE;
+
+import java.nio.file.Path;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -32,11 +36,6 @@ import org.hyperledger.besu.ethereum.eth.sync.worldstate.NodeDataRequest;
 import org.hyperledger.besu.ethereum.eth.sync.worldstate.StalledDownloadException;
 import org.hyperledger.besu.ethereum.eth.sync.worldstate.WorldStateDownloader;
 import org.hyperledger.besu.services.tasks.TaskCollection;
-
-import java.nio.file.Path;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-
 import org.junit.Test;
 
 public class FastSyncDownloaderTest {

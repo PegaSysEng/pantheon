@@ -15,6 +15,17 @@ package org.hyperledger.besu.chainimport;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+
+import com.google.common.base.MoreObjects;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.controller.PantheonController;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
@@ -29,18 +40,6 @@ import org.hyperledger.besu.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.util.RawBlockIterator;
 import org.hyperledger.besu.util.uint.UInt256;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
-
-import com.google.common.base.MoreObjects;
-import org.apache.logging.log4j.Logger;
-
 /** Tool for importing rlp-encoded block data from files. */
 public class RlpBlockImporter {
   private static final Logger LOG = getLogger();
@@ -51,8 +50,8 @@ public class RlpBlockImporter {
   private final ExecutorService importExecutor = Executors.newSingleThreadExecutor();
 
   /**
-   * Imports blocks that are stored as concatenated RLP sections in the given file into Pantheon's
-   * block storage.
+   * Imports blocks that are stored as concatenated RLP sections in the given file into Besu's block
+   * storage.
    *
    * @param blocks Path to the file containing the blocks
    * @param pantheonController the PantheonController that defines blockchain behavior

@@ -17,7 +17,6 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.core.Address;
-
 import org.junit.Test;
 
 public class VoteTallyTest {

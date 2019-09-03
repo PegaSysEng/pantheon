@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import org.hyperledger.besu.util.Subscribers;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.hyperledger.besu.util.Subscribers;
 
 public class EthMessages {
   private final Map<Integer, Subscribers<MessageCallback>> listenersByCode =

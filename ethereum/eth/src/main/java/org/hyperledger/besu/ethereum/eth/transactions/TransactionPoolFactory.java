@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.eth.transactions;
 
+import java.time.Clock;
+
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
@@ -20,8 +22,6 @@ import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
-
-import java.time.Clock;
 
 public class TransactionPoolFactory {
 

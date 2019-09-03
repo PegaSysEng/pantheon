@@ -16,10 +16,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
-import static org.hyperledger.besu.util.bytes.BytesValue.fromHexStringLenient;
-import static org.hyperledger.besu.util.bytes.BytesValue.wrap;
-import static org.hyperledger.besu.util.bytes.BytesValue.wrapBuffer;
 
 import java.util.Arrays;
 
@@ -89,7 +85,8 @@ public class BytesValueTest {
   }
 
   private static void assertConcatenatedWrap(final byte[] first, final byte[] second) {
-    final byte[] res = BytesValue.wrap(BytesValue.wrap(first), BytesValue.wrap(second)).extractArray();
+    final byte[] res =
+        BytesValue.wrap(BytesValue.wrap(first), BytesValue.wrap(second)).extractArray();
     assertArrayEquals(first, Arrays.copyOfRange(res, 0, first.length));
     assertArrayEquals(second, Arrays.copyOfRange(res, first.length, res.length));
   }
@@ -198,12 +195,17 @@ public class BytesValueTest {
     Assert.assertEquals(BytesValue.of(1), BytesValue.fromHexStringLenient("0x01"));
 
     Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("1FF2A"));
-    Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1FF2A"));
-    Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1ff2a"));
-    Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1fF2a"));
+    Assert.assertEquals(
+        BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1FF2A"));
+    Assert.assertEquals(
+        BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1ff2a"));
+    Assert.assertEquals(
+        BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1fF2a"));
     Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("01FF2A"));
-    Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x01FF2A"));
-    Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x01ff2A"));
+    Assert.assertEquals(
+        BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x01FF2A"));
+    Assert.assertEquals(
+        BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x01ff2A"));
   }
 
   @Test
@@ -227,13 +229,20 @@ public class BytesValueTest {
     Assert.assertEquals(BytesValue.of(0, 0, 1), BytesValue.fromHexStringLenient("0x1", 3));
     Assert.assertEquals(BytesValue.of(0, 0, 1), BytesValue.fromHexStringLenient("0x01", 3));
 
-    Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("1FF2A", 3));
-    Assert.assertEquals(BytesValue.of(0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1FF2A", 4));
-    Assert.assertEquals(BytesValue.of(0x00, 0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1ff2a", 5));
-    Assert.assertEquals(BytesValue.of(0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1fF2a", 4));
-    Assert.assertEquals(BytesValue.of(0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("01FF2A", 4));
-    Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x01FF2A", 3));
-    Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x01ff2A", 3));
+    Assert.assertEquals(
+        BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("1FF2A", 3));
+    Assert.assertEquals(
+        BytesValue.of(0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1FF2A", 4));
+    Assert.assertEquals(
+        BytesValue.of(0x00, 0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1ff2a", 5));
+    Assert.assertEquals(
+        BytesValue.of(0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x1fF2a", 4));
+    Assert.assertEquals(
+        BytesValue.of(0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("01FF2A", 4));
+    Assert.assertEquals(
+        BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x01FF2A", 3));
+    Assert.assertEquals(
+        BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexStringLenient("0x01ff2A", 3));
   }
 
   @Test
@@ -288,10 +297,13 @@ public class BytesValueTest {
     Assert.assertEquals(BytesValue.of(0, 0), BytesValue.fromHexString("0x00", 2));
     Assert.assertEquals(BytesValue.of(0, 0, 1), BytesValue.fromHexString("0x01", 3));
 
-    Assert.assertEquals(BytesValue.of(0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexString("01FF2A", 4));
+    Assert.assertEquals(
+        BytesValue.of(0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexString("01FF2A", 4));
     Assert.assertEquals(BytesValue.of(0x01, 0xff, 0x2a), BytesValue.fromHexString("0x01FF2A", 3));
-    Assert.assertEquals(BytesValue.of(0x00, 0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexString("0x01ff2a", 5));
-    Assert.assertEquals(BytesValue.of(0x00, 0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexString("0x01fF2a", 5));
+    Assert.assertEquals(
+        BytesValue.of(0x00, 0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexString("0x01ff2a", 5));
+    Assert.assertEquals(
+        BytesValue.of(0x00, 0x00, 0x01, 0xff, 0x2a), BytesValue.fromHexString("0x01fF2a", 5));
   }
 
   @Test

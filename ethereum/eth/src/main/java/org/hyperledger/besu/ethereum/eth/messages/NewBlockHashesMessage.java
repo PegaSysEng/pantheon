@@ -12,17 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.eth.messages;
 
+import java.util.Iterator;
+import java.util.Objects;
+
+import com.google.common.collect.Iterators;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.AbstractMessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Iterator;
-import java.util.Objects;
-
-import com.google.common.collect.Iterators;
 
 public final class NewBlockHashesMessage extends AbstractMessageData {
 

@@ -15,14 +15,6 @@ package org.hyperledger.besu.metrics.prometheus;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import org.hyperledger.besu.metrics.LabelledMetric;
-import org.hyperledger.besu.metrics.MetricCategory;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.Observation;
-import org.hyperledger.besu.metrics.OperationTimer;
-import org.hyperledger.besu.metrics.StandardMetricCategory;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,6 +39,13 @@ import io.prometheus.client.hotspot.GarbageCollectorExports;
 import io.prometheus.client.hotspot.MemoryPoolsExports;
 import io.prometheus.client.hotspot.StandardExports;
 import io.prometheus.client.hotspot.ThreadExports;
+import org.hyperledger.besu.metrics.LabelledMetric;
+import org.hyperledger.besu.metrics.MetricCategory;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.Observation;
+import org.hyperledger.besu.metrics.OperationTimer;
+import org.hyperledger.besu.metrics.StandardMetricCategory;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 public class PrometheusMetricsSystem implements MetricsSystem {
 
@@ -54,8 +53,8 @@ public class PrometheusMetricsSystem implements MetricsSystem {
   private final CollectorRegistry registry = new CollectorRegistry(true);
   private final Map<String, LabelledMetric<org.hyperledger.besu.metrics.Counter>> cachedCounters =
       new ConcurrentHashMap<>();
-  private final Map<String, LabelledMetric<OperationTimer>>
-      cachedTimers = new ConcurrentHashMap<>();
+  private final Map<String, LabelledMetric<OperationTimer>> cachedTimers =
+      new ConcurrentHashMap<>();
 
   private final Set<MetricCategory> enabledCategories;
   private final boolean timersEnabled;

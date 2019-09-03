@@ -14,9 +14,9 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.eea;
 
 import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaTransactions;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 
 public abstract class GetValidPrivateTransactionReceipt implements EeaCondition {
 

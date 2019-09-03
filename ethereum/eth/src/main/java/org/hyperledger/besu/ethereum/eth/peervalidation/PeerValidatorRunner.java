@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.eth.peervalidation;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthContext;
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-
 import java.time.Duration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 
 public class PeerValidatorRunner {
   private static final Logger LOG = LogManager.getLogger();

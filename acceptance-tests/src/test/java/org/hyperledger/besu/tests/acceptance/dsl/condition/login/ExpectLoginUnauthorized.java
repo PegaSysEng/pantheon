@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.login;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.login.LoginUnauthorizedTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.login.LoginUnauthorizedTransaction;
 
 public class ExpectLoginUnauthorized implements Condition {
 

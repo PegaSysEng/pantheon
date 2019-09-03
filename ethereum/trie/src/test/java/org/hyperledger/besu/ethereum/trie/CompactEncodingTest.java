@@ -14,13 +14,12 @@ package org.hyperledger.besu.ethereum.trie;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Random;
+
 import org.hyperledger.besu.crypto.Hash;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Random;
-
 import org.junit.Test;
 
 public class CompactEncodingTest {

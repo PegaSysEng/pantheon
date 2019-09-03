@@ -15,16 +15,6 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.clique;
 import static java.util.Collections.emptyList;
 import static org.hyperledger.besu.ethereum.core.Hash.fromHexString;
 
-import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
-import org.hyperledger.besu.config.CliqueConfigOptions;
-import org.hyperledger.besu.config.GenesisConfigFile;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,6 +23,15 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
+import org.hyperledger.besu.config.CliqueConfigOptions;
+import org.hyperledger.besu.config.GenesisConfigFile;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import org.web3j.protocol.core.DefaultBlockParameter;
 
 public class CliqueConditions {
@@ -82,7 +81,8 @@ public class CliqueConditions {
   }
 
   public Condition awaitSignerSetChange(final Node node) {
-    return new AwaitSignerSetChange(node.execute(clique.createGetSigners(CliqueTransactions.LATEST)), clique);
+    return new AwaitSignerSetChange(
+        node.execute(clique.createGetSigners(CliqueTransactions.LATEST)), clique);
   }
 
   private int cliqueBlockPeriod(final PantheonNode node) {

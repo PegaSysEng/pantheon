@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.util.Collection;
+
+import com.google.common.collect.ImmutableSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.core.MutableAccount;
@@ -19,12 +24,6 @@ import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.vm.EVM;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Collection;
-
-import com.google.common.collect.ImmutableSet;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class MainnetMessageCallProcessor extends AbstractMessageProcessor {
   private static final Logger LOG = LogManager.getLogger();

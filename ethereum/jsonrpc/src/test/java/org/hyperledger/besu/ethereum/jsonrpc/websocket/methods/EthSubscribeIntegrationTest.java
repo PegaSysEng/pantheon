@@ -14,14 +14,6 @@ package org.hyperledger.besu.ethereum.jsonrpc.websocket.methods;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketRequestHandler;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.Subscription;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +24,13 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketRequestHandler;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.Subscription;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

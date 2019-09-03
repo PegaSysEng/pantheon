@@ -14,12 +14,11 @@ package org.hyperledger.besu.ethereum.p2p.peers;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.util.Subscribers;
-
 import java.util.Set;
 import java.util.stream.Stream;
 
 import io.vertx.core.impl.ConcurrentHashSet;
+import org.hyperledger.besu.util.Subscribers;
 
 /** Represents a set of peers for which connections should be actively maintained. */
 public class MaintainedPeers {

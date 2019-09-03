@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.perm;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.AccountSmartContractPermissioningTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.AccountSmartContractPermissioningTransactions;
 
 public class AccountSmartContractPermissioningConditions {
 

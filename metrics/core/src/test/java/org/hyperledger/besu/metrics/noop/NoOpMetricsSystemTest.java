@@ -20,7 +20,6 @@ import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.OperationTimer;
 import org.hyperledger.besu.metrics.StandardMetricCategory;
-
 import org.junit.Test;
 
 public class NoOpMetricsSystemTest {

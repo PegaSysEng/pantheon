@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.web3;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.web3.Web3Transactions;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.web3.Web3Transactions;
 
 public class Web3Conditions {
 

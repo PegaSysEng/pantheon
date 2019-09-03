@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.blockcreation;
 
+import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.function.Supplier;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.MutableWorldState;
@@ -27,12 +32,6 @@ import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidationParams;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 import org.hyperledger.besu.ethereum.vm.BlockHashLookup;
-
-import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.function.Supplier;
-
-import com.google.common.collect.Lists;
 
 /**
  * Responsible for extracting transactions from PendingTransactions and determining if the

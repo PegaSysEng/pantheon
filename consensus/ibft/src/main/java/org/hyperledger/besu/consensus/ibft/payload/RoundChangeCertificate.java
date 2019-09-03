@@ -12,10 +12,6 @@
  */
 package org.hyperledger.besu.consensus.ibft.payload;
 
-import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
-import org.hyperledger.besu.ethereum.rlp.RLPInput;
-import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +19,9 @@ import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 
 public class RoundChangeCertificate {
 

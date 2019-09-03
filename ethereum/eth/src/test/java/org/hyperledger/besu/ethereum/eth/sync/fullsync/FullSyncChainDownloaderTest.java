@@ -16,8 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
-import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
+import org.awaitility.Awaitility;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
@@ -29,7 +34,9 @@ import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
+import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
+import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
 import org.hyperledger.besu.ethereum.eth.messages.EthPV62;
 import org.hyperledger.besu.ethereum.eth.messages.GetBlockHeadersMessage;
 import org.hyperledger.besu.ethereum.eth.sync.ChainDownloader;
@@ -41,14 +48,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.Di
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-
-import org.awaitility.Awaitility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -115,7 +114,8 @@ public class FullSyncChainDownloaderTest {
 
     final RespondingEthPeer peer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
         syncConfigBuilder().downloaderChainSegmentSize(10).build();
@@ -141,7 +141,8 @@ public class FullSyncChainDownloaderTest {
 
     final RespondingEthPeer peer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
         syncConfigBuilder().downloaderChainSegmentSize(10).build();
@@ -167,7 +168,8 @@ public class FullSyncChainDownloaderTest {
 
     final RespondingEthPeer peer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
         syncConfigBuilder().downloaderChainSegmentSize(4).build();
@@ -193,7 +195,8 @@ public class FullSyncChainDownloaderTest {
 
     final RespondingEthPeer peer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final ChainDownloader downloader = downloader();
     downloader.start();
@@ -225,7 +228,8 @@ public class FullSyncChainDownloaderTest {
 
     final RespondingEthPeer peer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
         syncConfigBuilder().downloaderChainSegmentSize(10).build();
@@ -247,7 +251,8 @@ public class FullSyncChainDownloaderTest {
   public void choosesBestPeerAsSyncTarget_byTd() {
     final UInt256 localTd = localBlockchain.getChainHead().getTotalDifficulty();
 
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
     final RespondingEthPeer peerA =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, localTd.plus(100));
     final RespondingEthPeer peerB =
@@ -268,7 +273,8 @@ public class FullSyncChainDownloaderTest {
   public void choosesBestPeerAsSyncTarget_byTdAndHeight() {
     final UInt256 localTd = localBlockchain.getChainHead().getTotalDifficulty();
 
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
     final RespondingEthPeer peerA =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, localTd.plus(100), 100);
     final RespondingEthPeer peerB =
@@ -305,8 +311,10 @@ public class FullSyncChainDownloaderTest {
     final Blockchain shorterChain = createShortChain(otherBlockchain, secondBestPeerChainHead);
     final RespondingEthPeer secondBestPeer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, shorterChain);
-    final RespondingEthPeer.Responder bestResponder = RespondingEthPeer.blockchainResponder(otherBlockchain);
-    final RespondingEthPeer.Responder secondBestResponder = RespondingEthPeer.blockchainResponder(shorterChain);
+    final RespondingEthPeer.Responder bestResponder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder secondBestResponder =
+        RespondingEthPeer.blockchainResponder(shorterChain);
     downloader.start();
 
     // Process through sync target selection
@@ -370,14 +378,16 @@ public class FullSyncChainDownloaderTest {
     final long bestPeerChainHead = otherBlockchain.getChainHeadBlockNumber();
     final RespondingEthPeer bestPeer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
-    final RespondingEthPeer.Responder bestResponder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder bestResponder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     // Create some other peers that are available to sync from
     final int otherPeersCount = 5;
     final List<RespondingEthPeer> otherPeers = new ArrayList<>(otherPeersCount);
     final long otherChainhead = bestPeerChainHead - 3;
     final Blockchain shorterChain = createShortChain(otherBlockchain, otherChainhead);
-    final RespondingEthPeer.Responder otherResponder = RespondingEthPeer.blockchainResponder(shorterChain);
+    final RespondingEthPeer.Responder otherResponder =
+        RespondingEthPeer.blockchainResponder(shorterChain);
     for (int i = 0; i < otherPeersCount; i++) {
       final RespondingEthPeer otherPeer =
           EthProtocolManagerTestUtil.createPeer(ethProtocolManager, shorterChain);

@@ -12,17 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.tasks;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthContext;
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import org.hyperledger.besu.ethereum.eth.manager.task.AbstractEthTask;
-import org.hyperledger.besu.ethereum.eth.manager.task.AbstractPeerTask;
-import org.hyperledger.besu.ethereum.eth.manager.task.GetHeadersFromPeerByNumberTask;
-import org.hyperledger.besu.ethereum.ProtocolContext;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import org.hyperledger.besu.ethereum.util.BlockchainUtil;
-import org.hyperledger.besu.metrics.MetricsSystem;
-
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
@@ -30,6 +19,16 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.task.AbstractEthTask;
+import org.hyperledger.besu.ethereum.eth.manager.task.AbstractPeerTask;
+import org.hyperledger.besu.ethereum.eth.manager.task.GetHeadersFromPeerByNumberTask;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.util.BlockchainUtil;
+import org.hyperledger.besu.metrics.MetricsSystem;
 
 /**
  * Finds the common ancestor with the given peer. It is assumed that the peer will at least share

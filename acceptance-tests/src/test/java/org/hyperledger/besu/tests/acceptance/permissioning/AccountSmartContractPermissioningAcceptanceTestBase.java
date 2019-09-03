@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.tests.acceptance.permissioning;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.perm.AccountSmartContractPermissioningConditions;
@@ -22,11 +27,6 @@ import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.ClusterConfigurati
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.permissioning.PermissionedNodeBuilder;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.AccountSmartContractPermissioningTransactions;
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-
-import java.io.IOException;
-import java.util.List;
 
 class AccountSmartContractPermissioningAcceptanceTestBase extends AcceptanceTestBase {
 

@@ -14,13 +14,12 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.junit.Test;
 
 public class FilterParameterTest {

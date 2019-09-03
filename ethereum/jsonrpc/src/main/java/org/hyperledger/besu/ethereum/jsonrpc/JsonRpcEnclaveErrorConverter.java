@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 
 public class JsonRpcEnclaveErrorConverter {
 

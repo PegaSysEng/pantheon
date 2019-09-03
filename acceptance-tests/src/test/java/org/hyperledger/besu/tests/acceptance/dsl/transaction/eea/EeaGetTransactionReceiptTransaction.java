@@ -14,12 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.eea;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory.PrivateTransactionReceipt;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory.PrivateTransactionReceiptResponse;
-
-import java.io.IOException;
 
 public class EeaGetTransactionReceiptTransaction implements Transaction<PrivateTransactionReceipt> {
 

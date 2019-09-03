@@ -14,12 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.net;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetPeerCountTransaction;
+import java.math.BigInteger;
+
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-
-import java.math.BigInteger;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetPeerCountTransaction;
 
 public class AwaitNetPeerCount implements Condition {
 

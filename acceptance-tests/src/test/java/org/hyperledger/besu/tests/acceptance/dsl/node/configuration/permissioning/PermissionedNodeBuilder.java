@@ -15,21 +15,6 @@ package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.permissioni
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
-import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
-import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
-import org.hyperledger.besu.ethereum.permissioning.SmartContractPermissioningConfiguration;
-import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor;
-import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonFactoryConfigurationBuilder;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -48,6 +33,20 @@ import java.util.stream.Collectors;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import org.assertj.core.util.Lists;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
+import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor;
+import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonFactoryConfigurationBuilder;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeFactory;
 
 public class PermissionedNodeBuilder {
 

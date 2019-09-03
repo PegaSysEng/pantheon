@@ -12,17 +12,17 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
 
 public class EthGetBlockTransactionCountByNumber extends AbstractBlockParameterMethod {
 
   public EthGetBlockTransactionCountByNumber(
-          final BlockchainQueries blockchain, final JsonRpcParameter parameters) {
+      final BlockchainQueries blockchain, final JsonRpcParameter parameters) {
     super(blockchain, parameters);
   }
 

@@ -26,7 +26,6 @@ import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockProcessor.TransactionReceiptFactory;
 import org.hyperledger.besu.ethereum.vm.TestBlockchain;
 import org.hyperledger.besu.ethereum.vm.WorldStateMock;
-
 import org.junit.Test;
 
 public class MainnetBlockProcessorTest {

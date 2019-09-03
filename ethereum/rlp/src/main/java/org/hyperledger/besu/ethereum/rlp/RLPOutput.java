@@ -14,15 +14,15 @@ package org.hyperledger.besu.ethereum.rlp;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.bytes.BytesValues;
-import org.hyperledger.besu.util.bytes.MutableBytesValue;
-import org.hyperledger.besu.util.uint.UInt256Value;
-
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.function.BiConsumer;
+
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.uint.UInt256Value;
 
 /**
  * An output used to encode data in RLP encoding.

@@ -14,12 +14,11 @@ package org.hyperledger.besu.ethereum.eth.sync;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.util.List;
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 public class CheckpointRangeHeaders {
   private final CheckpointRange checkpointRange;

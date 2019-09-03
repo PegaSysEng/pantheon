@@ -17,11 +17,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.hyperledger.besu.metrics.Counter;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hyperledger.besu.metrics.Counter;
 import org.junit.Test;
 
 public class PipeTest {

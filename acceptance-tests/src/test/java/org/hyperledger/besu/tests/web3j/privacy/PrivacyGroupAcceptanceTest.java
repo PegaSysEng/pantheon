@@ -14,15 +14,14 @@ package org.hyperledger.besu.tests.web3j.privacy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNet;
-import org.hyperledger.besu.enclave.Enclave;
-import org.hyperledger.besu.enclave.types.CreatePrivacyGroupRequest;
-import org.hyperledger.besu.enclave.types.PrivacyGroup;
-
 import java.util.List;
 
 import org.awaitility.Awaitility;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.types.CreatePrivacyGroupRequest;
+import org.hyperledger.besu.enclave.types.PrivacyGroup;
+import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBase;
+import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNet;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import org.hyperledger.besu.testutil.MockExecutorService;
-
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +19,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.hyperledger.besu.testutil.MockExecutorService;
 
 /** Schedules tasks that run immediately and synchronously for testing. */
 public class DeterministicEthScheduler extends EthScheduler {

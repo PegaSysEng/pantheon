@@ -14,13 +14,12 @@ package org.hyperledger.besu.metrics.rocksdb;
 
 import static org.hyperledger.besu.metrics.PantheonMetricCategory.KVSTORE_ROCKSDB_STATS;
 
-import org.hyperledger.besu.metrics.prometheus.PrometheusMetricsSystem;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import io.prometheus.client.Collector;
+import org.hyperledger.besu.metrics.prometheus.PrometheusMetricsSystem;
 import org.rocksdb.HistogramData;
 import org.rocksdb.HistogramType;
 import org.rocksdb.Statistics;

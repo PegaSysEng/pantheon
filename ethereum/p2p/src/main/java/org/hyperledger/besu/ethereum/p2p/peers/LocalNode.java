@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.p2p.peers;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
-
-import java.util.List;
 
 public interface LocalNode {
 

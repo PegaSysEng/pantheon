@@ -14,6 +14,12 @@ package org.hyperledger.besu.ethereum.retesteth;
 
 import static org.hyperledger.besu.config.JsonUtil.normalizeKeys;
 
+import java.util.Optional;
+import java.util.concurrent.locks.ReentrantLock;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.config.JsonGenesisConfigOptions;
 import org.hyperledger.besu.config.JsonUtil;
 import org.hyperledger.besu.ethereum.ProtocolContext;
@@ -52,13 +58,6 @@ import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
-
-import java.util.Optional;
-import java.util.concurrent.locks.ReentrantLock;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class RetestethContext {
 

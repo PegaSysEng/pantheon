@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.p2p.peers;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
 
 class DefaultLocalNode implements MutableLocalNode {
 

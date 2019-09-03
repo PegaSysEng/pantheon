@@ -18,7 +18,6 @@ import static org.hyperledger.besu.tests.web3j.generated.RevertReason.FUNC_REVER
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.hyperledger.besu.tests.web3j.generated.RevertReason;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;

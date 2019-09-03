@@ -12,19 +12,15 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc;
 
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.hyperledger.besu.config.GenesisConfigOptions;
 import org.hyperledger.besu.enclave.Enclave;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.FilterManager;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.miner.MinerSetCoinbase;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.miner.MinerSetEtherbase;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.miner.MinerStart;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.miner.MinerStop;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea.EeaGetTransactionCount;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea.EeaGetTransactionReceipt;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea.EeaPrivateNonceProvider;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea.EeaSendRawTransaction;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResultFactory;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -32,6 +28,7 @@ import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.FilterManager;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.AdminAddPeer;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.AdminChangeLogLevel;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.AdminNodeInfo;
@@ -93,6 +90,10 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.TxPoolPantheonStat
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.TxPoolPantheonTransactions;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.Web3Sha3;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.miner.MinerSetCoinbase;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.miner.MinerSetEtherbase;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.miner.MinerStart;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.miner.MinerStop;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.permissioning.PermAddAccountsToWhitelist;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.permissioning.PermAddNodesToWhitelist;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.permissioning.PermGetAccountsWhitelist;
@@ -101,6 +102,10 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.permissioning.Perm
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveAccountsFromWhitelist;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveNodesFromWhitelist;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea.EeaGetTransactionCount;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea.EeaGetTransactionReceipt;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea.EeaPrivateNonceProvider;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea.EeaSendRawTransaction;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.priv.PrivCreatePrivacyGroup;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.priv.PrivDeletePrivacyGroup;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.priv.PrivFindPrivacyGroup;
@@ -110,6 +115,8 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.priv.PrivG
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockReplay;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTracer;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.TransactionTracer;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResultFactory;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
@@ -125,13 +132,6 @@ import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-
-import java.math.BigInteger;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 public class JsonRpcMethodsFactory {
 

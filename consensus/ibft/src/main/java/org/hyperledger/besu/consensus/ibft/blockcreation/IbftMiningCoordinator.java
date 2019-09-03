@@ -14,6 +14,10 @@ package org.hyperledger.besu.consensus.ibft.blockcreation;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.consensus.ibft.IbftEventQueue;
 import org.hyperledger.besu.consensus.ibft.IbftProcessor;
 import org.hyperledger.besu.consensus.ibft.ibftevent.NewChainHead;
@@ -27,11 +31,6 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.logging.log4j.Logger;
 
 public class IbftMiningCoordinator implements MiningCoordinator, BlockAddedObserver {
 

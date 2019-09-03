@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.metrics.vertx;
 
-import org.hyperledger.besu.metrics.MetricsSystem;
-
 import io.vertx.core.VertxOptions;
 import io.vertx.core.spi.VertxMetricsFactory;
 import io.vertx.core.spi.metrics.VertxMetrics;
+import org.hyperledger.besu.metrics.MetricsSystem;
 
 public class VertxMetricsAdapterFactory implements VertxMetricsFactory {
 

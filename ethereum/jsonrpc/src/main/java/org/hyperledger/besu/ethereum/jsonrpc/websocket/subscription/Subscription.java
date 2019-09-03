@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription;
 
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 
 public class Subscription {
 

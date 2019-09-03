@@ -17,7 +17,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
 import org.hyperledger.besu.util.number.PositiveNumber;
-
 import org.junit.Test;
 
 public class EthProtocolOptionsTest
@@ -26,7 +25,7 @@ public class EthProtocolOptionsTest
   @Test
   public void parsesValidEwpMaxGetHeadersOptions() {
 
-    final TestPantheonCommand cmd = parseCommand("--Xewp-max-get-headers", "13");
+    final TestBesuCommand cmd = parseCommand("--Xewp-max-get-headers", "13");
 
     final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
@@ -47,7 +46,7 @@ public class EthProtocolOptionsTest
 
   @Test
   public void parsesValidEwpMaxGetBodiesOptions() {
-    final TestPantheonCommand cmd = parseCommand("--Xewp-max-get-bodies", "14");
+    final TestBesuCommand cmd = parseCommand("--Xewp-max-get-bodies", "14");
 
     final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
@@ -69,7 +68,7 @@ public class EthProtocolOptionsTest
 
   @Test
   public void parsesValidEwpMaxGetReceiptsOptions() {
-    final TestPantheonCommand cmd = parseCommand("--Xewp-max-get-receipts", "15");
+    final TestBesuCommand cmd = parseCommand("--Xewp-max-get-receipts", "15");
 
     final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
@@ -92,7 +91,7 @@ public class EthProtocolOptionsTest
 
   @Test
   public void parsesValidEwpMaxGetNodeDataOptions() {
-    final TestPantheonCommand cmd = parseCommand("--Xewp-max-get-node-data", "16");
+    final TestBesuCommand cmd = parseCommand("--Xewp-max-get-node-data", "16");
 
     final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
@@ -137,7 +136,7 @@ public class EthProtocolOptionsTest
   }
 
   @Override
-  EthProtocolOptions getOptionsFromPantheonCommand(final TestPantheonCommand pantheonCommand) {
+  EthProtocolOptions getOptionsFromPantheonCommand(final TestBesuCommand pantheonCommand) {
     return pantheonCommand.getEthProtocolOptions();
   }
 }

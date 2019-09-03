@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.vm.ehalt;
 
-import org.hyperledger.besu.ethereum.vm.EVM;
-import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
-import org.hyperledger.besu.ethereum.vm.MessageFrame;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+
+import org.hyperledger.besu.ethereum.vm.EVM;
+import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
+import org.hyperledger.besu.ethereum.vm.MessageFrame;
 
 public class ExceptionalHaltManager {
 

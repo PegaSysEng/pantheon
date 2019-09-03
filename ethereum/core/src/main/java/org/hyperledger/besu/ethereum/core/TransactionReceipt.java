@@ -12,17 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import org.hyperledger.besu.ethereum.mainnet.TransactionReceiptType;
-import org.hyperledger.besu.ethereum.rlp.RLPException;
-import org.hyperledger.besu.ethereum.rlp.RLPInput;
-import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.mainnet.TransactionReceiptType;
+import org.hyperledger.besu.ethereum.rlp.RLPException;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLPOutput;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * A transaction receipt, containing information pertaining a transaction execution.

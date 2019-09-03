@@ -16,23 +16,6 @@ import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
-import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.IbftMessage;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
-import org.hyperledger.besu.consensus.ibft.payload.Payload;
-import org.hyperledger.besu.consensus.ibft.payload.PreparePayload;
-import org.hyperledger.besu.consensus.ibft.payload.RoundChangePayload;
-import org.hyperledger.besu.consensus.ibft.payload.SignedData;
-import org.hyperledger.besu.consensus.ibft.messagedata.CommitMessageData;
-import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
-import org.hyperledger.besu.consensus.ibft.messagedata.PrepareMessageData;
-import org.hyperledger.besu.consensus.ibft.messagedata.ProposalMessageData;
-import org.hyperledger.besu.consensus.ibft.messagedata.RoundChangeMessageData;
-import org.hyperledger.besu.consensus.ibft.statemachine.PreparedRoundArtifacts;
-import org.hyperledger.besu.crypto.SECP256K1.Signature;
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -42,6 +25,22 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
+import org.hyperledger.besu.consensus.ibft.messagedata.CommitMessageData;
+import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
+import org.hyperledger.besu.consensus.ibft.messagedata.PrepareMessageData;
+import org.hyperledger.besu.consensus.ibft.messagedata.ProposalMessageData;
+import org.hyperledger.besu.consensus.ibft.messagedata.RoundChangeMessageData;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.IbftMessage;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
+import org.hyperledger.besu.consensus.ibft.payload.Payload;
+import org.hyperledger.besu.consensus.ibft.payload.PreparePayload;
+import org.hyperledger.besu.consensus.ibft.payload.RoundChangePayload;
+import org.hyperledger.besu.consensus.ibft.payload.SignedData;
+import org.hyperledger.besu.consensus.ibft.statemachine.PreparedRoundArtifacts;
+import org.hyperledger.besu.crypto.SECP256K1.Signature;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 
 public class RoundSpecificPeers {
 

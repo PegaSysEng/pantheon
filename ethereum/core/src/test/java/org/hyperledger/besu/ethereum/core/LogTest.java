@@ -15,7 +15,6 @@ package org.hyperledger.besu.ethereum.core;
 import static org.junit.Assert.assertEquals;
 
 import org.hyperledger.besu.ethereum.rlp.RLP;
-
 import org.junit.Test;
 
 public class LogTest {

@@ -12,9 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import org.hyperledger.besu.ethereum.core.Address;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
+import org.hyperledger.besu.ethereum.core.Address;
 
 /** A AccountAddress mock for testing. */
 public class AddressMock extends Address {

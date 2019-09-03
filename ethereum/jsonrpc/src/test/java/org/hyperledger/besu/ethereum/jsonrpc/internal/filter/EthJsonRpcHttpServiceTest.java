@@ -14,12 +14,6 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.core.Block;
-import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.core.Transaction;
-import org.hyperledger.besu.ethereum.jsonrpc.AbstractJsonRpcHttpServiceTest;
-
 import java.io.IOException;
 
 import io.vertx.core.json.Json;
@@ -28,6 +22,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.jsonrpc.AbstractJsonRpcHttpServiceTest;
 import org.junit.Test;
 
 public class EthJsonRpcHttpServiceTest extends AbstractJsonRpcHttpServiceTest {

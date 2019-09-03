@@ -13,11 +13,11 @@
 package org.hyperledger.besu.services.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hyperledger.besu.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
 
 import java.util.function.Function;
 

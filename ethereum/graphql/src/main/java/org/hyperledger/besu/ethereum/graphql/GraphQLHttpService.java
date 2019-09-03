@@ -16,13 +16,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Streams.stream;
 import static org.hyperledger.besu.util.NetworkUtility.urlForSocketAddress;
 
-import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLErrorResponse;
-import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLJsonRequest;
-import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLResponse;
-import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLSuccessResponse;
-import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLResponseType;
-import org.hyperledger.besu.util.NetworkUtility;
-
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.file.Path;
@@ -59,6 +52,12 @@ import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLErrorResponse;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLJsonRequest;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLResponse;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLResponseType;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLSuccessResponse;
+import org.hyperledger.besu.util.NetworkUtility;
 
 public class GraphQLHttpService {
 

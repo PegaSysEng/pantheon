@@ -13,7 +13,6 @@
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.eth;
 
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 

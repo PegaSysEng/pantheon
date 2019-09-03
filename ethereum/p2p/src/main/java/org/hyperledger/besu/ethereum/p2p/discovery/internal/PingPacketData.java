@@ -43,8 +43,7 @@ public class PingPacketData implements PacketData {
   }
 
   public static PingPacketData create(final Endpoint from, final Endpoint to) {
-    return new PingPacketData(
-        from, to, System.currentTimeMillis() + DEFAULT_EXPIRATION_PERIOD_MS);
+    return new PingPacketData(from, to, System.currentTimeMillis() + DEFAULT_EXPIRATION_PERIOD_MS);
   }
 
   public static PingPacketData readFrom(final RLPInput in) {

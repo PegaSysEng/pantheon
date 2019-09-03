@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.chain;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
-
-import java.util.List;
 
 public interface MutableBlockchain extends Blockchain {
 

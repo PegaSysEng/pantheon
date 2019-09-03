@@ -15,7 +15,6 @@ package org.hyperledger.besu.consensus.ibft;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.core.Address;
-
 import org.junit.Test;
 
 public class VoteTest {

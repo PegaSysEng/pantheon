@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.cli.options;
 
-import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
 
 public class RocksDBOptionsTest
     extends AbstractCLIOptionsTest<RocksDbConfiguration.Builder, RocksDBOptions> {
@@ -40,7 +40,7 @@ public class RocksDBOptionsTest
   }
 
   @Override
-  RocksDBOptions getOptionsFromPantheonCommand(final TestPantheonCommand command) {
+  RocksDBOptions getOptionsFromPantheonCommand(final TestBesuCommand command) {
     return command.getRocksDBOptions();
   }
 

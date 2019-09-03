@@ -12,8 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugTraceTransactionResult;
+import java.util.Collection;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.debug.TraceOptions;
@@ -23,19 +25,16 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParamete
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.TransactionTraceParams;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTrace;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTracer;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugTraceTransactionResult;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.ethereum.vm.DebugOperationTracer;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Collection;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class DebugTraceBlock implements JsonRpcMethod {
 

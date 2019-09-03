@@ -19,15 +19,6 @@ import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_FILE_FORMA
 import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_PATH_FORMAT_HELP;
 import static org.hyperledger.besu.cli.subcommands.operator.OperatorSubCommand.COMMAND_NAME;
 
-import org.hyperledger.besu.cli.PantheonCommand;
-import org.hyperledger.besu.config.JsonGenesisConfigOptions;
-import org.hyperledger.besu.config.JsonUtil;
-import org.hyperledger.besu.consensus.ibft.IbftExtraData;
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.Util;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -46,6 +37,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.Resources;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.cli.BesuCommand;
+import org.hyperledger.besu.config.JsonGenesisConfigOptions;
+import org.hyperledger.besu.config.JsonUtil;
+import org.hyperledger.besu.consensus.ibft.IbftExtraData;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Util;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
@@ -67,7 +66,7 @@ public class OperatorSubCommand implements Runnable {
 
   @SuppressWarnings("unused")
   @ParentCommand
-  private PantheonCommand parentCommand; // Picocli injects reference to parent command
+  private BesuCommand parentCommand; // Picocli injects reference to parent command
 
   @SuppressWarnings("unused")
   @Spec

@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.eth.transactions;
 
+import java.util.Set;
+import java.util.stream.StreamSupport;
+
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.messages.LimitedTransactionsMessages;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
-
-import java.util.Set;
-import java.util.stream.StreamSupport;
 
 class TransactionsMessageSender {
 

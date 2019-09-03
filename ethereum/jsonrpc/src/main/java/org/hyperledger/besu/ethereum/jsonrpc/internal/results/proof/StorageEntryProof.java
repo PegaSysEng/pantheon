@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results.proof;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class StorageEntryProof {
 

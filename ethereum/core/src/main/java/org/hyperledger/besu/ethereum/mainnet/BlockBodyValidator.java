@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
-
-import java.util.List;
 
 /** Validates block bodies. */
 public interface BlockBodyValidator<C> {

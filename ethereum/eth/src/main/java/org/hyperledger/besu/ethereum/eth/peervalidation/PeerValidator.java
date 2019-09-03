@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.eth.peervalidation;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 
 public interface PeerValidator {
 

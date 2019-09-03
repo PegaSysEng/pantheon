@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.services.pipeline;
 
-import org.hyperledger.besu.metrics.Counter;
-
 import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -22,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.metrics.Counter;
 
 /**
  * Forms the connection between two pipeline stages. A pipe is essentially a blocking queue with the

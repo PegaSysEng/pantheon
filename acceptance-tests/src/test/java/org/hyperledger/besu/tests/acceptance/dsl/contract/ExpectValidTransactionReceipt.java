@@ -14,11 +14,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.contract;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-
 import java.math.BigInteger;
 import java.util.Optional;
 
+import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.Contract;
 

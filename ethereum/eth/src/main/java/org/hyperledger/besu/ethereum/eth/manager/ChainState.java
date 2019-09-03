@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
+import com.google.common.base.MoreObjects;
 import org.hyperledger.besu.ethereum.chain.ChainHead;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import com.google.common.base.MoreObjects;
 
 public class ChainState {
   // The best block by total difficulty that we know about

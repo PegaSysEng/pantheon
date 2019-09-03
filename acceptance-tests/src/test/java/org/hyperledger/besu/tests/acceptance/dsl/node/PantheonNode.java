@@ -16,32 +16,6 @@ import static java.util.Collections.unmodifiableList;
 import static net.consensys.cava.io.file.Files.copyResource;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.admin.AdminRequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueRequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.miner.MinerRequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.CustomRequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivRequestFactory;
-import org.hyperledger.besu.controller.KeyPairUtil;
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.MiningParameters;
-import org.hyperledger.besu.ethereum.core.PrivacyParameters;
-import org.hyperledger.besu.ethereum.core.Util;
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
-import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
-import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -63,6 +37,31 @@ import com.google.common.io.RecursiveDeleteOption;
 import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
+import org.hyperledger.besu.controller.KeyPairUtil;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.MiningParameters;
+import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.ethereum.core.Util;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.admin.AdminRequestFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueRequestFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.login.LoginRequestFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.miner.MinerRequestFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.CustomRequestFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivRequestFactory;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.JsonRpc2_0Web3j;
@@ -422,7 +421,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
       portsProperties.load(fis);
       LOG.info("Ports for node {}: {}", name, portsProperties);
     } catch (final IOException e) {
-      throw new RuntimeException("Error reading Pantheon ports file", e);
+      throw new RuntimeException("Error reading Besu ports file", e);
     }
   }
 

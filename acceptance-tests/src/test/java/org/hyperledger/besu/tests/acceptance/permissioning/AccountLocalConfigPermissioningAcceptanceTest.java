@@ -14,14 +14,13 @@ package org.hyperledger.besu.tests.acceptance.permissioning;
 
 import static org.web3j.utils.Convert.Unit.ETHER;
 
-import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.account.TransferTransaction;
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-
 import java.math.BigInteger;
 import java.util.Collections;
 
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
+import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.account.TransferTransaction;
 import org.junit.Before;
 import org.junit.Test;
 

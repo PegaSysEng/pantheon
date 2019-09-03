@@ -14,7 +14,6 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.contract;
 
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.CallSmartContractFunction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.DeploySmartContractTransaction;
-
 import org.web3j.tx.Contract;
 
 public class ContractTransactions {

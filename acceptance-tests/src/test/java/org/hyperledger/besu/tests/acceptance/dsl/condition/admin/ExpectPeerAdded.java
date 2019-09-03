@@ -14,9 +14,9 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.admin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.admin.AddPeerTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.admin.AddPeerTransaction;
 
 public class ExpectPeerAdded implements Condition {
 

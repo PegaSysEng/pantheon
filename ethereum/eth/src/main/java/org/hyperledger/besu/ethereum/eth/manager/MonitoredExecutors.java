@@ -12,11 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import org.hyperledger.besu.ethereum.eth.manager.bounded.BoundedQueue;
-import org.hyperledger.besu.metrics.Counter;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-
 import java.util.Locale;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +27,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.hyperledger.besu.ethereum.eth.manager.bounded.BoundedQueue;
+import org.hyperledger.besu.metrics.Counter;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 public class MonitoredExecutors {
 

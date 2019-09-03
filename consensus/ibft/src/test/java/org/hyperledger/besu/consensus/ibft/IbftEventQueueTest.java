@@ -15,14 +15,13 @@ package org.hyperledger.besu.consensus.ibft;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import org.assertj.core.api.Assertions;
-import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvent;
-import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvents;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvent;
+import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvents;
 import org.junit.Test;
 
 public class IbftEventQueueTest {

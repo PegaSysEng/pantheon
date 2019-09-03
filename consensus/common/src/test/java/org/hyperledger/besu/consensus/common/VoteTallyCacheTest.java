@@ -14,6 +14,7 @@ package org.hyperledger.besu.consensus.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -21,8 +22,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import com.google.common.util.concurrent.UncheckedExecutionException;
+import org.assertj.core.util.Lists;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.AddressHelpers;
@@ -32,13 +38,6 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import com.google.common.util.concurrent.UncheckedExecutionException;
-import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -154,10 +153,12 @@ public class VoteTallyCacheTest {
     final VoteTallyUpdater tallyUpdater = new VoteTallyUpdater(epochManager, blockInterface);
 
     when(blockInterface.extractVoteFromHeader(block_1.getHeader()))
-        .thenReturn(Optional.of(new ValidatorVote(VoteType.DROP, validators.get(0), validators.get(2))));
+        .thenReturn(
+            Optional.of(new ValidatorVote(VoteType.DROP, validators.get(0), validators.get(2))));
 
     when(blockInterface.extractVoteFromHeader(block_2.getHeader()))
-        .thenReturn(Optional.of(new ValidatorVote(VoteType.DROP, validators.get(1), validators.get(2))));
+        .thenReturn(
+            Optional.of(new ValidatorVote(VoteType.DROP, validators.get(1), validators.get(2))));
 
     final VoteTallyCache cache =
         new VoteTallyCache(blockChain, tallyUpdater, epochManager, blockInterface);

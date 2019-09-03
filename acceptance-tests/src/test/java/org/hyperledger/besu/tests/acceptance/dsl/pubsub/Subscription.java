@@ -15,11 +15,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.pubsub;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
-import org.assertj.core.api.Assertions;
-import org.hyperledger.besu.ethereum.core.Hash;
-
 import java.util.List;
 import java.util.Map;
+
+import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 public class Subscription {
 

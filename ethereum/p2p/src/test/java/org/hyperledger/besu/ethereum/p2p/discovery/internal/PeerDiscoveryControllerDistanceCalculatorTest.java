@@ -15,10 +15,9 @@ package org.hyperledger.besu.ethereum.p2p.discovery.internal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.ethereum.p2p.discovery.internal.PeerDistanceCalculator.distance;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Random;
 
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 public class PeerDiscoveryControllerDistanceCalculatorTest {

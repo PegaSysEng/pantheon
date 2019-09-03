@@ -12,15 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderFunctions;
-import org.hyperledger.besu.ethereum.util.RawBlockIterator;
-import org.hyperledger.besu.testutil.BlockTestUtil;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderFunctions;
+import org.hyperledger.besu.ethereum.util.RawBlockIterator;
+import org.hyperledger.besu.testutil.BlockTestUtil;
 import org.junit.rules.TemporaryFolder;
 
 public final class BlockSyncTestUtils {

@@ -18,17 +18,16 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.internal.matchers.ThrowableMessageMatcher.hasMessage;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import io.vertx.core.json.Json;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.FilterParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.TopicsParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.methods.WebSocketRpcRequest;
-
-import java.util.Arrays;
-import java.util.Collections;
-
-import io.vertx.core.json.Json;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

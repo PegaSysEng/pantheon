@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.p2p.permissions;
 
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 
 public interface PermissionsUpdateCallback {
 

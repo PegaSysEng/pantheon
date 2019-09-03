@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.p2p.config;
 
-import org.hyperledger.besu.ethereum.p2p.network.ProtocolManager;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hyperledger.besu.ethereum.p2p.network.ProtocolManager;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
 
 public class SubProtocolConfiguration {
 

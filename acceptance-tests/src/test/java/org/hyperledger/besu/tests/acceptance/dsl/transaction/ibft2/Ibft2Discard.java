@@ -14,11 +14,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory.DiscardResponse;
-
-import java.io.IOException;
 
 public class Ibft2Discard implements Transaction<Boolean> {
   private final String address;

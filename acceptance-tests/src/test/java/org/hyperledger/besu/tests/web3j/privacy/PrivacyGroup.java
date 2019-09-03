@@ -12,10 +12,6 @@
  */
 package org.hyperledger.besu.tests.web3j.privacy;
 
-import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNet;
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.bytes.BytesValues;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -23,6 +19,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNet;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
 import org.web3j.crypto.Hash;
 import org.web3j.rlp.RlpEncoder;
 import org.web3j.rlp.RlpList;
@@ -31,7 +30,7 @@ import org.web3j.rlp.RlpType;
 
 public class PrivacyGroup {
   public static BytesValue generatePrivacyGroup(
-          final PrivacyNet privacyNet, final String sender, final String... receivers) {
+      final PrivacyNet privacyNet, final String sender, final String... receivers) {
     final List<byte[]> stringList = new ArrayList<>();
     stringList.add(
         Base64.getDecoder().decode(privacyNet.getEnclave(sender).getPublicKeys().get(0)));

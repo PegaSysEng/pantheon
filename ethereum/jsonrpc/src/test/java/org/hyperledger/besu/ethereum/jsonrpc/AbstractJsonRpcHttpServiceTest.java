@@ -18,6 +18,18 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.math.BigInteger;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import io.vertx.core.Vertx;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import org.hyperledger.besu.ethereum.blockcreation.EthHashMiningCoordinator;
 import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
@@ -42,19 +54,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.testutil.BlockTestUtil.ChainResources;
-
-import java.math.BigInteger;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import io.vertx.core.Vertx;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;

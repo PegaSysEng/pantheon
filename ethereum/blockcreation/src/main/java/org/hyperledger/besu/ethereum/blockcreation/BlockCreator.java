@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.blockcreation;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Transaction;
-
-import java.util.List;
 
 public interface BlockCreator {
   Block createBlock(final long timestamp);

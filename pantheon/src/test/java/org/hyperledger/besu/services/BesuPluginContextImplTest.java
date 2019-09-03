@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import tech.pegasys.pantheon.plugin.PantheonPlugin;
-import org.hyperledger.besu.plugins.TestPicoCLIPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,11 +25,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.ThrowableAssert;
+import org.hyperledger.besu.plugins.TestPicoCLIPlugin;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class PantheonPluginContextImplTest {
+public class BesuPluginContextImplTest {
 
   @BeforeClass
   public static void createFakePluginDir() throws IOException {

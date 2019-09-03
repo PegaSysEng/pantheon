@@ -12,6 +12,10 @@
  */
 package org.hyperledger.besu.consensus.ibft.jsonrpc;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.consensus.common.VoteProposer;
 import org.hyperledger.besu.consensus.ibft.IbftBlockInterface;
@@ -28,10 +32,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 public class IbftJsonRpcMethodsFactory implements JsonRpcMethodFactory {
 

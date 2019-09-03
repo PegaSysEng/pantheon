@@ -12,15 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
+import java.util.Optional;
+
+import graphql.schema.DataFetchingEnvironment;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Optional;
-
-import graphql.schema.DataFetchingEnvironment;
 
 @SuppressWarnings("unused") // reflected by GraphQL
 public class AccountAdapter extends AdapterBase {

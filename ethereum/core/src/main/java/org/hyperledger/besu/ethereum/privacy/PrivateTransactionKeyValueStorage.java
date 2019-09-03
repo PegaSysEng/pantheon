@@ -14,6 +14,9 @@ package org.hyperledger.besu.ethereum.privacy;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Log;
 import org.hyperledger.besu.ethereum.core.LogSeries;
 import org.hyperledger.besu.ethereum.rlp.RLP;
@@ -21,9 +24,6 @@ import org.hyperledger.besu.services.kvstore.KeyValueStorage;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.util.List;
-import java.util.Optional;
 
 public class PrivateTransactionKeyValueStorage implements PrivateTransactionStorage {
 

@@ -15,7 +15,6 @@ package org.hyperledger.besu.ethereum.jsonrpc.websocket;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
-
 import org.junit.Test;
 
 public class WebSocketConfigurationTest {

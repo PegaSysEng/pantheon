@@ -12,9 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.handshake.ecies;
 
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -22,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 
 import com.google.common.io.Resources;
 import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 /** Tests for {@link InitiatorHandshakeMessageV4}. */

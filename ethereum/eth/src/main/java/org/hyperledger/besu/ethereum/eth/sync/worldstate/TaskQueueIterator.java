@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
-import org.hyperledger.besu.services.tasks.Task;
-
 import java.util.Iterator;
+
+import org.hyperledger.besu.services.tasks.Task;
 
 class TaskQueueIterator implements Iterator<Task<NodeDataRequest>> {
 

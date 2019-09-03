@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.login.LoginSuccessfulTransaction;
-
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.login.LoginSuccessfulTransaction;
 
 public class PermissioningTransactions {
 

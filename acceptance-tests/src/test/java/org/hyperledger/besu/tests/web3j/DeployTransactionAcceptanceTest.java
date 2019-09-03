@@ -16,7 +16,6 @@ import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-
 import org.junit.Before;
 import org.junit.Test;
 

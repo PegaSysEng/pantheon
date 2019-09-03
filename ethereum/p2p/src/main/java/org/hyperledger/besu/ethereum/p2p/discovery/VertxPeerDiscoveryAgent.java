@@ -14,18 +14,6 @@ package org.hyperledger.besu.ethereum.p2p.discovery;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.Packet;
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.PeerDiscoveryController;
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.TimerUtil;
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.VertxTimerUtil;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import org.hyperledger.besu.nat.upnp.UpnpNatManager;
-import org.hyperledger.besu.util.NetworkUtility;
-
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
@@ -46,6 +34,17 @@ import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.datagram.DatagramSocketOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.Packet;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.PeerDiscoveryController;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.TimerUtil;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.VertxTimerUtil;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.nat.upnp.UpnpNatManager;
+import org.hyperledger.besu.util.NetworkUtility;
 
 public class VertxPeerDiscoveryAgent extends PeerDiscoveryAgent {
   private static final Logger LOG = LogManager.getLogger();

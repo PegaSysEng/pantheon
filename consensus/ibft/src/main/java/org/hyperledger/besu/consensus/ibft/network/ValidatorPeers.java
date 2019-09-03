@@ -12,12 +12,6 @@
  */
 package org.hyperledger.besu.consensus.ibft.network;
 
-import org.hyperledger.besu.consensus.common.VoteTallyCache;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -28,6 +22,11 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.consensus.common.VoteTallyCache;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 
 /**
  * Responsible for tracking the network peers which have a connection to this node, then

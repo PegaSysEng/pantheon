@@ -17,6 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.consensus.common.VoteType.ADD;
 import static org.hyperledger.besu.consensus.common.VoteType.DROP;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import org.hyperledger.besu.consensus.common.ValidatorVote;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -25,11 +29,6 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderBuilder;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.Util;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.Test;
 
 public class CliqueBlockInterfaceTest {

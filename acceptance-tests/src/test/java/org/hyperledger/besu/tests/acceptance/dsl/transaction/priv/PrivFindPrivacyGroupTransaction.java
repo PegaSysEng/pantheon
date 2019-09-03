@@ -14,12 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.priv;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.hyperledger.besu.enclave.types.PrivacyGroup;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
-import java.io.IOException;
-import java.util.List;
 
 public class PrivFindPrivacyGroupTransaction implements Transaction<List<PrivacyGroup>> {
 

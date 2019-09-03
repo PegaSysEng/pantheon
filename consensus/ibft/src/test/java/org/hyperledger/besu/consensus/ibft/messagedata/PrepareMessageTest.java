@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

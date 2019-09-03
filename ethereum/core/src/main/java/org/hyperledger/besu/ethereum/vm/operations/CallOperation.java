@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.vm.operations;
 
+import java.util.EnumSet;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Gas;
@@ -23,9 +26,6 @@ import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.ethereum.vm.Words;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.EnumSet;
-import java.util.Optional;
 
 public class CallOperation extends AbstractCallOperation {
 

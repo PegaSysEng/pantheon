@@ -15,17 +15,16 @@ package org.hyperledger.besu.ethereum.vm;
 import static org.apache.logging.log4j.LogManager.getLogger;
 import static org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason.INSUFFICIENT_STACK_ITEMS;
 
-import org.hyperledger.besu.ethereum.core.Gas;
-import org.hyperledger.besu.ethereum.vm.MessageFrame.State;
-import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltException;
-import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltManager;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.core.Gas;
+import org.hyperledger.besu.ethereum.vm.MessageFrame.State;
+import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltException;
+import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltManager;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class EVM {
   private static final Logger LOG = getLogger();

@@ -15,15 +15,14 @@ package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
+import java.util.function.Function;
+
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.FilterParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.blockheaders.NewBlockHeadersSubscription;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.logs.LogsSubscription;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
-
-import java.util.function.Function;
-
 import org.junit.Before;
 import org.junit.Test;
 

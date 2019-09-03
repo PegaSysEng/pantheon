@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.tests.acceptance.ibft2;
 
-import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-
 import java.io.IOException;
 import java.util.List;
 
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
+import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.junit.Test;
 
 public class Ibft2MiningAcceptanceTest extends AcceptanceTestBase {

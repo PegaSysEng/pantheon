@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.eth;
 
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.miner.MiningStatusCondition;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 
 public class EthConditions {
 

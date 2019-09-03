@@ -14,13 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.eea;
 
 import static org.junit.Assert.assertEquals;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaTransactions;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.math.BigInteger;
 
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaTransactions;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.web3j.utils.Numeric;
 
 public class ExpectValidPrivateContractValuesReturned extends GetValidPrivateTransactionReceipt {

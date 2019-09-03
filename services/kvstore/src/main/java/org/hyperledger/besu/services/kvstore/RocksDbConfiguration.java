@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.services.kvstore;
 
-import org.hyperledger.besu.services.util.RocksDbUtil;
-
 import java.nio.file.Path;
+
+import org.hyperledger.besu.services.util.RocksDbUtil;
 
 public class RocksDbConfiguration {
   public static final int DEFAULT_MAX_OPEN_FILES = 1024;

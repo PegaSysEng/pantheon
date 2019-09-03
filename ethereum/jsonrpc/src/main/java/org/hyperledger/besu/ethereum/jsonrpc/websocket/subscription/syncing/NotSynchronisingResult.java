@@ -12,9 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.syncing;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
-
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
 
 public class NotSynchronisingResult implements JsonRpcResult {
 

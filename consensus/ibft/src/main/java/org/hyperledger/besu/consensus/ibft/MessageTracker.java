@@ -14,10 +14,10 @@ package org.hyperledger.besu.consensus.ibft;
 
 import static java.util.Collections.newSetFromMap;
 
+import java.util.Set;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-
-import java.util.Set;
 
 public class MessageTracker {
   private final Set<Hash> seenMessages;

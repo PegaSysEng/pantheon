@@ -14,6 +14,10 @@ package org.hyperledger.besu;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.file.Path;
+
 import org.hyperledger.besu.config.GenesisConfigFile;
 import org.hyperledger.besu.controller.PantheonController;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
@@ -28,11 +32,6 @@ import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfigurati
 import org.hyperledger.besu.ethereum.mainnet.PrecompiledContract;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.testutil.TestClock;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.file.Path;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

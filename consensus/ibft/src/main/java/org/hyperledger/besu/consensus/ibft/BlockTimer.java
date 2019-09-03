@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.consensus.ibft.ibftevent.BlockTimerExpiry;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.time.Clock;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import org.hyperledger.besu.consensus.ibft.ibftevent.BlockTimerExpiry;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 /** Class for starting and keeping organised block timers */
 public class BlockTimer {

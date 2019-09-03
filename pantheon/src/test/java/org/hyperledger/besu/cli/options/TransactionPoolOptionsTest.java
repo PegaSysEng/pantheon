@@ -15,7 +15,6 @@ package org.hyperledger.besu.cli.options;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
-
 import org.junit.Test;
 
 public class TransactionPoolOptionsTest
@@ -24,7 +23,7 @@ public class TransactionPoolOptionsTest
   @Test
   public void txMessageKeepAliveSeconds() {
     final int txMessageKeepAliveSeconds = 999;
-    final TestPantheonCommand cmd =
+    final TestBesuCommand cmd =
         parseCommand(
             "--Xincoming-tx-messages-keep-alive-seconds",
             String.valueOf(txMessageKeepAliveSeconds));
@@ -55,7 +54,7 @@ public class TransactionPoolOptionsTest
   }
 
   @Override
-  TransactionPoolOptions getOptionsFromPantheonCommand(final TestPantheonCommand pantheonCommand) {
+  TransactionPoolOptions getOptionsFromPantheonCommand(final TestBesuCommand pantheonCommand) {
     return pantheonCommand.getTransactionPoolOptions();
   }
 }

@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
+import java.text.DecimalFormat;
+import java.util.function.LongSupplier;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.metrics.Counter;
@@ -19,12 +24,6 @@ import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.metrics.RunnableCounter;
 import org.hyperledger.besu.services.tasks.Task;
-
-import java.text.DecimalFormat;
-import java.util.function.LongSupplier;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class CompleteTaskStep {
   private static final Logger LOG = LogManager.getLogger();

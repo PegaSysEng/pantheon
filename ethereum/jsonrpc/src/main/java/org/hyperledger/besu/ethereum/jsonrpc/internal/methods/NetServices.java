@@ -12,6 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
+import com.google.common.collect.ImmutableMap;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
@@ -20,8 +21,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessRes
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-
-import com.google.common.collect.ImmutableMap;
 
 public class NetServices implements JsonRpcMethod {
 

@@ -16,6 +16,12 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.consensus.ibft.IbftContextBuilder;
 import org.hyperledger.besu.consensus.ibft.IbftExtraData;
@@ -25,13 +31,6 @@ import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Util;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import com.google.common.collect.Lists;
 import org.junit.Test;
 
 public class IbftCommitSealsValidationRuleTest {
@@ -51,9 +50,12 @@ public class IbftCommitSealsValidationRuleTest {
             .collect(Collectors.toList());
 
     final ProtocolContext<IbftContext> context =
-        new ProtocolContext<>(null, null, IbftContextBuilder.setupContextWithValidators(committerAddresses));
+        new ProtocolContext<>(
+            null, null, IbftContextBuilder.setupContextWithValidators(committerAddresses));
 
-    BlockHeader header = HeaderValidationTestHelpers.createProposedBlockHeader(committerAddresses, committerKeyPairs, false);
+    BlockHeader header =
+        HeaderValidationTestHelpers.createProposedBlockHeader(
+            committerAddresses, committerKeyPairs, false);
 
     assertThat(commitSealsValidationRule.validate(header, null, context)).isTrue();
   }
@@ -66,9 +68,11 @@ public class IbftCommitSealsValidationRuleTest {
 
     final List<Address> validators = singletonList(committerAddress);
     final ProtocolContext<IbftContext> context =
-        new ProtocolContext<>(null, null, IbftContextBuilder.setupContextWithValidators(validators));
+        new ProtocolContext<>(
+            null, null, IbftContextBuilder.setupContextWithValidators(validators));
 
-    final BlockHeader header = HeaderValidationTestHelpers.createProposedBlockHeader(validators, emptyList(), false);
+    final BlockHeader header =
+        HeaderValidationTestHelpers.createProposedBlockHeader(validators, emptyList(), false);
 
     // Note that no committer seals are in the header's IBFT extra data.
     final IbftExtraData headerExtraData = IbftExtraData.decode(header);
@@ -88,10 +92,12 @@ public class IbftCommitSealsValidationRuleTest {
     final KeyPair nonValidatorKeyPair = KeyPair.generate();
 
     final BlockHeader header =
-        HeaderValidationTestHelpers.createProposedBlockHeader(validators, singletonList(nonValidatorKeyPair), false);
+        HeaderValidationTestHelpers.createProposedBlockHeader(
+            validators, singletonList(nonValidatorKeyPair), false);
 
     final ProtocolContext<IbftContext> context =
-        new ProtocolContext<>(null, null, IbftContextBuilder.setupContextWithValidators(validators));
+        new ProtocolContext<>(
+            null, null, IbftContextBuilder.setupContextWithValidators(validators));
 
     assertThat(commitSealsValidationRule.validate(header, null, context)).isFalse();
   }
@@ -145,7 +151,8 @@ public class IbftCommitSealsValidationRuleTest {
             validators, Lists.newArrayList(committerKeyPair, committerKeyPair), false);
 
     final ProtocolContext<IbftContext> context =
-        new ProtocolContext<>(null, null, IbftContextBuilder.setupContextWithValidators(validators));
+        new ProtocolContext<>(
+            null, null, IbftContextBuilder.setupContextWithValidators(validators));
 
     assertThat(commitSealsValidationRule.validate(header, null, context)).isFalse();
   }
@@ -172,7 +179,8 @@ public class IbftCommitSealsValidationRuleTest {
             useDifferentRoundNumbersForCommittedSeals);
 
     final ProtocolContext<IbftContext> context =
-        new ProtocolContext<>(null, null, IbftContextBuilder.setupContextWithValidators(validators));
+        new ProtocolContext<>(
+            null, null, IbftContextBuilder.setupContextWithValidators(validators));
 
     return commitSealsValidationRule.validate(header, null, context);
   }

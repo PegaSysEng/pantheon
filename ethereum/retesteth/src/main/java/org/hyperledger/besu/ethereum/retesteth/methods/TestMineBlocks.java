@@ -12,6 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.retesteth.methods;
 
+import com.google.common.base.Functions;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.blockcreation.EthHashBlockCreator;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
@@ -28,8 +29,6 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.retesteth.RetestethClock;
 import org.hyperledger.besu.ethereum.retesteth.RetestethContext;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import com.google.common.base.Functions;
 
 public class TestMineBlocks implements JsonRpcMethod {
   private final RetestethContext context;

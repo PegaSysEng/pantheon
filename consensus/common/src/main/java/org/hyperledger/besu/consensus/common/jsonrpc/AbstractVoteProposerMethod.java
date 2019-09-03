@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.consensus.common.jsonrpc;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.hyperledger.besu.consensus.common.VoteProposer;
 import org.hyperledger.besu.consensus.common.VoteType;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class AbstractVoteProposerMethod {
 

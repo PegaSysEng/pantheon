@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.Optional;
+
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 interface NodeFactory<V> {
 

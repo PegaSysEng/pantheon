@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.vm.ehalt;
 
+import java.util.EnumSet;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.vm.EVM;
 import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.ethereum.vm.Operation;
-
-import java.util.EnumSet;
-import java.util.Optional;
 
 public class StackOverflowExceptionalHaltPredicate implements ExceptionalHaltPredicate {
 

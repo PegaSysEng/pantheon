@@ -14,11 +14,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.eea;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 
 public class EeaSendRawTransactionTransaction implements Transaction<String> {

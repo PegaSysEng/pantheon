@@ -12,15 +12,6 @@
  */
 package org.hyperledger.besu;
 
-import org.hyperledger.besu.controller.PantheonController;
-import org.hyperledger.besu.ethereum.graphql.GraphQLHttpService;
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcHttpService;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketService;
-import org.hyperledger.besu.ethereum.p2p.network.NetworkRunner;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.metrics.prometheus.MetricsService;
-import org.hyperledger.besu.nat.upnp.UpnpNatManager;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Path;
@@ -35,6 +26,14 @@ import com.google.common.annotations.VisibleForTesting;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.ethereum.graphql.GraphQLHttpService;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcHttpService;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketService;
+import org.hyperledger.besu.ethereum.p2p.network.NetworkRunner;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.metrics.prometheus.MetricsService;
+import org.hyperledger.besu.nat.upnp.UpnpNatManager;
 
 public class Runner implements AutoCloseable {
 
@@ -207,7 +206,7 @@ public class Runner implements AutoCloseable {
     try (final FileOutputStream fileOutputStream = new FileOutputStream(portsFile)) {
       properties.store(
           fileOutputStream,
-          "This file contains the ports used by the running instance of Pantheon. This file will be deleted after the node is shutdown.");
+          "This file contains the ports used by the running instance of Besu. This file will be deleted after the node is shutdown.");
     } catch (final Exception e) {
       LOG.warn("Error writing ports file", e);
     }

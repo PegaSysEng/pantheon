@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.vm.operations;
 
+import java.util.EnumSet;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.vm.AbstractOperation;
 import org.hyperledger.besu.ethereum.vm.Code;
@@ -21,9 +24,6 @@ import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.EnumSet;
-import java.util.Optional;
 
 public class JumpiOperation extends AbstractOperation {
 

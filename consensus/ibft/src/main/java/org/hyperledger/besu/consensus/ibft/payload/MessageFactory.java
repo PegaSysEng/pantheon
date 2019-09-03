@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.consensus.ibft.payload;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Commit;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
@@ -25,8 +27,6 @@ import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Util;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.util.Optional;
 
 public class MessageFactory {
 

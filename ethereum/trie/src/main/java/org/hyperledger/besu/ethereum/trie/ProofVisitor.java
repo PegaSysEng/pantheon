@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 class ProofVisitor<V> extends GetVisitor<V> implements PathNodeVisitor<V> {
 

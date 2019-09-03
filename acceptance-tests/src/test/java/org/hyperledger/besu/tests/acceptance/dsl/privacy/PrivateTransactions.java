@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
+import java.util.List;
+
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaSendRawTransactionTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivCreatePrivacyGroupTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivCreatePrivacyGroupTransactionWithoutDescription;
@@ -19,8 +21,6 @@ import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivCreatePriv
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivCreatePrivacyGroupWithoutOptionalParamsTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivFindPrivacyGroupTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivGetTransactionCountTransaction;
-
-import java.util.List;
 
 public class PrivateTransactions {
 

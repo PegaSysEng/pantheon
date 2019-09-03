@@ -19,9 +19,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.hyperledger.besu.cli.CommandTestAbstract;
-import org.hyperledger.besu.controller.PantheonController;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -30,6 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import org.hyperledger.besu.cli.CommandTestAbstract;
+import org.hyperledger.besu.controller.PantheonController;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

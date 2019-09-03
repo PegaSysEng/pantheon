@@ -14,17 +14,16 @@ package org.hyperledger.besu;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.chainexport.RlpBlockExporter;
 import org.hyperledger.besu.chainimport.JsonBlockImporter;
 import org.hyperledger.besu.chainimport.RlpBlockImporter;
-import org.hyperledger.besu.cli.PantheonCommand;
+import org.hyperledger.besu.cli.BesuCommand;
 import org.hyperledger.besu.controller.PantheonController;
 import org.hyperledger.besu.services.PantheonPluginContextImpl;
-
-import org.apache.logging.log4j.Logger;
 import picocli.CommandLine.RunLast;
 
-public final class Pantheon {
+public final class Besu {
   private static final int SUCCESS_EXIT_CODE = 0;
   private static final int ERROR_EXIT_CODE = 1;
 
@@ -33,8 +32,8 @@ public final class Pantheon {
     Thread.setDefaultUncaughtExceptionHandler(
         (thread, error) ->
             logger.error("Uncaught exception in thread \"" + thread.getName() + "\"", error));
-    final PantheonCommand pantheonCommand =
-        new PantheonCommand(
+    final BesuCommand besuCommand =
+        new BesuCommand(
             logger,
             new RlpBlockImporter(),
             JsonBlockImporter::new,
@@ -44,9 +43,9 @@ public final class Pantheon {
             new PantheonPluginContextImpl(),
             System.getenv());
 
-    pantheonCommand.parse(
+    besuCommand.parse(
         new RunLast().andExit(SUCCESS_EXIT_CODE),
-        pantheonCommand.exceptionHandler().andExit(ERROR_EXIT_CODE),
+        besuCommand.exceptionHandler().andExit(ERROR_EXIT_CODE),
         System.in,
         args);
   }

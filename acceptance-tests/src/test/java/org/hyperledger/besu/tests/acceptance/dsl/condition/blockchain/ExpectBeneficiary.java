@@ -15,10 +15,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 public class ExpectBeneficiary implements Condition {
   private final EthTransactions eth;

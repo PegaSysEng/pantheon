@@ -14,6 +14,12 @@ package org.hyperledger.besu.ethereum.eth.peervalidation;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
@@ -22,13 +28,6 @@ import org.hyperledger.besu.ethereum.eth.manager.task.GetHeadersFromPeerByNumber
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderValidator;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.MetricsSystem;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class DaoForkPeerValidator implements PeerValidator {
   private static final Logger LOG = LogManager.getLogger();

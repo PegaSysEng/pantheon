@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.crypto.altbn128;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.bytes.BytesValues;
-
 import java.math.BigInteger;
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 /**
  * Adapted from the pc_ecc (Apache 2 License) implementation:

@@ -14,12 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.CustomRequestFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 import java.util.Optional;
+
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.CustomRequestFactory;
 
 public class EthGetTransactionReceiptWithRevertReason
     implements Transaction<Optional<CustomRequestFactory.TransactionReceiptWithRevertReason>> {
@@ -30,7 +30,8 @@ public class EthGetTransactionReceiptWithRevertReason
   }
 
   @Override
-  public Optional<CustomRequestFactory.TransactionReceiptWithRevertReason> execute(final NodeRequests node) {
+  public Optional<CustomRequestFactory.TransactionReceiptWithRevertReason> execute(
+      final NodeRequests node) {
     try {
       final CustomRequestFactory.EthGetTransactionReceiptWithRevertReasonResponse response =
           node.custom().ethGetTransactionReceiptWithRevertReason(transactionHash).send();

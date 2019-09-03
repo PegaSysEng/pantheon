@@ -15,6 +15,7 @@ package org.hyperledger.besu.ethereum.permissioning;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController.NodesWhitelistResult;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -24,13 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController.NodesWhitelistResult;
-
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
-import org.hyperledger.besu.metrics.Counter;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -44,6 +38,11 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.google.common.collect.Lists;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
+import org.hyperledger.besu.metrics.Counter;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

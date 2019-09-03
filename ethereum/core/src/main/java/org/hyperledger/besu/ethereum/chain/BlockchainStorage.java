@@ -12,15 +12,15 @@
  */
 package org.hyperledger.besu.ethereum.chain;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.BlockBody;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
 public interface BlockchainStorage {
 

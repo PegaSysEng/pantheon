@@ -23,7 +23,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcPa
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

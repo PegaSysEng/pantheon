@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal;
 
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.Log;
-import org.hyperledger.besu.ethereum.core.LogTopic;
-
 import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Log;
+import org.hyperledger.besu.ethereum.core.LogTopic;
 
 public class LogsQuery {
 

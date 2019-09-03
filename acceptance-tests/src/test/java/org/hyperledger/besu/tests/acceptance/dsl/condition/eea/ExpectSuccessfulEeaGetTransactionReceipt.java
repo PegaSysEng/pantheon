@@ -15,10 +15,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.eea;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaGetTransactionReceiptTransaction;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaGetTransactionReceiptTransaction;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
 
 public class ExpectSuccessfulEeaGetTransactionReceipt implements Condition {
 

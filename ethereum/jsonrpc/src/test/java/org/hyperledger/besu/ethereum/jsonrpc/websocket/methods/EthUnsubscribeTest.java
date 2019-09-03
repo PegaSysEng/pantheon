@@ -18,6 +18,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.vertx.core.json.Json;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
@@ -27,8 +28,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.Subscription
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.InvalidSubscriptionRequestException;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionRequestMapper;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
-
-import io.vertx.core.json.Json;
 import org.junit.Before;
 import org.junit.Test;
 

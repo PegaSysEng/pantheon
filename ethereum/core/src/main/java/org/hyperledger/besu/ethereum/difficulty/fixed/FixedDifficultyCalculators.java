@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.difficulty.fixed;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.config.GenesisConfigOptions;
 import org.hyperledger.besu.ethereum.mainnet.DifficultyCalculator;
-
-import java.math.BigInteger;
 
 /**
  * This provides a difficulty calculator that can be used during development efforts; given

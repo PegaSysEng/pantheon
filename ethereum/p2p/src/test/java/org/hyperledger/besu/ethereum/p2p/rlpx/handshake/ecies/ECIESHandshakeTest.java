@@ -14,18 +14,17 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.handshake.ecies;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import junit.framework.AssertionFailedError;
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.crypto.SECP256K1.PrivateKey;
 import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.Handshaker;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Optional;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import junit.framework.AssertionFailedError;
 import org.junit.Test;
 
 /** Test vectors taken from https://gist.github.com/fjl/3a78780d17c755d22df2 */
@@ -187,16 +186,20 @@ public class ECIESHandshakeTest {
     Assertions.assertThat(initiator.secrets().getAesSecret()).isEqualTo(Expectations.aesSecret);
     Assertions.assertThat(initiator.secrets().getMacSecret()).isEqualTo(Expectations.macSecret);
     Assertions.assertThat(initiator.secrets().getToken()).isEqualTo(Expectations.token);
-    Assertions.assertThat(initiator.secrets().getIngressMac()).isEqualTo(Expectations.initialIngressMac);
-    Assertions.assertThat(initiator.secrets().getEgressMac()).isEqualTo(Expectations.initialEgressMac);
+    Assertions.assertThat(initiator.secrets().getIngressMac())
+        .isEqualTo(Expectations.initialIngressMac);
+    Assertions.assertThat(initiator.secrets().getEgressMac())
+        .isEqualTo(Expectations.initialEgressMac);
 
     // Assert that the responder's secrets match the expected values, where the ingress and egress
     // are reversed.
     Assertions.assertThat(responder.secrets().getAesSecret()).isEqualTo(Expectations.aesSecret);
     Assertions.assertThat(responder.secrets().getMacSecret()).isEqualTo(Expectations.macSecret);
     Assertions.assertThat(responder.secrets().getToken()).isEqualTo(Expectations.token);
-    Assertions.assertThat(responder.secrets().getIngressMac()).isEqualTo(Expectations.initialEgressMac);
-    Assertions.assertThat(responder.secrets().getEgressMac()).isEqualTo(Expectations.initialIngressMac);
+    Assertions.assertThat(responder.secrets().getIngressMac())
+        .isEqualTo(Expectations.initialEgressMac);
+    Assertions.assertThat(responder.secrets().getEgressMac())
+        .isEqualTo(Expectations.initialIngressMac);
   }
 
   private static BytesValue h(final String hex) {

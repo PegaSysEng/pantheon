@@ -12,20 +12,19 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.consensus.ibft.network.ValidatorMulticaster;
-import org.hyperledger.besu.consensus.ibft.payload.Authored;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.consensus.ibft.messagedata.CommitMessageData;
 import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
 import org.hyperledger.besu.consensus.ibft.messagedata.PrepareMessageData;
 import org.hyperledger.besu.consensus.ibft.messagedata.ProposalMessageData;
 import org.hyperledger.besu.consensus.ibft.messagedata.RoundChangeMessageData;
+import org.hyperledger.besu.consensus.ibft.network.ValidatorMulticaster;
+import org.hyperledger.besu.consensus.ibft.payload.Authored;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-
-import java.util.List;
-
-import com.google.common.collect.Lists;
 
 /** Class responsible for rebroadcasting IBFT messages to known validators */
 public class IbftGossip implements Gossiper {

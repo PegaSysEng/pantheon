@@ -12,13 +12,6 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.ibft2;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2Transactions;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -28,6 +21,12 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2Transactions;
 
 public class Ibft2Conditions {
 
@@ -54,7 +53,8 @@ public class Ibft2Conditions {
   }
 
   public Condition awaitValidatorSetChange(final Node node) {
-    return new AwaitValidatorSetChange(node.execute(ibftTwo.createGetValidators(CliqueTransactions.LATEST)), ibftTwo);
+    return new AwaitValidatorSetChange(
+        node.execute(ibftTwo.createGetValidators(CliqueTransactions.LATEST)), ibftTwo);
   }
 
   public Condition noProposals() {
@@ -87,8 +87,7 @@ public class Ibft2Conditions {
       final Map<Address, Boolean> proposalsAsAddress =
           this.proposals.entrySet().stream()
               .collect(Collectors.toMap(p -> p.getKey().getAddress(), Entry::getValue));
-      return new ExpectProposals(
-          ibft, proposalsAsAddress);
+      return new ExpectProposals(ibft, proposalsAsAddress);
     }
   }
 }

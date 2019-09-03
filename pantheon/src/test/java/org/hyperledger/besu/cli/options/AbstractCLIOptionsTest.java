@@ -14,11 +14,10 @@ package org.hyperledger.besu.cli.options;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.cli.CommandTestAbstract;
-
 import java.util.Collections;
 import java.util.List;
 
+import org.hyperledger.besu.cli.CommandTestAbstract;
 import org.junit.Test;
 
 public abstract class AbstractCLIOptionsTest<D, T extends CLIOptions<D>>
@@ -56,7 +55,7 @@ public abstract class AbstractCLIOptionsTest<D, T extends CLIOptions<D>>
     T options = optionsFromDomainObject(domainObject);
     final String[] cliOptions = options.getCLIOptions().toArray(new String[0]);
 
-    final TestPantheonCommand cmd = parseCommand(cliOptions);
+    final TestBesuCommand cmd = parseCommand(cliOptions);
     final T optionsFromCommand = getOptionsFromPantheonCommand(cmd);
 
     assertThat(optionsFromCommand).isEqualToComparingFieldByField(options);
@@ -67,7 +66,7 @@ public abstract class AbstractCLIOptionsTest<D, T extends CLIOptions<D>>
 
   @Test
   public void defaultValues() {
-    final TestPantheonCommand cmd = parseCommand();
+    final TestBesuCommand cmd = parseCommand();
 
     final D defaultDomainObject = createDefaultDomainObject();
     final T defaultOptions = optionsFromDomainObject(defaultDomainObject);
@@ -92,5 +91,5 @@ public abstract class AbstractCLIOptionsTest<D, T extends CLIOptions<D>>
 
   abstract T optionsFromDomainObject(D domainObject);
 
-  abstract T getOptionsFromPantheonCommand(final TestPantheonCommand pantheonCommand);
+  abstract T getOptionsFromPantheonCommand(final TestBesuCommand pantheonCommand);
 }

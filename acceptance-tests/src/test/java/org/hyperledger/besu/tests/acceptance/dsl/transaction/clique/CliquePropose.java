@@ -14,11 +14,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueRequestFactory.ProposeResponse;
-
-import java.io.IOException;
 
 public class CliquePropose implements Transaction<Boolean> {
   private final String address;

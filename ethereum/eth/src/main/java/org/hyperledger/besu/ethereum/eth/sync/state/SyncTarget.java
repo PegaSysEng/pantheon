@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.state;
 
-import org.hyperledger.besu.ethereum.eth.manager.ChainState;
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.eth.manager.ChainState;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 
 public class SyncTarget {
 
@@ -38,7 +37,8 @@ public class SyncTarget {
     return commonAncestor;
   }
 
-  public long addPeerChainEstimatedHeightListener(final ChainState.EstimatedHeightListener listener) {
+  public long addPeerChainEstimatedHeightListener(
+      final ChainState.EstimatedHeightListener listener) {
     return peer.addChainEstimatedHeightListener(listener);
   }
 

@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.consensus.ibft.messagewrappers;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.consensus.ibft.IbftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.ibft.payload.ProposalPayload;
 import org.hyperledger.besu.consensus.ibft.payload.RoundChangeCertificate;
@@ -22,8 +24,6 @@ import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Optional;
 
 public class Proposal extends IbftMessage<ProposalPayload> {
 

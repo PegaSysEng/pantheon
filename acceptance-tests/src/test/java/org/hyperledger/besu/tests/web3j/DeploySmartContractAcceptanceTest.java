@@ -15,7 +15,6 @@ package org.hyperledger.besu.tests.web3j;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.hyperledger.besu.tests.web3j.generated.SimpleStorage;
-
 import org.junit.Before;
 import org.junit.Test;
 

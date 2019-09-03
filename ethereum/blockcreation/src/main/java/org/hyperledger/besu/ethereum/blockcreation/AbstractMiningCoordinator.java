@@ -14,6 +14,10 @@ package org.hyperledger.besu.ethereum.blockcreation;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
 import org.hyperledger.besu.ethereum.chain.BlockAddedObserver;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
@@ -26,11 +30,6 @@ import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.apache.logging.log4j.Logger;
 
 public abstract class AbstractMiningCoordinator<
         C, M extends BlockMiner<C, ? extends AbstractBlockCreator<C>>>

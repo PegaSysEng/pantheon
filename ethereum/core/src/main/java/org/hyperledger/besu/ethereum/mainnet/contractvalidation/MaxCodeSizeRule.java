@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.mainnet.contractvalidation;
 
-import org.hyperledger.besu.ethereum.mainnet.ContractValidationRule;
-import org.hyperledger.besu.ethereum.vm.MessageFrame;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.mainnet.ContractValidationRule;
+import org.hyperledger.besu.ethereum.vm.MessageFrame;
 
 public class MaxCodeSizeRule implements ContractValidationRule {
 

@@ -12,8 +12,12 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 import tech.pegasys.orion.testutil.OrionTestHarness;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
@@ -22,10 +26,7 @@ import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonFactoryConfiguration;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 
 public class PrivacyPantheonFactoryConfiguration extends PantheonFactoryConfiguration {
 

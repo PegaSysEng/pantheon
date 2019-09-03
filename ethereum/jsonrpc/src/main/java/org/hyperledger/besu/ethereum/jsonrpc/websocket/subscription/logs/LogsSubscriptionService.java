@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.logs;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
 import org.hyperledger.besu.ethereum.chain.BlockAddedObserver;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
@@ -22,9 +25,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionReceipt
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.LogResult;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-
-import java.util.List;
-import java.util.Optional;
 
 public class LogsSubscriptionService implements BlockAddedObserver {
 

@@ -15,24 +15,23 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.web3j.utils.Numeric.toHexString;
 
-import org.hyperledger.besu.ethereum.core.Hash;
+import java.io.IOException;
+import java.math.BigInteger;
+
 import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.io.IOException;
-import java.math.BigInteger;
-
 import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
 
 public class AccountSmartContractPermissioningAllowAccountTransaction implements Transaction<Hash> {
 
   private static final BytesValue ADD_ACCOUNT_SIGNATURE =
-          org.hyperledger.besu.crypto.Hash.keccak256(
+      org.hyperledger.besu.crypto.Hash.keccak256(
               BytesValue.of("addAccount(address)".getBytes(UTF_8)))
           .slice(0, 4);
 

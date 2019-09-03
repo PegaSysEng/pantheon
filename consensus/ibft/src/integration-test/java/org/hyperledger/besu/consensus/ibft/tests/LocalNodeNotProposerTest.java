@@ -23,7 +23,6 @@ import org.hyperledger.besu.consensus.ibft.support.RoundSpecificPeers;
 import org.hyperledger.besu.consensus.ibft.support.TestContext;
 import org.hyperledger.besu.consensus.ibft.support.TestContextBuilder;
 import org.hyperledger.besu.ethereum.core.Block;
-
 import org.junit.Before;
 import org.junit.Test;
 

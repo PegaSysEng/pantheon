@@ -12,6 +12,10 @@
  */
 package org.hyperledger.besu.consensus.clique.jsonrpc;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hyperledger.besu.consensus.clique.CliqueBlockInterface;
 import org.hyperledger.besu.consensus.clique.CliqueContext;
 import org.hyperledger.besu.consensus.clique.jsonrpc.methods.CliqueGetSignerMetrics;
@@ -32,10 +36,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethodFacto
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CliqueJsonRpcMethodsFactory implements JsonRpcMethodFactory {
 

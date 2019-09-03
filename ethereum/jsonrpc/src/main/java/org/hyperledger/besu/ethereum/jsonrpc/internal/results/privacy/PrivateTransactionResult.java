@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results.privacy;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
 
 public abstract class PrivateTransactionResult {
   private final String from;

@@ -16,10 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
 
-import org.hyperledger.besu.cli.PantheonCommand;
-import org.hyperledger.besu.cli.subcommands.rlp.RLPSubCommand.EncodeSubCommand;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,6 +27,9 @@ import java.nio.file.Path;
 import java.util.Scanner;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import org.hyperledger.besu.cli.BesuCommand;
+import org.hyperledger.besu.cli.subcommands.rlp.RLPSubCommand.EncodeSubCommand;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ExecutionException;
 import picocli.CommandLine.Model.CommandSpec;
@@ -53,7 +52,7 @@ public class RLPSubCommand implements Runnable {
 
   @SuppressWarnings("unused")
   @ParentCommand
-  private PantheonCommand parentCommand;
+  private BesuCommand parentCommand;
 
   @SuppressWarnings("unused")
   @Spec

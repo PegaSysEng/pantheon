@@ -15,14 +15,6 @@ package org.hyperledger.besu.ethereum.eth.transactions;
 import static java.time.Instant.now;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import org.hyperledger.besu.ethereum.core.Transaction;
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import org.hyperledger.besu.ethereum.eth.messages.TransactionsMessage;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-import org.hyperledger.besu.ethereum.rlp.RLPException;
-import org.hyperledger.besu.metrics.Counter;
-import org.hyperledger.besu.metrics.RunnableCounter;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
@@ -30,6 +22,13 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.messages.TransactionsMessage;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
+import org.hyperledger.besu.ethereum.rlp.RLPException;
+import org.hyperledger.besu.metrics.Counter;
+import org.hyperledger.besu.metrics.RunnableCounter;
 
 class TransactionsMessageProcessor {
 

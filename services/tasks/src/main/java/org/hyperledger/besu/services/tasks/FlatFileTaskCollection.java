@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.services.tasks;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -28,6 +26,7 @@ import java.util.function.Function;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class FlatFileTaskCollection<T> implements TaskCollection<T> {
   private static final Logger LOG = LogManager.getLogger();

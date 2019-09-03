@@ -12,19 +12,18 @@
  */
 package org.hyperledger.besu.tests.web3j.privacy;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.Collections;
+
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.ethsigner.EthSignerClient;
 import org.hyperledger.besu.tests.acceptance.dsl.ethsigner.testutil.EthSignerTestHarness;
 import org.hyperledger.besu.tests.acceptance.dsl.ethsigner.testutil.EthSignerTestHarnessFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNet;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder;
-import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 

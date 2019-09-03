@@ -15,9 +15,8 @@ package org.hyperledger.besu.crypto;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import org.bouncycastle.util.encoders.Hex;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 public class HashTest {

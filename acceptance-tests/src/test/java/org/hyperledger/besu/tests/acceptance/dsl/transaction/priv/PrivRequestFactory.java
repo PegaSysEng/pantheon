@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.priv;
 
-import org.hyperledger.besu.enclave.types.PrivacyGroup;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.parameters.CreatePrivacyGroupParameter;
-
 import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.util.Lists;
+import org.hyperledger.besu.enclave.types.PrivacyGroup;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.parameters.CreatePrivacyGroupParameter;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.Response;

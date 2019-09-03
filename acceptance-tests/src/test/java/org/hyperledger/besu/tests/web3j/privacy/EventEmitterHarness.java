@@ -15,6 +15,12 @@ package org.hyperledger.besu.tests.web3j.privacy;
 import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 import static org.hyperledger.besu.tests.web3j.privacy.PrivacyGroup.generatePrivacyGroup;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.EeaCondition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.eea.EeaConditions;
@@ -24,12 +30,6 @@ import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivateTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.PrivateTransactionBuilder;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class EventEmitterHarness {
 

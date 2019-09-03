@@ -23,12 +23,10 @@ import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.contentOf;
-import static org.junit.Assert.assertTrue;
 import static org.hyperledger.besu.cli.operator.OperatorSubCommandTest.Cmd.cmd;
 import static org.hyperledger.besu.cli.subcommands.operator.OperatorSubCommand.COMMAND_NAME;
 import static org.hyperledger.besu.cli.subcommands.operator.OperatorSubCommand.GENERATE_BLOCKCHAIN_CONFIG_SUBCOMMAND_NAME;
-
-import org.hyperledger.besu.cli.CommandTestAbstract;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,6 +43,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.json.JsonObject;
+import org.hyperledger.besu.cli.CommandTestAbstract;
 import org.junit.Before;
 import org.junit.Test;
 import picocli.CommandLine;

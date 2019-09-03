@@ -12,19 +12,19 @@
  */
 package org.hyperledger.besu.ethereum.p2p.network;
 
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissionsBlacklist;
 import org.hyperledger.besu.ethereum.p2p.rlpx.DisconnectCallback;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
 
-import java.util.Set;
-
-import com.google.common.collect.ImmutableSet;
-
 public class PeerReputationManager implements DisconnectCallback {
   private static final Set<DisconnectMessage.DisconnectReason> locallyTriggeredDisconnectReasons =
       ImmutableSet.of(
-          DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL, DisconnectMessage.DisconnectReason.INCOMPATIBLE_P2P_PROTOCOL_VERSION);
+          DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL,
+          DisconnectMessage.DisconnectReason.INCOMPATIBLE_P2P_PROTOCOL_VERSION);
 
   private static final Set<DisconnectMessage.DisconnectReason> remotelyTriggeredDisconnectReasons =
       ImmutableSet.of(DisconnectMessage.DisconnectReason.INCOMPATIBLE_P2P_PROTOCOL_VERSION);
@@ -45,7 +45,8 @@ public class PeerReputationManager implements DisconnectCallback {
     }
   }
 
-  private boolean shouldBlock(final DisconnectMessage.DisconnectReason reason, final boolean initiatedByPeer) {
+  private boolean shouldBlock(
+      final DisconnectMessage.DisconnectReason reason, final boolean initiatedByPeer) {
     return (!initiatedByPeer && locallyTriggeredDisconnectReasons.contains(reason))
         || (initiatedByPeer && remotelyTriggeredDisconnectReasons.contains(reason));
   }

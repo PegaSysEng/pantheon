@@ -12,15 +12,15 @@
  */
 package org.hyperledger.besu.consensus.ibft.payload;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-
-import java.util.Objects;
-import java.util.StringJoiner;
 
 public class CommitPayload implements Payload {
   private static final int TYPE = IbftV2.COMMIT;

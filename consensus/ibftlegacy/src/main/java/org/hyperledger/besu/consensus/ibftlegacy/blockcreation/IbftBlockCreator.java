@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.consensus.ibftlegacy.blockcreation;
 
+import java.util.function.Function;
+
 import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.consensus.ibftlegacy.IbftBlockHashing;
 import org.hyperledger.besu.consensus.ibftlegacy.IbftExtraData;
@@ -31,8 +33,6 @@ import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
-
-import java.util.function.Function;
 
 /**
  * Responsible for producing a Block which conforms to IBFT validation rules (other than missing

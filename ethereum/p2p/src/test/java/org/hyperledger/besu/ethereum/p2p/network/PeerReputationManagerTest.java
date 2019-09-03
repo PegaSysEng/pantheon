@@ -19,13 +19,12 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions.Action;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissionsBlacklist;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions.Action;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissionsBlacklist;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
 import org.junit.Test;
 
 public class PeerReputationManagerTest {
@@ -44,7 +43,8 @@ public class PeerReputationManagerTest {
 
     checkPermissions(blacklist, peer.getPeer(), true);
 
-    peerReputationManager.onDisconnect(peer, DisconnectMessage.DisconnectReason.TOO_MANY_PEERS, false);
+    peerReputationManager.onDisconnect(
+        peer, DisconnectMessage.DisconnectReason.TOO_MANY_PEERS, false);
 
     checkPermissions(blacklist, peer.getPeer(), true);
   }
@@ -54,7 +54,8 @@ public class PeerReputationManagerTest {
     final PeerConnection peer = generatePeerConnection();
 
     checkPermissions(blacklist, peer.getPeer(), true);
-    peerReputationManager.onDisconnect(peer, DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL, false);
+    peerReputationManager.onDisconnect(
+        peer, DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL, false);
     checkPermissions(blacklist, peer.getPeer(), false);
   }
 
@@ -63,7 +64,8 @@ public class PeerReputationManagerTest {
     final PeerConnection peer = generatePeerConnection();
 
     checkPermissions(blacklist, peer.getPeer(), true);
-    peerReputationManager.onDisconnect(peer, DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL, true);
+    peerReputationManager.onDisconnect(
+        peer, DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL, true);
     checkPermissions(blacklist, peer.getPeer(), true);
   }
 

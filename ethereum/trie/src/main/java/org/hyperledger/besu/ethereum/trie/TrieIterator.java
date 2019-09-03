@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class TrieIterator<V> implements PathNodeVisitor<V> {
 

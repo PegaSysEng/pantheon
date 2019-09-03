@@ -18,14 +18,13 @@ import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.Transac
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.REPLAY_PROTECTED_SIGNATURES_NOT_SUPPORTED;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID;
 
-import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
-import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
-
 import java.math.BigInteger;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
+import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 
 public class PrivateTransactionValidator {
 

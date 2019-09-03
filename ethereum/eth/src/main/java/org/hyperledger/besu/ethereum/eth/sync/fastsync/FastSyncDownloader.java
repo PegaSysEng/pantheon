@@ -15,14 +15,6 @@ package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 import static org.hyperledger.besu.util.FutureUtils.exceptionallyCompose;
 
-import org.hyperledger.besu.ethereum.eth.sync.worldstate.NodeDataRequest;
-import org.hyperledger.besu.ethereum.eth.sync.worldstate.StalledDownloadException;
-import org.hyperledger.besu.ethereum.eth.sync.worldstate.WorldStateDownloader;
-import org.hyperledger.besu.ethereum.eth.sync.ChainDownloader;
-import org.hyperledger.besu.ethereum.eth.sync.TrailingPeerRequirements;
-import org.hyperledger.besu.services.tasks.TaskCollection;
-import org.hyperledger.besu.util.ExceptionUtils;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -34,6 +26,13 @@ import com.google.common.io.MoreFiles;
 import com.google.common.io.RecursiveDeleteOption;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.eth.sync.ChainDownloader;
+import org.hyperledger.besu.ethereum.eth.sync.TrailingPeerRequirements;
+import org.hyperledger.besu.ethereum.eth.sync.worldstate.NodeDataRequest;
+import org.hyperledger.besu.ethereum.eth.sync.worldstate.StalledDownloadException;
+import org.hyperledger.besu.ethereum.eth.sync.worldstate.WorldStateDownloader;
+import org.hyperledger.besu.services.tasks.TaskCollection;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 public class FastSyncDownloader<C> {
   private static final Logger LOG = LogManager.getLogger();

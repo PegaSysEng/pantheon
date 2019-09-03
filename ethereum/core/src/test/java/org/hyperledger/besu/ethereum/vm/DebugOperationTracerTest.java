@@ -14,10 +14,15 @@ package org.hyperledger.besu.ethereum.vm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason.INSUFFICIENT_GAS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason.INSUFFICIENT_GAS;
+
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
@@ -32,12 +37,6 @@ import org.hyperledger.besu.ethereum.vm.OperationTracer.ExecuteOperation;
 import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltException;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

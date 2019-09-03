@@ -14,10 +14,6 @@ package org.hyperledger.besu.ethereum.p2p.discovery.internal;
 
 import static org.hyperledger.besu.ethereum.p2p.discovery.internal.PeerDistanceCalculator.distance;
 
-import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,6 +27,9 @@ import java.util.stream.Collectors;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class RecursivePeerRefreshState {
   private static final Logger LOG = LogManager.getLogger();

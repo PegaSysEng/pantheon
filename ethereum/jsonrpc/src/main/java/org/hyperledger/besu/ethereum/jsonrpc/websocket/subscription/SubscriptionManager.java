@@ -12,16 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.response.SubscriptionResponse;
-import org.hyperledger.besu.metrics.Counter;
-import org.hyperledger.besu.metrics.LabelledMetric;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +24,15 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.Json;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.response.SubscriptionResponse;
+import org.hyperledger.besu.metrics.Counter;
+import org.hyperledger.besu.metrics.LabelledMetric;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 /**
  * The SubscriptionManager is responsible for managing subscriptions and sending messages to the

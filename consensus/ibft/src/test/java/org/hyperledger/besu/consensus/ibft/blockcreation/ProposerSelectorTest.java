@@ -18,6 +18,11 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Optional;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
@@ -26,12 +31,6 @@ import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.AddressHelpers;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
-
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Optional;
-
-import com.google.common.collect.Lists;
 import org.junit.Test;
 
 public class ProposerSelectorTest {

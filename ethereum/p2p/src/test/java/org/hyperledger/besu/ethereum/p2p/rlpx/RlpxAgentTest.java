@@ -22,32 +22,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
-
-import org.assertj.core.api.Assertions;
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.MockConnectionInitializer;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.MockPeerConnection;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.PingMessage;
-import org.mockito.Mockito;
-import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.p2p.peers.MutableLocalNode;
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.ethereum.p2p.peers.PeerPrivileges;
-import org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions.Action;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissionsException;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -58,8 +32,32 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
+import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
+import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.p2p.peers.MutableLocalNode;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.ethereum.p2p.peers.PeerPrivileges;
+import org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions.Action;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissionsException;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.MockConnectionInitializer;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.MockPeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.PingMessage;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class RlpxAgentTest {
   private static final KeyPair KEY_PAIR = KeyPair.generate();
@@ -108,12 +106,14 @@ public class RlpxAgentTest {
 
     // Stop after starting should succeed
     startAgent();
-    final MockPeerConnection connection = (MockPeerConnection) agent.connect(PeerTestHelper.createPeer()).get();
+    final MockPeerConnection connection =
+        (MockPeerConnection) agent.connect(PeerTestHelper.createPeer()).get();
     final CompletableFuture<Void> future2 = agent.stop();
     assertThat(future2).isDone();
     assertThat(future2).isNotCompletedExceptionally();
     // Check peer was disconnected
-    Assertions.assertThat(connection.getDisconnectReason()).contains(DisconnectMessage.DisconnectReason.CLIENT_QUITTING);
+    Assertions.assertThat(connection.getDisconnectReason())
+        .contains(DisconnectMessage.DisconnectReason.CLIENT_QUITTING);
 
     // Cannot stop again
     final CompletableFuture<Void> future3 = agent.stop();
@@ -204,7 +204,8 @@ public class RlpxAgentTest {
   @Test
   public void connect_failsIfPeerIsNotListening() {
     startAgent();
-    final Peer peer = DefaultPeer.fromEnodeURL(PeerTestHelper.enodeBuilder().disableListening().build());
+    final Peer peer =
+        DefaultPeer.fromEnodeURL(PeerTestHelper.enodeBuilder().disableListening().build());
     final CompletableFuture<PeerConnection> connection = agent.connect(peer);
 
     assertThat(connection).isDone();
@@ -338,7 +339,8 @@ public class RlpxAgentTest {
     final Peer remotelyInitiatedPeer = PeerTestHelper.createPeer();
     final MockPeerConnection incomingConnection = connection(remotelyInitiatedPeer);
     connectionInitializer.simulateIncomingConnection(incomingConnection);
-    Assertions.assertThat(incomingConnection.getDisconnectReason()).contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
+    Assertions.assertThat(incomingConnection.getDisconnectReason())
+        .contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
   }
 
   @Test
@@ -415,7 +417,8 @@ public class RlpxAgentTest {
     final Peer remotelyInitiatedPeer = PeerTestHelper.createPeer();
     final MockPeerConnection incomingConnection = connection(remotelyInitiatedPeer);
     connectionInitializer.simulateIncomingConnection(incomingConnection);
-    Assertions.assertThat(incomingConnection.getDisconnectReason()).contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
+    Assertions.assertThat(incomingConnection.getDisconnectReason())
+        .contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
   }
 
   @Test
@@ -469,7 +472,8 @@ public class RlpxAgentTest {
     final MockPeerConnection incomingConnection = connection(remotelyInitiatedPeer);
     connectionInitializer.simulateIncomingConnection(incomingConnection);
     assertThat(agent.getConnectionCount()).isEqualTo(maxRemotePeers + 1);
-    Assertions.assertThat(incomingConnection.getDisconnectReason()).contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
+    Assertions.assertThat(incomingConnection.getDisconnectReason())
+        .contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
   }
 
   @Test
@@ -481,7 +485,8 @@ public class RlpxAgentTest {
 
     // Saturate connections
     startAgentWithMaxPeers(1);
-    final CompletableFuture<PeerConnection> existingConnectionFuture = agent.connect(PeerTestHelper.createPeer());
+    final CompletableFuture<PeerConnection> existingConnectionFuture =
+        agent.connect(PeerTestHelper.createPeer());
     connectionInitializer.completePendingFutures();
     final MockPeerConnection existingConnection =
         (MockPeerConnection) existingConnectionFuture.get();
@@ -497,7 +502,8 @@ public class RlpxAgentTest {
     assertThat(agent.getPeerConnection(peer)).contains(connection);
     // Previous, non-exempt connection should be disconnected
     assertThat(existingConnection.isDisconnected()).isTrue();
-    Assertions.assertThat(existingConnection.getDisconnectReason()).contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
+    Assertions.assertThat(existingConnection.getDisconnectReason())
+        .contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
     assertThat(agent.getConnectionCount()).isEqualTo(1);
   }
 
@@ -553,7 +559,8 @@ public class RlpxAgentTest {
     assertPeerConnectionNotTracked(peerA);
     assertThat(agent.getPeerConnection(peerB)).isNotEmpty();
     assertThat(existingConnection.isDisconnected()).isTrue();
-    Assertions.assertThat(existingConnection.getDisconnectReason()).contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
+    Assertions.assertThat(existingConnection.getDisconnectReason())
+        .contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
     assertThat(connection.isDisconnected()).isFalse();
   }
 
@@ -580,7 +587,8 @@ public class RlpxAgentTest {
     assertPeerConnectionNotTracked(peerB);
     assertThat(agent.getPeerConnection(peerA)).isNotEmpty();
     assertThat(connection.isDisconnected()).isTrue();
-    Assertions.assertThat(connection.getDisconnectReason()).contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
+    Assertions.assertThat(connection.getDisconnectReason())
+        .contains(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
     assertThat(existingConnection.isDisconnected()).isFalse();
   }
 
@@ -640,7 +648,8 @@ public class RlpxAgentTest {
     connectionInitializer.simulateIncomingConnection(connection);
 
     assertPeerConnectionNotTracked(peer);
-    Assertions.assertThat(connection.getDisconnectReason()).contains(DisconnectMessage.DisconnectReason.UNKNOWN);
+    Assertions.assertThat(connection.getDisconnectReason())
+        .contains(DisconnectMessage.DisconnectReason.UNKNOWN);
   }
 
   @Test
@@ -902,7 +911,8 @@ public class RlpxAgentTest {
   }
 
   @Test
-  public void subscribeMessage() throws ExecutionException, InterruptedException, PeerConnection.PeerNotConnected {
+  public void subscribeMessage()
+      throws ExecutionException, InterruptedException, PeerConnection.PeerNotConnected {
     final Peer peer = PeerTestHelper.createPeer();
     final Capability cap = Capability.create("eth", 63);
     startAgent();

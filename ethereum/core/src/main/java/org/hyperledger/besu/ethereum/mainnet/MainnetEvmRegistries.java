@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.vm.EVM;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
@@ -95,8 +97,6 @@ import org.hyperledger.besu.ethereum.vm.operations.TimestampOperation;
 import org.hyperledger.besu.ethereum.vm.operations.XorOperation;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.math.BigInteger;
 
 /** Provides EVMs supporting the appropriate operations for mainnet hard forks. */
 abstract class MainnetEvmRegistries {

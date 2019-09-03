@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.framing.Framer;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.CapabilityMultiplexer;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.hyperledger.besu.ethereum.p2p.rlpx.framing.Framer;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.CapabilityMultiplexer;
 
 final class MessageFramer extends MessageToByteEncoder<OutboundMessage> {
 

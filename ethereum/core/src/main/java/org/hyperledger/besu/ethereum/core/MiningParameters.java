@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Objects;
 import java.util.Optional;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class MiningParameters {
 

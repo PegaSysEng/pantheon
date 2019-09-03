@@ -14,13 +14,12 @@ package org.hyperledger.besu.tests.acceptance.permissioning;
 
 import static java.util.stream.Collectors.toList;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Test;

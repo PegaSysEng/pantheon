@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.cli.util;
 
-import org.hyperledger.besu.PantheonInfo;
-
+import org.hyperledger.besu.BesuInfo;
 import picocli.CommandLine;
 
 public class VersionProvider implements CommandLine.IVersionProvider {
   @Override
   public String[] getVersion() {
-    return new String[] {PantheonInfo.version()};
+    return new String[] {BesuInfo.version()};
   }
 }

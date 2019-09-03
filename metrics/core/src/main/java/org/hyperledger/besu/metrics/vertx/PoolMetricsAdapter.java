@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.metrics.vertx;
 
+import io.vertx.core.spi.metrics.PoolMetrics;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
-
-import io.vertx.core.spi.metrics.PoolMetrics;
 
 final class PoolMetricsAdapter implements PoolMetrics<Object> {
 
@@ -25,7 +24,7 @@ final class PoolMetricsAdapter implements PoolMetrics<Object> {
   private final Counter rejectedCounter;
 
   public PoolMetricsAdapter(
-          final MetricsSystem metricsSystem, final String poolType, final String poolName) {
+      final MetricsSystem metricsSystem, final String poolType, final String poolName) {
     submittedCounter =
         metricsSystem
             .createLabelledCounter(

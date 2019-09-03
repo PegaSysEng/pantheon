@@ -12,14 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.p2p.network;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
-import org.hyperledger.besu.metrics.Counter;
-import org.hyperledger.besu.metrics.LabelledMetric;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,6 +24,13 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
+import org.hyperledger.besu.metrics.Counter;
+import org.hyperledger.besu.metrics.LabelledMetric;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 public class NetworkRunner implements AutoCloseable {
   private static final Logger LOG = LogManager.getLogger();
@@ -121,7 +120,9 @@ public class NetworkRunner implements AutoCloseable {
                     cap.getVersion(),
                     code,
                     message.getConnection());
-                message.getConnection().disconnect(DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL);
+                message
+                    .getConnection()
+                    .disconnect(DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL);
                 return;
               }
               inboundMessageCounter

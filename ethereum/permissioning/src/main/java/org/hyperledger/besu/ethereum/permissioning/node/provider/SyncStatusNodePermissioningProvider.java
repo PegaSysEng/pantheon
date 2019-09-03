@@ -14,6 +14,12 @@ package org.hyperledger.besu.ethereum.permissioning.node.provider;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.net.URI;
+import java.util.Collection;
+import java.util.OptionalLong;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.hyperledger.besu.ethereum.core.SyncStatus;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
@@ -21,12 +27,6 @@ import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningProvide
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
-
-import java.net.URI;
-import java.util.Collection;
-import java.util.OptionalLong;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SyncStatusNodePermissioningProvider implements NodePermissioningProvider {
 

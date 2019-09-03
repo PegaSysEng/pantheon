@@ -21,6 +21,18 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.Runner;
 import org.hyperledger.besu.RunnerBuilder;
 import org.hyperledger.besu.chainexport.RlpBlockExporter;
@@ -52,19 +64,6 @@ import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.services.PantheonPluginContextImpl;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -205,15 +204,15 @@ public abstract class CommandTestAbstract {
     environment.put(name, value);
   }
 
-  protected TestPantheonCommand parseCommand(final String... args) {
+  protected TestBesuCommand parseCommand(final String... args) {
     return parseCommand(System.in, args);
   }
 
-  protected TestPantheonCommand parseCommand(final KeyLoader keyLoader, final String... args) {
+  protected TestBesuCommand parseCommand(final KeyLoader keyLoader, final String... args) {
     return parseCommand(keyLoader, System.in, args);
   }
 
-  protected TestPantheonCommand parseCommand(final InputStream in, final String... args) {
+  protected TestBesuCommand parseCommand(final InputStream in, final String... args) {
     return parseCommand(f -> KeyPair.generate(), in, args);
   }
 
@@ -223,13 +222,13 @@ public abstract class CommandTestAbstract {
     return (JsonBlockImporter<T>) jsonBlockImporter;
   }
 
-  private TestPantheonCommand parseCommand(
+  private TestBesuCommand parseCommand(
       final KeyLoader keyLoader, final InputStream in, final String... args) {
     // turn off ansi usage globally in picocli
     System.setProperty("picocli.ansi", "false");
 
-    final TestPantheonCommand pantheonCommand =
-        new TestPantheonCommand(
+    final TestBesuCommand pantheonCommand =
+        new TestBesuCommand(
             mockLogger,
             rlpBlockImporter,
             this::jsonBlockImporterFactory,
@@ -250,7 +249,7 @@ public abstract class CommandTestAbstract {
   }
 
   @CommandLine.Command
-  public static class TestPantheonCommand extends PantheonCommand {
+  public static class TestBesuCommand extends BesuCommand {
     @CommandLine.Spec CommandLine.Model.CommandSpec spec;
     private final KeyLoader keyLoader;
 
@@ -259,7 +258,7 @@ public abstract class CommandTestAbstract {
       return keyLoader;
     }
 
-    TestPantheonCommand(
+    TestBesuCommand(
         final Logger mockLogger,
         final RlpBlockImporter mockBlockImporter,
         final JsonBlockImporterFactory jsonBlockImporterFactory,

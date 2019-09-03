@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.consensus.clique;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.mainnet.DifficultyCalculator;
-
-import java.math.BigInteger;
 
 public class CliqueDifficultyCalculator implements DifficultyCalculator<CliqueContext> {
 

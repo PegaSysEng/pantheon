@@ -14,10 +14,6 @@ package org.hyperledger.besu.ethereum.jsonrpc.websocket;
 
 import static com.google.common.collect.Streams.stream;
 
-import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationService;
-import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationUtils;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
-
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -38,6 +34,9 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationService;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationUtils;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 
 public class WebSocketService {
 

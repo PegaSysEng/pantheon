@@ -14,9 +14,9 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.net;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetVersionTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetVersionTransaction;
 
 public class ExpectNetVersionIsNotBlank implements Condition {
 

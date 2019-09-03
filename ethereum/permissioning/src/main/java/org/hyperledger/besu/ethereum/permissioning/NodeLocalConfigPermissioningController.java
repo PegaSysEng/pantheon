@@ -12,15 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.permissioning;
 
-import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningProvider;
-import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.metrics.Counter;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import org.hyperledger.besu.util.Subscribers;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -36,6 +27,14 @@ import java.util.stream.Collectors;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningProvider;
+import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
+import org.hyperledger.besu.metrics.Counter;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.util.Subscribers;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class NodeLocalConfigPermissioningController implements NodePermissioningProvider {
 

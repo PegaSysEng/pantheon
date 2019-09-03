@@ -14,14 +14,14 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2RequestFactory.SignersBlockResponse;
-
-import java.io.IOException;
-import java.util.List;
 
 public class Ibft2GetValidatorsAtHash implements Transaction<List<Address>> {
 

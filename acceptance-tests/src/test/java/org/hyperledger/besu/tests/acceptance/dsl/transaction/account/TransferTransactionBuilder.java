@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.account;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.blockchain.Amount;
-
-import java.math.BigInteger;
 
 public class TransferTransactionBuilder {
 

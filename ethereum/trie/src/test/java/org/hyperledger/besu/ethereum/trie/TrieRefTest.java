@@ -15,12 +15,11 @@ package org.hyperledger.besu.ethereum.trie;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
 
-import org.hyperledger.besu.testutil.JsonTestParameters;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Collection;
 import java.util.function.Function;
 
+import org.hyperledger.besu.testutil.JsonTestParameters;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

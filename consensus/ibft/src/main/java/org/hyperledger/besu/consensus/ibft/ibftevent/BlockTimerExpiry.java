@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.consensus.ibft.ibftevent;
 
-import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
-
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 
 /** Event indicating a block timer has expired */
 public final class BlockTimerExpiry implements IbftEvent {

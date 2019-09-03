@@ -18,8 +18,6 @@ import static org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration.MA
 import static org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration.RINKEBY_BOOTSTRAP_NODES;
 import static org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration.ROPSTEN_BOOTSTRAP_NODES;
 
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
@@ -30,6 +28,7 @@ import java.util.Objects;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.Resources;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 
 public class EthNetworkConfig {
   public static final BigInteger MAINNET_NETWORK_ID = BigInteger.valueOf(1);

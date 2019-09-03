@@ -15,24 +15,6 @@ package org.hyperledger.besu.ethereum.jsonrpc;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionWithMetadata;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResult;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionCompleteResult;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionResult;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.core.LogsBloomFilter;
-import org.hyperledger.besu.ethereum.core.Transaction;
-import org.hyperledger.besu.ethereum.core.Wei;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionHashResult;
-import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderFunctions;
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +22,23 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.LogsBloomFilter;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResult;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionCompleteResult;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionHashResult;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionResult;
+import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderFunctions;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class JsonRpcResponseUtils {
 

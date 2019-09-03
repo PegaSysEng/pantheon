@@ -12,9 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket;
 
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,6 +19,8 @@ import java.util.List;
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
 
 public class WebSocketConfiguration {
   public static final String DEFAULT_WEBSOCKET_HOST = "127.0.0.1";

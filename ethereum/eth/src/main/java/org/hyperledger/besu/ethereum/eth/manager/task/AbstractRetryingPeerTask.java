@@ -12,15 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager.task;
 
-import org.hyperledger.besu.ethereum.eth.manager.exceptions.MaxRetriesReachedException;
-import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;
-import org.hyperledger.besu.ethereum.eth.manager.exceptions.PeerBreachedProtocolException;
-import org.hyperledger.besu.ethereum.eth.manager.exceptions.PeerDisconnectedException;
-import org.hyperledger.besu.ethereum.eth.manager.EthContext;
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.util.ExceptionUtils;
-
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -29,6 +20,14 @@ import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.MaxRetriesReachedException;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.PeerBreachedProtocolException;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.PeerDisconnectedException;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 /**
  * A task that will retry a fixed number of times before completing the associated CompletableFuture

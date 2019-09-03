@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.fullsync;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.eth.manager.ChainState;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Optional;
 
 public class BetterSyncTargetEvaluator {
 

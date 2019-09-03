@@ -14,6 +14,9 @@ package org.hyperledger.besu.ethereum.permissioning;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.net.InetAddress;
+import java.util.Optional;
+
 import org.hyperledger.besu.crypto.Hash;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
@@ -26,9 +29,6 @@ import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.net.InetAddress;
-import java.util.Optional;
 
 /**
  * Controller that can read from a smart contract that exposes the permissioning call

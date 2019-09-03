@@ -14,7 +14,6 @@ package org.hyperledger.besu.tests.web3j.privacy;
 
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNet;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

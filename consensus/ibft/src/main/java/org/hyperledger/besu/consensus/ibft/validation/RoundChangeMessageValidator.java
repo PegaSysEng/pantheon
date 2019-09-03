@@ -12,10 +12,9 @@
  */
 package org.hyperledger.besu.consensus.ibft.validation;
 
-import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
 
 public class RoundChangeMessageValidator {
 

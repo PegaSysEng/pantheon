@@ -16,13 +16,6 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.condition.net.NetConditions;
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNodeRunner;
-import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +26,12 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.net.NetConditions;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNodeRunner;
+import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 
 public class Cluster implements AutoCloseable {
   private static final Logger LOG = LogManager.getLogger();

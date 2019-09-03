@@ -16,11 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.methods.WebSocketMethodsFactory;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-
 import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,6 +31,10 @@ import io.vertx.core.http.HttpClientRequest;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.methods.WebSocketMethodsFactory;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;

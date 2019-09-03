@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import org.hyperledger.besu.ethereum.vm.LogMock;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hyperledger.besu.ethereum.vm.LogMock;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * A VM test case specification.

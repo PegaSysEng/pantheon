@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.util.uint.UInt256;
 
 @SuppressWarnings("unused") // reflected by GraphQL
 class UncleBlockAdapter extends BlockAdapterBase {

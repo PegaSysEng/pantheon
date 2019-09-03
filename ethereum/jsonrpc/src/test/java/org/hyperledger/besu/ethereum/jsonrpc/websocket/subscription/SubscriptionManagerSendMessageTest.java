@@ -15,12 +15,6 @@ package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription;
 import static junit.framework.TestCase.fail;
 import static org.mockito.Mockito.mock;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.response.SubscriptionResponse;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-
 import java.util.UUID;
 
 import io.vertx.core.Vertx;
@@ -28,6 +22,11 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.response.SubscriptionResponse;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

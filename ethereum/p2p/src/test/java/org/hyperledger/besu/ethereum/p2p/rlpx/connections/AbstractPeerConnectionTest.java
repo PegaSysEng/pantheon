@@ -16,7 +16,12 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
+
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
@@ -32,13 +37,6 @@ import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -69,7 +67,8 @@ public class AbstractPeerConnectionTest {
   @Test
   public void disconnect() {
     final AtomicBoolean disconnectCallbackInvoked = new AtomicBoolean(false);
-    final DisconnectMessage.DisconnectReason disconnectReason = DisconnectMessage.DisconnectReason.USELESS_PEER;
+    final DisconnectMessage.DisconnectReason disconnectReason =
+        DisconnectMessage.DisconnectReason.USELESS_PEER;
     connectionEvents.subscribeDisconnect(
         (conn, reason, fromPeer) -> {
           disconnectCallbackInvoked.set(true);
@@ -93,7 +92,8 @@ public class AbstractPeerConnectionTest {
   @Test
   public void disconnect_multipleInvocations() {
     final AtomicBoolean disconnectCallbackInvoked = new AtomicBoolean(false);
-    final DisconnectMessage.DisconnectReason disconnectReason = DisconnectMessage.DisconnectReason.USELESS_PEER;
+    final DisconnectMessage.DisconnectReason disconnectReason =
+        DisconnectMessage.DisconnectReason.USELESS_PEER;
     connectionEvents.subscribeDisconnect(
         (conn, reason, fromPeer) -> {
           disconnectCallbackInvoked.set(true);

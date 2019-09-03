@@ -15,14 +15,6 @@ package org.hyperledger.besu.ethereum.p2p.discovery.internal;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
 
-import org.hyperledger.besu.crypto.Hash;
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.ethereum.p2p.peers.PeerId;
-import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.PeerTable.AddResult.AddOutcome;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +24,13 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Stream;
 
 import com.google.common.hash.BloomFilter;
+import org.hyperledger.besu.crypto.Hash;
+import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.PeerTable.AddResult.AddOutcome;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.ethereum.p2p.peers.PeerId;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * Implements a Kademlia routing table based on k-buckets with a keccak-256 XOR-based distance
@@ -192,7 +191,8 @@ public class PeerTable {
     final BytesValue keccak256 = Hash.keccak256(target);
     return streamAllPeers()
         .filter(p -> p.getStatus() == PeerDiscoveryStatus.BONDED)
-        .sorted(comparingInt((peer) -> PeerDistanceCalculator.distance(peer.keccak256(), keccak256)))
+        .sorted(
+            comparingInt((peer) -> PeerDistanceCalculator.distance(peer.keccak256(), keccak256)))
         .limit(limit)
         .collect(toList());
   }
@@ -210,7 +210,9 @@ public class PeerTable {
    */
   private int distanceFrom(final PeerId peer) {
     final Integer distance = distanceCache.get(peer.getId());
-    return distance == null ? PeerDistanceCalculator.distance(keccak256, peer.keccak256()) : distance;
+    return distance == null
+        ? PeerDistanceCalculator.distance(keccak256, peer.keccak256())
+        : distance;
   }
 
   /** A class that encapsulates the result of a peer addition to the table. */

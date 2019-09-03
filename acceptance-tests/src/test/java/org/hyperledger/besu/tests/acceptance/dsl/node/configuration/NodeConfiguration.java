@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.node.configuration;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 
 public interface NodeConfiguration {
 

@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.worldstate;
 
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public interface WorldStateStorage {
 

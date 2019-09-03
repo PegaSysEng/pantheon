@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.pending;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactionDroppedListener;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.Subscription;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-
-import java.util.List;
 
 public class PendingTransactionDroppedSubscriptionService
     implements PendingTransactionDroppedListener {

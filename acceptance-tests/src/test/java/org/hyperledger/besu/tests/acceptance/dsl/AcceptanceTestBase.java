@@ -36,7 +36,6 @@ import org.hyperledger.besu.tests.acceptance.dsl.transaction.miner.MinerTransact
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.PermissioningTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.web3.Web3Transactions;
-
 import org.junit.After;
 
 public class AcceptanceTestBase {

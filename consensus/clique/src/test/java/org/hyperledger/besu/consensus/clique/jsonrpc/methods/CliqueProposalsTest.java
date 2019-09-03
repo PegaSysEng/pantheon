@@ -16,7 +16,6 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import org.hyperledger.besu.consensus.common.jsonrpc.AbstractVoteProposerMethod;
 import org.hyperledger.besu.consensus.common.jsonrpc.AbstractVoteProposerMethodTest;
-
 import org.junit.Before;
 import org.junit.Test;
 

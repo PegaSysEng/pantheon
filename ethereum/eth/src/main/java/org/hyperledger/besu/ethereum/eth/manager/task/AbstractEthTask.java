@@ -14,13 +14,6 @@ package org.hyperledger.besu.ethereum.eth.manager.task;
 
 import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
-import org.hyperledger.besu.metrics.LabelledMetric;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.OperationTimer;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-
 import java.util.Collection;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
@@ -31,6 +24,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import com.google.common.base.Stopwatch;
+import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
+import org.hyperledger.besu.metrics.LabelledMetric;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.OperationTimer;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 public abstract class AbstractEthTask<T> implements EthTask<T> {
 

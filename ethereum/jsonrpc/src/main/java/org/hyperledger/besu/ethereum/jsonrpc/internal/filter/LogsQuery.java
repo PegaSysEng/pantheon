@@ -12,15 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.Log;
-import org.hyperledger.besu.ethereum.core.LogTopic;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.TopicsParameter;
-
 import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Log;
+import org.hyperledger.besu.ethereum.core.LogTopic;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.TopicsParameter;
 
 public class LogsQuery {
 

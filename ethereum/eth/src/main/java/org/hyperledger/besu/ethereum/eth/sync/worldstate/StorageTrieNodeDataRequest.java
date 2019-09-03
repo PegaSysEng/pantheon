@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage.Updater;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Optional;
-import java.util.stream.Stream;
 
 class StorageTrieNodeDataRequest extends TrieNodeDataRequest {
 

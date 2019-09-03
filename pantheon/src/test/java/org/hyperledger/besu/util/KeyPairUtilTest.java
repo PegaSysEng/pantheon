@@ -14,10 +14,9 @@ package org.hyperledger.besu.util;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.hyperledger.besu.controller.KeyPairUtil;
-
 import java.io.File;
 
+import org.hyperledger.besu.controller.KeyPairUtil;
 import org.junit.Test;
 
 public class KeyPairUtilTest {

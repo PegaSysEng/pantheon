@@ -18,13 +18,12 @@ import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.elementSize;
 import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.isSingleRLPByte;
 import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.writeElement;
 
-import org.hyperledger.besu.ethereum.rlp.RLPDecodingHelpers.Kind;
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.bytes.MutableBytesValue;
-
 import java.util.function.Consumer;
 
 import io.vertx.core.buffer.Buffer;
+import org.hyperledger.besu.ethereum.rlp.RLPDecodingHelpers.Kind;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
 
 /** Static methods to work with RLP encoding/decoding. */
 public abstract class RLP {

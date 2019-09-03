@@ -14,12 +14,12 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.wire;
 
 import static org.hyperledger.besu.util.bytes.BytesValue.wrap;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 /**
  * Represents a client capability.

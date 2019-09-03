@@ -12,9 +12,6 @@
  */
 package org.hyperledger.besu.metrics.prometheus;
 
-import org.hyperledger.besu.metrics.MetricCategory;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +20,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.metrics.MetricCategory;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 
 public class MetricsConfiguration {
   private static final String DEFAULT_METRICS_HOST = "127.0.0.1";

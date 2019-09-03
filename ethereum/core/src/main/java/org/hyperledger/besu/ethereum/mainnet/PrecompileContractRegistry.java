@@ -12,10 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import org.hyperledger.besu.ethereum.core.Address;
-
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.hyperledger.besu.ethereum.core.Address;
 
 /** Encapsulates a group of {@link PrecompiledContract}s used together. */
 public class PrecompileContractRegistry {

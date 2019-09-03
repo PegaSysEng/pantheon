@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.account;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TransferTransactionSet implements Transaction<List<Hash>> {
 

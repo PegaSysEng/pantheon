@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.consensus.ibftlegacy.protocol;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.eth.messages.EthPV62;
 import org.hyperledger.besu.ethereum.eth.messages.EthPV63;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Represents the istanbul/64 protocol as used by Quorum (effectively an extension of eth/63, which

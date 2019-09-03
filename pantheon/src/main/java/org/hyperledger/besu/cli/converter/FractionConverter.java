@@ -14,7 +14,6 @@ package org.hyperledger.besu.cli.converter;
 
 import org.hyperledger.besu.cli.converter.exception.FractionConversionException;
 import org.hyperledger.besu.util.number.Fraction;
-
 import picocli.CommandLine;
 
 public class FractionConverter implements CommandLine.ITypeConverter<Float> {

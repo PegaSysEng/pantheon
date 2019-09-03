@@ -13,6 +13,7 @@
 package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
+
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonFactoryConfiguration;
 
 public class PrivacyPantheonFactoryConfigurationBuilder {

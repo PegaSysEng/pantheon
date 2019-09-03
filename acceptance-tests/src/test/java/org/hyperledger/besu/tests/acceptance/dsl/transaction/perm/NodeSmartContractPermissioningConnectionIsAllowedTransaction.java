@@ -15,7 +15,8 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hyperledger.besu.ethereum.permissioning.NodeSmartContractPermissioningController.checkTransactionResult;
 
-import org.hyperledger.besu.ethereum.core.Hash;
+import java.io.IOException;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.NodeSmartContractPermissioningController;
@@ -24,16 +25,13 @@ import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.io.IOException;
-
 import org.web3j.protocol.core.DefaultBlockParameterName;
 
 public class NodeSmartContractPermissioningConnectionIsAllowedTransaction
     implements Transaction<Boolean> {
 
   private static final BytesValue IS_CONNECTION_ALLOWED_SIGNATURE =
-          org.hyperledger.besu.crypto.Hash.keccak256(
+      org.hyperledger.besu.crypto.Hash.keccak256(
               BytesValue.of(
                   "connectionAllowed(bytes32,bytes32,bytes16,uint16,bytes32,bytes32,bytes16,uint16)"
                       .getBytes(UTF_8)))

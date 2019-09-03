@@ -15,9 +15,17 @@ package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivGetTransactionCountTransaction;
 import tech.pegasys.orion.testutil.OrionTestHarness;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.enclave.types.SendRequest;
 import org.hyperledger.besu.enclave.types.SendRequestLegacy;
@@ -29,18 +37,10 @@ import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivGetTransactionCountTransaction;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class PrivacyNode extends PantheonNode {
   private static final Logger LOG = LogManager.getLogger();

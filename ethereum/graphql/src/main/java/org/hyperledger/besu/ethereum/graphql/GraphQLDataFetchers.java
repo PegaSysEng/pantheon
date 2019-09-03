@@ -14,9 +14,13 @@ package org.hyperledger.besu.ethereum.graphql;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.ethereum.graphql.internal.BlockWithMetadata;
-import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
-import org.hyperledger.besu.ethereum.graphql.internal.TransactionWithMetadata;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
+
+import graphql.schema.DataFetcher;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -27,6 +31,9 @@ import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.WorldState;
 import org.hyperledger.besu.ethereum.eth.EthProtocol;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.graphql.internal.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
+import org.hyperledger.besu.ethereum.graphql.internal.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.graphql.internal.pojoadapter.AccountAdapter;
 import org.hyperledger.besu.ethereum.graphql.internal.pojoadapter.NormalBlockAdapter;
 import org.hyperledger.besu.ethereum.graphql.internal.pojoadapter.PendingStateAdapter;
@@ -41,14 +48,6 @@ import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
-import java.util.Set;
-
-import graphql.schema.DataFetcher;
 
 public class GraphQLDataFetchers {
   public GraphQLDataFetchers(final Set<Capability> supportedCapabilities) {

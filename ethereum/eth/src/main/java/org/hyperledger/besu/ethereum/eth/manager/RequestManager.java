@@ -12,9 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -23,6 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 
 public class RequestManager {
   private final AtomicLong responseStreamId = new AtomicLong(0L);

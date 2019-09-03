@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import graphql.schema.DataFetchingEnvironment;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.LogTopic;
 import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
@@ -19,12 +24,6 @@ import org.hyperledger.besu.ethereum.graphql.internal.LogWithMetadata;
 import org.hyperledger.besu.ethereum.graphql.internal.TransactionWithMetadata;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import graphql.schema.DataFetchingEnvironment;
 
 @SuppressWarnings("unused") // reflected by GraphQL
 public class LogAdapter extends AdapterBase {

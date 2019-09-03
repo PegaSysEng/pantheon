@@ -12,10 +12,6 @@
  */
 package org.hyperledger.besu.controller;
 
-import org.hyperledger.besu.crypto.InvalidSEC256K1PrivateKeyStoreException;
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.util.bytes.Bytes32;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -25,6 +21,9 @@ import java.nio.file.Path;
 import com.google.common.io.Resources;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.crypto.InvalidSEC256K1PrivateKeyStoreException;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 public class KeyPairUtil {
   private static final Logger LOG = LogManager.getLogger();

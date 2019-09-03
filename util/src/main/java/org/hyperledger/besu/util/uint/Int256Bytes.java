@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.util.uint;
 
+import java.math.BigInteger;
+import java.util.function.BinaryOperator;
+
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
 import org.hyperledger.besu.util.bytes.MutableBytes32;
-
-import java.math.BigInteger;
-import java.util.function.BinaryOperator;
 
 /**
  * Static operations to work on bytes interpreted as 256 bytes signed integers.

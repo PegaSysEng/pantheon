@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.consensus.ibft.ibftevent;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 /** Event indicating that new chain head has been received */
 public final class NewChainHead implements IbftEvent {

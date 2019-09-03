@@ -14,10 +14,9 @@ package org.hyperledger.besu.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.util.LimitedSet.Mode;
-
 import java.util.Set;
 
+import org.hyperledger.besu.util.LimitedSet.Mode;
 import org.junit.Test;
 
 public class LimitedSetTest {

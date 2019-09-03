@@ -14,11 +14,11 @@ package org.hyperledger.besu.services.kvstore;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.Closeable;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * Service provided by pantheon to facilitate persistent data storage.

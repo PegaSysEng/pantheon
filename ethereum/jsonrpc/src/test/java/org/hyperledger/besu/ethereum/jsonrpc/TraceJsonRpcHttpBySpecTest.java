@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc;
 
+import java.net.URL;
+import java.util.Map;
+
 import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.TraceReplayBlockTransactions;
@@ -19,10 +22,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParamete
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockReplay;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTracer;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-
-import java.net.URL;
-import java.util.Map;
-
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;

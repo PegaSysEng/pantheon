@@ -18,10 +18,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.mainnet.EthHashSolver.EthHashSolverJob;
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +26,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.mainnet.EthHashSolver.EthHashSolverJob;
+import org.hyperledger.besu.util.uint.UInt256;
 import org.junit.Test;
 
 public class EthHashSolverTest {

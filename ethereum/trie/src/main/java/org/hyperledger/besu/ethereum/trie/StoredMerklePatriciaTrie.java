@@ -14,15 +14,15 @@ package org.hyperledger.besu.ethereum.trie;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * A {@link MerklePatriciaTrie} that persists trie nodes to a {@link MerkleStorage} key/value store.
@@ -81,7 +81,8 @@ public class StoredMerklePatriciaTrie<K extends BytesValue, V> implements Merkle
   public Proof<V> getValueWithProof(final K key) {
     checkNotNull(key);
     final ProofVisitor<V> proofVisitor = new ProofVisitor<>(root);
-    final Optional<V> value = root.accept(proofVisitor, CompactEncoding.bytesToPath(key)).getValue();
+    final Optional<V> value =
+        root.accept(proofVisitor, CompactEncoding.bytesToPath(key)).getValue();
     final List<BytesValue> proof =
         proofVisitor.getProof().stream().map(Node::getRlp).collect(Collectors.toList());
     return new Proof<>(value, proof);

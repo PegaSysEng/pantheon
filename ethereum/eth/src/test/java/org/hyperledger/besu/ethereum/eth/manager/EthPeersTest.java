@@ -22,6 +22,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.concurrent.CancellationException;
+import java.util.function.Consumer;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.eth.manager.RequestManager.ResponseStream;
 import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;
@@ -30,12 +35,6 @@ import org.hyperledger.besu.ethereum.eth.messages.NodeDataMessage;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Optional;
-import java.util.OptionalLong;
-import java.util.concurrent.CancellationException;
-import java.util.function.Consumer;
-
 import org.junit.Before;
 import org.junit.Test;
 

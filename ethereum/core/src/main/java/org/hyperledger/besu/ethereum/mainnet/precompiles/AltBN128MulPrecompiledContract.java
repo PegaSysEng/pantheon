@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.mainnet.precompiles;
 
+import java.math.BigInteger;
+import java.util.Arrays;
+
 import org.hyperledger.besu.crypto.altbn128.AltBn128Point;
 import org.hyperledger.besu.crypto.altbn128.Fq;
 import org.hyperledger.besu.ethereum.core.Gas;
@@ -20,9 +23,6 @@ import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.MutableBytesValue;
-
-import java.math.BigInteger;
-import java.util.Arrays;
 
 public class AltBN128MulPrecompiledContract extends AbstractPrecompiledContract {
 

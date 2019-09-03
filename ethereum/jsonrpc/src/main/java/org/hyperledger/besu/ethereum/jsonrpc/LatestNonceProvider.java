@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
+import java.util.OptionalLong;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.util.NonceProvider;
-
-import java.util.OptionalLong;
 
 public class LatestNonceProvider implements NonceProvider {
 

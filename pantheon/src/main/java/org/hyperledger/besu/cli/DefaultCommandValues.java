@@ -12,12 +12,6 @@
  */
 package org.hyperledger.besu.cli;
 
-import org.hyperledger.besu.ethereum.core.Wei;
-import org.hyperledger.besu.ethereum.eth.sync.SyncMode;
-import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
-import org.hyperledger.besu.nat.NatMethod;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -26,6 +20,11 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.eth.sync.SyncMode;
+import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
+import org.hyperledger.besu.nat.NatMethod;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import picocli.CommandLine;
 
 public interface DefaultCommandValues {
@@ -70,7 +69,7 @@ public interface DefaultCommandValues {
       RlpxConfiguration.DEFAULT_FRACTION_REMOTE_CONNECTIONS_ALLOWED;
 
   static Path getDefaultPantheonDataPath(final Object command) {
-    // this property is retrieved from Gradle tasks or Pantheon running shell script.
+    // this property is retrieved from Gradle tasks or Besu running shell script.
     final String pantheonHomeProperty = System.getProperty(PANTHEON_HOME_PROPERTY_NAME);
     final Path pantheonHome;
 

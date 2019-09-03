@@ -13,18 +13,17 @@
 package org.hyperledger.besu.ethereum.eth.messages;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hyperledger.besu.ethereum.eth.messages.LimitedTransactionsMessages.LIMIT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.hyperledger.besu.ethereum.eth.messages.LimitedTransactionsMessages.LIMIT;
-
-import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
-import org.hyperledger.besu.ethereum.core.Transaction;
-import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 public class LimitedTransactionsMessagesTest {

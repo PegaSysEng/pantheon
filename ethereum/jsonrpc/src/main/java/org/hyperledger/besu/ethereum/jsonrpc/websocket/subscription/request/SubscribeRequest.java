@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.FilterParameter;
-
 import java.util.Objects;
+
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.FilterParameter;
 
 public class SubscribeRequest {
 

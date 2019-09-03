@@ -15,9 +15,9 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.net;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetVersionTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetVersionTransaction;
 
 public class ExpectNetVersionConnectionExceptionWithCause implements Condition {
 

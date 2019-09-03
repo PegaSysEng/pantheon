@@ -15,8 +15,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.web3j.utils.Numeric.toHexString;
 
-import org.hyperledger.besu.ethereum.core.Hash;
+import java.io.IOException;
+import java.math.BigInteger;
+
 import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.NodeSmartContractPermissioningController;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
@@ -25,17 +28,13 @@ import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.io.IOException;
-import java.math.BigInteger;
-
 import org.web3j.crypto.RawTransaction;
 import org.web3j.crypto.TransactionEncoder;
 
 public class NodeSmartContractPermissioningForbidNodeTransaction implements Transaction<Hash> {
 
   private static final BytesValue REMOVE_ENODE_SIGNATURE =
-          org.hyperledger.besu.crypto.Hash.keccak256(
+      org.hyperledger.besu.crypto.Hash.keccak256(
               BytesValue.of("removeEnode(bytes32,bytes32,bytes16,uint16)".getBytes(UTF_8)))
           .slice(0, 4);
 

@@ -17,14 +17,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_FILE_FORMAT_HELP;
 import static org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.COMMAND_NAME;
 
-import org.hyperledger.besu.cli.PantheonCommand;
-import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.AddressSubCommand;
-import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.ExportSubCommand;
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.Util;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +27,13 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.cli.BesuCommand;
+import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.AddressSubCommand;
+import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.ExportSubCommand;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Util;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
@@ -54,7 +53,7 @@ public class PublicKeySubCommand implements Runnable {
 
   @SuppressWarnings("unused")
   @ParentCommand
-  private PantheonCommand parentCommand; // Picocli injects reference to parent command
+  private BesuCommand parentCommand; // Picocli injects reference to parent command
 
   @SuppressWarnings("unused")
   @Spec

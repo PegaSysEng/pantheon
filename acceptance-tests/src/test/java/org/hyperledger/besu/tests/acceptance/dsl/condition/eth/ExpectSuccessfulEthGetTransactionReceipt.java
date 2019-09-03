@@ -14,10 +14,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptTransaction;
 
 public class ExpectSuccessfulEthGetTransactionReceipt implements Condition {
 

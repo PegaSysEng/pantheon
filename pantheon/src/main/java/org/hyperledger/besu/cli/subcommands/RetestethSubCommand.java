@@ -19,12 +19,6 @@ import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultPantheonDa
 import static org.hyperledger.besu.cli.subcommands.RetestethSubCommand.COMMAND_NAME;
 import static org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 
-import org.hyperledger.besu.PantheonInfo;
-import org.hyperledger.besu.cli.custom.JsonRPCWhitelistHostsProperty;
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
-import org.hyperledger.besu.ethereum.retesteth.RetestethConfiguration;
-import org.hyperledger.besu.ethereum.retesteth.RetestethService;
-
 import java.net.InetAddress;
 import java.nio.file.Path;
 
@@ -32,6 +26,11 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.hyperledger.besu.BesuInfo;
+import org.hyperledger.besu.cli.custom.JsonRPCWhitelistHostsProperty;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.retesteth.RetestethConfiguration;
+import org.hyperledger.besu.ethereum.retesteth.RetestethService;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -49,7 +48,7 @@ public class RetestethSubCommand implements Runnable {
   @CommandLine.Option(
       names = {"--data-path"},
       paramLabel = MANDATORY_PATH_FORMAT_HELP,
-      description = "The path to Pantheon data directory (default: ${DEFAULT-VALUE})")
+      description = "The path to Besu data directory (default: ${DEFAULT-VALUE})")
   final Path dataPath = getDefaultPantheonDataPath(this);
 
   @Option(
@@ -117,7 +116,7 @@ public class RetestethSubCommand implements Runnable {
     jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist);
 
     final RetestethService retestethService =
-        new RetestethService(PantheonInfo.version(), retestethConfiguration, jsonRpcConfiguration);
+        new RetestethService(BesuInfo.version(), retestethConfiguration, jsonRpcConfiguration);
 
     Runtime.getRuntime()
         .addShutdownHook(
@@ -127,7 +126,7 @@ public class RetestethSubCommand implements Runnable {
                     retestethService.close();
                     LogManager.shutdown();
                   } catch (final Exception e) {
-                    LOG.error("Failed to stop Pantheon Retesteth");
+                    LOG.error("Failed to stop Besu Retesteth");
                   }
                 }));
     retestethService.start();

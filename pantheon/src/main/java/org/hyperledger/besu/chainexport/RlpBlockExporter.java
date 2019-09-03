@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.chainexport;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class RlpBlockExporter extends BlockExporter {
 

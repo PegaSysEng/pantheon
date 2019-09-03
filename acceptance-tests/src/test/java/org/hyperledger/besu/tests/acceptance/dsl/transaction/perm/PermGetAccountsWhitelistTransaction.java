@@ -14,18 +14,19 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 import java.util.List;
+
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 
 public class PermGetAccountsWhitelistTransaction implements Transaction<List<String>> {
 
   @Override
   public List<String> execute(final NodeRequests node) {
     try {
-      PermissioningJsonRpcRequestFactory.GetAccountsWhitelistResponse response = node.perm().getAccountsWhitelist().send();
+      PermissioningJsonRpcRequestFactory.GetAccountsWhitelistResponse response =
+          node.perm().getAccountsWhitelist().send();
       assertThat(response.getResult()).isNotNull();
       return response.getResult();
     } catch (IOException e) {

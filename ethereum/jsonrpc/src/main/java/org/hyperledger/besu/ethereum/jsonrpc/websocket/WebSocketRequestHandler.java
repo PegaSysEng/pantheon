@@ -12,14 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket;
 
-import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationService;
-import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationUtils;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcUnauthorizedResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.methods.WebSocketRpcRequest;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,6 +22,13 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.auth.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationService;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationUtils;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcUnauthorizedResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.methods.WebSocketRpcRequest;
 
 public class WebSocketRequestHandler {
 

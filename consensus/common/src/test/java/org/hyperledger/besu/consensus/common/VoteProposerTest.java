@@ -14,12 +14,11 @@ package org.hyperledger.besu.consensus.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.core.Address;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.hyperledger.besu.ethereum.core.Address;
 import org.junit.Test;
 
 public class VoteProposerTest {

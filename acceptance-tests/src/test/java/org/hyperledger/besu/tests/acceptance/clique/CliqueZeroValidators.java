@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.tests.acceptance.clique;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-
 import java.io.IOException;
 
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.junit.Test;
 
 public class CliqueZeroValidators extends AcceptanceTestBase {

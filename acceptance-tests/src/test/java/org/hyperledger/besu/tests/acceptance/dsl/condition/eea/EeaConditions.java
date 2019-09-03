@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.eea;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaTransactions;
 
 public class EeaConditions {
 

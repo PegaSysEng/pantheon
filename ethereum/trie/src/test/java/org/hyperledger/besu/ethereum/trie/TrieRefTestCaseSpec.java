@@ -14,12 +14,11 @@ package org.hyperledger.besu.ethereum.trie;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * A Trie reference test case specification.

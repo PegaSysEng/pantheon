@@ -15,9 +15,9 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.miner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthMiningTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthMiningTransaction;
 
 public class MiningStatusCondition implements Condition {
 

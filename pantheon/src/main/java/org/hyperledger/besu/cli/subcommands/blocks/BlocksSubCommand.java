@@ -17,22 +17,6 @@ import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_FILE_FORMA
 import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_LONG_FORMAT_HELP;
 import static org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.COMMAND_NAME;
 
-import org.hyperledger.besu.chainexport.RlpBlockExporter;
-import org.hyperledger.besu.chainimport.JsonBlockImporter;
-import org.hyperledger.besu.chainimport.RlpBlockImporter;
-import org.hyperledger.besu.controller.PantheonController;
-import org.hyperledger.besu.cli.PantheonCommand;
-import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.ExportSubCommand;
-import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.ImportSubCommand;
-import org.hyperledger.besu.ethereum.ProtocolContext;
-import org.hyperledger.besu.ethereum.chain.Blockchain;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.MiningParameters;
-import org.hyperledger.besu.ethereum.core.Wei;
-import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-import org.hyperledger.besu.metrics.prometheus.MetricsService;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,6 +29,21 @@ import java.util.Optional;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.chainexport.RlpBlockExporter;
+import org.hyperledger.besu.chainimport.JsonBlockImporter;
+import org.hyperledger.besu.chainimport.RlpBlockImporter;
+import org.hyperledger.besu.cli.BesuCommand;
+import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.ExportSubCommand;
+import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.ImportSubCommand;
+import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.MiningParameters;
+import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
+import org.hyperledger.besu.metrics.prometheus.MetricsService;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.ExecutionException;
@@ -68,7 +67,7 @@ public class BlocksSubCommand implements Runnable {
 
   @SuppressWarnings("unused")
   @ParentCommand
-  private PantheonCommand parentCommand; // Picocli injects reference to parent command
+  private BesuCommand parentCommand; // Picocli injects reference to parent command
 
   @SuppressWarnings("unused")
   @Spec

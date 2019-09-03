@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.handshake;
 
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.ecies.ECIESHandshaker;
-
 import java.util.Optional;
 
 import io.netty.buffer.ByteBuf;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.ecies.ECIESHandshaker;
 
 /**
  * A protocol to perform an RLPx crypto handshake with a peer.

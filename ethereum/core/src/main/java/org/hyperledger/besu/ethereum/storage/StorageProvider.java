@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.storage;
 
+import java.io.Closeable;
+
 import org.hyperledger.besu.ethereum.chain.BlockchainStorage;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.privacy.PrivateStateStorage;
@@ -19,8 +21,6 @@ import org.hyperledger.besu.ethereum.privacy.PrivateTransactionStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStatePreimageStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;
-
-import java.io.Closeable;
 
 public interface StorageProvider extends Closeable {
 

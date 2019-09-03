@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.methods;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 
 public class WebSocketRpcRequest extends JsonRpcRequest {
 

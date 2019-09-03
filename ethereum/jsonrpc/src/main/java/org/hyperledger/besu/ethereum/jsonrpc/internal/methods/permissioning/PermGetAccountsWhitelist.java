@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods.permissioning;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
@@ -20,8 +22,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorRespo
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.permissioning.AccountLocalConfigPermissioningController;
-
-import java.util.Optional;
 
 public class PermGetAccountsWhitelist implements JsonRpcMethod {
 

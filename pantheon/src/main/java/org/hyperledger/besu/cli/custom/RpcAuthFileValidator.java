@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.cli.custom;
 
-import org.hyperledger.besu.ethereum.permissioning.TomlConfigFileParser;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
 import net.consensys.cava.toml.TomlParseResult;
+import org.hyperledger.besu.ethereum.permissioning.TomlConfigFileParser;
 import picocli.CommandLine;
 import picocli.CommandLine.ParameterException;
 

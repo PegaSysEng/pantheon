@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.util.uint;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
-
 import java.math.BigInteger;
+
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 /**
  * An unsigned 256-bits precision number.

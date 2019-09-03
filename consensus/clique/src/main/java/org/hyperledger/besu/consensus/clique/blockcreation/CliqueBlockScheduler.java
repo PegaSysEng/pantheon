@@ -12,16 +12,15 @@
  */
 package org.hyperledger.besu.consensus.clique.blockcreation;
 
+import java.time.Clock;
+import java.util.Random;
+
+import com.google.common.annotations.VisibleForTesting;
 import org.hyperledger.besu.consensus.common.ValidatorProvider;
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
 import org.hyperledger.besu.ethereum.blockcreation.DefaultBlockScheduler;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-
-import java.time.Clock;
-import java.util.Random;
-
-import com.google.common.annotations.VisibleForTesting;
 
 public class CliqueBlockScheduler extends DefaultBlockScheduler {
 

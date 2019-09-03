@@ -14,11 +14,6 @@ package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis;
 
 import static java.util.stream.Collectors.toList;
 
-import org.hyperledger.besu.consensus.clique.CliqueExtraData;
-import org.hyperledger.besu.consensus.ibft.IbftExtraData;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,6 +24,10 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import com.google.common.io.Resources;
+import org.hyperledger.besu.consensus.clique.CliqueExtraData;
+import org.hyperledger.besu.consensus.ibft.IbftExtraData;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 
 public class GenesisConfigurationFactory {
 

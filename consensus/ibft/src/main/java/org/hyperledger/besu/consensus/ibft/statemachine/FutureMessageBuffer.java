@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.consensus.ibft.statemachine;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +19,7 @@ import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
 
 /**
  * Buffer which holds future IBFT messages.

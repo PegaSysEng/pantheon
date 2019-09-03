@@ -19,6 +19,12 @@ import static org.junit.Assert.assertTrue;
 
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.enclave.types.CreatePrivacyGroupRequest;
 import org.hyperledger.besu.enclave.types.DeletePrivacyGroupRequest;
 import org.hyperledger.besu.enclave.types.FindPrivacyGroupRequest;
@@ -28,12 +34,6 @@ import org.hyperledger.besu.enclave.types.ReceiveResponse;
 import org.hyperledger.besu.enclave.types.SendRequestLegacy;
 import org.hyperledger.besu.enclave.types.SendRequestPantheon;
 import org.hyperledger.besu.enclave.types.SendResponse;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-
-import com.google.common.collect.Lists;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;

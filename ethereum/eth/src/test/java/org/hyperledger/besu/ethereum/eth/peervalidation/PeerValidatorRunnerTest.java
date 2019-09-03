@@ -15,21 +15,19 @@ package org.hyperledger.besu.ethereum.eth.peervalidation;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.mockito.Mockito;
+import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-
-import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
-
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class PeerValidatorRunnerTest {
 

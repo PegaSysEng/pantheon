@@ -15,15 +15,14 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.methods.permissioning;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import org.hyperledger.besu.ethereum.permissioning.AccountLocalConfigPermissioningController;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

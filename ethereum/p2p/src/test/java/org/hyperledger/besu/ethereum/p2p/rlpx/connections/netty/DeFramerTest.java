@@ -22,33 +22,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
-import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.p2p.peers.LocalNode;
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty.testhelpers.NettyMocks;
-import org.hyperledger.besu.ethereum.p2p.rlpx.framing.Framer;
-import org.hyperledger.besu.ethereum.p2p.rlpx.framing.FramingException;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.HelloMessage;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.PingMessage;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.WireMessageCodes;
-import org.hyperledger.besu.ethereum.p2p.network.exceptions.BreachOfProtocolException;
-import org.hyperledger.besu.ethereum.p2p.network.exceptions.IncompatiblePeerException;
-import org.hyperledger.besu.ethereum.p2p.network.exceptions.PeerDisconnectedException;
-import org.hyperledger.besu.ethereum.p2p.network.exceptions.UnexpectedPeerConnectionException;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MockSubProtocol;
-import org.hyperledger.besu.ethereum.rlp.RLPException;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,6 +41,32 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoop;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.concurrent.ScheduledFuture;
+import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.ethereum.p2p.network.exceptions.BreachOfProtocolException;
+import org.hyperledger.besu.ethereum.p2p.network.exceptions.IncompatiblePeerException;
+import org.hyperledger.besu.ethereum.p2p.network.exceptions.PeerDisconnectedException;
+import org.hyperledger.besu.ethereum.p2p.network.exceptions.UnexpectedPeerConnectionException;
+import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.p2p.peers.LocalNode;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty.testhelpers.NettyMocks;
+import org.hyperledger.besu.ethereum.p2p.rlpx.framing.Framer;
+import org.hyperledger.besu.ethereum.p2p.rlpx.framing.FramingException;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MockSubProtocol;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.HelloMessage;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.PingMessage;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.WireMessageCodes;
+import org.hyperledger.besu.ethereum.rlp.RLPException;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -322,7 +321,8 @@ public class DeFramerTest {
 
   @Test
   public void decode_shouldHandleImmediateDisconnectMessage() {
-    DisconnectMessage disconnectMessage = DisconnectMessage.create(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
+    DisconnectMessage disconnectMessage =
+        DisconnectMessage.create(DisconnectMessage.DisconnectReason.TOO_MANY_PEERS);
     ByteBuf disconnectData = Unpooled.wrappedBuffer(disconnectMessage.getData().extractArray());
     when(framer.deframe(eq(disconnectData)))
         .thenReturn(new RawMessage(disconnectMessage.getCode(), disconnectMessage.getData()))

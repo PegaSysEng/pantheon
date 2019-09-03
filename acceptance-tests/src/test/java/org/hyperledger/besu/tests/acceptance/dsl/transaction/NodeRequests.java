@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.admin.AdminRequestFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueRequestFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eea.EeaRequestFactory;
@@ -21,9 +23,6 @@ import org.hyperledger.besu.tests.acceptance.dsl.transaction.miner.MinerRequestF
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.CustomRequestFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.priv.PrivRequestFactory;
-
-import java.util.Optional;
-
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.websocket.WebSocketService;
 

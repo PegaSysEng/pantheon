@@ -19,32 +19,31 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
-import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
-import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
-import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
-import org.hyperledger.besu.ethereum.p2p.network.exceptions.IncompatiblePeerException;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions.Action;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissionsBlacklist;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import io.vertx.core.Vertx;
+import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
+import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
+import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
+import org.hyperledger.besu.ethereum.p2p.network.exceptions.IncompatiblePeerException;
+import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions.Action;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissionsBlacklist;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -152,7 +151,8 @@ public class P2PNetworkTest {
 
       // Setup second connection and check that connection is not accepted
       final CompletableFuture<PeerConnection> peerFuture = new CompletableFuture<>();
-      final CompletableFuture<DisconnectMessage.DisconnectReason> reasonFuture = new CompletableFuture<>();
+      final CompletableFuture<DisconnectMessage.DisconnectReason> reasonFuture =
+          new CompletableFuture<>();
       connector2.subscribeDisconnect(
           (peerConnection, reason, initiatedByPeer) -> {
             peerFuture.complete(peerConnection);
@@ -223,7 +223,8 @@ public class P2PNetworkTest {
 
       // Setup disconnect listener
       final CompletableFuture<PeerConnection> peerFuture = new CompletableFuture<>();
-      final CompletableFuture<DisconnectMessage.DisconnectReason> reasonFuture = new CompletableFuture<>();
+      final CompletableFuture<DisconnectMessage.DisconnectReason> reasonFuture =
+          new CompletableFuture<>();
       remoteNetwork.subscribeDisconnect(
           (peerConnection, reason, initiatedByPeer) -> {
             peerFuture.complete(peerConnection);
@@ -236,7 +237,8 @@ public class P2PNetworkTest {
       // Check connection is made, and then a disconnect is registered at remote
       Assertions.assertThat(connectFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
           .isEqualTo(localId);
-      Assertions.assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId()).isEqualTo(localId);
+      Assertions.assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
+          .isEqualTo(localId);
       assertThat(reasonFuture.get(5L, TimeUnit.SECONDS))
           .isEqualByComparingTo(DisconnectMessage.DisconnectReason.UNKNOWN);
     }
@@ -264,7 +266,8 @@ public class P2PNetworkTest {
 
       // Setup disconnect listener
       final CompletableFuture<PeerConnection> peerFuture = new CompletableFuture<>();
-      final CompletableFuture<DisconnectMessage.DisconnectReason> reasonFuture = new CompletableFuture<>();
+      final CompletableFuture<DisconnectMessage.DisconnectReason> reasonFuture =
+          new CompletableFuture<>();
       remoteNetwork.subscribeDisconnect(
           (peerConnection, reason, initiatedByPeer) -> {
             peerFuture.complete(peerConnection);
@@ -278,7 +281,8 @@ public class P2PNetworkTest {
       final BytesValue localId = localEnode.getNodeId();
       Assertions.assertThat(connectFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
           .isEqualTo(localId);
-      Assertions.assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId()).isEqualTo(localId);
+      Assertions.assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
+          .isEqualTo(localId);
       assertThat(reasonFuture.get(5L, TimeUnit.SECONDS))
           .isEqualByComparingTo(DisconnectMessage.DisconnectReason.UNKNOWN);
     }

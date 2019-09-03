@@ -14,8 +14,9 @@ package org.hyperledger.besu.util.uint;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import org.hyperledger.besu.util.bytes.Bytes32Backed;
 import tech.pegasys.pantheon.plugin.data.Quantity;
+
+import org.hyperledger.besu.util.bytes.Bytes32Backed;
 
 /**
  * Represents a 256-bits (32 bytes) unsigned integer value.

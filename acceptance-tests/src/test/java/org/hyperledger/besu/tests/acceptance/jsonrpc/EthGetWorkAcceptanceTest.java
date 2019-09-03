@@ -12,9 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.jsonrpc;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.processor;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockReplay.TransactionAction;
 import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor;
 import org.hyperledger.besu.ethereum.vm.BlockHashLookup;
 import org.hyperledger.besu.ethereum.vm.DebugOperationTracer;
-
-import java.util.Optional;
 
 /** Used to produce debug traces of blocks */
 public class BlockTracer {

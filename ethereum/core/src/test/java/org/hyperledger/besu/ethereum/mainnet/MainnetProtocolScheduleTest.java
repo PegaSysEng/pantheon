@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import org.hyperledger.besu.config.GenesisConfigFile;
-
 import java.nio.charset.StandardCharsets;
 
 import com.google.common.io.Resources;
 import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.config.GenesisConfigFile;
 import org.junit.Test;
 
 public class MainnetProtocolScheduleTest {

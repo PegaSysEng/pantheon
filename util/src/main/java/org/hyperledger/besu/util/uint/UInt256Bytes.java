@@ -14,16 +14,15 @@ package org.hyperledger.besu.util.uint;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.math.BigInteger;
+import java.util.function.BinaryOperator;
+
+import com.google.common.annotations.VisibleForTesting;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.Bytes32s;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
 import org.hyperledger.besu.util.bytes.MutableBytes32;
-
-import java.math.BigInteger;
-import java.util.function.BinaryOperator;
-
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Static operations to work on bytes interpreted as 256 bytes unsigned integers.
@@ -70,7 +69,7 @@ public abstract class UInt256Bytes {
   private static final long LONG_MASK = 0xffffffffL;
 
   static void copyPadded(
-          final BytesValue toCopy, final MutableBytes32 destination, final byte padByte) {
+      final BytesValue toCopy, final MutableBytes32 destination, final byte padByte) {
     final int copySize = toCopy.size();
     if (copySize == SIZE) {
       toCopy.copyTo(destination);

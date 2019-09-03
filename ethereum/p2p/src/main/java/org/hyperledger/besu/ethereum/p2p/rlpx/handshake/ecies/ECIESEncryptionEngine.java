@@ -14,9 +14,6 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.handshake.ecies;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.math.BigInteger;
 
 import org.bouncycastle.crypto.BasicAgreement;
@@ -44,6 +41,8 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.Pack;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * An <a href="https://en.wikipedia.org/wiki/Integrated_Encryption_Scheme">Integrated Encryption

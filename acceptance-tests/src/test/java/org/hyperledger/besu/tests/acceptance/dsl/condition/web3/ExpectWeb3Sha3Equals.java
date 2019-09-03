@@ -14,9 +14,9 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.web3;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.web3.Web3Sha3Transaction;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.web3.Web3Sha3Transaction;
 
 public class ExpectWeb3Sha3Equals implements Condition {
 

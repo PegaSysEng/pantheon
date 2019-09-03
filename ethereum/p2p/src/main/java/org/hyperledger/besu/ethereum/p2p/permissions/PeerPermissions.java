@@ -12,15 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.p2p.permissions;
 
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.util.Subscribers;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableList;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.util.Subscribers;
 
 public abstract class PeerPermissions implements AutoCloseable {
   private final Subscribers<PermissionsUpdateCallback> updateSubscribers = Subscribers.create();

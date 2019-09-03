@@ -14,6 +14,11 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
 import static org.hyperledger.besu.ethereum.jsonrpc.JsonRpcErrorConverter.convertTransactionInvalidReason;
 
+import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
@@ -30,12 +35,6 @@ import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.function.Supplier;
-
-import com.google.common.base.Suppliers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class EthSendRawTransaction implements JsonRpcMethod {
 

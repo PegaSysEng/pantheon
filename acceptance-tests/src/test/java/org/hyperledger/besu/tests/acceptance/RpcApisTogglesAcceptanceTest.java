@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.junit.Before;
 import org.junit.Test;

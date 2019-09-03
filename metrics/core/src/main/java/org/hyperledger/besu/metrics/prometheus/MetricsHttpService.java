@@ -15,8 +15,6 @@ package org.hyperledger.besu.metrics.prometheus;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Streams.stream;
 
-import org.hyperledger.besu.metrics.MetricsSystem;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -42,6 +40,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.metrics.MetricsSystem;
 
 class MetricsHttpService implements MetricsService {
   private static final Logger LOG = LogManager.getLogger();

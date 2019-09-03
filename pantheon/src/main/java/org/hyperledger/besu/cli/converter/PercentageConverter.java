@@ -14,7 +14,6 @@ package org.hyperledger.besu.cli.converter;
 
 import org.hyperledger.besu.cli.converter.exception.PercentageConversionException;
 import org.hyperledger.besu.util.number.Percentage;
-
 import picocli.CommandLine;
 
 public class PercentageConverter implements CommandLine.ITypeConverter<Integer> {

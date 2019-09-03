@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
 
 class LogFilter extends Filter {
 

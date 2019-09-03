@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugTraceTransactionResult;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.debug.TraceOptions;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
@@ -23,9 +23,9 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParamete
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.TransactionTraceParams;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTrace;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTracer;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugTraceTransactionResult;
 import org.hyperledger.besu.ethereum.vm.DebugOperationTracer;
-
-import java.util.Optional;
 
 public class DebugTraceBlockByNumber extends AbstractBlockParameterMethod {
 

@@ -12,6 +12,10 @@
  */
 package org.hyperledger.besu.metrics.noop;
 
+import java.util.function.DoubleSupplier;
+import java.util.stream.Stream;
+
+import com.google.common.base.Preconditions;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricCategory;
@@ -19,11 +23,6 @@ import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.Observation;
 import org.hyperledger.besu.metrics.OperationTimer;
 import org.hyperledger.besu.metrics.OperationTimer.TimingContext;
-
-import java.util.function.DoubleSupplier;
-import java.util.stream.Stream;
-
-import com.google.common.base.Preconditions;
 
 public class NoOpMetricsSystem implements MetricsSystem {
 

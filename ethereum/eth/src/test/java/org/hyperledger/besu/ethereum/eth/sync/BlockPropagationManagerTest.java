@@ -23,9 +23,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
-import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
-import org.mockito.Mockito;
+import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
+
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
@@ -38,7 +39,9 @@ import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthMessages;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
+import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
+import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
 import org.hyperledger.besu.ethereum.eth.messages.NewBlockHashesMessage;
 import org.hyperledger.besu.ethereum.eth.messages.NewBlockHashesMessage.NewBlockHash;
 import org.hyperledger.besu.ethereum.eth.messages.NewBlockMessage;
@@ -50,14 +53,10 @@ import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.testutil.TestClock;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class BlockPropagationManagerTest {
 
@@ -130,7 +129,8 @@ public class BlockPropagationManagerTest {
         NewBlockHashesMessage.create(
             Collections.singletonList(
                 new NewBlockHash(nextNextBlock.getHash(), nextNextBlock.getHeader().getNumber())));
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
 
     // Broadcast first message
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, nextAnnouncement);
@@ -165,7 +165,8 @@ public class BlockPropagationManagerTest {
         NewBlockHashesMessage.create(
             Collections.singletonList(
                 new NewBlockHash(nextNextBlock.getHash(), nextNextBlock.getHeader().getNumber())));
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
 
     // Broadcast second message first
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, nextNextAnnouncement);
@@ -198,7 +199,8 @@ public class BlockPropagationManagerTest {
     final NewBlockMessage nextNextAnnouncement =
         NewBlockMessage.create(
             nextNextBlock, fullBlockchain.getTotalDifficultyByHash(nextNextBlock.getHash()).get());
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
 
     // Broadcast first message
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, nextAnnouncement);
@@ -231,7 +233,8 @@ public class BlockPropagationManagerTest {
     final NewBlockMessage nextNextAnnouncement =
         NewBlockMessage.create(
             nextNextBlock, fullBlockchain.getTotalDifficultyByHash(nextNextBlock.getHash()).get());
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
 
     // Broadcast second message first
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, nextNextAnnouncement);
@@ -276,7 +279,8 @@ public class BlockPropagationManagerTest {
     final NewBlockMessage block4Msg =
         NewBlockMessage.create(
             block4, fullBlockchain.getTotalDifficultyByHash(block4.getHash()).get());
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
 
     // Broadcast older blocks
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, block3Msg);
@@ -329,7 +333,8 @@ public class BlockPropagationManagerTest {
     final NewBlockMessage newBlock =
         NewBlockMessage.create(
             nextBlock, fullBlockchain.getTotalDifficultyByHash(nextBlock.getHash()).get());
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
 
     // Broadcast first message
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, newBlock);
@@ -385,7 +390,8 @@ public class BlockPropagationManagerTest {
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, newBlockHash);
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, newBlock);
     // Respond
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
     peer.respondWhile(responder, peer::hasOutstandingRequests);
 
     assertThat(blockchain.contains(nextBlock.getHash())).isTrue();
@@ -411,7 +417,8 @@ public class BlockPropagationManagerTest {
 
     // Broadcast
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, futureAnnouncement);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
     peer.respondWhile(responder, peer::hasOutstandingRequests);
 
     assertThat(blockchain.contains(futureBlock.getHash())).isFalse();
@@ -435,7 +442,8 @@ public class BlockPropagationManagerTest {
 
     // Broadcast
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, futureAnnouncement);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
     peer.respondWhile(responder, peer::hasOutstandingRequests);
 
     assertThat(blockchain.contains(futureBlock.getHash())).isFalse();
@@ -463,7 +471,8 @@ public class BlockPropagationManagerTest {
 
     // Broadcast
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, oldAnnouncement);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
     peer.respondWhile(responder, peer::hasOutstandingRequests);
 
     verify(propManager, times(0)).importOrSavePendingBlock(any());
@@ -489,7 +498,8 @@ public class BlockPropagationManagerTest {
 
     // Broadcast
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, oldAnnouncement);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
     peer.respondWhile(responder, peer::hasOutstandingRequests);
 
     verify(propManager, times(0)).importOrSavePendingBlock(any());
@@ -525,7 +535,8 @@ public class BlockPropagationManagerTest {
 
     // Broadcast
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, blockAnnouncementMsg);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
     peer.respondWhile(responder, peer::hasOutstandingRequests);
 
     // Check that we pushed our block into the pending collection
@@ -563,7 +574,8 @@ public class BlockPropagationManagerTest {
 
     // Broadcast message
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, nextAnnouncement);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
     peer.respondWhile(responder, peer::hasOutstandingRequests);
 
     assertThat(peer.getEthPeer().chainState().getBestBlock().getHash())
@@ -618,7 +630,8 @@ public class BlockPropagationManagerTest {
     // Broadcast message
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, newBlockMessage);
 
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(fullBlockchain);
     peer.respondWhile(responder, peer::hasOutstandingRequests);
 
     verify(blockBroadcaster, times(1)).propagate(block, totalDifficulty);

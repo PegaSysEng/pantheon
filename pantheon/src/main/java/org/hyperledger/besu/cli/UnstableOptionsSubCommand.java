@@ -20,12 +20,12 @@ import java.util.Map;
 import picocli.CommandLine;
 
 /**
- * This class provides a CLI command to enumerate the unstable options available in Pantheon.
+ * This class provides a CLI command to enumerate the unstable options available in Besu.
  *
  * <p>Unstable options are distinguished by
  *
  * <ul>
- *   <li>Not being configured in the main PantheonCommand
+ *   <li>Not being configured in the main BesuCommand
  *   <li>Being marked as 'hidden'
  *   <li>Having their first option name start with <code>--X</code>
  * </ul>

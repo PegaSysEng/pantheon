@@ -41,7 +41,10 @@ import org.hyperledger.besu.util.bytes.MutableBytesValue;
  *     responder response</a>
  */
 public final class ResponderHandshakeMessageV1 implements ResponderHandshakeMessage {
-  public static final int MESSAGE_LENGTH = ECIESHandshaker.PUBKEY_LENGTH + ECIESHandshaker.NONCE_LENGTH + ECIESHandshaker.TOKEN_FLAG_LENGTH;
+  public static final int MESSAGE_LENGTH =
+      ECIESHandshaker.PUBKEY_LENGTH
+          + ECIESHandshaker.NONCE_LENGTH
+          + ECIESHandshaker.TOKEN_FLAG_LENGTH;
 
   private final SECP256K1.PublicKey ephPublicKey; // 64 bytes - uncompressed and no type byte
   private final Bytes32 nonce; // 32 bytes
@@ -64,8 +67,10 @@ public final class ResponderHandshakeMessageV1 implements ResponderHandshakeMess
 
     final BytesValue pubk = bytes.slice(0, ECIESHandshaker.PUBKEY_LENGTH);
     final SECP256K1.PublicKey ephPubKey = SECP256K1.PublicKey.create(pubk);
-    final Bytes32 nonce = Bytes32.wrap(bytes.slice(ECIESHandshaker.PUBKEY_LENGTH, ECIESHandshaker.NONCE_LENGTH), 0);
-    final boolean token = bytes.get(ECIESHandshaker.PUBKEY_LENGTH + ECIESHandshaker.NONCE_LENGTH) == 0x01;
+    final Bytes32 nonce =
+        Bytes32.wrap(bytes.slice(ECIESHandshaker.PUBKEY_LENGTH, ECIESHandshaker.NONCE_LENGTH), 0);
+    final boolean token =
+        bytes.get(ECIESHandshaker.PUBKEY_LENGTH + ECIESHandshaker.NONCE_LENGTH) == 0x01;
     return new ResponderHandshakeMessageV1(ephPubKey, nonce, token);
   }
 
@@ -74,7 +79,8 @@ public final class ResponderHandshakeMessageV1 implements ResponderHandshakeMess
     final MutableBytesValue bytes = MutableBytesValue.create(MESSAGE_LENGTH);
     ephPublicKey.getEncodedBytes().copyTo(bytes, 0);
     nonce.copyTo(bytes, ECIESHandshaker.PUBKEY_LENGTH);
-    BytesValue.of((byte) (token ? 0x01 : 0x00)).copyTo(bytes, ECIESHandshaker.PUBKEY_LENGTH + ECIESHandshaker.NONCE_LENGTH);
+    BytesValue.of((byte) (token ? 0x01 : 0x00))
+        .copyTo(bytes, ECIESHandshaker.PUBKEY_LENGTH + ECIESHandshaker.NONCE_LENGTH);
     return bytes;
   }
 

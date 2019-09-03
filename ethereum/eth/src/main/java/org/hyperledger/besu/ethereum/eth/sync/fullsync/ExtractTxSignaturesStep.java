@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.fullsync;
 
-import org.hyperledger.besu.ethereum.core.Block;
-import org.hyperledger.besu.ethereum.core.Transaction;
-
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
+
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Transaction;
 
 public class ExtractTxSignaturesStep implements Function<List<Block>, Stream<Block>> {
 

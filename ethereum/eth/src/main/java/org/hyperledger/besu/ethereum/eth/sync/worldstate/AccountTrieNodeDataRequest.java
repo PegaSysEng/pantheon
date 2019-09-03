@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.trie.MerklePatriciaTrie;
@@ -19,9 +22,6 @@ import org.hyperledger.besu.ethereum.worldstate.StateTrieAccountValue;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage.Updater;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Optional;
-import java.util.stream.Stream;
 
 class AccountTrieNodeDataRequest extends TrieNodeDataRequest {
 
@@ -55,8 +55,7 @@ class AccountTrieNodeDataRequest extends TrieNodeDataRequest {
     // Add storage, if appropriate
     if (!accountValue.getStorageRoot().equals(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH)) {
       // If storage is non-empty queue download
-      final NodeDataRequest storageNode =
-          createStorageDataRequest(accountValue.getStorageRoot());
+      final NodeDataRequest storageNode = createStorageDataRequest(accountValue.getStorageRoot());
       builder.add(storageNode);
     }
     return builder.build();

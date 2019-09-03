@@ -12,16 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.connections;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.Set;
+
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.Set;
 
 /** A P2P connection to another node. */
 public interface PeerConnection {

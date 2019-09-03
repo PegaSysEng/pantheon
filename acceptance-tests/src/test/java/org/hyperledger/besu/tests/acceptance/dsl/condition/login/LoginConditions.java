@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.login;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.login.LoginTransaction;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.login.LoginTransaction;
 
 public class LoginConditions {
 

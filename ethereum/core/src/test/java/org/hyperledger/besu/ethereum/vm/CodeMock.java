@@ -12,9 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /** A mock for representing EVM Code associated with an account. */
 public class CodeMock extends Code {

@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.cli.util;
 
-import org.hyperledger.besu.ethereum.core.Wei;
-
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -25,6 +23,7 @@ import java.util.stream.Collectors;
 import net.consensys.cava.toml.Toml;
 import net.consensys.cava.toml.TomlParseError;
 import net.consensys.cava.toml.TomlParseResult;
+import org.hyperledger.besu.ethereum.core.Wei;
 import picocli.CommandLine;
 import picocli.CommandLine.IDefaultValueProvider;
 import picocli.CommandLine.Model.ArgSpec;

@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.connections;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.hyperledger.besu.ethereum.p2p.rlpx.DisconnectCallback;
 import org.hyperledger.besu.ethereum.p2p.rlpx.MessageCallback;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
@@ -24,9 +27,6 @@ import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.util.Subscribers;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PeerConnectionEvents implements PeerConnectionEventDispatcher {
   private final Subscribers<DisconnectCallback> disconnectSubscribers = Subscribers.create(true);

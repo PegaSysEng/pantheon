@@ -14,12 +14,12 @@ package org.hyperledger.besu.util.uint;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.math.BigInteger;
+import java.util.function.Supplier;
+
 import org.hyperledger.besu.util.bytes.AbstractBytes32Backed;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.Bytes32s;
-
-import java.math.BigInteger;
-import java.util.function.Supplier;
 
 /**
  * Base implementation of all {@link UInt256Value}.

@@ -14,17 +14,12 @@ package org.hyperledger.besu.ethereum.trie;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.inOrder;
-
-import org.hyperledger.besu.crypto.Hash;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.uint.UInt256;
+import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
 import java.util.NavigableSet;
@@ -32,6 +27,10 @@ import java.util.Random;
 import java.util.TreeSet;
 import java.util.function.Function;
 
+import org.hyperledger.besu.crypto.Hash;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 import org.junit.Test;
 import org.mockito.InOrder;
 
@@ -54,7 +53,8 @@ public class TrieIteratorTest {
 
   @Test
   public void shouldCallLeafHandlerWhenRootNodeIsALeaf() {
-    final Node<String> leaf = nodeFactory.createLeaf(CompactEncoding.bytesToPath(KEY_HASH1), "Leaf");
+    final Node<String> leaf =
+        nodeFactory.createLeaf(CompactEncoding.bytesToPath(KEY_HASH1), "Leaf");
     leaf.accept(iterator, PATH1);
 
     verify(leafHandler).onLeaf(KEY_HASH1, leaf);
@@ -78,7 +78,8 @@ public class TrieIteratorTest {
   @Test
   @SuppressWarnings("unchecked")
   public void shouldVisitEachChildOfABranchNode() {
-    when(leafHandler.onLeaf(any(Bytes32.class), any(Node.class))).thenReturn(TrieIterator.State.CONTINUE);
+    when(leafHandler.onLeaf(any(Bytes32.class), any(Node.class)))
+        .thenReturn(TrieIterator.State.CONTINUE);
     final Node<String> root =
         NullNode.<String>instance()
             .accept(new PutVisitor<>(nodeFactory, "Leaf 1"), PATH1)
@@ -94,7 +95,8 @@ public class TrieIteratorTest {
   @Test
   @SuppressWarnings("unchecked")
   public void shouldStopIteratingChildrenOfBranchWhenLeafHandlerReturnsStop() {
-    when(leafHandler.onLeaf(any(Bytes32.class), any(Node.class))).thenReturn(TrieIterator.State.STOP);
+    when(leafHandler.onLeaf(any(Bytes32.class), any(Node.class)))
+        .thenReturn(TrieIterator.State.STOP);
     final Node<String> root =
         NullNode.<String>instance()
             .accept(new PutVisitor<>(nodeFactory, "Leaf 1"), PATH1)
@@ -118,7 +120,8 @@ public class TrieIteratorTest {
     final int stopNodeNumber = random.nextInt(Math.max(1, totalNodes - 1));
     for (int i = 0; i < totalNodes; i++) {
       final Bytes32 keyHash = Hash.keccak256(UInt256.of(Math.abs(random.nextLong())).getBytes());
-      root = root.accept(new PutVisitor<>(nodeFactory, "Value"), CompactEncoding.bytesToPath(keyHash));
+      root =
+          root.accept(new PutVisitor<>(nodeFactory, "Value"), CompactEncoding.bytesToPath(keyHash));
       expectedKeyHashes.add(keyHash);
       if (i == startNodeNumber) {
         startAtHash = keyHash;
@@ -129,8 +132,10 @@ public class TrieIteratorTest {
 
     final Bytes32 actualStopAtHash =
         stopAtHash.compareTo(startAtHash) >= 0 ? stopAtHash : startAtHash;
-    when(leafHandler.onLeaf(any(Bytes32.class), any(Node.class))).thenReturn(TrieIterator.State.CONTINUE);
-    when(leafHandler.onLeaf(eq(actualStopAtHash), any(Node.class))).thenReturn(TrieIterator.State.STOP);
+    when(leafHandler.onLeaf(any(Bytes32.class), any(Node.class)))
+        .thenReturn(TrieIterator.State.CONTINUE);
+    when(leafHandler.onLeaf(eq(actualStopAtHash), any(Node.class)))
+        .thenReturn(TrieIterator.State.STOP);
     root.accept(iterator, CompactEncoding.bytesToPath(startAtHash));
     final InOrder inOrder = inOrder(leafHandler);
     expectedKeyHashes

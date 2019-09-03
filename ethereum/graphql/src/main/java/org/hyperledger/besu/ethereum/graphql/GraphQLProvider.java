@@ -14,8 +14,6 @@ package org.hyperledger.besu.ethereum.graphql;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 
-import org.hyperledger.besu.ethereum.graphql.internal.Scalars;
-
 import java.io.IOException;
 import java.net.URL;
 
@@ -27,6 +25,7 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import org.hyperledger.besu.ethereum.graphql.internal.Scalars;
 
 public class GraphQLProvider {
 

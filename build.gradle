@@ -139,7 +139,7 @@ allprojects {
         exclude '**/generalstate/GeneralStateReferenceTest*.java'
         exclude '**/generalstate/GeneralStateRegressionReferenceTest*.java'
         exclude '**/blockchain/BlockchainReferenceTest*.java'
-        exclude '**/pantheon/PantheonInfo.java'
+        exclude '**/pantheon/BesuInfo.java'
         exclude '**/.gradle/**'
       }
       removeUnusedImports()
@@ -293,7 +293,7 @@ subprojects {
             usage('java-runtime') { fromResolutionResult() }
           }
           pom {
-            name = "Pantheon - ${project.name}"
+            name = "Besu - ${project.name}"
             url = 'http://github.com/PegaSysEng/pantheon'
             licenses {
               license {

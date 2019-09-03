@@ -15,13 +15,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.Hash;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.web3j.protocol.Web3jService;
 import org.web3j.protocol.core.Request;
 import org.web3j.protocol.core.Response;

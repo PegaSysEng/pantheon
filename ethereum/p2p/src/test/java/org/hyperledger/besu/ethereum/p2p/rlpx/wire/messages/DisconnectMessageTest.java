@@ -19,7 +19,6 @@ import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
 import org.junit.Test;
 
 public class DisconnectMessageTest {
@@ -75,15 +74,18 @@ public class DisconnectMessageTest {
 
   @Test
   public void createWithReason() {
-    DisconnectMessage disconnectMessage = DisconnectMessage.create(DisconnectMessage.DisconnectReason.USELESS_PEER);
+    DisconnectMessage disconnectMessage =
+        DisconnectMessage.create(DisconnectMessage.DisconnectReason.USELESS_PEER);
 
-    assertThat(disconnectMessage.getReason()).isEqualTo(DisconnectMessage.DisconnectReason.USELESS_PEER);
+    assertThat(disconnectMessage.getReason())
+        .isEqualTo(DisconnectMessage.DisconnectReason.USELESS_PEER);
     Assertions.assertThat(disconnectMessage.getData().toString()).isEqualToIgnoringCase("0xC103");
   }
 
   @Test
   public void createWithUnknownReason() {
-    DisconnectMessage disconnectMessage = DisconnectMessage.create(DisconnectMessage.DisconnectReason.UNKNOWN);
+    DisconnectMessage disconnectMessage =
+        DisconnectMessage.create(DisconnectMessage.DisconnectReason.UNKNOWN);
 
     assertThat(disconnectMessage.getReason()).isEqualTo(DisconnectMessage.DisconnectReason.UNKNOWN);
     Assertions.assertThat(disconnectMessage.getData().toString()).isEqualToIgnoringCase("0xC180");

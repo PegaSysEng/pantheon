@@ -14,14 +14,13 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
 import static java.util.Objects.isNull;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 
 public class TraceTypeParameter {
 

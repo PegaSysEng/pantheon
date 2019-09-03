@@ -16,13 +16,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.contentOf;
 
-import org.hyperledger.besu.cli.CommandTestAbstract;
-
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
 
+import org.hyperledger.besu.cli.CommandTestAbstract;
 import org.junit.After;
 import org.junit.Test;
 import picocli.CommandLine.Model.CommandSpec;

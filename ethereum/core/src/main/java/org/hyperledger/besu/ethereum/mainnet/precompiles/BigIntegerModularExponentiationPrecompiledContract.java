@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.mainnet.precompiles;
 
+import java.math.BigInteger;
+import java.util.Arrays;
+
 import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.mainnet.AbstractPrecompiledContract;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
@@ -19,9 +22,6 @@ import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
 import org.hyperledger.besu.util.bytes.MutableBytesValue;
-
-import java.math.BigInteger;
-import java.util.Arrays;
 
 // The big integer modular exponentiation precompiled contract defined in EIP-198.
 public class BigIntegerModularExponentiationPrecompiledContract

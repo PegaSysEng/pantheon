@@ -14,11 +14,10 @@ package org.hyperledger.besu.util.uint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.MutableBytes32;
-
 import java.math.BigInteger;
 
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.MutableBytes32;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -320,7 +319,7 @@ public class UInt256BytesTest {
   }
 
   private void longOp(
-          final UInt256Bytes.BinaryLongOp op, final Bytes32 v1, final long v2, final Bytes32 expected) {
+      final UInt256Bytes.BinaryLongOp op, final Bytes32 v1, final long v2, final Bytes32 expected) {
     final MutableBytes32 r1 = MutableBytes32.create();
     op.applyOp(v1, v2, r1);
     assertEquals(expected, r1, false);
@@ -332,7 +331,8 @@ public class UInt256BytesTest {
     assertEquals(expected, r2, false);
   }
 
-  private void op(final UInt256Bytes.BinaryOp op, final Bytes32 v1, final Bytes32 v2, final Bytes32 expected) {
+  private void op(
+      final UInt256Bytes.BinaryOp op, final Bytes32 v1, final Bytes32 v2, final Bytes32 expected) {
     final MutableBytes32 r1 = MutableBytes32.create();
     op.applyOp(v1, v2, r1);
     assertEquals(expected, r1, false);

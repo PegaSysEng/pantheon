@@ -19,7 +19,6 @@ import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.consensus.ibft.validation;
 
+import java.util.Collection;
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.payload.CommitPayload;
 import org.hyperledger.besu.consensus.ibft.payload.Payload;
@@ -21,12 +26,6 @@ import org.hyperledger.besu.consensus.ibft.payload.SignedData;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Util;
-
-import java.util.Collection;
-import java.util.Optional;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class SignedDataValidator {
 
@@ -131,7 +130,7 @@ public class SignedDataValidator {
   }
 
   private boolean isMessageForCurrentRoundFromValidatorAndProposalAvailable(
-          final SignedData<? extends Payload> msg, final String msgType) {
+      final SignedData<? extends Payload> msg, final String msgType) {
 
     if (!msg.getPayload().getRoundIdentifier().equals(roundIdentifier)) {
       LOG.info("Invalid {} message, does not match current round.", msgType);

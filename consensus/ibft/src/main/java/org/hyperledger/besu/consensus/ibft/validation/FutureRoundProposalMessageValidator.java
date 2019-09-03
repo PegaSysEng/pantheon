@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.consensus.ibft.validation;
 
-import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 /* One of these will be created by the IbftBlockHeightManager and will exist for the life of the
 chainheight, and used to ensure supplied Proposals are suitable for starting a new round.

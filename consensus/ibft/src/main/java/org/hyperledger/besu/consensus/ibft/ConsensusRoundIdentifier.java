@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.ethereum.rlp.RLPInput;
-import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 
 /**
  * Represents the chain index (i.e. height) and number of attempted consensuses conducted at this

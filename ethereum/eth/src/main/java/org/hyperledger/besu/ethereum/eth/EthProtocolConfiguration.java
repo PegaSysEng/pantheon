@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.eth;
 
-import org.hyperledger.besu.util.number.PositiveNumber;
-
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.util.number.PositiveNumber;
 
 public class EthProtocolConfiguration {
 

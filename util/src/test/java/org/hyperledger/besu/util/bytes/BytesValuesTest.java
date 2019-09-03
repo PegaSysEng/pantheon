@@ -12,9 +12,6 @@
  */
 package org.hyperledger.besu.util.bytes;
 
-import static org.junit.Assert.assertEquals;
-import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
-
 import java.math.BigInteger;
 
 import org.junit.Assert;

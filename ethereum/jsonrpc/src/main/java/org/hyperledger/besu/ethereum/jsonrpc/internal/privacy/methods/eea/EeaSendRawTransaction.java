@@ -15,6 +15,8 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea;
 import static org.hyperledger.besu.ethereum.jsonrpc.JsonRpcEnclaveErrorConverter.convertEnclaveInvalidReason;
 import static org.hyperledger.besu.ethereum.jsonrpc.JsonRpcErrorConverter.convertTransactionInvalidReason;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
@@ -32,9 +34,6 @@ import org.hyperledger.besu.ethereum.privacy.Restriction;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class EeaSendRawTransaction implements JsonRpcMethod {
 

@@ -14,6 +14,9 @@ package org.hyperledger.besu.ethereum.eth.messages;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.util.Optional;
+import java.util.OptionalLong;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.AbstractMessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
@@ -22,9 +25,6 @@ import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Optional;
-import java.util.OptionalLong;
 
 /** PV62 GetBlockHeaders Message. */
 public final class GetBlockHeadersMessage extends AbstractMessageData {

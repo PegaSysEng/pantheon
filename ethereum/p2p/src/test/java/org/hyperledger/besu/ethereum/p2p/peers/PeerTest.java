@@ -13,15 +13,14 @@
 package org.hyperledger.besu.ethereum.p2p.peers;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
 
+import com.google.common.net.InetAddresses;
 import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
 import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import com.google.common.net.InetAddresses;
 import org.junit.Test;
 
 public class PeerTest {

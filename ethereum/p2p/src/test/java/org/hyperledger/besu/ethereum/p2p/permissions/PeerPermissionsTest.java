@@ -18,14 +18,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions.Action;
-
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.junit.Test;
 
 public class PeerPermissionsTest {

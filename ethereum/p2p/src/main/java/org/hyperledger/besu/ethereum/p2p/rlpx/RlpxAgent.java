@@ -16,29 +16,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.isNull;
 
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.p2p.peers.LocalNode;
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.ethereum.p2p.peers.PeerPrivileges;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty.NettyConnectionInitializer;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
-import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.ConnectionInitializer;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerRlpxPermissions;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.RlpxConnection;
-import org.hyperledger.besu.metrics.Counter;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import org.hyperledger.besu.util.FutureUtils;
-import org.hyperledger.besu.util.Subscribers;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +31,28 @@ import java.util.stream.Stream;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
+import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.p2p.peers.LocalNode;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.ethereum.p2p.peers.PeerPrivileges;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.ConnectionInitializer;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerRlpxPermissions;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.RlpxConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty.NettyConnectionInitializer;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
+import org.hyperledger.besu.metrics.Counter;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.util.FutureUtils;
+import org.hyperledger.besu.util.Subscribers;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class RlpxAgent {
   private static final Logger LOG = LogManager.getLogger();
@@ -132,7 +131,8 @@ public class RlpxAgent {
           new IllegalStateException("Illegal attempt to stop " + getClass().getSimpleName()));
     }
 
-    streamConnections().forEach((conn) -> conn.disconnect(DisconnectMessage.DisconnectReason.CLIENT_QUITTING));
+    streamConnections()
+        .forEach((conn) -> conn.disconnect(DisconnectMessage.DisconnectReason.CLIENT_QUITTING));
     return connectionInitializer.stop();
   }
 
@@ -359,7 +359,9 @@ public class RlpxAgent {
                 "Duplicate connection detected, disconnecting previously established connection in favor of new inbound connection for peer:  {}",
                 peerConnection.getPeer().getId());
             disconnectAction.set(
-                () -> existingConnection.disconnect(DisconnectMessage.DisconnectReason.ALREADY_CONNECTED));
+                () ->
+                    existingConnection.disconnect(
+                        DisconnectMessage.DisconnectReason.ALREADY_CONNECTED));
             newConnectionAccepted.set(true);
             return inboundConnection;
           } else {
@@ -368,7 +370,9 @@ public class RlpxAgent {
                 "Duplicate connection detected, disconnecting inbound connection in favor of previously established connection for peer:  {}",
                 peerConnection.getPeer().getId());
             disconnectAction.set(
-                () -> inboundConnection.disconnect(DisconnectMessage.DisconnectReason.ALREADY_CONNECTED));
+                () ->
+                    inboundConnection.disconnect(
+                        DisconnectMessage.DisconnectReason.ALREADY_CONNECTED));
             return existingConnection;
           }
         });

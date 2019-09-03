@@ -48,7 +48,11 @@ import org.hyperledger.besu.util.bytes.MutableBytesValue;
  */
 public final class InitiatorHandshakeMessageV1 implements InitiatorHandshakeMessage {
   public static final int MESSAGE_LENGTH =
-      ECIESHandshaker.SIGNATURE_LENGTH + ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH + ECIESHandshaker.PUBKEY_LENGTH + ECIESHandshaker.NONCE_LENGTH + ECIESHandshaker.TOKEN_FLAG_LENGTH;
+      ECIESHandshaker.SIGNATURE_LENGTH
+          + ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH
+          + ECIESHandshaker.PUBKEY_LENGTH
+          + ECIESHandshaker.NONCE_LENGTH
+          + ECIESHandshaker.TOKEN_FLAG_LENGTH;
 
   private final SECP256K1.PublicKey pubKey;
   private final SECP256K1.Signature signature;
@@ -103,10 +107,17 @@ public final class InitiatorHandshakeMessageV1 implements InitiatorHandshakeMess
     final SECP256K1.Signature signature =
         SECP256K1.Signature.decode(bytes.slice(offset, ECIESHandshaker.SIGNATURE_LENGTH));
     final Bytes32 ephPubKeyHash =
-        Bytes32.wrap(bytes.slice(offset += ECIESHandshaker.SIGNATURE_LENGTH, ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH), 0);
+        Bytes32.wrap(
+            bytes.slice(
+                offset += ECIESHandshaker.SIGNATURE_LENGTH, ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH),
+            0);
     final SECP256K1.PublicKey pubKey =
-        SECP256K1.PublicKey.create(bytes.slice(offset += ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH, ECIESHandshaker.PUBKEY_LENGTH));
-    final Bytes32 nonce = Bytes32.wrap(bytes.slice(offset += ECIESHandshaker.PUBKEY_LENGTH, ECIESHandshaker.NONCE_LENGTH), 0);
+        SECP256K1.PublicKey.create(
+            bytes.slice(
+                offset += ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH, ECIESHandshaker.PUBKEY_LENGTH));
+    final Bytes32 nonce =
+        Bytes32.wrap(
+            bytes.slice(offset += ECIESHandshaker.PUBKEY_LENGTH, ECIESHandshaker.NONCE_LENGTH), 0);
     final boolean token = bytes.get(offset) == 0x01;
 
     final Bytes32 staticSharedSecret = calculateKeyAgreement(keyPair.getPrivateKey(), pubKey);
@@ -124,8 +135,14 @@ public final class InitiatorHandshakeMessageV1 implements InitiatorHandshakeMess
     final MutableBytesValue bytes = MutableBytesValue.create(MESSAGE_LENGTH);
     signature.encodedBytes().copyTo(bytes, 0);
     ephPubKeyHash.copyTo(bytes, ECIESHandshaker.SIGNATURE_LENGTH);
-    pubKey.getEncodedBytes().copyTo(bytes, ECIESHandshaker.SIGNATURE_LENGTH + ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH);
-    nonce.copyTo(bytes, ECIESHandshaker.SIGNATURE_LENGTH + ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH + ECIESHandshaker.PUBKEY_LENGTH);
+    pubKey
+        .getEncodedBytes()
+        .copyTo(bytes, ECIESHandshaker.SIGNATURE_LENGTH + ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH);
+    nonce.copyTo(
+        bytes,
+        ECIESHandshaker.SIGNATURE_LENGTH
+            + ECIESHandshaker.HASH_EPH_PUBKEY_LENGTH
+            + ECIESHandshaker.PUBKEY_LENGTH);
     bytes.set(MESSAGE_LENGTH - 1, (byte) (token ? 0x01 : 0x00));
     return bytes;
   }

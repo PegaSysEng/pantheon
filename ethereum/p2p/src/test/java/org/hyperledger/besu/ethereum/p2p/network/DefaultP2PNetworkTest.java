@@ -13,6 +13,8 @@
 package org.hyperledger.besu.ethereum.p2p.network;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -20,30 +22,6 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enode;
-
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
-import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
-import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
-import org.hyperledger.besu.ethereum.p2p.peers.MaintainedPeers;
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.ethereum.p2p.rlpx.RlpxAgent;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
-import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import org.hyperledger.besu.ethereum.p2p.discovery.Endpoint;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerBondedObserver;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryAgent;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.MockPeerConnection;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MockSubProtocol;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import org.hyperledger.besu.nat.upnp.UpnpNatManager;
-import org.hyperledger.besu.nat.upnp.UpnpNatManager.Protocol;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +31,27 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
+import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
+import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
+import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
+import org.hyperledger.besu.ethereum.p2p.discovery.Endpoint;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerBondedObserver;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryAgent;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryEvent.PeerBondedEvent;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
+import org.hyperledger.besu.ethereum.p2p.peers.MaintainedPeers;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.ethereum.p2p.rlpx.RlpxAgent;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.MockPeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MockSubProtocol;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.nat.upnp.UpnpNatManager;
+import org.hyperledger.besu.nat.upnp.UpnpNatManager.Protocol;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,8 +65,7 @@ public final class DefaultP2PNetworkTest {
 
   final MaintainedPeers maintainedPeers = new MaintainedPeers();
   @Mock PeerDiscoveryAgent discoveryAgent;
-  @Mock
-  RlpxAgent rlpxAgent;
+  @Mock RlpxAgent rlpxAgent;
   @Mock UpnpNatManager natManager;
 
   private final ArgumentCaptor<PeerBondedObserver> discoverySubscriberCaptor =
@@ -131,7 +129,8 @@ public final class DefaultP2PNetworkTest {
 
     assertThat(maintainedPeers.contains(peer)).isFalse();
     verify(rlpxAgent, times(1)).connect(peer);
-    verify(rlpxAgent, times(1)).disconnect(peer.getId(), DisconnectMessage.DisconnectReason.REQUESTED);
+    verify(rlpxAgent, times(1))
+        .disconnect(peer.getId(), DisconnectMessage.DisconnectReason.REQUESTED);
     verify(discoveryAgent, times(1)).dropPeer(peer);
   }
 
@@ -144,7 +143,8 @@ public final class DefaultP2PNetworkTest {
     assertThat(network.removeMaintainedConnectionPeer(peer)).isFalse();
 
     assertThat(maintainedPeers.contains(peer)).isFalse();
-    verify(rlpxAgent, times(1)).disconnect(peer.getId(), DisconnectMessage.DisconnectReason.REQUESTED);
+    verify(rlpxAgent, times(1))
+        .disconnect(peer.getId(), DisconnectMessage.DisconnectReason.REQUESTED);
     verify(discoveryAgent, times(1)).dropPeer(peer);
   }
 

@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.tests.acceptance.clique;
 
+import java.io.IOException;
+
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.clique.ExpectNonceVote;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-
-import java.io.IOException;
-
 import org.junit.Test;
 
 public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {

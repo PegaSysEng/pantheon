@@ -12,10 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.response;
 
-import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum GraphQLError {

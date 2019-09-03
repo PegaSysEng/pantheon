@@ -17,24 +17,18 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.NETWORK;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.PEERS;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.RPC;
 import static org.hyperledger.besu.metrics.StandardMetricCategory.JVM;
 
-import org.hyperledger.besu.metrics.OperationTimer.TimingContext;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
+import java.util.Comparator;
+
+import com.google.common.collect.ImmutableSet;
 import org.hyperledger.besu.metrics.Counter;
 import org.hyperledger.besu.metrics.LabelledMetric;
 import org.hyperledger.besu.metrics.MetricsSystem;
 import org.hyperledger.besu.metrics.Observation;
 import org.hyperledger.besu.metrics.OperationTimer;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
-
-import java.util.Comparator;
-
-import com.google.common.collect.ImmutableSet;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.junit.Test;
 
 public class PrometheusMetricsSystemTest {
@@ -49,38 +43,46 @@ public class PrometheusMetricsSystemTest {
 
   @Test
   public void shouldCreateObservationFromCounter() {
-    final Counter counter = metricsSystem.createCounter(PantheonMetricCategory.PEERS, "connected", "Some help string");
+    final Counter counter =
+        metricsSystem.createCounter(PantheonMetricCategory.PEERS, "connected", "Some help string");
 
     counter.inc();
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(new Observation(PantheonMetricCategory.PEERS, "connected", 1d, emptyList()));
+        .containsExactly(
+            new Observation(PantheonMetricCategory.PEERS, "connected", 1d, emptyList()));
 
     counter.inc();
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(new Observation(PantheonMetricCategory.PEERS, "connected", 2d, emptyList()));
+        .containsExactly(
+            new Observation(PantheonMetricCategory.PEERS, "connected", 2d, emptyList()));
   }
 
   @Test
   public void shouldHandleDuplicateCounterCreation() {
     final LabelledMetric<Counter> counter1 =
-        metricsSystem.createLabelledCounter(PantheonMetricCategory.PEERS, "connected", "Some help string");
+        metricsSystem.createLabelledCounter(
+            PantheonMetricCategory.PEERS, "connected", "Some help string");
     final LabelledMetric<Counter> counter2 =
-        metricsSystem.createLabelledCounter(PantheonMetricCategory.PEERS, "connected", "Some help string");
+        metricsSystem.createLabelledCounter(
+            PantheonMetricCategory.PEERS, "connected", "Some help string");
     assertThat(counter1).isEqualTo(counter2);
 
     counter1.labels().inc();
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(new Observation(PantheonMetricCategory.PEERS, "connected", 1d, emptyList()));
+        .containsExactly(
+            new Observation(PantheonMetricCategory.PEERS, "connected", 1d, emptyList()));
 
     counter2.labels().inc();
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(new Observation(PantheonMetricCategory.PEERS, "connected", 2d, emptyList()));
+        .containsExactly(
+            new Observation(PantheonMetricCategory.PEERS, "connected", 2d, emptyList()));
   }
 
   @Test
   public void shouldCreateSeparateObservationsForEachCounterLabelValue() {
     final LabelledMetric<Counter> counter =
-        metricsSystem.createLabelledCounter(PantheonMetricCategory.PEERS, "connected", "Some help string", "labelName");
+        metricsSystem.createLabelledCounter(
+            PantheonMetricCategory.PEERS, "connected", "Some help string", "labelName");
 
     counter.labels("value1").inc();
     counter.labels("value2").inc();
@@ -89,25 +91,30 @@ public class PrometheusMetricsSystemTest {
     assertThat(metricsSystem.streamObservations())
         .containsExactlyInAnyOrder(
             new Observation(PantheonMetricCategory.PEERS, "connected", 2d, singletonList("value1")),
-            new Observation(PantheonMetricCategory.PEERS, "connected", 1d, singletonList("value2")));
+            new Observation(
+                PantheonMetricCategory.PEERS, "connected", 1d, singletonList("value2")));
   }
 
   @Test
   public void shouldIncrementCounterBySpecifiedAmount() {
-    final Counter counter = metricsSystem.createCounter(PantheonMetricCategory.PEERS, "connected", "Some help string");
+    final Counter counter =
+        metricsSystem.createCounter(PantheonMetricCategory.PEERS, "connected", "Some help string");
 
     counter.inc(5);
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(new Observation(PantheonMetricCategory.PEERS, "connected", 5d, emptyList()));
+        .containsExactly(
+            new Observation(PantheonMetricCategory.PEERS, "connected", 5d, emptyList()));
 
     counter.inc(6);
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(new Observation(PantheonMetricCategory.PEERS, "connected", 11d, emptyList()));
+        .containsExactly(
+            new Observation(PantheonMetricCategory.PEERS, "connected", 11d, emptyList()));
   }
 
   @Test
   public void shouldCreateObservationsFromTimer() {
-    final OperationTimer timer = metricsSystem.createTimer(PantheonMetricCategory.RPC, "request", "Some help");
+    final OperationTimer timer =
+        metricsSystem.createTimer(PantheonMetricCategory.RPC, "request", "Some help");
 
     final OperationTimer.TimingContext context = timer.startTimer();
     context.stopTimer();
@@ -118,8 +125,10 @@ public class PrometheusMetricsSystemTest {
             new Observation(PantheonMetricCategory.RPC, "request", null, asList("quantile", "0.2")),
             new Observation(PantheonMetricCategory.RPC, "request", null, asList("quantile", "0.5")),
             new Observation(PantheonMetricCategory.RPC, "request", null, asList("quantile", "0.8")),
-            new Observation(PantheonMetricCategory.RPC, "request", null, asList("quantile", "0.95")),
-            new Observation(PantheonMetricCategory.RPC, "request", null, asList("quantile", "0.99")),
+            new Observation(
+                PantheonMetricCategory.RPC, "request", null, asList("quantile", "0.95")),
+            new Observation(
+                PantheonMetricCategory.RPC, "request", null, asList("quantile", "0.99")),
             new Observation(PantheonMetricCategory.RPC, "request", null, asList("quantile", "1.0")),
             new Observation(PantheonMetricCategory.RPC, "request", null, singletonList("sum")),
             new Observation(PantheonMetricCategory.RPC, "request", null, singletonList("count")));
@@ -137,7 +146,8 @@ public class PrometheusMetricsSystemTest {
   @Test
   public void shouldCreateObservationsFromTimerWithLabels() {
     final LabelledMetric<OperationTimer> timer =
-        metricsSystem.createLabelledTimer(PantheonMetricCategory.RPC, "request", "Some help", "methodName");
+        metricsSystem.createLabelledTimer(
+            PantheonMetricCategory.RPC, "request", "Some help", "methodName");
 
     //noinspection EmptyTryBlock
     try (final OperationTimer.TimingContext ignored = timer.labels("method").startTimer()) {}
@@ -145,14 +155,21 @@ public class PrometheusMetricsSystemTest {
     assertThat(metricsSystem.streamObservations())
         .usingElementComparator(IGNORE_VALUES) // We don't know how long it will actually take.
         .containsExactlyInAnyOrder(
-            new Observation(PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.2")),
-            new Observation(PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.5")),
-            new Observation(PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.8")),
-            new Observation(PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.95")),
-            new Observation(PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.99")),
-            new Observation(PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "1.0")),
+            new Observation(
+                PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.2")),
+            new Observation(
+                PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.5")),
+            new Observation(
+                PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.8")),
+            new Observation(
+                PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.95")),
+            new Observation(
+                PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "0.99")),
+            new Observation(
+                PantheonMetricCategory.RPC, "request", null, asList("method", "quantile", "1.0")),
             new Observation(PantheonMetricCategory.RPC, "request", null, asList("method", "sum")),
-            new Observation(PantheonMetricCategory.RPC, "request", null, asList("method", "count")));
+            new Observation(
+                PantheonMetricCategory.RPC, "request", null, asList("method", "count")));
   }
 
   @Test
@@ -160,7 +177,8 @@ public class PrometheusMetricsSystemTest {
     final MetricsSystem metricsSystem =
         new PrometheusMetricsSystem(PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES, false);
     final LabelledMetric<OperationTimer> timer =
-        metricsSystem.createLabelledTimer(PantheonMetricCategory.RPC, "request", "Some help", "methodName");
+        metricsSystem.createLabelledTimer(
+            PantheonMetricCategory.RPC, "request", "Some help", "methodName");
 
     //noinspection EmptyTryBlock
     try (final OperationTimer.TimingContext ignored = timer.labels("method").startTimer()) {}
@@ -197,7 +215,8 @@ public class PrometheusMetricsSystemTest {
 
     // do a category we are not watching
     final LabelledMetric<Counter> counterN =
-        localMetricSystem.createLabelledCounter(PantheonMetricCategory.NETWORK, "ABC", "Not that kind of network", "show");
+        localMetricSystem.createLabelledCounter(
+            PantheonMetricCategory.NETWORK, "ABC", "Not that kind of network", "show");
     assertThat(counterN).isSameAs(NoOpMetricsSystem.NO_OP_LABELLED_1_COUNTER);
 
     counterN.labels("show").inc();
@@ -205,12 +224,14 @@ public class PrometheusMetricsSystemTest {
 
     // do a category we are watching
     final LabelledMetric<Counter> counterR =
-        localMetricSystem.createLabelledCounter(PantheonMetricCategory.RPC, "name", "Not useful", "method");
+        localMetricSystem.createLabelledCounter(
+            PantheonMetricCategory.RPC, "name", "Not useful", "method");
     assertThat(counterR).isNotSameAs(NoOpMetricsSystem.NO_OP_LABELLED_1_COUNTER);
 
     counterR.labels("op").inc();
     assertThat(localMetricSystem.streamObservations())
-        .containsExactly(new Observation(PantheonMetricCategory.RPC, "name", 1.0, singletonList("op")));
+        .containsExactly(
+            new Observation(PantheonMetricCategory.RPC, "name", 1.0, singletonList("op")));
   }
 
   @Test

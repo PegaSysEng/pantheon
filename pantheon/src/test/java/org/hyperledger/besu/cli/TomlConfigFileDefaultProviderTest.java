@@ -16,9 +16,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.cli.util.TomlConfigFileDefaultProvider;
-import org.hyperledger.besu.ethereum.core.Wei;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +24,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hyperledger.besu.cli.util.TomlConfigFileDefaultProvider;
+import org.hyperledger.besu.ethereum.core.Wei;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

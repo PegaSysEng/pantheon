@@ -23,9 +23,6 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.waitAtMost;
 import static org.hyperledger.besu.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_2_COUNTER;
 
-import org.hyperledger.besu.metrics.Counter;
-import org.hyperledger.besu.metrics.LabelledMetric;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -49,6 +46,8 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.hyperledger.besu.metrics.Counter;
+import org.hyperledger.besu.metrics.LabelledMetric;
 import org.junit.After;
 import org.junit.Test;
 

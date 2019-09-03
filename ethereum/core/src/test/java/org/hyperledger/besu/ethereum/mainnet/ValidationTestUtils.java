@@ -12,6 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.io.IOException;
+import java.util.List;
+
+import com.google.common.io.Resources;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockBody;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -19,11 +23,6 @@ import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.io.IOException;
-import java.util.List;
-
-import com.google.common.io.Resources;
 
 public final class ValidationTestUtils {
 

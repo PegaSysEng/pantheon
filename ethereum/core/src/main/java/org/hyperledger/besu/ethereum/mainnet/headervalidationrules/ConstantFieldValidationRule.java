@@ -14,12 +14,11 @@ package org.hyperledger.besu.ethereum.mainnet.headervalidationrules;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-import org.hyperledger.besu.ethereum.mainnet.DetachedBlockHeaderValidationRule;
-
 import java.util.function.Function;
 
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.mainnet.DetachedBlockHeaderValidationRule;
 
 public class ConstantFieldValidationRule<T> implements DetachedBlockHeaderValidationRule {
   private static final Logger LOG = getLogger();

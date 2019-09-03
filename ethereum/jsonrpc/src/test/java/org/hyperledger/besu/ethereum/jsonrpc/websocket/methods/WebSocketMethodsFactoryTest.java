@@ -15,12 +15,11 @@ package org.hyperledger.besu.ethereum.jsonrpc.websocket.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

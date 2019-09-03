@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.handshake.ecies;
 
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 /** Tests for {@link EncryptedMessage}. */

@@ -14,8 +14,6 @@ package org.hyperledger.besu.services.pipeline;
 
 import static java.util.stream.Collectors.toList;
 
-import org.hyperledger.besu.util.ExceptionUtils;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -27,6 +25,7 @@ import java.util.stream.Stream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 public class Pipeline<I> {
   private static final Logger LOG = LogManager.getLogger();

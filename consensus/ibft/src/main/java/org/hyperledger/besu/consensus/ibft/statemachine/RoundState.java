@@ -14,14 +14,6 @@ package org.hyperledger.besu.consensus.ibft.statemachine;
 
 import static org.hyperledger.besu.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
 
-import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.Commit;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
-import org.hyperledger.besu.consensus.ibft.validation.MessageValidator;
-import org.hyperledger.besu.crypto.SECP256K1.Signature;
-import org.hyperledger.besu.ethereum.core.Block;
-
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
@@ -30,6 +22,13 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Sets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.Commit;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
+import org.hyperledger.besu.consensus.ibft.validation.MessageValidator;
+import org.hyperledger.besu.crypto.SECP256K1.Signature;
+import org.hyperledger.besu.ethereum.core.Block;
 
 // Data items used to define how a round will operate
 public class RoundState {

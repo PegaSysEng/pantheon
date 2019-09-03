@@ -12,13 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import static org.hyperledger.besu.ethereum.eth.manager.MonitoredExecutors.newFixedThreadPool;
 import static org.hyperledger.besu.util.FutureUtils.propagateResult;
-
-import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.services.pipeline.Pipeline;
-import org.hyperledger.besu.util.ExceptionUtils;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -38,6 +32,10 @@ import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.services.pipeline.Pipeline;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 public class EthScheduler {
   private static final Logger LOG = LogManager.getLogger();
@@ -72,13 +70,15 @@ public class EthScheduler {
     this(
         MonitoredExecutors.newFixedThreadPool(
             EthScheduler.class.getSimpleName() + "-Workers", syncWorkerCount, metricsSystem),
-        MonitoredExecutors.newScheduledThreadPool(EthScheduler.class.getSimpleName() + "-Timer", 1, metricsSystem),
+        MonitoredExecutors.newScheduledThreadPool(
+            EthScheduler.class.getSimpleName() + "-Timer", 1, metricsSystem),
         MonitoredExecutors.newBoundedThreadPool(
             EthScheduler.class.getSimpleName() + "-Transactions",
             txWorkerCount,
             txWorkerQueueSize,
             metricsSystem),
-        MonitoredExecutors.newCachedThreadPool(EthScheduler.class.getSimpleName() + "-Services", metricsSystem),
+        MonitoredExecutors.newCachedThreadPool(
+            EthScheduler.class.getSimpleName() + "-Services", metricsSystem),
         MonitoredExecutors.newFixedThreadPool(
             EthScheduler.class.getSimpleName() + "-Computation",
             computationWorkerCount,

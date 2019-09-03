@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.consensus.clique.blockcreation;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 import org.hyperledger.besu.consensus.clique.CliqueBlockHashing;
 import org.hyperledger.besu.consensus.clique.CliqueBlockInterface;
 import org.hyperledger.besu.consensus.clique.CliqueContext;
@@ -34,9 +37,6 @@ import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
-
-import java.util.Optional;
-import java.util.function.Function;
 
 public class CliqueBlockCreator extends AbstractBlockCreator<CliqueContext> {
 

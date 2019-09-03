@@ -12,17 +12,17 @@
  */
 package org.hyperledger.besu.consensus.ibft.validation;
 
+import java.util.Collection;
+
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
+import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.consensus.ibft.IbftHelpers;
 import org.hyperledger.besu.consensus.ibft.blockcreation.ProposerSelector;
-import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.ethereum.BlockValidator;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-
-import java.util.Collection;
 
 public class MessageValidatorFactory {
 
@@ -48,7 +48,7 @@ public class MessageValidatorFactory {
   }
 
   private SignedDataValidator createSignedDataValidator(
-          final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
+      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
 
     return new SignedDataValidator(
         getValidatorsAfterBlock(parentHeader),

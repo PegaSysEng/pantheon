@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.consensus.ibft.payload;
 
+import java.util.Objects;
+import java.util.StringJoiner;
+
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Util;
@@ -19,9 +22,6 @@ import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Objects;
-import java.util.StringJoiner;
 
 public class SignedData<M extends Payload> implements Authored {
 

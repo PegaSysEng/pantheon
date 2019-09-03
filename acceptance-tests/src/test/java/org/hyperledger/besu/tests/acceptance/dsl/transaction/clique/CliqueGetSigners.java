@@ -14,13 +14,13 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueRequestFactory.SignersBlockResponse;
-
-import java.io.IOException;
-import java.util.List;
 
 public class CliqueGetSigners implements Transaction<List<Address>> {
   private final String blockNumber;

@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-public final class PantheonInfoTest {
+public final class BesuInfoTest {
 
   /**
    * Ethstats wants a version string like &lt;foo&gt/v&lt;bar&gt/&lt;baz&gt/&lt;bif&gt. Foo is the
@@ -26,6 +26,6 @@ public final class PantheonInfoTest {
    */
   @Test
   public void versionStringIsEthstatsFriendly() {
-    assertThat(PantheonInfo.version()).matches("[^/]+/v(\\d+\\.\\d+\\.\\d+[^/]*|null)/[^/]+/[^/]+");
+    assertThat(BesuInfo.version()).matches("[^/]+/v(\\d+\\.\\d+\\.\\d+[^/]*|null)/[^/]+/[^/]+");
   }
 }

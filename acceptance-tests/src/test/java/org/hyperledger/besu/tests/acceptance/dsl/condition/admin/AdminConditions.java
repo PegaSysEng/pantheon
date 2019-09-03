@@ -14,12 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.admin;
 
 import static org.assertj.core.api.Assertions.fail;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.admin.AdminTransactions;
+import java.net.URI;
+
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-
-import java.net.URI;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.admin.AdminTransactions;
 
 public class AdminConditions {
 

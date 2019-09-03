@@ -17,12 +17,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static picocli.CommandLine.defaultExceptionHandler;
 
-import org.hyperledger.besu.cli.util.CommandLineUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.cli.util.CommandLineUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -48,7 +47,7 @@ public class CommandLineUtilsTest {
       commandLine = new CommandLine(this);
     }
 
-    // Completely disables p2p within Pantheon.
+    // Completely disables p2p within Besu.
     @Option(
         names = {"--option-enabled"},
         arity = "1")

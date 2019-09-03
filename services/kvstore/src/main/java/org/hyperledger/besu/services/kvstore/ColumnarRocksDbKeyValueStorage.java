@@ -14,11 +14,6 @@ package org.hyperledger.besu.services.kvstore;
 
 import static java.util.Objects.requireNonNullElse;
 
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.OperationTimer;
-import org.hyperledger.besu.services.util.RocksDbUtil;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -32,6 +27,10 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.OperationTimer;
+import org.hyperledger.besu.services.util.RocksDbUtil;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.rocksdb.BlockBasedTableConfig;
 import org.rocksdb.ColumnFamilyDescriptor;
 import org.rocksdb.ColumnFamilyHandle;

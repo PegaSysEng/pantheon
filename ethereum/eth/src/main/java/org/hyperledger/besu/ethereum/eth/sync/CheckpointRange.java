@@ -14,13 +14,12 @@ package org.hyperledger.besu.ethereum.eth.sync;
 
 import static java.lang.Math.toIntExact;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.util.Objects;
 import java.util.Optional;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 
 public class CheckpointRange {
 

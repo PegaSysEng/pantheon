@@ -16,15 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
+
+import java.util.concurrent.CompletableFuture;
 
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
-
-import java.util.concurrent.CompletableFuture;
-
 import org.junit.Test;
 
 public class RlpxConnectionTest {

@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.net;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.util.Map;
 
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.web3j.protocol.core.Request;
 
 public class NetServicesTransaction implements Transaction<Map<String, Map<String, String>>> {

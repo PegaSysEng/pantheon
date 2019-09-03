@@ -15,6 +15,10 @@ package org.hyperledger.besu.consensus.ibft.payload;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
+import org.assertj.core.util.Lists;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.TestHelpers;
 import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
@@ -25,11 +29,6 @@ import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
-
-import java.math.BigInteger;
-import java.util.Optional;
-
-import org.assertj.core.util.Lists;
 import org.junit.Test;
 
 public class RoundChangeCertificateTest {

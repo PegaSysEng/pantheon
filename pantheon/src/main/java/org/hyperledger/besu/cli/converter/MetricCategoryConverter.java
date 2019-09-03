@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.cli.converter;
 
-import org.hyperledger.besu.metrics.MetricCategory;
-
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hyperledger.besu.metrics.MetricCategory;
 import picocli.CommandLine;
 
 public class MetricCategoryConverter implements CommandLine.ITypeConverter<MetricCategory> {

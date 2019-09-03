@@ -15,9 +15,6 @@ package org.hyperledger.besu.ethereum.p2p.peers;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.hyperledger.besu.util.NetworkUtility;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.net.InetAddress;
 import java.net.URI;
 import java.util.Objects;
@@ -27,6 +24,8 @@ import java.util.regex.Pattern;
 
 import com.google.common.net.InetAddresses;
 import com.google.common.primitives.Ints;
+import org.hyperledger.besu.util.NetworkUtility;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class EnodeURL {
 

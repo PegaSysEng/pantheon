@@ -25,77 +25,8 @@ import static org.hyperledger.besu.metrics.PantheonMetricCategory.DEFAULT_METRIC
 import static org.hyperledger.besu.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
 import static org.hyperledger.besu.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 
-import org.hyperledger.besu.chainimport.RlpBlockImporter;
-import org.hyperledger.besu.cli.config.EthNetworkConfig;
-import org.hyperledger.besu.cli.config.NetworkName;
-import org.hyperledger.besu.cli.converter.MetricCategoryConverter;
-import org.hyperledger.besu.cli.converter.PercentageConverter;
-import org.hyperledger.besu.cli.converter.RpcApisConverter;
-import org.hyperledger.besu.cli.custom.CorsAllowedOriginsProperty;
-import org.hyperledger.besu.cli.custom.JsonRPCWhitelistHostsProperty;
-import org.hyperledger.besu.cli.custom.RpcAuthFileValidator;
-import org.hyperledger.besu.cli.error.PantheonExceptionHandler;
-import org.hyperledger.besu.cli.subcommands.PasswordSubCommand;
-import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand;
-import org.hyperledger.besu.cli.subcommands.RetestethSubCommand;
-import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand;
-import org.hyperledger.besu.cli.subcommands.operator.OperatorSubCommand;
-import org.hyperledger.besu.cli.subcommands.rlp.RLPSubCommand;
-import org.hyperledger.besu.cli.util.CommandLineUtils;
-import org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler;
-import org.hyperledger.besu.cli.util.VersionProvider;
-import org.hyperledger.besu.controller.KeyPairUtil;
-import org.hyperledger.besu.controller.PantheonController;
-import org.hyperledger.besu.controller.PantheonControllerBuilder;
-import org.hyperledger.besu.services.PantheonEventsImpl;
-import org.hyperledger.besu.services.PantheonPluginContextImpl;
-import org.hyperledger.besu.services.PicoCLIOptionsImpl;
-import org.hyperledger.besu.PantheonInfo;
-import org.hyperledger.besu.Runner;
-import org.hyperledger.besu.RunnerBuilder;
-import org.hyperledger.besu.cli.options.EthProtocolOptions;
-import org.hyperledger.besu.cli.options.MetricsCLIOptions;
-import org.hyperledger.besu.cli.options.NetworkingOptions;
-import org.hyperledger.besu.cli.options.RocksDBOptions;
-import org.hyperledger.besu.cli.options.SynchronizerOptions;
-import org.hyperledger.besu.cli.options.TransactionPoolOptions;
-import org.hyperledger.besu.config.GenesisConfigFile;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.MiningParameters;
-import org.hyperledger.besu.ethereum.core.PrivacyParameters;
-import org.hyperledger.besu.ethereum.core.Wei;
-import org.hyperledger.besu.ethereum.eth.sync.SyncMode;
-import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
-import org.hyperledger.besu.ethereum.graphql.GraphQLConfiguration;
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.p2p.peers.StaticNodesParser;
-import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
-import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
-import org.hyperledger.besu.ethereum.permissioning.PermissioningConfigurationBuilder;
-import org.hyperledger.besu.ethereum.permissioning.SmartContractPermissioningConfiguration;
-import org.hyperledger.besu.ethereum.worldstate.PruningConfiguration;
-import org.hyperledger.besu.metrics.MetricCategory;
-import org.hyperledger.besu.metrics.MetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import org.hyperledger.besu.metrics.StandardMetricCategory;
-import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-import org.hyperledger.besu.metrics.prometheus.PrometheusMetricsSystem;
-import org.hyperledger.besu.metrics.vertx.VertxMetricsAdapterFactory;
-import org.hyperledger.besu.nat.NatMethod;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
-import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
-import org.hyperledger.besu.util.PermissioningConfigurationValidator;
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.number.Fraction;
-import org.hyperledger.besu.util.number.PositiveNumber;
-import org.hyperledger.besu.util.uint.UInt256;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,6 +57,75 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.hyperledger.besu.BesuInfo;
+import org.hyperledger.besu.Runner;
+import org.hyperledger.besu.RunnerBuilder;
+import org.hyperledger.besu.chainimport.RlpBlockImporter;
+import org.hyperledger.besu.cli.config.EthNetworkConfig;
+import org.hyperledger.besu.cli.config.NetworkName;
+import org.hyperledger.besu.cli.converter.MetricCategoryConverter;
+import org.hyperledger.besu.cli.converter.PercentageConverter;
+import org.hyperledger.besu.cli.converter.RpcApisConverter;
+import org.hyperledger.besu.cli.custom.CorsAllowedOriginsProperty;
+import org.hyperledger.besu.cli.custom.JsonRPCWhitelistHostsProperty;
+import org.hyperledger.besu.cli.custom.RpcAuthFileValidator;
+import org.hyperledger.besu.cli.error.PantheonExceptionHandler;
+import org.hyperledger.besu.cli.options.EthProtocolOptions;
+import org.hyperledger.besu.cli.options.MetricsCLIOptions;
+import org.hyperledger.besu.cli.options.NetworkingOptions;
+import org.hyperledger.besu.cli.options.RocksDBOptions;
+import org.hyperledger.besu.cli.options.SynchronizerOptions;
+import org.hyperledger.besu.cli.options.TransactionPoolOptions;
+import org.hyperledger.besu.cli.subcommands.PasswordSubCommand;
+import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand;
+import org.hyperledger.besu.cli.subcommands.RetestethSubCommand;
+import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand;
+import org.hyperledger.besu.cli.subcommands.operator.OperatorSubCommand;
+import org.hyperledger.besu.cli.subcommands.rlp.RLPSubCommand;
+import org.hyperledger.besu.cli.util.CommandLineUtils;
+import org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler;
+import org.hyperledger.besu.cli.util.VersionProvider;
+import org.hyperledger.besu.config.GenesisConfigFile;
+import org.hyperledger.besu.controller.KeyPairUtil;
+import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.PantheonControllerBuilder;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.MiningParameters;
+import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.eth.sync.SyncMode;
+import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
+import org.hyperledger.besu.ethereum.graphql.GraphQLConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.p2p.peers.StaticNodesParser;
+import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfigurationBuilder;
+import org.hyperledger.besu.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import org.hyperledger.besu.ethereum.worldstate.PruningConfiguration;
+import org.hyperledger.besu.metrics.MetricCategory;
+import org.hyperledger.besu.metrics.MetricsSystem;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.StandardMetricCategory;
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
+import org.hyperledger.besu.metrics.prometheus.PrometheusMetricsSystem;
+import org.hyperledger.besu.metrics.vertx.VertxMetricsAdapterFactory;
+import org.hyperledger.besu.nat.NatMethod;
+import org.hyperledger.besu.services.PantheonEventsImpl;
+import org.hyperledger.besu.services.PantheonPluginContextImpl;
+import org.hyperledger.besu.services.PicoCLIOptionsImpl;
+import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
+import org.hyperledger.besu.util.PermissioningConfigurationValidator;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.number.Fraction;
+import org.hyperledger.besu.util.number.PositiveNumber;
+import org.hyperledger.besu.util.uint.UInt256;
 import picocli.CommandLine;
 import picocli.CommandLine.AbstractParseResultHandler;
 import picocli.CommandLine.Command;
@@ -135,9 +135,9 @@ import picocli.CommandLine.ParameterException;
 
 @SuppressWarnings("FieldCanBeLocal") // because Picocli injected fields report false positives
 @Command(
-    description = "This command runs the Pantheon Ethereum client full node.",
+    description = "This command runs the Besu Ethereum client full node.",
     abbreviateSynopsis = true,
-    name = "pantheon",
+    name = "besu",
     mixinStandardHelpOptions = true,
     versionProvider = VersionProvider.class,
     header = "Usage:",
@@ -145,8 +145,8 @@ import picocli.CommandLine.ParameterException;
     descriptionHeading = "%nDescription:%n%n",
     optionListHeading = "%nOptions:%n",
     footerHeading = "%n",
-    footer = "Pantheon is licensed under the Apache License 2.0")
-public class PantheonCommand implements DefaultCommandValues, Runnable {
+    footer = "Besu is licensed under the Apache License 2.0")
+public class BesuCommand implements DefaultCommandValues, Runnable {
 
   private final Logger logger;
 
@@ -174,13 +174,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Public IP stored to prevent having to research it each time we need it.
   private InetAddress autoDiscoveredDefaultIP = null;
 
-  // Property to indicate whether Pantheon has been launched via docker
+  // Property to indicate whether Besu has been launched via docker
   private final boolean isDocker = Boolean.getBoolean("pantheon.docker");
 
   // CLI options defined by user at runtime.
   // Options parsing is done with CLI library Picocli https://picocli.info/
 
-  // Completely disables P2P within Pantheon.
+  // Completely disables P2P within Besu.
   @Option(
       names = {"--p2p-enabled"},
       description = "Enable P2P functionality (default: ${DEFAULT-VALUE})",
@@ -656,7 +656,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final Supplier<MetricsSystem> metricsSystem =
       Suppliers.memoize(() -> PrometheusMetricsSystem.init(metricsConfiguration()));
 
-  public PantheonCommand(
+  public BesuCommand(
       final Logger logger,
       final RlpBlockImporter rlpBlockImporter,
       final BlocksSubCommand.JsonBlockImporterFactory jsonBlockImporterFactory,
@@ -695,14 +695,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   public void run() {
     try {
       prepareLogging();
-      logger.info("Starting Pantheon version: {}", PantheonInfo.version());
+      logger.info("Starting Besu version: {}", BesuInfo.version());
       checkOptions().configure().controller().startPlugins().startSynchronization();
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
   }
 
-  private PantheonCommand handleStandaloneCommand() {
+  private BesuCommand handleStandaloneCommand() {
     standaloneCommands = new StandaloneCommand();
     if (isFullInstantiation()) {
       commandLine.addMixin("standaloneCommands", standaloneCommands);
@@ -710,7 +710,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand addSubCommands(
+  private BesuCommand addSubCommands(
       final AbstractParseResultHandler<List<Object>> resultHandler, final InputStream in) {
     commandLine.addSubcommand(
         BlocksSubCommand.COMMAND_NAME,
@@ -732,7 +732,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand registerConverters() {
+  private BesuCommand registerConverters() {
     commandLine.registerConverter(Address.class, Address::fromHexStringStrict);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
     commandLine.registerConverter(Level.class, Level::valueOf);
@@ -748,7 +748,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand handleUnstableOptions() {
+  private BesuCommand handleUnstableOptions() {
     // Add unstable options
     final ImmutableMap.Builder<String, Object> unstableOptionsBuild = ImmutableMap.builder();
     final ImmutableMap<String, Object> unstableOptions =
@@ -765,7 +765,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand preparePlugins() {
+  private BesuCommand preparePlugins() {
     pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
     pantheonPluginContext.registerPlugins(pluginsDir());
     return this;
@@ -801,7 +801,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         staticNodes);
   }
 
-  private PantheonCommand startPlugins() {
+  private BesuCommand startPlugins() {
     pantheonPluginContext.addService(
         PantheonEvents.class,
         new PantheonEventsImpl(
@@ -819,7 +819,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private PantheonCommand checkOptions() {
+  private BesuCommand checkOptions() {
     // Check that P2P options are able to work or send an error
     CommandLineUtils.checkOptionDependencies(
         logger,
@@ -865,7 +865,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand configure() throws Exception {
+  private BesuCommand configure() throws Exception {
     ethNetworkConfig = updateNetworkConfig(getNetwork());
     jsonRpcConfiguration = jsonRpcConfiguration();
     graphQLConfiguration = graphQLConfiguration();
@@ -907,7 +907,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private PantheonCommand controller() {
+  private BesuCommand controller() {
     pantheonController = buildController();
     return this;
   }
@@ -1198,7 +1198,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private RocksDbConfiguration buildRocksDbConfiguration() {
-    return rocksDBOptions.toDomainObject().databaseDir(dataDir().resolve(PantheonController.DATABASE_PATH)).build();
+    return rocksDBOptions
+        .toDomainObject()
+        .databaseDir(dataDir().resolve(PantheonController.DATABASE_PATH))
+        .build();
   }
 
   private TransactionPoolConfiguration buildTransactionPoolConfiguration() {
@@ -1282,7 +1285,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
                     runner.close();
                     LogManager.shutdown();
                   } catch (final Exception e) {
-                    logger.error("Failed to stop Pantheon");
+                    logger.error("Failed to stop Besu");
                   }
                 }));
   }

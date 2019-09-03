@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.connections;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.ConnectCallback;
-
-import java.util.concurrent.CompletableFuture;
 
 public interface ConnectionInitializer {
 

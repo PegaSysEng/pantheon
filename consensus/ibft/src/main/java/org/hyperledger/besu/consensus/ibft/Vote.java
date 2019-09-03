@@ -12,15 +12,14 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
+import java.util.Objects;
+
+import com.google.common.collect.ImmutableBiMap;
 import org.hyperledger.besu.consensus.common.VoteType;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-
-import java.util.Objects;
-
-import com.google.common.collect.ImmutableBiMap;
 
 /**
  * This class is only used to serialise/deserialise BlockHeaders and should not appear in business

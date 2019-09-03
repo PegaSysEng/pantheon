@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.processor;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.debug.TraceFrame;
 import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor.Result;
-
-import java.util.List;
 
 public class TransactionTrace {
 

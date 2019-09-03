@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-
-import java.math.BigInteger;
 
 /** Calculates block difficulties. */
 @FunctionalInterface

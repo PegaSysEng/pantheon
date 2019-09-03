@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.vm.ehalt;
 
-import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
-
 import java.util.EnumSet;
+
+import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
 
 /** An exception to signal that an exceptional halt has occurred. */
 public class ExceptionalHaltException extends Exception {

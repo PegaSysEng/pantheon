@@ -14,13 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptWithRevertReason;
+import java.nio.charset.StandardCharsets;
+
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-
-import java.nio.charset.StandardCharsets;
-
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptWithRevertReason;
 import org.web3j.utils.Numeric;
 
 public class ExpectSuccessfulEthGetTransactionReceiptWithReason implements Condition {

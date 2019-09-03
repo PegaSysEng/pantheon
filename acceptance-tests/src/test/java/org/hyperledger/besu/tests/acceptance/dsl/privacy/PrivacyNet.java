@@ -12,11 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.Cluster;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyPantheonNodeFactory;
 import tech.pegasys.orion.testutil.OrionTestHarness;
 import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
-import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -28,6 +25,9 @@ import java.util.Optional;
 import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.Cluster;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyPantheonNodeFactory;
 import org.junit.rules.TemporaryFolder;
 
 public class PrivacyNet {
@@ -91,7 +91,7 @@ public class PrivacyNet {
     try {
       cluster.stop();
     } catch (RuntimeException e) {
-      LOG.error("Error stopping Pantheon nodes.  Logging and continuing.", e);
+      LOG.error("Error stopping Besu nodes.  Logging and continuing.", e);
     }
     try {
       stopOrionNodes();
@@ -133,11 +133,10 @@ public class PrivacyNet {
     StringBuilder sb = new StringBuilder();
     sb.append(String.format("temporaryFolder      = %s\n", temporaryFolder.getRoot()));
     for (PrivacyNode privacyNode : nodes.values()) {
-      sb.append(String.format("Pantheon Node Name   = %s\n", privacyNode.getName()));
-      sb.append(String.format("Pantheon Address     = %s\n", privacyNode.getAddress()));
-      sb.append(
-          String.format("Pantheon Private Key = %s\n", privacyNode.keyPair().getPrivateKey()));
-      sb.append(String.format("Pantheon Public  Key = %s\n", privacyNode.keyPair().getPublicKey()));
+      sb.append(String.format("Besu Node Name   = %s\n", privacyNode.getName()));
+      sb.append(String.format("Besu Address     = %s\n", privacyNode.getAddress()));
+      sb.append(String.format("Besu Private Key = %s\n", privacyNode.keyPair().getPrivateKey()));
+      sb.append(String.format("Besu Public  Key = %s\n", privacyNode.keyPair().getPublicKey()));
       sb.append(String.format("Orion Pub Key        = %s\n", privacyNode.getOrionPubKeyBytes()));
       sb.append(
           String.format(
@@ -145,7 +144,7 @@ public class PrivacyNet {
               Base64.getEncoder()
                   .encodeToString(privacyNode.getOrionPubKeyBytes().extractArray())));
 
-      sb.append(String.format("Pantheon             = %s\n", privacyNode));
+      sb.append(String.format("Besu             = %s\n", privacyNode));
       sb.append(String.format("Orion Config         = %s\n", privacyNode.orion.getConfig()));
       sb.append(String.format("Orion Pub Key        = %s\n", privacyNode.getOrionPubKeyBytes()));
     }

@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.transaction.CallParameter;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JsonCallParameter extends CallParameter {
   @JsonCreator

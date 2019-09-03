@@ -14,14 +14,13 @@ package org.hyperledger.besu.services.kvstore;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.services.kvstore.SegmentedKeyValueStorage.Segment;
 import org.hyperledger.besu.services.kvstore.SegmentedKeyValueStorage.Transaction;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Arrays;
-import java.util.Optional;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;

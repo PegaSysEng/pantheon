@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import graphql.schema.DataFetchingEnvironment;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
@@ -23,12 +28,6 @@ import org.hyperledger.besu.ethereum.graphql.internal.TransactionReceiptWithMeta
 import org.hyperledger.besu.ethereum.graphql.internal.TransactionWithMetadata;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import graphql.schema.DataFetchingEnvironment;
 
 @SuppressWarnings("unused") // reflected by GraphQL
 public class TransactionAdapter extends AdapterBase {

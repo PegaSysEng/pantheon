@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.wire;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Objects;
+
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public abstract class AbstractMessageData implements MessageData {
 

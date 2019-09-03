@@ -14,13 +14,13 @@ package org.hyperledger.besu.metrics;
 
 import static java.util.Arrays.asList;
 
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
+
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 public class StubMetricsSystem implements MetricsSystem {
 

@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.tests.acceptance.permissioning;
 
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.Cluster;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-
 import org.junit.Before;
 import org.junit.Test;
 

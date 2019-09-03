@@ -15,14 +15,13 @@ package org.hyperledger.besu.ethereum.rlp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.bytes.BytesValues;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
 import org.junit.Test;
 
 public class BytesValueRLPInputTest {

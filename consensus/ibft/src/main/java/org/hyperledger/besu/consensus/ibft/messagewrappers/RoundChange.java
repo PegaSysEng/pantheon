@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.consensus.ibft.messagewrappers;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.IbftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.ibft.payload.PreparedCertificate;
@@ -23,14 +25,12 @@ import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
-import java.util.Optional;
-
 public class RoundChange extends IbftMessage<RoundChangePayload> {
 
   private final Optional<Block> proposedBlock;
 
   public RoundChange(
-          final SignedData<RoundChangePayload> payload, final Optional<Block> proposedBlock) {
+      final SignedData<RoundChangePayload> payload, final Optional<Block> proposedBlock) {
     super(payload);
     this.proposedBlock = proposedBlock;
   }

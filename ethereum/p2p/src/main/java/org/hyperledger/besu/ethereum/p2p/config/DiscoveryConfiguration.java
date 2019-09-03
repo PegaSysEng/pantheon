@@ -14,14 +14,14 @@ package org.hyperledger.besu.ethereum.p2p.config;
 
 import static java.util.stream.Collectors.toList;
 
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 
 public class DiscoveryConfiguration {
   public static List<EnodeURL> MAINNET_BOOTSTRAP_NODES =

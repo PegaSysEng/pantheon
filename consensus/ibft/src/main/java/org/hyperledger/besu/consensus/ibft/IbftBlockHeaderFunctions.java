@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
+import java.util.function.Function;
+
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.core.Hash;
-
-import java.util.function.Function;
 
 public class IbftBlockHeaderFunctions implements BlockHeaderFunctions {
 
