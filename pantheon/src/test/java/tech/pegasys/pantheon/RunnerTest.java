@@ -63,6 +63,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Suppliers;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -336,7 +337,8 @@ public final class RunnerTest {
     return new KeyValueStorageProviderBuilder()
         .withStorageFactory(
             new RocksDBKeyValueStorageFactory(
-                RocksDBConfiguration.builder().databaseDir(dbAhead).build(),
+                Suppliers.memoize(
+                    () -> RocksDBConfiguration.builder().databaseDir(dbAhead).build()),
                 Arrays.asList(KeyValueSegmentIdentifier.values()),
                 new NoOpMetricsSystem()))
         .build();

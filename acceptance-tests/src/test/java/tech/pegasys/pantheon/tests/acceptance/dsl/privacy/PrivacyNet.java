@@ -17,6 +17,7 @@ import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValuePrivacyStorageFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.cluster.Cluster;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.configuration.privacy.PrivacyPantheonNodeFactory;
@@ -30,6 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Suppliers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.rules.TemporaryFolder;
@@ -271,9 +273,11 @@ public class PrivacyNet {
 
     private PrivacyParameters generatePrivacyParameters(final OrionTestHarness testHarness)
         throws IOException {
+      final Path dbPath = temporaryFolder.newFolder().toPath();
+
       final RocksDBKeyValuePrivacyStorageFactory factory =
           new RocksDBKeyValuePrivacyStorageFactory(
-              temporaryFolder.newFolder().toPath(),
+              Suppliers.memoize(() -> RocksDBConfiguration.builder().databaseDir(dbPath).build()),
               Collections.emptyList(),
               new NoOpMetricsSystem());
 

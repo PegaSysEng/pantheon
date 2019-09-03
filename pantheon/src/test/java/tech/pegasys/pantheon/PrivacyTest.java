@@ -29,6 +29,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.PrecompiledContract;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValuePrivacyStorageFactory;
 import tech.pegasys.pantheon.testutil.TestClock;
 
@@ -36,7 +37,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.Collections;
+import java.util.function.Supplier;
 
+import com.google.common.base.Suppliers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -49,11 +52,14 @@ public class PrivacyTest {
   @Test
   public void privacyPrecompiled() throws IOException {
     final Path dataDir = folder.newFolder().toPath();
+
+    final Supplier<RocksDBConfiguration> configurationSupplier =
+        Suppliers.memoize(() -> RocksDBConfiguration.builder().databaseDir(dataDir).build());
     final KeyValueStorageProvider storageProvider =
         new KeyValueStorageProviderBuilder()
             .withStorageFactory(
                 new RocksDBKeyValuePrivacyStorageFactory(
-                    dataDir, Collections.emptyList(), new NoOpMetricsSystem()))
+                    configurationSupplier, Collections.emptyList(), new NoOpMetricsSystem()))
             .build();
 
     final PrivacyParameters privacyParameters =

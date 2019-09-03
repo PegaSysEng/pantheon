@@ -176,7 +176,6 @@ public class PantheonPluginContextImpl implements PantheonContext {
 
   private Optional<URLClassLoader> includePluginDirectory(final Path pluginsDir) {
     LOG.debug("Searching for plugins in {}", pluginsDir.toAbsolutePath().toString());
-    Optional<URLClassLoader> pluginLoader = Optional.empty();
 
     try (final Stream<Path> pluginFilesList = Files.list(pluginsDir)) {
       final URL[] pluginJarURLs =
@@ -184,14 +183,13 @@ public class PantheonPluginContextImpl implements PantheonContext {
               .filter(p -> p.getFileName().toString().endsWith(".jar"))
               .map(PantheonPluginContextImpl::pathToURIOrNull)
               .toArray(URL[]::new);
-      pluginLoader =
-          Optional.of(new URLClassLoader(pluginJarURLs, this.getClass().getClassLoader()));
+      return Optional.of(new URLClassLoader(pluginJarURLs, this.getClass().getClassLoader()));
     } catch (final MalformedURLException e) {
       LOG.error("Error converting files to URLs, could not load plugins", e);
     } catch (final IOException e) {
       LOG.error("Error enumerating plugins, could not load plugins", e);
     }
 
-    return pluginLoader;
+    return Optional.empty();
   }
 }

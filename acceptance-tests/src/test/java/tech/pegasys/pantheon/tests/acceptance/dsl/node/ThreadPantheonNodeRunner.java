@@ -30,9 +30,11 @@ import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.plugin.services.StorageService;
+import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
@@ -51,6 +53,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import com.google.common.io.Files;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,8 +68,13 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
   private final Map<Node, PantheonPluginContextImpl> pantheonPluginContextMap = new HashMap<>();
 
-  private PantheonPluginContextImpl buildPluginContext(final PantheonNode node) {
+  private PantheonPluginContextImpl buildPluginContext(
+      final PantheonNode node, final StorageServiceImpl storageService) {
+    final CommandLine commandLine = new CommandLine(CommandSpec.create());
     final PantheonPluginContextImpl pantheonPluginContext = new PantheonPluginContextImpl();
+    pantheonPluginContext.addService(StorageService.class, storageService);
+    pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
+
     final Path pluginsPath = node.homeDirectory().resolve("plugins");
     final File pluginsDirFile = pluginsPath.toFile();
     if (!pluginsDirFile.isDirectory()) {
@@ -75,23 +83,25 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     }
     System.setProperty("pantheon.plugins.dir", pluginsPath.toString());
     pantheonPluginContext.registerPlugins(pluginsPath);
+
+    commandLine.parseArgs(node.getConfiguration().getExtraCLIOptions().toArray(new String[0]));
+
+    pantheonPluginContext.addService(
+        PantheonConfiguration.class, new PantheonConfigurationImpl(Files.createTempDir().toPath()));
+
     return pantheonPluginContext;
   }
 
   @Override
-  @SuppressWarnings("UnstableApiUsage")
   public void startNode(final PantheonNode node) {
     if (nodeExecutor == null || nodeExecutor.isShutdown()) {
       nodeExecutor = Executors.newCachedThreadPool();
     }
 
-    final CommandLine commandLine = new CommandLine(CommandSpec.create());
-    final PantheonPluginContextImpl pantheonPluginContext =
-        pantheonPluginContextMap.computeIfAbsent(node, n -> buildPluginContext(node));
     final StorageServiceImpl storageService = new StorageServiceImpl();
-    pantheonPluginContext.addService(StorageService.class, storageService);
-    pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
-    commandLine.parseArgs(node.getConfiguration().getExtraCLIOptions().toArray(new String[0]));
+    final PantheonPluginContextImpl pantheonPluginContext =
+        pantheonPluginContextMap.computeIfAbsent(
+            node, n -> buildPluginContext(node, storageService));
 
     final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
     final List<EnodeURL> bootnodes =
@@ -105,6 +115,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     final EthNetworkConfig ethNetworkConfig = networkConfigBuilder.build();
     final PantheonControllerBuilder<?> builder =
         new PantheonController.Builder().fromEthNetworkConfig(ethNetworkConfig);
+
     final KeyValueStorageProvider storageProvider =
         new KeyValueStorageProviderBuilder()
             .withStorageFactory(storageService.getByName("rocksdb"))

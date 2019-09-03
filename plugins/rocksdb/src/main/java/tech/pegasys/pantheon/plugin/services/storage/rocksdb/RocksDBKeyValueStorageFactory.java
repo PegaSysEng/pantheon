@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -35,40 +36,36 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   private static final Logger LOG = LogManager.getLogger();
   private static final int DEFAULT_VERSION = 1;
   private static final Set<Integer> SUPPORTED_VERSION = Set.of(0, 1);
+  private static final String NAME = "rocksdb";
 
-  private final boolean isSegmentIsolationSupported;
-  private final SegmentedKeyValueStorage<?> segmentedStorage;
-  private final KeyValueStorage unsegmentedStorage;
+  private boolean isSegmentIsolationSupported;
+  private SegmentedKeyValueStorage<?> segmentedStorage;
+  private KeyValueStorage unsegmentedStorage;
+
+  private final Supplier<RocksDBConfiguration> configurationSupplier;
+  private final List<SegmentIdentifier> segments;
+  private final MetricsSystem metricsSystem;
 
   public RocksDBKeyValueStorageFactory(
-      final RocksDBConfiguration configuration,
+      final Supplier<RocksDBConfiguration> configurationSupplier,
       final List<SegmentIdentifier> segments,
       final MetricsSystem metricsSystem) {
-
-    try {
-      this.isSegmentIsolationSupported = databaseVersion(configuration) == DEFAULT_VERSION;
-    } catch (final IOException e) {
-      LOG.error("Failed to retrieve the RocksDB database meta version: {}", e.getMessage());
-      throw new StorageException(e.getMessage(), e);
-    }
-
-    if (isSegmentIsolationSupported) {
-      this.unsegmentedStorage = null;
-      this.segmentedStorage =
-          new RocksDBColumnarKeyValueStorage(configuration, segments, metricsSystem);
-    } else {
-      this.unsegmentedStorage = new RocksDBKeyValueStorage(configuration, metricsSystem);
-      this.segmentedStorage = null;
-    }
+    this.configurationSupplier = configurationSupplier;
+    this.segments = segments;
+    this.metricsSystem = metricsSystem;
   }
 
   @Override
   public String getName() {
-    return "RocksDB";
+    return NAME;
   }
 
   @Override
   public KeyValueStorage create(final SegmentIdentifier segment) throws StorageException {
+    if (requiresInit()) {
+      init(configurationSupplier.get());
+    }
+
     return isSegmentIsolationSupported
         ? new SegmentedKeyValueStorageAdapter<>(segment, segmentedStorage)
         : unsegmentedStorage;
@@ -85,6 +82,28 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     }
     if (unsegmentedStorage != null) {
       unsegmentedStorage.close();
+    }
+  }
+
+  private boolean requiresInit() {
+    return segmentedStorage == null && unsegmentedStorage == null;
+  }
+
+  private void init(final RocksDBConfiguration configuration) {
+    try {
+      this.isSegmentIsolationSupported = databaseVersion(configuration) == DEFAULT_VERSION;
+    } catch (final IOException e) {
+      LOG.error("Failed to retrieve the RocksDB database meta version: {}", e.getMessage());
+      throw new StorageException(e.getMessage(), e);
+    }
+
+    if (isSegmentIsolationSupported) {
+      this.unsegmentedStorage = null;
+      this.segmentedStorage =
+          new RocksDBColumnarKeyValueStorage(configuration, segments, metricsSystem);
+    } else {
+      this.unsegmentedStorage = new RocksDBKeyValueStorage(configuration, metricsSystem);
+      this.segmentedStorage = null;
     }
   }
 

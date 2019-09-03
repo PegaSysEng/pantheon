@@ -804,6 +804,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private PantheonCommand preparePlugins() {
     pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
+    pantheonPluginContext.addService(StorageService.class, storageService);
     pantheonPluginContext.registerPlugins(pluginsDir());
     return this;
   }
@@ -846,7 +847,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         new PantheonEventsImpl(
             (pantheonController.getProtocolManager().getBlockBroadcaster()),
             pantheonController.getTransactionPool()));
-    pantheonPluginContext.addService(StorageService.class, storageService);
     pantheonPluginContext.startPlugins();
     return this;
   }

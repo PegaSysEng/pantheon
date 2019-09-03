@@ -17,6 +17,9 @@ import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
 
 @Deprecated
 public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorageFactory {
@@ -24,10 +27,10 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
   private static final String PRIVATE_DATABASE_PATH = "private";
 
   public RocksDBKeyValuePrivacyStorageFactory(
-      final Path dataDir,
+      final Supplier<RocksDBConfiguration> configurationSupplier,
       final List<SegmentIdentifier> segments,
       final MetricsSystem metricsSystem) {
-    super(getPrivacyConfiguration(dataDir), segments, metricsSystem);
+    super(getPrivacyConfiguration(configurationSupplier), segments, metricsSystem);
   }
 
   @Override
@@ -35,9 +38,17 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
     return "rocksdb-privacy";
   }
 
-  private static RocksDBConfiguration getPrivacyConfiguration(final Path dataDir) {
-    final Path privateDbPath = dataDir.resolve(PRIVATE_DATABASE_PATH);
+  private static Supplier<RocksDBConfiguration> getPrivacyConfiguration(
+      final Supplier<RocksDBConfiguration> configurationSupplier) {
+    return Suppliers.memoize(
+        () -> {
+          final Path privateDbPath =
+              configurationSupplier.get().getDatabaseDir().resolve(PRIVATE_DATABASE_PATH);
 
-    return RocksDBConfiguration.builder().databaseDir(privateDbPath).label("private_state").build();
+          return RocksDBConfiguration.builder()
+              .databaseDir(privateDbPath)
+              .label("private_state")
+              .build();
+        });
   }
 }

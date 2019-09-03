@@ -19,13 +19,16 @@ import tech.pegasys.pantheon.plugin.PantheonPlugin;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.plugin.services.StorageService;
+import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Suppliers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,7 +54,16 @@ public class RocksDBPlugin implements PantheonPlugin {
 
     context
         .getService(PicoCLIOptions.class)
-        .ifPresent(picoCLIOptions -> picoCLIOptions.addPicoCLIOptions(NAME, options));
+        .ifPresentOrElse(
+            picoCLIOptions -> picoCLIOptions.addPicoCLIOptions(NAME, options),
+            () -> LOG.error("Failed to register CLI options due to missing PicoCLIO options."));
+
+    context
+        .getService(StorageService.class)
+        .ifPresentOrElse(
+            this::createAndRegister,
+            () -> LOG.error("Failed to register KeyValueFactory due to missing StorageService."));
+
     LOG.info("Plugin registered.");
   }
 
@@ -63,7 +75,7 @@ public class RocksDBPlugin implements PantheonPlugin {
         .getService(StorageService.class)
         .ifPresentOrElse(
             this::createAndRegister,
-            () -> LOG.error("Failed to start due to missing StorageService."));
+            () -> LOG.error("Failed to register KeyValueFactory due to missing StorageService."));
   }
 
   @Override
@@ -85,22 +97,31 @@ public class RocksDBPlugin implements PantheonPlugin {
     // TODO get the metrics system from a service (code will arrive soon on master - MT)
     final MetricsSystem metricsSystem = new NoOpMetricsSystem();
 
-    context
-        .getService(PantheonConfiguration.class)
-        .ifPresentOrElse(
-            (commonConfiguration) -> {
-              final Path dataDir = commonConfiguration.getStoragePath();
-              final RocksDBConfiguration configuration =
-                  options.toDomainObject().databaseDir(dataDir).build();
-              final List<SegmentIdentifier> segments = service.getAllSegmentIdentifiers();
+    // TODO parse all cmd & create the common config before PantheonController is built
+    final List<SegmentIdentifier> segments = service.getAllSegmentIdentifiers();
 
-              factory = new RocksDBKeyValueStorageFactory(configuration, segments, metricsSystem);
-              privacyFactory =
-                  new RocksDBKeyValuePrivacyStorageFactory(dataDir, segments, metricsSystem);
+    final Supplier<PantheonConfiguration> pantheonConfigurationSupplier =
+        Suppliers.memoize(
+            () ->
+                context
+                    .getService(PantheonConfiguration.class)
+                    .orElseThrow(
+                        () ->
+                            new StorageException(
+                                "Failed to start due to missing PantheonConfiguration.")));
 
-              service.registerKeyValueStorage(factory);
-              service.registerKeyValueStorage(privacyFactory);
-            },
-            () -> LOG.error("Failed to start due to missing PantheonConfiguration."));
+    final Supplier<RocksDBConfiguration> configurationSupplier =
+        Suppliers.memoize(
+            () -> {
+              final Path dataDir = pantheonConfigurationSupplier.get().getStoragePath();
+              return options.toDomainObject().databaseDir(dataDir).build();
+            });
+
+    factory = new RocksDBKeyValueStorageFactory(configurationSupplier, segments, metricsSystem);
+    privacyFactory =
+        new RocksDBKeyValuePrivacyStorageFactory(configurationSupplier, segments, metricsSystem);
+
+    service.registerKeyValueStorage(factory);
+    service.registerKeyValueStorage(privacyFactory);
   }
 }
