@@ -80,7 +80,7 @@ check.dependsOn('checkAPIChanges')
       // pom {
         // name = 'Pantheon Plugins Library'
         // description = 'Core Plugins Libraries for Pantheon'
-        // url = 'http://github.com/PegaSysEng/pantheon-plugin-api'
+        // url = 'http://github.com/PegaSysEng/pantheon'
         // licenses {
           // license {
             // name = 'The Apache License, Version 2.0'
@@ -88,9 +88,9 @@ check.dependsOn('checkAPIChanges')
           // }
         // }
         // scm {
-          // connection = 'scm:git:git://github.com/PegaSysEng/pantheon-plugin-api.git'
-          // developerConnection = 'scm:git:ssh://github.com/PegaSysEng/pantheon-plugin-api.git'
-          // url = 'https://github.com/PegaSysEng/pantheon-plugin-api'
+          // connection = 'scm:git:git://github.com/PegaSysEng/pantheon.git'
+          // developerConnection = 'scm:git:ssh://github.com/PegaSysEng/pantheon.git'
+          // url = 'https://github.com/PegaSysEng/pantheon'
         // }
       // }
     // }
