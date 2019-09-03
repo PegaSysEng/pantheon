@@ -53,6 +53,8 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     this.configurationSupplier = configurationSupplier;
     this.segments = segments;
     this.metricsSystem = metricsSystem;
+
+    LOG.error("<><><><>----  constructor");
   }
 
   @Override
@@ -62,9 +64,14 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   @Override
   public KeyValueStorage create(final SegmentIdentifier segment) throws StorageException {
+
+    LOG.error("<><><><>----  create, before init");
+
     if (requiresInit()) {
       init(configurationSupplier.get());
     }
+
+    LOG.error("<><><><>----  create, after init");
 
     return isSegmentIsolationSupported
         ? new SegmentedKeyValueStorageAdapter<>(segment, segmentedStorage)

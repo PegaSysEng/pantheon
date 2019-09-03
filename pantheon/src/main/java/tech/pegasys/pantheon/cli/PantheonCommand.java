@@ -733,6 +733,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   public void run() {
     try {
       prepareLogging();
+      pantheonPluginContext.addService(
+          PantheonConfiguration.class, new PantheonConfigurationImpl(dataDir()));
+
       logger.info("Starting Pantheon version: {}", PantheonInfo.version());
       checkOptions().configure().controller().startPlugins().startSynchronization();
     } catch (final Exception e) {
@@ -840,8 +843,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private PantheonCommand startPlugins() {
-    pantheonPluginContext.addService(
-        PantheonConfiguration.class, new PantheonConfigurationImpl(dataDir()));
     pantheonPluginContext.addService(
         PantheonEvents.class,
         new PantheonEventsImpl(

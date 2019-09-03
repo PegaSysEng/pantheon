@@ -75,17 +75,17 @@ public class PantheonPluginContextImpl implements PantheonContext {
         state == Lifecycle.UNINITIALIZED,
         "Pantheon plugins have already been registered.  Cannot register additional plugins.");
 
-    final ClassLoader pluginLoader;
-    if (pluginsDir == null) {
-      pluginLoader = this.getClass().getClassLoader();
-    } else {
-      Optional<URLClassLoader> optionalLoader = includePluginDirectory(pluginsDir);
+    final ClassLoader pluginLoader =
+        pluginDirectoryLoader(pluginsDir).orElse(this.getClass().getClassLoader());
 
-      if (optionalLoader.isPresent()) {
-        pluginLoader = optionalLoader.get();
-      } else {
-        return;
-      }
+    //TODO debug line - remove
+    try {
+      LOG.error(
+          "<><><><>>>>> "
+              + pluginLoader.loadClass(
+                  "tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBPlugin"));
+    } catch (ClassNotFoundException e) {
+      LOG.error(e);
     }
 
     state = Lifecycle.REGISTERING;
@@ -174,20 +174,24 @@ public class PantheonPluginContextImpl implements PantheonContext {
     return Collections.unmodifiableList(plugins);
   }
 
-  private Optional<URLClassLoader> includePluginDirectory(final Path pluginsDir) {
-    LOG.debug("Searching for plugins in {}", pluginsDir.toAbsolutePath().toString());
+  private Optional<ClassLoader> pluginDirectoryLoader(final Path pluginsDir) {
+    if (pluginsDir != null && pluginsDir.toFile().isDirectory()) {
+      LOG.debug("Searching for plugins in {}", pluginsDir.toAbsolutePath().toString());
 
-    try (final Stream<Path> pluginFilesList = Files.list(pluginsDir)) {
-      final URL[] pluginJarURLs =
-          pluginFilesList
-              .filter(p -> p.getFileName().toString().endsWith(".jar"))
-              .map(PantheonPluginContextImpl::pathToURIOrNull)
-              .toArray(URL[]::new);
-      return Optional.of(new URLClassLoader(pluginJarURLs, this.getClass().getClassLoader()));
-    } catch (final MalformedURLException e) {
-      LOG.error("Error converting files to URLs, could not load plugins", e);
-    } catch (final IOException e) {
-      LOG.error("Error enumerating plugins, could not load plugins", e);
+      try (final Stream<Path> pluginFilesList = Files.list(pluginsDir)) {
+        final URL[] pluginJarURLs =
+            pluginFilesList
+                .filter(p -> p.getFileName().toString().endsWith(".jar"))
+                .map(PantheonPluginContextImpl::pathToURIOrNull)
+                .toArray(URL[]::new);
+        return Optional.of(new URLClassLoader(pluginJarURLs, this.getClass().getClassLoader()));
+      } catch (final MalformedURLException e) {
+        LOG.error("Error converting files to URLs, could not load plugins", e);
+      } catch (final IOException e) {
+        LOG.error("Error enumerating plugins, could not load plugins", e);
+      }
+    } else {
+      LOG.debug("Plugin directory does not exist, skipping registration. - {}", pluginsDir);
     }
 
     return Optional.empty();
