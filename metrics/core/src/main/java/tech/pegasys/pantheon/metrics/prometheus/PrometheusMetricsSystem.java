@@ -15,8 +15,8 @@ package tech.pegasys.pantheon.metrics.prometheus;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.Observation;
-import tech.pegasys.pantheon.metrics.PantheonMetricsSystem;
 import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
@@ -48,7 +48,7 @@ import io.prometheus.client.hotspot.MemoryPoolsExports;
 import io.prometheus.client.hotspot.StandardExports;
 import io.prometheus.client.hotspot.ThreadExports;
 
-public class PrometheusMetricsSystem implements PantheonMetricsSystem {
+public class PrometheusMetricsSystem implements ObservableMetricsSystem {
 
   private final Map<MetricCategory, Collection<Collector>> collectors = new ConcurrentHashMap<>();
   private final CollectorRegistry registry = new CollectorRegistry(true);
@@ -66,7 +66,7 @@ public class PrometheusMetricsSystem implements PantheonMetricsSystem {
     this.timersEnabled = timersEnabled;
   }
 
-  public static PantheonMetricsSystem init(final MetricsConfiguration metricsConfiguration) {
+  public static ObservableMetricsSystem init(final MetricsConfiguration metricsConfiguration) {
     if (!metricsConfiguration.isEnabled() && !metricsConfiguration.isPushEnabled()) {
       return new NoOpMetricsSystem();
     }

@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
 
-public class StubMetricsSystem implements PantheonMetricsSystem {
+public class StubMetricsSystem implements ObservableMetricsSystem {
 
   private final Map<String, StubLabelledCounter> counters = new HashMap<>();
   private final Map<String, DoubleSupplier> gauges = new HashMap<>();

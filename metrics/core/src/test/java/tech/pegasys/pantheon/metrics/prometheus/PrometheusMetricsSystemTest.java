@@ -23,9 +23,9 @@ import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.PEERS;
 import static tech.pegasys.pantheon.metrics.PantheonMetricCategory.RPC;
 import static tech.pegasys.pantheon.metrics.StandardMetricCategory.JVM;
 
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.Observation;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.metrics.PantheonMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.metrics.Counter;
@@ -44,7 +44,7 @@ public class PrometheusMetricsSystemTest {
           .thenComparing(Observation::getMetricName)
           .thenComparing((o1, o2) -> o1.getLabels().equals(o2.getLabels()) ? 0 : 1);
 
-  private final PantheonMetricsSystem metricsSystem =
+  private final ObservableMetricsSystem metricsSystem =
       new PrometheusMetricsSystem(DEFAULT_METRIC_CATEGORIES, true);
 
   @Test
@@ -157,7 +157,7 @@ public class PrometheusMetricsSystemTest {
 
   @Test
   public void shouldNotCreateObservationsFromTimerWhenTimersDisabled() {
-    final PantheonMetricsSystem metricsSystem =
+    final ObservableMetricsSystem metricsSystem =
         new PrometheusMetricsSystem(DEFAULT_METRIC_CATEGORIES, false);
     final LabelledMetric<OperationTimer> timer =
         metricsSystem.createLabelledTimer(RPC, "request", "Some help", "methodName");
@@ -193,7 +193,7 @@ public class PrometheusMetricsSystemTest {
             .metricCategories(ImmutableSet.of(PantheonMetricCategory.RPC))
             .enabled(true)
             .build();
-    final PantheonMetricsSystem localMetricSystem =
+    final ObservableMetricsSystem localMetricSystem =
         PrometheusMetricsSystem.init(metricsConfiguration);
 
     // do a category we are not watching

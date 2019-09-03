@@ -82,8 +82,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.PruningConfiguration;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.metrics.PantheonMetricsSystem;
 import tech.pegasys.pantheon.metrics.StandardMetricCategory;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
@@ -659,7 +659,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private Collection<EnodeURL> staticNodes;
   private PantheonController<?> pantheonController;
 
-  private final Supplier<PantheonMetricsSystem> metricsSystem =
+  private final Supplier<ObservableMetricsSystem> metricsSystem =
       Suppliers.memoize(() -> PrometheusMetricsSystem.init(metricsConfiguration()));
 
   public PantheonCommand(
@@ -1240,7 +1240,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
     permissioningConfiguration.ifPresent(runnerBuilder::permissioningConfiguration);
 
-    final PantheonMetricsSystem metricsSystem = this.metricsSystem.get();
+    final ObservableMetricsSystem metricsSystem = this.metricsSystem.get();
     final Runner runner =
         runnerBuilder
             .vertx(Vertx.vertx(createVertxOptions(metricsSystem)))

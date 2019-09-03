@@ -17,7 +17,7 @@ import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
 
 import java.util.stream.Stream;
 
-public interface PantheonMetricsSystem extends MetricsSystem {
+public interface ObservableMetricsSystem extends MetricsSystem {
 
   Stream<Observation> streamObservations(MetricCategory category);
 

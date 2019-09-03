@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.metrics.noop;
 
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.Observation;
-import tech.pegasys.pantheon.metrics.PantheonMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.metrics.Counter;
 import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
 import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 import com.google.common.base.Preconditions;
 
-public class NoOpMetricsSystem implements PantheonMetricsSystem {
+public class NoOpMetricsSystem implements ObservableMetricsSystem {
 
   public static final Counter NO_OP_COUNTER = new NoOpCounter();
   private static final OperationTimer.TimingContext NO_OP_TIMING_CONTEXT = () -> 0;
