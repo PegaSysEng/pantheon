@@ -733,14 +733,21 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   public void run() {
     try {
       prepareLogging();
-      pantheonPluginContext.addService(
-          PantheonConfiguration.class, new PantheonConfigurationImpl(dataDir()));
-
+      addConfigurationService();
       logger.info("Starting Pantheon version: {}", PantheonInfo.version());
       checkOptions().configure().controller().startPlugins().startSynchronization();
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
+  }
+
+  /**
+   * As this is needed by the StorageProvider, it must be created after the configuration parsing
+   * and before the controller is built.
+   */
+  private void addConfigurationService() {
+    pantheonPluginContext.addService(
+        PantheonConfiguration.class, new PantheonConfigurationImpl(dataDir()));
   }
 
   private PantheonCommand handleStandaloneCommand() {

@@ -78,16 +78,6 @@ public class PantheonPluginContextImpl implements PantheonContext {
     final ClassLoader pluginLoader =
         pluginDirectoryLoader(pluginsDir).orElse(this.getClass().getClassLoader());
 
-    //TODO debug line - remove
-    try {
-      LOG.error(
-          "<><><><>>>>> "
-              + pluginLoader.loadClass(
-                  "tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBPlugin"));
-    } catch (ClassNotFoundException e) {
-      LOG.error(e);
-    }
-
     state = Lifecycle.REGISTERING;
 
     final ServiceLoader<PantheonPlugin> serviceLoader =

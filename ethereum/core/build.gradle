@@ -34,6 +34,9 @@ dependencies {
   implementation project(':metrics:core')
   implementation project(':services:kvstore')
 
+  //TODO hack - otherwise the JAR is not included in the lib (i.e. not flagged as needed)
+  implementation project(":plugins:rocksdb")
+
   implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'com.google.guava:guava'
   implementation 'io.vertx:vertx-core'
