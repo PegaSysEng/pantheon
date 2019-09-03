@@ -14,9 +14,9 @@ package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import static java.util.Objects.requireNonNullElse;
 
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
+import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageTransactionTransitionValidatorDecorator;
@@ -65,7 +65,7 @@ public class RocksDBColumnarKeyValueStorage
   public RocksDBColumnarKeyValueStorage(
       final RocksDBConfiguration configuration,
       final List<SegmentIdentifier> segments,
-      final MetricsSystem metricsSystem)
+      final ObservableMetricsSystem metricsSystem)
       throws StorageException {
     RocksDbUtil.loadNativeLibrary();
 

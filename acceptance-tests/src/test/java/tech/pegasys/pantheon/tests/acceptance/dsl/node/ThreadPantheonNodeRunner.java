@@ -28,7 +28,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
@@ -103,7 +103,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         pantheonPluginContextMap.computeIfAbsent(
             node, n -> buildPluginContext(node, storageService));
 
-    final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
+    final ObservableMetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
     final List<EnodeURL> bootnodes =
         node.getConfiguration().getBootnodes().stream()
             .map(EnodeURL::fromURI)

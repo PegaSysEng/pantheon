@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
 import java.nio.file.Path;
@@ -29,7 +29,7 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
   public RocksDBKeyValuePrivacyStorageFactory(
       final Supplier<RocksDBConfiguration> configurationSupplier,
       final List<SegmentIdentifier> segments,
-      final MetricsSystem metricsSystem) {
+      final ObservableMetricsSystem metricsSystem) {
     super(getPrivacyConfiguration(configurationSupplier), segments, metricsSystem);
   }
 

@@ -47,7 +47,7 @@ import tech.pegasys.pantheon.ethereum.worldstate.MarkSweepPruner;
 import tech.pegasys.pantheon.ethereum.worldstate.Pruner;
 import tech.pegasys.pantheon.ethereum.worldstate.PruningConfiguration;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public abstract class PantheonControllerBuilder<C> {
   protected TransactionPoolConfiguration transactionPoolConfiguration;
   protected BigInteger networkId;
   protected MiningParameters miningParameters;
-  protected MetricsSystem metricsSystem;
+  protected ObservableMetricsSystem metricsSystem;
   protected PrivacyParameters privacyParameters;
   protected Path dataDirectory;
   protected Clock clock;
@@ -130,7 +130,7 @@ public abstract class PantheonControllerBuilder<C> {
     return this;
   }
 
-  public PantheonControllerBuilder<C> metricsSystem(final MetricsSystem metricsSystem) {
+  public PantheonControllerBuilder<C> metricsSystem(final ObservableMetricsSystem metricsSystem) {
     this.metricsSystem = metricsSystem;
     return this;
   }

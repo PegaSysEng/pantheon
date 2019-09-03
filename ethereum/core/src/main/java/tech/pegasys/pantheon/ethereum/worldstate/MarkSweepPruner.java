@@ -17,9 +17,9 @@ import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.trie.MerklePatriciaTrie;
 import tech.pegasys.pantheon.ethereum.trie.StoredMerklePatriciaTrie;
-import tech.pegasys.pantheon.metrics.Counter;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import tech.pegasys.pantheon.plugin.services.metrics.Counter;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
@@ -37,6 +37,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class MarkSweepPruner {
+
   private static final int DEFAULT_OPS_PER_TRANSACTION = 1000;
   private static final Logger LOG = LogManager.getLogger();
   private static final byte[] IN_USE = BytesValue.of(1).getArrayUnsafe();
@@ -57,7 +58,7 @@ public class MarkSweepPruner {
       final WorldStateStorage worldStateStorage,
       final MutableBlockchain blockchain,
       final KeyValueStorage markStorage,
-      final MetricsSystem metricsSystem) {
+      final ObservableMetricsSystem metricsSystem) {
     this(worldStateStorage, blockchain, markStorage, metricsSystem, DEFAULT_OPS_PER_TRANSACTION);
   }
 
@@ -65,7 +66,7 @@ public class MarkSweepPruner {
       final WorldStateStorage worldStateStorage,
       final MutableBlockchain blockchain,
       final KeyValueStorage markStorage,
-      final MetricsSystem metricsSystem,
+      final ObservableMetricsSystem metricsSystem,
       final int operationsPerTransaction) {
     this.worldStateStorage = worldStateStorage;
     this.markStorage = markStorage;

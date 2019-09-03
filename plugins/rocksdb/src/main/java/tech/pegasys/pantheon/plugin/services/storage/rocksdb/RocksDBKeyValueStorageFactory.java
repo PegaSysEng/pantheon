@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageFactory;
@@ -44,17 +44,15 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   private final Supplier<RocksDBConfiguration> configurationSupplier;
   private final List<SegmentIdentifier> segments;
-  private final MetricsSystem metricsSystem;
+  private final ObservableMetricsSystem metricsSystem;
 
   public RocksDBKeyValueStorageFactory(
       final Supplier<RocksDBConfiguration> configurationSupplier,
       final List<SegmentIdentifier> segments,
-      final MetricsSystem metricsSystem) {
+      final ObservableMetricsSystem metricsSystem) {
     this.configurationSupplier = configurationSupplier;
     this.segments = segments;
     this.metricsSystem = metricsSystem;
-
-    LOG.error("<><><><>----  constructor");
   }
 
   @Override

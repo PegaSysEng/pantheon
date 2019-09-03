@@ -12,9 +12,9 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.OperationTimer;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
+import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorageTransactionTransitionValidatorDecorator;
@@ -46,7 +46,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   private final RocksDBMetrics rocksDBMetrics;
 
   public RocksDBKeyValueStorage(
-      final RocksDBConfiguration configuration, final MetricsSystem metricsSystem) {
+      final RocksDBConfiguration configuration, final ObservableMetricsSystem metricsSystem) {
     RocksDbUtil.loadNativeLibrary();
 
     try {

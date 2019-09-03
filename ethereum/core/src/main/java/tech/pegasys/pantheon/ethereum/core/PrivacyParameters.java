@@ -32,6 +32,7 @@ import java.util.Optional;
 import com.google.common.io.Files;
 
 public class PrivacyParameters {
+
   public static final URI DEFAULT_ENCLAVE_URL = URI.create("http://localhost:8888");
   public static final PrivacyParameters DEFAULT = new PrivacyParameters();
 
@@ -134,6 +135,7 @@ public class PrivacyParameters {
   }
 
   public static class Builder {
+
     private boolean enabled;
     private URI enclaveUrl;
     private Integer privacyAddress = Address.PRIVACY;

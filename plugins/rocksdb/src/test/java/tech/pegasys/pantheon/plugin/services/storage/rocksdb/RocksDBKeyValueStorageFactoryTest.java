@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
@@ -44,7 +44,7 @@ public class RocksDBKeyValueStorageFactoryTest {
 
   @Mock private RocksDBConfiguration rocksDbConfiguration;
   @Rule public final TemporaryFolder temporaryFolder = new TemporaryFolder();
-  private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
+  private final ObservableMetricsSystem metricsSystem = new NoOpMetricsSystem();
   private final List<SegmentIdentifier> segments = List.of();
   @Mock private SegmentIdentifier segment;
 

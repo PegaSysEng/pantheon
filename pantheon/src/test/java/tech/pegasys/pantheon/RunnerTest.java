@@ -44,7 +44,7 @@ import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
@@ -121,7 +121,7 @@ public final class RunnerTest {
     final KeyPair aheadDbNodeKeys = loadKeyPair(dbAhead);
     final SynchronizerConfiguration syncConfigAhead =
         SynchronizerConfiguration.builder().syncMode(SyncMode.FULL).build();
-    final MetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
+    final ObservableMetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
     final BigInteger networkId = BigInteger.valueOf(2929);
 
     // Setup state with block data
