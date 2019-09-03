@@ -14,6 +14,23 @@ package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
+import com.google.common.io.Files;
+import com.google.common.io.MoreFiles;
+import com.google.common.io.RecursiveDeleteOption;
+import java.nio.file.Path;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.TearDown;
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
@@ -31,7 +48,7 @@ import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
+import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValueStorageFactory;
@@ -39,31 +56,13 @@ import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
 import tech.pegasys.pantheon.services.tasks.FlatFileTaskCollection;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
-import java.nio.file.Path;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import com.google.common.io.Files;
-import com.google.common.io.MoreFiles;
-import com.google.common.io.RecursiveDeleteOption;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Level;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.TearDown;
-
 @State(Scope.Thread)
 public class WorldStateDownloaderBenchmark {
 
   private final BlockDataGenerator dataGen = new BlockDataGenerator();
   private Path tempDir;
   private BlockHeader blockHeader;
-  private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
+  private final ObservableMetricsSystem metricsSystem = new NoOpMetricsSystem();
   private WorldStateDownloader worldStateDownloader;
   private WorldStateStorage worldStateStorage;
   private RespondingEthPeer peer;
@@ -96,8 +95,8 @@ public class WorldStateDownloaderBenchmark {
         new KeyValueStorageProviderBuilder()
             .withStorageFactory(
                 new RocksDBKeyValueStorageFactory(
-                    RocksDBConfiguration.builder().databaseDir(tempDir.resolve("database")).build(),
-                    List.of(),
+                    ()->       RocksDBConfiguration.builder().databaseDir(tempDir.resolve("database")).build(),
+                    Collections.emptyList(),
                     metricsSystem))
             .build();
     worldStateStorage = storageProvider.createWorldStateStorage();
