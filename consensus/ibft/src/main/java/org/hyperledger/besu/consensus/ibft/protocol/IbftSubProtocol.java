@@ -13,8 +13,8 @@
 package org.hyperledger.besu.consensus.ibft.protocol;
 
 import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.SubProtocol;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
 
 public class IbftSubProtocol implements SubProtocol {
 

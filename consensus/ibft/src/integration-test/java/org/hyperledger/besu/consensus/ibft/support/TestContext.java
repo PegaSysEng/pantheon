@@ -17,10 +17,10 @@ import org.hyperledger.besu.consensus.ibft.statemachine.IbftFinalState;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.EventMultiplexer;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
-import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.util.ArrayList;
 import java.util.List;

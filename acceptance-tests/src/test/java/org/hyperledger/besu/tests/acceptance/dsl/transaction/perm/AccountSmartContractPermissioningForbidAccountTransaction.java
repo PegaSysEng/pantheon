@@ -15,8 +15,8 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.web3j.utils.Numeric.toHexString;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;

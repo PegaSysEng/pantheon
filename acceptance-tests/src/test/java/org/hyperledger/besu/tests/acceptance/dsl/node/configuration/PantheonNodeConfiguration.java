@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.node.configuration;
 
-import tech.pegasys.pantheon.ethereum.core.MiningParameters;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
+import org.hyperledger.besu.ethereum.core.MiningParameters;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;

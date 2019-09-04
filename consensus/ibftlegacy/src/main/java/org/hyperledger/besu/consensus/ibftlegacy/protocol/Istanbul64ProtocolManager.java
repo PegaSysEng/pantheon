@@ -14,11 +14,11 @@ package org.hyperledger.besu.consensus.ibftlegacy.protocol;
 
 import static java.util.Collections.singletonList;
 
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManager;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Capability;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 
 import java.math.BigInteger;

@@ -15,15 +15,15 @@ package org.hyperledger.besu.consensus.clique.jsonrpc.methods;
 import static org.hyperledger.besu.consensus.clique.CliqueBlockInterface.NO_VOTE_SUBJECT;
 
 import org.hyperledger.besu.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcError;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
 public class Propose implements JsonRpcMethod {
   private final VoteProposer proposer;

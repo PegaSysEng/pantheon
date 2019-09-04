@@ -14,9 +14,9 @@ package org.hyperledger.besu.consensus.clique.blockcreation;
 
 import org.hyperledger.besu.consensus.clique.CliqueContext;
 import org.hyperledger.besu.consensus.clique.CliqueMiningTracker;
-import tech.pegasys.pantheon.ethereum.blockcreation.AbstractMiningCoordinator;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.blockcreation.AbstractMiningCoordinator;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 
 public class CliqueMiningCoordinator

@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.consensus.ibftlegacy;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 public class IbftHelpers {
 

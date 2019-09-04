@@ -16,10 +16,10 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeConfigurationBuilder;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
 import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;

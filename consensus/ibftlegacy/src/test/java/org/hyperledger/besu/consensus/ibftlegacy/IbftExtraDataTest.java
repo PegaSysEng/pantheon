@@ -15,7 +15,7 @@ package org.hyperledger.besu.consensus.ibftlegacy;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 import tech.pegasys.pantheon.util.bytes.BytesValue;

@@ -18,10 +18,10 @@ import static org.hyperledger.besu.consensus.ibft.IbftContextBuilder.setupContex
 import static org.hyperledger.besu.consensus.ibft.headervalidationrules.HeaderValidationTestHelpers.createProposedBlockHeader;
 
 import org.hyperledger.besu.consensus.ibft.IbftContext;
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.AddressHelpers;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.util.List;
 

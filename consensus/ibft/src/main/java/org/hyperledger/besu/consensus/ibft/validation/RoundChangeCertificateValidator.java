@@ -24,8 +24,8 @@ import org.hyperledger.besu.consensus.ibft.IbftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.ibft.IbftBlockInterface;
 import org.hyperledger.besu.consensus.ibft.IbftHelpers;
 import org.hyperledger.besu.consensus.ibft.validation.RoundChangePayloadValidator.MessageValidatorForHeightFactory;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Block;
 
 import java.util.Collection;
 import java.util.Optional;

@@ -18,7 +18,7 @@ import org.hyperledger.besu.consensus.ibft.payload.SignedData;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.payload.PreparePayload;
 import org.hyperledger.besu.consensus.ibft.payload.ProposalPayload;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 import java.util.Collection;
 

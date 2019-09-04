@@ -13,7 +13,7 @@
 package org.hyperledger.besu.consensus.ibft.support;
 
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 public class NodeParams {
   private final Address address;

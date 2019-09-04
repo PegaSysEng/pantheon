@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.consensus.common;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.util.Collection;
 import java.util.Optional;

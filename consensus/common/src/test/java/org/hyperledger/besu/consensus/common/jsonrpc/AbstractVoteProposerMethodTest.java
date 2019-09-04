@@ -18,10 +18,10 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.consensus.common.VoteProposer;
 import org.hyperledger.besu.consensus.common.VoteType;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.Test;

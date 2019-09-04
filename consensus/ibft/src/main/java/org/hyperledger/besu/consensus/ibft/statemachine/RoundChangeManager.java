@@ -15,7 +15,7 @@ package org.hyperledger.besu.consensus.ibft.statemachine;
 import org.hyperledger.besu.consensus.ibft.validation.RoundChangeMessageValidator;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 import java.util.Collection;
 import java.util.Map;

@@ -15,7 +15,7 @@ package org.hyperledger.besu.tests.acceptance.permissioning;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.permissioning.PermissionedNodeBuilder;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.AccountSmartContractPermissioningTransactions;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.perm.AccountSmartContractPermissioningConditions;

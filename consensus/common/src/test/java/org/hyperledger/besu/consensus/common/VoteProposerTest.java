@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.consensus.common.VoteType.ADD;
 import static org.hyperledger.besu.consensus.common.VoteType.DROP;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 import java.util.Arrays;
 import java.util.Collections;

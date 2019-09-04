@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import org.junit.Test;

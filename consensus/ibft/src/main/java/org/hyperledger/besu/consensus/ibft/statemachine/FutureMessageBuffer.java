@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.consensus.ibft.statemachine;
 
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
 
 import java.util.ArrayList;
 import java.util.Collections;

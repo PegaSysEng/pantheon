@@ -16,14 +16,14 @@ import static org.hyperledger.besu.consensus.ibft.IbftBlockHeaderValidationRules
 
 import org.hyperledger.besu.config.GenesisConfigOptions;
 import org.hyperledger.besu.config.IbftConfigOptions;
-import tech.pegasys.pantheon.ethereum.MainnetBlockValidator;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.core.Wei;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockBodyValidator;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockImporter;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolScheduleBuilder;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpecBuilder;
+import org.hyperledger.besu.ethereum.MainnetBlockValidator;
+import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.mainnet.MainnetBlockBodyValidator;
+import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecBuilder;
 
 import java.math.BigInteger;
 

@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.consensus.clique;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.mainnet.MainnetBlockHeaderFunctions;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderFunctions;
 
 public class CliqueBlockHeaderFunctions implements BlockHeaderFunctions {
 

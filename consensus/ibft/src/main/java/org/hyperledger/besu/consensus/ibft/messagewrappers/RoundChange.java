@@ -17,7 +17,7 @@ import org.hyperledger.besu.consensus.ibft.payload.RoundChangePayload;
 import org.hyperledger.besu.consensus.ibft.payload.SignedData;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.IbftBlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Block;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;

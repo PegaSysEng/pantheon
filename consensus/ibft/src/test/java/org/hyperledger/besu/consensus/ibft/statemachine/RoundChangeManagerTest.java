@@ -30,11 +30,11 @@ import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.consensus.ibft.IbftHelpers;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.BlockValidator;
-import tech.pegasys.pantheon.ethereum.BlockValidator.BlockProcessingOutputs;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.Util;
+import org.hyperledger.besu.ethereum.BlockValidator;
+import org.hyperledger.besu.ethereum.BlockValidator.BlockProcessingOutputs;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Util;
 
 import java.util.Collections;
 import java.util.List;

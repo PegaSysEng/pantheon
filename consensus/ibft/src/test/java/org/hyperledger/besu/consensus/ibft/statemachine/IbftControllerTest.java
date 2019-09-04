@@ -41,12 +41,12 @@ import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.EthSynchronizerUpdater;
 import org.hyperledger.besu.consensus.ibft.IbftGossip;
 import org.hyperledger.besu.consensus.ibft.MessageTracker;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.DefaultMessage;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.DefaultMessage;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
 
 import java.util.List;
 

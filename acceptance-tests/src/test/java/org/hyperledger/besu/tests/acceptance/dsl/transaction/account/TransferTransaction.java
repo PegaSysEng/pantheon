@@ -14,7 +14,7 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.account;
 
 import static org.web3j.utils.Numeric.toHexString;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.blockchain.Amount;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;

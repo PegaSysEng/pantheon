@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.clique;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 
 public class CliqueTransactions {

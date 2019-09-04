@@ -14,8 +14,8 @@ package org.hyperledger.besu.consensus.clique.jsonrpc.methods;
 
 import org.hyperledger.besu.consensus.common.VoteProposer;
 import org.hyperledger.besu.consensus.common.jsonrpc.AbstractVoteProposerMethod;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcMethod;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 
 public class CliqueProposals extends AbstractVoteProposerMethod implements JsonRpcMethod {
 

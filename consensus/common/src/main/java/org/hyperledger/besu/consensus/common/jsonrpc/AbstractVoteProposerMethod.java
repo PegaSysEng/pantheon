@@ -14,9 +14,9 @@ package org.hyperledger.besu.consensus.common.jsonrpc;
 
 import org.hyperledger.besu.consensus.common.VoteProposer;
 import org.hyperledger.besu.consensus.common.VoteType;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
 import java.util.Map;
 import java.util.stream.Collectors;

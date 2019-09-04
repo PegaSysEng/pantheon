@@ -17,9 +17,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.consensus.common.ValidatorProvider;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.util.ArrayList;
 import java.util.Collection;

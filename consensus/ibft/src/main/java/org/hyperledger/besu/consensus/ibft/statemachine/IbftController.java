@@ -27,10 +27,10 @@ import org.hyperledger.besu.consensus.ibft.MessageTracker;
 import org.hyperledger.besu.consensus.ibft.SynchronizerUpdater;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.IbftMessage;
 import org.hyperledger.besu.consensus.ibft.payload.Authored;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.Message;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 
 import java.util.function.Consumer;
 

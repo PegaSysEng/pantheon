@@ -17,7 +17,7 @@ import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.payload.Authored;
 import org.hyperledger.besu.consensus.ibft.payload.Payload;
 import org.hyperledger.besu.consensus.ibft.payload.RoundSpecific;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 

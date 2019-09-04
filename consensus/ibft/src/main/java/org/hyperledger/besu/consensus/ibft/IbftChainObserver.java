@@ -13,9 +13,9 @@
 package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.consensus.ibft.ibftevent.NewChainHead;
-import tech.pegasys.pantheon.ethereum.chain.BlockAddedEvent;
-import tech.pegasys.pantheon.ethereum.chain.BlockAddedObserver;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
+import org.hyperledger.besu.ethereum.chain.BlockAddedObserver;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
 
 /**
  * Blockchain observer that adds {@link NewChainHead} events to the event queue when a new block is

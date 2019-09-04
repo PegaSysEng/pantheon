@@ -28,11 +28,11 @@ import org.hyperledger.besu.consensus.ibft.support.ValidatorPeer;
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.RawMessage;
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Util;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.time.Clock;

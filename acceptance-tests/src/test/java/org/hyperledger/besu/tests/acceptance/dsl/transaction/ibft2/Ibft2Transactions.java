@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 
 public class Ibft2Transactions {

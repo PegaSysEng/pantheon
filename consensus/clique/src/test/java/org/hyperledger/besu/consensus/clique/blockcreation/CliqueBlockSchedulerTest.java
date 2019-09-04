@@ -20,12 +20,12 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.consensus.common.VoteTally;
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.blockcreation.AbstractBlockScheduler.BlockCreationTimeResult;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.AddressHelpers;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
-import tech.pegasys.pantheon.ethereum.core.Util;
+import org.hyperledger.besu.ethereum.blockcreation.AbstractBlockScheduler.BlockCreationTimeResult;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.AddressHelpers;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.core.Util;
 
 import java.time.Clock;
 import java.util.List;

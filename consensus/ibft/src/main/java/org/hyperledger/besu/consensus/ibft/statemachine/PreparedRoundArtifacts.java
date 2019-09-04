@@ -15,7 +15,7 @@ package org.hyperledger.besu.consensus.ibft.statemachine;
 import org.hyperledger.besu.consensus.ibft.payload.PreparedCertificate;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
-import tech.pegasys.pantheon.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Block;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

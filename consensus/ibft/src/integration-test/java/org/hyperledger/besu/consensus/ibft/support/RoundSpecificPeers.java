@@ -30,8 +30,8 @@ import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.payload.Payload;
 import org.hyperledger.besu.consensus.ibft.payload.PreparePayload;
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 
 import java.util.Arrays;
 import java.util.Collection;
