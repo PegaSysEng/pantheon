@@ -19,7 +19,7 @@ import static org.apache.logging.log4j.util.Strings.join;
 import static org.assertj.core.api.Assertions.assertThat;
 import static tech.pegasys.pantheon.ethereum.eth.transactions.TestNode.shortId;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;

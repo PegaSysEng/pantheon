@@ -14,8 +14,8 @@ package tech.pegasys.pantheon.ethereum.mainnet;
 
 import static tech.pegasys.pantheon.ethereum.mainnet.EthHash.EPOCH_LENGTH;
 
-import tech.pegasys.pantheon.crypto.Hash;
-import tech.pegasys.pantheon.crypto.MessageDigestFactory;
+import org.hyperledger.besu.crypto.Hash;
+import org.hyperledger.besu.crypto.MessageDigestFactory;
 
 import java.security.DigestException;
 import java.security.MessageDigest;

@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.chain;
 
-import tech.pegasys.pantheon.config.GenesisAllocation;
-import tech.pegasys.pantheon.config.GenesisConfigFile;
+import org.hyperledger.besu.config.GenesisAllocation;
+import org.hyperledger.besu.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Block;

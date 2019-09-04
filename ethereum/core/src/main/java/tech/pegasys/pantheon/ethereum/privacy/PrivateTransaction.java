@@ -13,9 +13,9 @@
 package tech.pegasys.pantheon.ethereum.privacy;
 
 import static com.google.common.base.Preconditions.checkState;
-import static tech.pegasys.pantheon.crypto.Hash.keccak256;
+import static org.hyperledger.besu.crypto.Hash.keccak256;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.core.Wei;

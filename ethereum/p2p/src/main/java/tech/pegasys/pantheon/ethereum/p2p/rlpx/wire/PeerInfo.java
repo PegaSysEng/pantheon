@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.p2p.rlpx.wire;
 
 import static tech.pegasys.pantheon.util.bytes.BytesValue.wrap;
 
-import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
+import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;

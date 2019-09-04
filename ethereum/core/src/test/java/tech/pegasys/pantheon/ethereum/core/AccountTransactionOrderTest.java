@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 
 import java.util.stream.Stream;
 

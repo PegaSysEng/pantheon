@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SecureRandomProvider;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SecureRandomProvider;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
 

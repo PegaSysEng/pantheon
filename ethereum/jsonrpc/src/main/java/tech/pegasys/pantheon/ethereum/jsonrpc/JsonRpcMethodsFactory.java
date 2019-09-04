@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc;
 
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
-import tech.pegasys.pantheon.enclave.Enclave;
+import org.hyperledger.besu.config.GenesisConfigOptions;
+import org.hyperledger.besu.enclave.Enclave;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.Address;

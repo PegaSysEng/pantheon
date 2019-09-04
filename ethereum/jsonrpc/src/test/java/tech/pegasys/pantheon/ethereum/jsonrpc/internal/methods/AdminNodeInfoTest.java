@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
-import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
+import org.hyperledger.besu.config.GenesisConfigOptions;
+import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.ChainHead;
 import tech.pegasys.pantheon.ethereum.core.Hash;

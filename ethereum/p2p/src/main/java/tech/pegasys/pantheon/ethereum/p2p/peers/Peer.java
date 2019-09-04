@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.peers;
 
-import tech.pegasys.pantheon.crypto.SecureRandomProvider;
+import org.hyperledger.besu.crypto.SecureRandomProvider;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 public interface Peer extends PeerId {

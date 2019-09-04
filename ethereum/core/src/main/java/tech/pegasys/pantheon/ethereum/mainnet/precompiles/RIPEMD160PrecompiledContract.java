@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet.precompiles;
 
-import tech.pegasys.pantheon.crypto.Hash;
+import org.hyperledger.besu.crypto.Hash;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;

@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.ethereum.difficulty.fixed;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.config.GenesisConfigFile;
+import org.hyperledger.besu.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.BlockHeaderTestFixture;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;

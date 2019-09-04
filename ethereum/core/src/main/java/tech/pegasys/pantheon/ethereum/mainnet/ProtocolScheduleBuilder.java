@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet;
 
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import org.hyperledger.besu.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.privacy.PrivateTransactionValidator;
 

@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.blockcreation;
 
-import tech.pegasys.pantheon.crypto.SecureRandomProvider;
+import org.hyperledger.besu.crypto.SecureRandomProvider;
 
 import java.util.Iterator;
 import java.util.Random;

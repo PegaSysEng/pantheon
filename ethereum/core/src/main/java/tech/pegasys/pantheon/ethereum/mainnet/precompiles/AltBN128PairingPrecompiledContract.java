@@ -12,12 +12,12 @@
  */
 package tech.pegasys.pantheon.ethereum.mainnet.precompiles;
 
-import tech.pegasys.pantheon.crypto.altbn128.AltBn128Fq12Pairer;
-import tech.pegasys.pantheon.crypto.altbn128.AltBn128Fq2Point;
-import tech.pegasys.pantheon.crypto.altbn128.AltBn128Point;
-import tech.pegasys.pantheon.crypto.altbn128.Fq;
-import tech.pegasys.pantheon.crypto.altbn128.Fq12;
-import tech.pegasys.pantheon.crypto.altbn128.Fq2;
+import org.hyperledger.besu.crypto.altbn128.AltBn128Fq12Pairer;
+import org.hyperledger.besu.crypto.altbn128.AltBn128Fq2Point;
+import org.hyperledger.besu.crypto.altbn128.AltBn128Point;
+import org.hyperledger.besu.crypto.altbn128.Fq;
+import org.hyperledger.besu.crypto.altbn128.Fq12;
+import org.hyperledger.besu.crypto.altbn128.Fq2;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.mainnet.AbstractPrecompiledContract;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
