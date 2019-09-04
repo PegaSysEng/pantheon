@@ -44,9 +44,9 @@ import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.util.ExceptionUtils;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

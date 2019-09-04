@@ -14,9 +14,9 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
 import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.debug.TraceFrame;
-import tech.pegasys.pantheon.util.bytes.Bytes32s;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.Bytes32s;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.Arrays;
 import java.util.Map;

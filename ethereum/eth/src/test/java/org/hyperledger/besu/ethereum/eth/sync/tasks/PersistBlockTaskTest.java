@@ -24,7 +24,7 @@ import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 
 import java.util.Arrays;

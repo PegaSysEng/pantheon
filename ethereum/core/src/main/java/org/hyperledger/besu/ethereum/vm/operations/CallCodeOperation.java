@@ -20,7 +20,7 @@ import org.hyperledger.besu.ethereum.vm.AbstractCallOperation;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.ethereum.vm.Words;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class CallCodeOperation extends AbstractCallOperation {
 

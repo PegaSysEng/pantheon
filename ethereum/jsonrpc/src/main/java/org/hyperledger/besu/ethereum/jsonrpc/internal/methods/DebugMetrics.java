@@ -16,8 +16,8 @@ import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
-import tech.pegasys.pantheon.metrics.Observation;
+import org.hyperledger.besu.metrics.ObservableMetricsSystem;
+import org.hyperledger.besu.metrics.Observation;
 
 import java.util.HashMap;
 import java.util.List;

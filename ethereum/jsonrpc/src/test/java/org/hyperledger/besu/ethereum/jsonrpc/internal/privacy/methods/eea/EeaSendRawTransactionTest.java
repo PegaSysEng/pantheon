@@ -34,7 +34,7 @@ import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInv
 import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionHandler;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.io.IOException;
 import java.math.BigInteger;

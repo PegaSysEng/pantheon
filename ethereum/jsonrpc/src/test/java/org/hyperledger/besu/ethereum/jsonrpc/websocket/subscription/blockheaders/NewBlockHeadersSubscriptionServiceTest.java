@@ -35,7 +35,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResult;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResultFactory;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.ArrayList;
 import java.util.Collections;

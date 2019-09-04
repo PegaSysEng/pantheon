@@ -19,7 +19,7 @@ import org.hyperledger.besu.ethereum.p2p.peers.LocalNode.NodeNotReadyException;
 import org.hyperledger.besu.ethereum.p2p.peers.MutableLocalNode.NodeAlreadySetException;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Arrays;
 import java.util.List;

@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.graphql.internal.scalar;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.Scalars;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import graphql.language.StringValue;
 import graphql.schema.CoercingParseLiteralException;

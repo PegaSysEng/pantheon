@@ -34,7 +34,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessRes
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugTraceTransactionResult;
 import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor;
 import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Collection;
 import java.util.EnumSet;

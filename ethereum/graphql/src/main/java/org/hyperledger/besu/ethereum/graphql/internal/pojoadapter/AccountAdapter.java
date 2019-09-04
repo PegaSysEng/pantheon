@@ -14,9 +14,9 @@ package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.Optional;
 

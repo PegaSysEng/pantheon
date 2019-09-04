@@ -15,8 +15,8 @@ package org.hyperledger.besu.ethereum.proof;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.trie.Proof;
 import org.hyperledger.besu.ethereum.worldstate.StateTrieAccountValue;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.ArrayList;
 import java.util.List;

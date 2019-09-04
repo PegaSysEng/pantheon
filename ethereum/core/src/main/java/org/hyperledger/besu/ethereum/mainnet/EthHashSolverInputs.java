@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class EthHashSolverInputs {
   private final UInt256 target;

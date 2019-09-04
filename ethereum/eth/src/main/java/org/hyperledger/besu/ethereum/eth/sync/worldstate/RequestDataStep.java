@@ -19,9 +19,9 @@ import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.RetryingGetNodeDataFromPeerTask;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.services.tasks.Task;
-import tech.pegasys.pantheon.util.ExceptionUtils;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.services.tasks.Task;
+import org.hyperledger.besu.util.ExceptionUtils;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Collections;
 import java.util.List;

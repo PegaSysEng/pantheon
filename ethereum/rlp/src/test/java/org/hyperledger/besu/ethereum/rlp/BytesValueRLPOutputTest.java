@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.rlp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import org.junit.Test;
 

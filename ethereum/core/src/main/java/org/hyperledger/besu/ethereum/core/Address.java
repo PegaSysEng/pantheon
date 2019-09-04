@@ -18,8 +18,8 @@ import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.DelegatingBytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.DelegatingBytesValue;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 

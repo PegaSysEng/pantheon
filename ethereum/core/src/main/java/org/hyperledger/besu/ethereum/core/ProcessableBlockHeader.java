@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 /** A block header capable of being processed. */
 public class ProcessableBlockHeader {

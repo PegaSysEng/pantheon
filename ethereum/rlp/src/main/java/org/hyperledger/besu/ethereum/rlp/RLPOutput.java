@@ -14,10 +14,10 @@ package org.hyperledger.besu.ethereum.rlp;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
-import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256Value;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.uint.UInt256Value;
 
 import java.math.BigInteger;
 import java.net.InetAddress;

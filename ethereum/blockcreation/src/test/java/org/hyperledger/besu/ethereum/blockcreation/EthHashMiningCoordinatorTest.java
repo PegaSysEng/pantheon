@@ -21,7 +21,7 @@ import org.hyperledger.besu.ethereum.core.ExecutionContextTestFixture;
 import org.hyperledger.besu.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.mainnet.EthHashSolution;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 import java.util.Optional;
 

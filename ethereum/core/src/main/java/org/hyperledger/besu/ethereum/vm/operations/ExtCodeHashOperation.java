@@ -19,7 +19,7 @@ import org.hyperledger.besu.ethereum.vm.AbstractOperation;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.ethereum.vm.Words;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 public class ExtCodeHashOperation extends AbstractOperation {
 

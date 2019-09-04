@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.consensus.common;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 public class ConsensusHelpers {
 

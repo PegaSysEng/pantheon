@@ -22,7 +22,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.testutil.BlockTestUtil;
+import org.hyperledger.besu.testutil.BlockTestUtil;
 
 import java.util.EnumMap;
 import java.util.Map;

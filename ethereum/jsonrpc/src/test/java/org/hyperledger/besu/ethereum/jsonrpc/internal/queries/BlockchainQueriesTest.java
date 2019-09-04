@@ -34,7 +34,7 @@ import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.core.WorldState;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.LogsQuery;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.ArrayList;
 import java.util.Arrays;

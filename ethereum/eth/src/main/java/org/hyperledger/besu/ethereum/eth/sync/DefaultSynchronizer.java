@@ -28,10 +28,10 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.worldstate.Pruner;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.util.ExceptionUtils;
-import tech.pegasys.pantheon.util.Subscribers;
+import org.hyperledger.besu.util.ExceptionUtils;
+import org.hyperledger.besu.util.Subscribers;
 
 import java.nio.file.Path;
 import java.time.Clock;

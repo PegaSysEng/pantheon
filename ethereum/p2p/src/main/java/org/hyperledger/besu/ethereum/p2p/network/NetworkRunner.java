@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.p2p.network;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.metrics.Counter;
 import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;

@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.wire;
 
 import static java.util.Comparator.comparing;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.ArrayList;
 import java.util.Comparator;

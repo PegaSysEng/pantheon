@@ -13,7 +13,7 @@
 package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy;
 
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeConfiguration;
-import tech.pegasys.orion.testutil.OrionKeyConfiguration;
+import org.hyperledger.orion.testutil.OrionKeyConfiguration;
 
 public class PrivacyNodeConfiguration {
 

@@ -28,7 +28,7 @@ import static tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermis
 
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.metrics.Counter;
 

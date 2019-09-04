@@ -33,9 +33,9 @@ import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor.Result;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidationParams;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.List;
 import java.util.Map.Entry;

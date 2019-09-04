@@ -21,7 +21,7 @@ import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.GetReceiptsForHeadersTask;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.util.FutureUtils;
+import org.hyperledger.besu.util.FutureUtils;
 
 import java.util.List;
 import java.util.Map;

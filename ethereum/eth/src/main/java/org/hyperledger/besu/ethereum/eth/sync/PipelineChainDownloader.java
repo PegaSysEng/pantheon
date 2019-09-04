@@ -13,8 +13,8 @@
 package org.hyperledger.besu.ethereum.eth.sync;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
-import static tech.pegasys.pantheon.util.FutureUtils.exceptionallyCompose;
+import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
+import static org.hyperledger.besu.util.FutureUtils.exceptionallyCompose;
 
 import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.EthTaskException;
@@ -22,12 +22,12 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
 import tech.pegasys.pantheon.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.metrics.Counter;
 import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
-import tech.pegasys.pantheon.services.pipeline.Pipeline;
-import tech.pegasys.pantheon.util.ExceptionUtils;
+import org.hyperledger.besu.services.pipeline.Pipeline;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 import java.time.Duration;
 import java.util.Optional;

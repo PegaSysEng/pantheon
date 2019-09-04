@@ -123,8 +123,8 @@ import org.hyperledger.besu.ethereum.privacy.markertransaction.PrivateMarkerTran
 import org.hyperledger.besu.ethereum.privacy.markertransaction.RandomSigningPrivateMarkerTransactionFactory;
 import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
-import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import org.hyperledger.besu.metrics.ObservableMetricsSystem;
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 
 import java.math.BigInteger;
 import java.util.Collection;

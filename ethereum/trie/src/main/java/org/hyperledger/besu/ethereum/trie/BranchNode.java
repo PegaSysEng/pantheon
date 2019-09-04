@@ -16,9 +16,9 @@ import static org.hyperledger.besu.crypto.Hash.keccak256;
 
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
 
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;

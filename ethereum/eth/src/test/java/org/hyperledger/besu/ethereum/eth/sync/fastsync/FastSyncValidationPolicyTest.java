@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.FULL;
 import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.LIGHT;
-import static tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_1_COUNTER;
+import static org.hyperledger.besu.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_1_COUNTER;
 
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 

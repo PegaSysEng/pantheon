@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.p2p.discovery.internal;
 import org.hyperledger.besu.ethereum.p2p.discovery.Endpoint;
 import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
 import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class PongPacketData implements PacketData {
 

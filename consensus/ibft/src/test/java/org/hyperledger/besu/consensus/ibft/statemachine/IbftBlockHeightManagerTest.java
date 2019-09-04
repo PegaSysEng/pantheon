@@ -57,8 +57,8 @@ import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.BlockImporter;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Util;
-import tech.pegasys.pantheon.util.Subscribers;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.Subscribers;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.math.BigInteger;
 import java.time.Clock;

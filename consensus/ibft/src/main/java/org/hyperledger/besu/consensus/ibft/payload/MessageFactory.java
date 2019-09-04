@@ -24,7 +24,7 @@ import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Util;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 import java.util.Optional;
 

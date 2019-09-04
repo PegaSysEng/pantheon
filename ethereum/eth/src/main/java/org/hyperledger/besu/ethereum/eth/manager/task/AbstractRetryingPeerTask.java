@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersExc
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerBreachedProtocolException;
 import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerDisconnectedException;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.util.ExceptionUtils;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 import java.time.Duration;
 import java.util.Optional;

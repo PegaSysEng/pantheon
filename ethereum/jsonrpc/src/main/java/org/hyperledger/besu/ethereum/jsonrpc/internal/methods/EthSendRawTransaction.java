@@ -28,7 +28,7 @@ import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInv
 import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.function.Supplier;
 

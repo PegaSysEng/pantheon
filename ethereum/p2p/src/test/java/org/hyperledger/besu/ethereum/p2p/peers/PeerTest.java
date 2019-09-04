@@ -15,11 +15,11 @@ package org.hyperledger.besu.ethereum.p2p.peers;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static tech.pegasys.pantheon.util.bytes.BytesValue.fromHexString;
+import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
 
 import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
 import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import com.google.common.net.InetAddresses;
 import org.junit.Test;

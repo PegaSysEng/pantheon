@@ -19,8 +19,8 @@ import static tech.pegasys.pantheon.ethereum.rlp.RLPEncodingHelpers.isSingleRLPB
 import static tech.pegasys.pantheon.ethereum.rlp.RLPEncodingHelpers.writeElement;
 
 import tech.pegasys.pantheon.ethereum.rlp.RLPDecodingHelpers.Kind;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
 
 import java.util.function.Consumer;
 

@@ -26,7 +26,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorRespo
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.transaction.CallParameter;
-import tech.pegasys.pantheon.testutil.BlockTestUtil;
+import org.hyperledger.besu.testutil.BlockTestUtil;
 
 import java.util.Map;
 

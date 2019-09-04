@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.p2p.peers;
 
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public interface PeerId {
   /**

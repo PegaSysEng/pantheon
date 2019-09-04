@@ -15,8 +15,8 @@ package org.hyperledger.besu.ethereum.eth.sync;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.services.tasks.CachingTaskCollection;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.concurrent.TimeUnit;
 

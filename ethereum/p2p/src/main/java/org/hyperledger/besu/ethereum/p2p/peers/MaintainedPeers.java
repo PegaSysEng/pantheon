@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.p2p.peers;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import tech.pegasys.pantheon.util.Subscribers;
+import org.hyperledger.besu.util.Subscribers;
 
 import java.util.Set;
 import java.util.stream.Stream;

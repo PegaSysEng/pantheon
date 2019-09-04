@@ -23,7 +23,7 @@ import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfigurat
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 
 import java.io.File;

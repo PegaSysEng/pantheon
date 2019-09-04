@@ -16,7 +16,7 @@ import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 public abstract class PrivateMarkerTransactionFactory {
 

@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.p2p.permissions;
 
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import tech.pegasys.pantheon.util.Subscribers;
+import org.hyperledger.besu.util.Subscribers;
 
 import java.util.Arrays;
 import java.util.List;

@@ -39,8 +39,8 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessRes
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugStorageRangeAtResult;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugStorageRangeAtResult.StorageEntry;
 import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -19,7 +19,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class Web3Sha3 implements JsonRpcMethod {
 

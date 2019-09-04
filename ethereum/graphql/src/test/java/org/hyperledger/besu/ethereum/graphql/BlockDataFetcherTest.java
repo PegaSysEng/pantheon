@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.BlockWithMetadata;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Optional;
 

@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.jsonrpc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import java.util.HashMap;
 import java.util.Optional;

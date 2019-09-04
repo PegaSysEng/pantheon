@@ -14,14 +14,14 @@ package org.hyperledger.besu.ethereum.graphql;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Streams.stream;
-import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
+import static org.hyperledger.besu.util.NetworkUtility.urlForSocketAddress;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLJsonRequest;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponseType;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
-import tech.pegasys.pantheon.util.NetworkUtility;
+import org.hyperledger.besu.util.NetworkUtility;
 
 import java.net.InetSocketAddress;
 import java.net.SocketException;

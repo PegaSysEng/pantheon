@@ -25,7 +25,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugAccountRangeAtResult;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 import java.util.Collections;
 import java.util.List;

@@ -24,7 +24,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.Subs
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import java.util.List;
 import java.util.UUID;

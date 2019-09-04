@@ -28,8 +28,8 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
 import org.hyperledger.besu.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.util.RawBlockIterator;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.testutil.BlockTestUtil;
-import tech.pegasys.pantheon.testutil.BlockTestUtil.ChainResources;
+import org.hyperledger.besu.testutil.BlockTestUtil;
+import org.hyperledger.besu.testutil.BlockTestUtil.ChainResources;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
-import tech.pegasys.pantheon.util.bytes.MutableBytes32;
-import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
-import tech.pegasys.pantheon.util.uint.UInt256Value;
-import tech.pegasys.pantheon.util.uint.UInt256s;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.MutableBytes32;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256Value;
+import org.hyperledger.besu.util.uint.UInt256s;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

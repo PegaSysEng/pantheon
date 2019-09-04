@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth;
 
-import tech.pegasys.pantheon.util.number.PositiveNumber;
+import org.hyperledger.besu.util.number.PositiveNumber;
 
 import java.util.Objects;
 

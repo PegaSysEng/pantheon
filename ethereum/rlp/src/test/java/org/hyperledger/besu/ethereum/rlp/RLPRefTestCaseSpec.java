@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.rlp;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 import java.math.BigInteger;
 import java.util.Arrays;

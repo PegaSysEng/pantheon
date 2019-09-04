@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Commit;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

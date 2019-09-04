@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
 import static org.junit.Assert.assertEquals;
 
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import org.junit.Test;
 

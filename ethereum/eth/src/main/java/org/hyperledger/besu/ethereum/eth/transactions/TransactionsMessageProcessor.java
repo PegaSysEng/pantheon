@@ -20,7 +20,7 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.messages.TransactionsMessage;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
-import tech.pegasys.pantheon.metrics.RunnableCounter;
+import org.hyperledger.besu.metrics.RunnableCounter;
 import tech.pegasys.pantheon.plugin.services.metrics.Counter;
 
 import java.time.Duration;

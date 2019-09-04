@@ -24,7 +24,7 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
 import tech.pegasys.pantheon.ethereum.retesteth.RetestethContext;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
 import tech.pegasys.pantheon.ethereum.rlp.RLPException;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

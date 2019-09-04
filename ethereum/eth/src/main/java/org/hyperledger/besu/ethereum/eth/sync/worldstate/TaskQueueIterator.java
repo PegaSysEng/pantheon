@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
-import tech.pegasys.pantheon.services.tasks.Task;
+import org.hyperledger.besu.services.tasks.Task;
 
 import java.util.Iterator;
 

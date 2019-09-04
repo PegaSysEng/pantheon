@@ -43,7 +43,7 @@ import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.util.RawBlockIterator;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.testutil.BlockTestUtil;
+import org.hyperledger.besu.testutil.BlockTestUtil;
 
 import java.net.URL;
 import java.nio.file.Paths;

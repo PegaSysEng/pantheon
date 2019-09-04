@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 @SuppressWarnings("unused") // reflected by GraphQL
 class CallResult {

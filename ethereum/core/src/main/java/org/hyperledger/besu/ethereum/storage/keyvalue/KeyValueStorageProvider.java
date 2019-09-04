@@ -22,7 +22,7 @@ import org.hyperledger.besu.ethereum.privacy.PrivateTransactionStorage;
 import org.hyperledger.besu.ethereum.storage.StorageProvider;
 import org.hyperledger.besu.ethereum.worldstate.WorldStatePreimageStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.services.kvstore.KeyValueStorage;
+import org.hyperledger.besu.services.kvstore.KeyValueStorage;
 
 import java.io.IOException;
 

@@ -47,10 +47,10 @@ import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.testutil.TestClock;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.testutil.TestClock;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.io.Closeable;
 import java.io.IOException;

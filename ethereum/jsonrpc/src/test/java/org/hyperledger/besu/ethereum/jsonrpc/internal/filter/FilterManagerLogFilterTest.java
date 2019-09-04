@@ -33,7 +33,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.List;
 import java.util.Optional;

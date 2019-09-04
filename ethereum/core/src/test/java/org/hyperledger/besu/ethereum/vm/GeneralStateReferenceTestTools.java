@@ -26,7 +26,7 @@ import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidationParams;
 import org.hyperledger.besu.ethereum.worldstate.DefaultMutableWorldState;
 import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.testutil.JsonTestParameters;
+import org.hyperledger.besu.testutil.JsonTestParameters;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -19,7 +19,7 @@ import static org.mockito.Mockito.spy;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.methods.WebSocketMethodsFactory;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;

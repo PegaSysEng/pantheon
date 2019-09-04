@@ -38,7 +38,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionReceiptWithMetadata;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.LogResult;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.ArrayList;
 import java.util.Collections;

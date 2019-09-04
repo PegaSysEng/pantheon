@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.mainnet.ConstantinopleGasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

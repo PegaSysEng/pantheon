@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.jsonrpc.internal.queries;
 
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.List;
 

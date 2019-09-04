@@ -18,10 +18,10 @@ import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.core.MiningParametersTestBuilder;
 import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.testutil.TestClock;
-import tech.pegasys.pantheon.util.Subscribers;
+import org.hyperledger.besu.testutil.TestClock;
+import org.hyperledger.besu.util.Subscribers;
 
 import java.util.concurrent.Executors;
 

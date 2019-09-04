@@ -24,9 +24,9 @@ import org.hyperledger.besu.enclave.types.ReceiveRequest;
 import org.hyperledger.besu.enclave.types.ReceiveResponse;
 import org.hyperledger.besu.enclave.types.SendRequestLegacy;
 import org.hyperledger.besu.enclave.types.SendResponse;
-import tech.pegasys.orion.testutil.OrionKeyConfiguration;
-import tech.pegasys.orion.testutil.OrionTestHarness;
-import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
+import org.hyperledger.orion.testutil.OrionKeyConfiguration;
+import org.hyperledger.orion.testutil.OrionTestHarness;
+import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
 import org.hyperledger.besu.enclave.types.CreatePrivacyGroupRequest;
 import org.hyperledger.besu.enclave.types.SendRequestPantheon;
 

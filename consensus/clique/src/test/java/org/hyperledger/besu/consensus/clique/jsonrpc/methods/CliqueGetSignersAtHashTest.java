@@ -35,7 +35,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionWithMet
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.List;
 import java.util.Optional;

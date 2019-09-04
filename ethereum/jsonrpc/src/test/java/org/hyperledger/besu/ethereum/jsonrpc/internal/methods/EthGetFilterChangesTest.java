@@ -32,7 +32,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorRespo
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.LogsResult;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.List;
 import java.util.stream.Collectors;

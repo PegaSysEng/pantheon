@@ -46,10 +46,10 @@ import tech.pegasys.pantheon.ethereum.eth.sync.state.PendingBlocks;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.testutil.TestClock;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.testutil.TestClock;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;

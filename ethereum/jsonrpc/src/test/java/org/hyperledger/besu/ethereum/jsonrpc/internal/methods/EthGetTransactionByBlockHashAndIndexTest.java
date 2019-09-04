@@ -21,8 +21,8 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParamete
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

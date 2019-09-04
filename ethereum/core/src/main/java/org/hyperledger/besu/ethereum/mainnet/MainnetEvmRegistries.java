@@ -93,8 +93,8 @@ import org.hyperledger.besu.ethereum.vm.operations.SubOperation;
 import org.hyperledger.besu.ethereum.vm.operations.SwapOperation;
 import org.hyperledger.besu.ethereum.vm.operations.TimestampOperation;
 import org.hyperledger.besu.ethereum.vm.operations.XorOperation;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.math.BigInteger;
 

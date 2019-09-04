@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.uint.BaseUInt256Value;
-import tech.pegasys.pantheon.util.uint.Counter;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.uint.BaseUInt256Value;
+import org.hyperledger.besu.util.uint.Counter;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.math.BigInteger;
 

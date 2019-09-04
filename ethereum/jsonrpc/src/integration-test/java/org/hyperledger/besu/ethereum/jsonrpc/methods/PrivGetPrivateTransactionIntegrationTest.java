@@ -21,9 +21,9 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionWithMetadata;
-import tech.pegasys.orion.testutil.OrionKeyConfiguration;
-import tech.pegasys.orion.testutil.OrionTestHarness;
-import tech.pegasys.orion.testutil.OrionTestHarnessFactory;
+import org.hyperledger.orion.testutil.OrionKeyConfiguration;
+import org.hyperledger.orion.testutil.OrionTestHarness;
+import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.enclave.types.SendRequest;
@@ -41,8 +41,8 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.results.privacy.PrivateTra
 import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
 import org.hyperledger.besu.ethereum.privacy.Restriction;
 import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 import java.math.BigInteger;
 import java.util.Base64;

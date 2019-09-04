@@ -30,8 +30,8 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionComplet
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionHashResult;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionResult;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderFunctions;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

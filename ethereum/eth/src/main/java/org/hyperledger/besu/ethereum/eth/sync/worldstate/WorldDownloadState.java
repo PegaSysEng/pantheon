@@ -17,10 +17,10 @@ import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
 import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage.Updater;
-import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
-import tech.pegasys.pantheon.services.tasks.Task;
-import tech.pegasys.pantheon.util.ExceptionUtils;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.services.tasks.CachingTaskCollection;
+import org.hyperledger.besu.services.tasks.Task;
+import org.hyperledger.besu.util.ExceptionUtils;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.time.Clock;
 import java.util.Collections;

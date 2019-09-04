@@ -26,7 +26,7 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
-import tech.pegasys.pantheon.util.Subscribers;
+import org.hyperledger.besu.util.Subscribers;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;

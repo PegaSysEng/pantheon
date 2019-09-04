@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager.task;
 
-import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
+import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockHeader;

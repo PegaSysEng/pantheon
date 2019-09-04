@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
-import tech.pegasys.pantheon.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 import java.util.Map;
 import java.util.TreeMap;

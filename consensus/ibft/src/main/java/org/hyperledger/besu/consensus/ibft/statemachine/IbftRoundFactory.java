@@ -21,7 +21,7 @@ import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MinedBlockObserver;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.util.Subscribers;
+import org.hyperledger.besu.util.Subscribers;
 
 public class IbftRoundFactory {
   private final IbftFinalState finalState;

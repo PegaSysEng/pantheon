@@ -27,7 +27,7 @@ import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.retesteth.RetestethClock;
 import tech.pegasys.pantheon.ethereum.retesteth.RetestethContext;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import com.google.common.base.Functions;
 

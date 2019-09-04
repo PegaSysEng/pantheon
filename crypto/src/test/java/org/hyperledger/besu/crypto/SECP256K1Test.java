@@ -17,10 +17,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static tech.pegasys.pantheon.util.bytes.BytesValue.fromHexString;
+import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
 
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.io.File;
 import java.math.BigInteger;

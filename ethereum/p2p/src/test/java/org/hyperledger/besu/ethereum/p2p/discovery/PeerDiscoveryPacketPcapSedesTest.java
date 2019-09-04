@@ -20,7 +20,7 @@ import org.hyperledger.besu.ethereum.p2p.discovery.internal.NeighborsPacketData;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.Packet;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.PingPacketData;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.PongPacketData;
-import tech.pegasys.pantheon.util.NetworkUtility;
+import org.hyperledger.besu.util.NetworkUtility;
 
 import java.io.IOException;
 import java.time.Instant;

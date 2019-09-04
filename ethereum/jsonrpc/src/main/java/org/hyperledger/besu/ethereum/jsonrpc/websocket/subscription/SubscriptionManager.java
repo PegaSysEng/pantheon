@@ -17,7 +17,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.Subs
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.UnsubscribeRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.response.SubscriptionResponse;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.metrics.Counter;
 import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;

@@ -19,7 +19,7 @@ import static tech.pegasys.pantheon.ethereum.eth.messages.LimitedTransactionsMes
 
 import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;

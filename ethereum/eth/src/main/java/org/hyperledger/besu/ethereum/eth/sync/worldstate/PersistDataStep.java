@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage.Updater;
-import tech.pegasys.pantheon.services.tasks.Task;
+import org.hyperledger.besu.services.tasks.Task;
 
 import java.util.List;
 

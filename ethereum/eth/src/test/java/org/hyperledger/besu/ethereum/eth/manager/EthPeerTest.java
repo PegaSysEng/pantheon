@@ -29,7 +29,7 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-import tech.pegasys.pantheon.testutil.TestClock;
+import org.hyperledger.besu.testutil.TestClock;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -13,8 +13,8 @@
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
-import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
-import static tech.pegasys.pantheon.util.FutureUtils.exceptionallyCompose;
+import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
+import static org.hyperledger.besu.util.FutureUtils.exceptionallyCompose;
 
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -24,10 +24,10 @@ import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.metrics.Counter;
-import tech.pegasys.pantheon.util.ExceptionUtils;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
