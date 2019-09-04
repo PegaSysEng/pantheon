@@ -19,7 +19,7 @@ import java.util.Set;
 import com.google.common.collect.ImmutableSet;
 import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
 
-public enum PantheonMetricCategory implements MetricCategory {
+public enum BesuMetricCategory implements MetricCategory {
   BLOCKCHAIN("blockchain"),
   ETHEREUM("ethereum", false),
   EXECUTORS("executors"),
@@ -33,31 +33,31 @@ public enum PantheonMetricCategory implements MetricCategory {
   SYNCHRONIZER("synchronizer"),
   TRANSACTION_POOL("transaction_pool");
 
-  private static final Optional<String> PANTHEON_PREFIX = Optional.of("pantheon_");
+  private static final Optional<String> BESU_PREFIX = Optional.of("besu_");
   public static final Set<MetricCategory> DEFAULT_METRIC_CATEGORIES;
 
   static {
     // Why not ROCKSDB and KVSTORE_ROCKSDB_STATS?  They hurt performance under load.
-    final EnumSet<PantheonMetricCategory> pantheonCategories =
+    final EnumSet<BesuMetricCategory> besuCategories =
         EnumSet.complementOf(EnumSet.of(KVSTORE_ROCKSDB, KVSTORE_ROCKSDB_STATS));
 
     DEFAULT_METRIC_CATEGORIES =
         ImmutableSet.<MetricCategory>builder()
-            .addAll(pantheonCategories)
+            .addAll(besuCategories)
             .addAll(EnumSet.allOf(StandardMetricCategory.class))
             .build();
   }
 
   private final String name;
-  private final boolean pantheonSpecific;
+  private final boolean besuSpecific;
 
-  PantheonMetricCategory(final String name) {
+  BesuMetricCategory(final String name) {
     this(name, true);
   }
 
-  PantheonMetricCategory(final String name, final boolean pantheonSpecific) {
+  BesuMetricCategory(final String name, final boolean besuSpecific) {
     this.name = name;
-    this.pantheonSpecific = pantheonSpecific;
+    this.besuSpecific = besuSpecific;
   }
 
   @Override
@@ -67,6 +67,6 @@ public enum PantheonMetricCategory implements MetricCategory {
 
   @Override
   public Optional<String> getApplicationPrefix() {
-    return pantheonSpecific ? PANTHEON_PREFIX : Optional.empty();
+    return besuSpecific ? BESU_PREFIX : Optional.empty();
   }
 }

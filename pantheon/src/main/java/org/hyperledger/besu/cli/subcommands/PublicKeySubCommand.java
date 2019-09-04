@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hyperledger.besu.cli.PantheonCommand;
+import org.hyperledger.besu.cli.BesuCommand;
 import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.AddressSubCommand;
 import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.ExportSubCommand;
 import org.hyperledger.besu.crypto.SECP256K1;
@@ -53,7 +53,7 @@ public class PublicKeySubCommand implements Runnable {
 
   @SuppressWarnings("unused")
   @ParentCommand
-  private PantheonCommand parentCommand; // Picocli injects reference to parent command
+  private BesuCommand parentCommand; // Picocli injects reference to parent command
 
   @SuppressWarnings("unused")
   @Spec

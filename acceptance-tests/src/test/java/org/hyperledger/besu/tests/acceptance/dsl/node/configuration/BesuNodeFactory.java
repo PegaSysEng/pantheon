@@ -25,17 +25,17 @@ import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationFactory;
 
-public class PantheonNodeFactory {
+public class BesuNodeFactory {
 
   private final GenesisConfigurationFactory genesis = new GenesisConfigurationFactory();
   private final NodeConfigurationFactory node = new NodeConfigurationFactory();
 
-  public PantheonNode create(final PantheonNodeConfiguration config) throws IOException {
-    return new PantheonNode(
+  public BesuNode create(final BesuNodeConfiguration config) throws IOException {
+    return new BesuNode(
         config.getName(),
         config.getMiningParameters(),
         config.getJsonRpcConfiguration(),
@@ -55,9 +55,9 @@ public class PantheonNodeFactory {
         config.getStaticNodes());
   }
 
-  public PantheonNode createMinerNode(final String name) throws IOException {
+  public BesuNode createMinerNode(final String name) throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .miningEnabled()
             .jsonRpcEnabled()
@@ -65,9 +65,9 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createMinerNodeWithRevertReasonEnabled(final String name) throws IOException {
+  public BesuNode createMinerNodeWithRevertReasonEnabled(final String name) throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .miningEnabled()
             .jsonRpcEnabled()
@@ -76,9 +76,9 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createArchiveNode(final String name) throws IOException {
+  public BesuNode createArchiveNode(final String name) throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
@@ -87,7 +87,7 @@ public class PantheonNodeFactory {
 
   public Node createArchiveNodeThatMustNotBeTheBootnode(final String name) throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
@@ -95,10 +95,10 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createArchiveNodeWithDiscoveryDisabledAndAdmin(final String name)
+  public BesuNode createArchiveNodeWithDiscoveryDisabledAndAdmin(final String name)
       throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .jsonRpcConfiguration(node.jsonRpcConfigWithAdmin())
             .webSocketEnabled()
@@ -106,13 +106,13 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createArchiveNodeNetServicesEnabled(final String name) throws IOException {
+  public BesuNode createArchiveNodeNetServicesEnabled(final String name) throws IOException {
     // TODO: Enable metrics coverage in the acceptance tests. See PIE-1606
     // final MetricsConfiguration metricsConfiguration = MetricsConfiguration.createDefault();
     // metricsConfiguration.setEnabled(true);
     // metricsConfiguration.setPort(0);
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             // .setMetricsConfiguration(metricsConfiguration)
             .jsonRpcConfiguration(node.jsonRpcConfigWithAdmin())
@@ -121,19 +121,19 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createArchiveNodeNetServicesDisabled(final String name) throws IOException {
+  public BesuNode createArchiveNodeNetServicesDisabled(final String name) throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .jsonRpcConfiguration(node.jsonRpcConfigWithAdmin())
             .p2pEnabled(false)
             .build());
   }
 
-  public PantheonNode createArchiveNodeWithAuthentication(final String name)
+  public BesuNode createArchiveNodeWithAuthentication(final String name)
       throws IOException, URISyntaxException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .jsonRpcEnabled()
             .jsonRpcAuthenticationEnabled()
@@ -141,41 +141,41 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createArchiveNodeWithAuthenticationOverWebSocket(final String name)
+  public BesuNode createArchiveNodeWithAuthenticationOverWebSocket(final String name)
       throws IOException, URISyntaxException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .webSocketEnabled()
             .webSocketAuthenticationEnabled()
             .build());
   }
 
-  public PantheonNode createNodeWithP2pDisabled(final String name) throws IOException {
+  public BesuNode createNodeWithP2pDisabled(final String name) throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .p2pEnabled(false)
             .jsonRpcConfiguration(node.createJsonRpcEnabledConfig())
             .build());
   }
 
-  public PantheonNode createArchiveNodeWithRpcDisabled(final String name) throws IOException {
-    return create(new PantheonNodeConfigurationBuilder().name(name).build());
+  public BesuNode createArchiveNodeWithRpcDisabled(final String name) throws IOException {
+    return create(new BesuNodeConfigurationBuilder().name(name).build());
   }
 
-  public PantheonNode createPluginsNode(
+  public BesuNode createPluginsNode(
       final String name, final List<String> plugins, final List<String> extraCLIOptions)
       throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .plugins(plugins)
             .extraCLIOptions(extraCLIOptions)
             .build());
   }
 
-  public PantheonNode createArchiveNodeWithRpcApis(
+  public BesuNode createArchiveNodeWithRpcApis(
       final String name, final RpcApi... enabledRpcApis) throws IOException {
     final JsonRpcConfiguration jsonRpcConfig = node.createJsonRpcEnabledConfig();
     jsonRpcConfig.setRpcApis(asList(enabledRpcApis));
@@ -183,21 +183,21 @@ public class PantheonNodeFactory {
     webSocketConfig.setRpcApis(asList(enabledRpcApis));
 
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .jsonRpcConfiguration(jsonRpcConfig)
             .webSocketConfiguration(webSocketConfig)
             .build());
   }
 
-  public PantheonNode createNodeWithNoDiscovery(final String name) throws IOException {
+  public BesuNode createNodeWithNoDiscovery(final String name) throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder().name(name).discoveryEnabled(false).build());
+        new BesuNodeConfigurationBuilder().name(name).discoveryEnabled(false).build());
   }
 
-  public PantheonNode createCliqueNode(final String name) throws IOException {
+  public BesuNode createCliqueNode(final String name) throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .miningEnabled()
             .jsonRpcConfiguration(node.createJsonRpcWithCliqueEnabledConfig())
@@ -207,9 +207,9 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createIbft2Node(final String name) throws IOException {
+  public BesuNode createIbft2Node(final String name) throws IOException {
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .miningEnabled()
             .jsonRpcConfiguration(node.createJsonRpcWithIbft2EnabledConfig())
@@ -219,20 +219,20 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createCustomGenesisNode(
+  public BesuNode createCustomGenesisNode(
       final String name, final String genesisPath, final boolean canBeBootnode) throws IOException {
     return createCustomGenesisNode(name, genesisPath, canBeBootnode, false);
   }
 
-  public PantheonNode createCustomGenesisNode(
+  public BesuNode createCustomGenesisNode(
       final String name,
       final String genesisPath,
       final boolean canBeBootnode,
       final boolean mining)
       throws IOException {
     final String genesisFile = genesis.readGenesisFile(genesisPath);
-    final PantheonNodeConfigurationBuilder builder =
-        new PantheonNodeConfigurationBuilder()
+    final BesuNodeConfigurationBuilder builder =
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .jsonRpcEnabled()
             .webSocketEnabled()
@@ -247,11 +247,11 @@ public class PantheonNodeFactory {
     return create(builder.build());
   }
 
-  public PantheonNode createCliqueNodeWithValidators(final String name, final String... validators)
+  public BesuNode createCliqueNodeWithValidators(final String name, final String... validators)
       throws IOException {
 
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .miningEnabled()
             .jsonRpcConfiguration(node.createJsonRpcWithCliqueEnabledConfig())
@@ -264,11 +264,11 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createIbft2NodeWithValidators(final String name, final String... validators)
+  public BesuNode createIbft2NodeWithValidators(final String name, final String... validators)
       throws IOException {
 
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .miningEnabled()
             .jsonRpcConfiguration(node.createJsonRpcWithIbft2EnabledConfig())
@@ -281,7 +281,7 @@ public class PantheonNodeFactory {
             .build());
   }
 
-  public PantheonNode createNodeWithStaticNodes(final String name, final List<Node> staticNodes)
+  public BesuNode createNodeWithStaticNodes(final String name, final List<Node> staticNodes)
       throws IOException {
 
     final List<String> staticNodesUrls =
@@ -292,7 +292,7 @@ public class PantheonNodeFactory {
             .collect(toList());
 
     return create(
-        new PantheonNodeConfigurationBuilder()
+        new BesuNodeConfigurationBuilder()
             .name(name)
             .jsonRpcEnabled()
             .webSocketEnabled()

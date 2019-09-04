@@ -13,21 +13,21 @@
 package org.hyperledger.besu.plugin.services;
 
 /**
- * A service that plugins can use to add CLI options and commands to the PantheonCommand. The
+ * A service that plugins can use to add CLI options and commands to the BesuCommand. The
  * PicoCLI library annotations will be inspected and the object will be passed into a
  * picocli.CommandLine.addMixin call.
  *
  * <p>This service will be available during the registration callbacks.
  *
  * <p>CLI arguments should conform to the <a
- * href="https://github.com/PegaSysEng/pantheon/blob/master/CLI-STYLE-GUIDE.md">CLI-STYLE-GUIDE.md</a>
+ * href="https://github.com/PegaSysEng/besu/blob/master/CLI-STYLE-GUIDE.md">CLI-STYLE-GUIDE.md</a>
  * conventions.
  */
 public interface PicoCLIOptions {
 
   /**
    * During the registration callback plugins can register CLI options that should be added to
-   * Pantheon's CLI startup.
+   * Besu's CLI startup.
    *
    * @param namespace A namespace prefix. All registered options must start with this prefix
    * @param optionObject The instance of the object to be inspected. PicoCLI will reflect the fields

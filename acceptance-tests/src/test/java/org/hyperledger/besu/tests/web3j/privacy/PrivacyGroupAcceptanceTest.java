@@ -18,7 +18,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBa
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNode;
 import org.junit.Before;
 import org.junit.Test;
-import org.web3j.protocol.pantheon.response.privacy.PrivacyGroup;
+import org.web3j.protocol.besu.response.privacy.PrivacyGroup;
 import org.web3j.utils.Base64String;
 
 public class PrivacyGroupAcceptanceTest extends PrivacyAcceptanceTestBase {
@@ -30,13 +30,13 @@ public class PrivacyGroupAcceptanceTest extends PrivacyAcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     alice =
-        privacyPantheon.createPrivateTransactionEnabledMinerNode(
+        privacyBesu.createPrivateTransactionEnabledMinerNode(
             "node1", privacyAccountResolver.resolve(0));
     bob =
-        privacyPantheon.createPrivateTransactionEnabledNode(
+        privacyBesu.createPrivateTransactionEnabledNode(
             "node2", privacyAccountResolver.resolve(1));
     charlie =
-        privacyPantheon.createPrivateTransactionEnabledNode(
+        privacyBesu.createPrivateTransactionEnabledNode(
             "node3", privacyAccountResolver.resolve(2));
     privacyCluster.start(alice, bob, charlie);
   }

@@ -16,14 +16,14 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.Provider;
 
-public final class PantheonProvider extends Provider {
+public final class BesuProvider extends Provider {
 
-  private static final String info = "Pantheon Security Provider v1.0";
+  private static final String info = "Besu Security Provider v1.0";
 
-  public static final String PROVIDER_NAME = "Pantheon";
+  public static final String PROVIDER_NAME = "Besu";
 
   @SuppressWarnings("unchecked")
-  public PantheonProvider() {
+  public BesuProvider() {
     super(PROVIDER_NAME, "1.0", info);
     AccessController.doPrivileged(
         (PrivilegedAction)

@@ -51,7 +51,7 @@ import picocli.CommandLine.Model.CommandSpec;
 public class OperatorSubCommandTest extends CommandTestAbstract {
 
   private static final String EXPECTED_OPERATOR_USAGE =
-      "Usage: pantheon operator [-hV] [COMMAND]"
+      "Usage: besu operator [-hV] [COMMAND]"
           + System.lineSeparator()
           + "This command provides operator related actions."
           + System.lineSeparator()

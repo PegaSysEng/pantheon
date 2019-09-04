@@ -23,7 +23,7 @@ import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 
-public class PantheonNodeConfiguration {
+public class BesuNodeConfiguration {
 
   private final String name;
   private final MiningParameters miningParameters;
@@ -43,7 +43,7 @@ public class PantheonNodeConfiguration {
   private final List<String> extraCLIOptions;
   private final List<String> staticNodes;
 
-  public PantheonNodeConfiguration(
+  public BesuNodeConfiguration(
       final String name,
       final MiningParameters miningParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,

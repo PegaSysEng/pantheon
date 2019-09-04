@@ -29,7 +29,7 @@ import org.hyperledger.besu.enclave.types.PrivacyGroup;
 import org.hyperledger.besu.enclave.types.ReceiveRequest;
 import org.hyperledger.besu.enclave.types.ReceiveResponse;
 import org.hyperledger.besu.enclave.types.SendRequestLegacy;
-import org.hyperledger.besu.enclave.types.SendRequestPantheon;
+import org.hyperledger.besu.enclave.types.SendRequestBesu;
 import org.hyperledger.besu.enclave.types.SendResponse;
 import org.hyperledger.orion.testutil.OrionKeyConfiguration;
 import org.hyperledger.orion.testutil.OrionTestHarness;
@@ -98,7 +98,7 @@ public class EnclaveTest {
 
     final SendResponse sr =
         enclave.send(
-            new SendRequestPantheon(
+            new SendRequestBesu(
                 PAYLOAD, publicKeys.get(0), privacyGroupResponse.getPrivacyGroupId()));
     final ReceiveResponse rr = enclave.receive(new ReceiveRequest(sr.getKey(), publicKeys.get(0)));
     assertThat(rr).isNotNull();

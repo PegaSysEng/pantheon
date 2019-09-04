@@ -19,7 +19,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBene
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBlockNumberAbove;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectMinimumBlockNumber;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 public class Blockchain {
@@ -34,7 +34,7 @@ public class Blockchain {
     return new ExpectMinimumBlockNumber(eth, currentHeight(node));
   }
 
-  public Condition beneficiaryEquals(final PantheonNode node) {
+  public Condition beneficiaryEquals(final BesuNode node) {
     return new ExpectBeneficiary(eth, node);
   }
 
@@ -42,12 +42,12 @@ public class Blockchain {
     return new ExpectBlockNumberAbove(eth, BigInteger.valueOf(blockNumber));
   }
 
-  public Condition reachesHeight(final PantheonNode node, final int blocksAheadOfLatest) {
+  public Condition reachesHeight(final BesuNode node, final int blocksAheadOfLatest) {
     return new ExpectBlockNumberAbove(eth, futureHeight(node, blocksAheadOfLatest));
   }
 
   public Condition reachesHeight(
-      final PantheonNode node, final int blocksAheadOfLatest, final int timeout) {
+      final BesuNode node, final int blocksAheadOfLatest, final int timeout) {
     return new ExpectBlockNumberAbove(eth, futureHeight(node, blocksAheadOfLatest), timeout);
   }
 

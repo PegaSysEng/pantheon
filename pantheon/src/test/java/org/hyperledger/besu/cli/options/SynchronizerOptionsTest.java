@@ -67,9 +67,9 @@ public class SynchronizerOptionsTest
   }
 
   @Override
-  SynchronizerOptions getOptionsFromPantheonCommand(
-      final CommandTestAbstract.TestPantheonCommand pantheonCommand) {
-    return pantheonCommand.getSynchronizerOptions();
+  SynchronizerOptions getOptionsFromBesuCommand(
+      final CommandTestAbstract.TestBesuCommand besuCommand) {
+    return besuCommand.getSynchronizerOptions();
   }
 
   @Override

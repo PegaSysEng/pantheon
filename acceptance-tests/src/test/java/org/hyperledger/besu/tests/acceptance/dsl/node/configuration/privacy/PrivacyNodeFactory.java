@@ -15,7 +15,7 @@ package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy;
 import java.io.IOException;
 
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfigurationFactory;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeConfigurationBuilder;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuNodeConfigurationBuilder;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNode;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.account.PrivacyAccount;
@@ -34,7 +34,7 @@ public class PrivacyNodeFactory {
       final String name, final PrivacyAccount privacyAccount) throws IOException {
     return create(
         new PrivacyNodeConfiguration(
-            new PantheonNodeConfigurationBuilder()
+            new BesuNodeConfigurationBuilder()
                 .name(name)
                 .miningEnabled()
                 .jsonRpcEnabled()
@@ -50,7 +50,7 @@ public class PrivacyNodeFactory {
       final String name, final PrivacyAccount privacyAccount) throws IOException {
     return create(
         new PrivacyNodeConfiguration(
-            new PantheonNodeConfigurationBuilder()
+            new BesuNodeConfigurationBuilder()
                 .name(name)
                 .jsonRpcEnabled()
                 .keyFilePath(privacyAccount.getPrivateKeyPath())
@@ -65,7 +65,7 @@ public class PrivacyNodeFactory {
       final String name, final PrivacyAccount privacyAccount) throws IOException {
     return create(
         new PrivacyNodeConfiguration(
-            new PantheonNodeConfigurationBuilder()
+            new BesuNodeConfigurationBuilder()
                 .name(name)
                 .miningEnabled()
                 .jsonRpcConfiguration(node.createJsonRpcWithIbft2EnabledConfig())

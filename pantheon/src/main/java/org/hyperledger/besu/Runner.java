@@ -26,7 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 import io.vertx.core.Vertx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.ethereum.graphql.GraphQLHttpService;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcHttpService;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketService;
@@ -48,7 +48,7 @@ public class Runner implements AutoCloseable {
   private final Optional<WebSocketService> websocketRpc;
   private final Optional<MetricsService> metrics;
 
-  private final PantheonController<?> pantheonController;
+  private final BesuController<?> besuController;
   private final Path dataDir;
 
   Runner(
@@ -59,7 +59,7 @@ public class Runner implements AutoCloseable {
       final Optional<GraphQLHttpService> graphQLHttp,
       final Optional<WebSocketService> websocketRpc,
       final Optional<MetricsService> metrics,
-      final PantheonController<?> pantheonController,
+      final BesuController<?> besuController,
       final Path dataDir) {
     this.vertx = vertx;
     this.networkRunner = networkRunner;
@@ -68,7 +68,7 @@ public class Runner implements AutoCloseable {
     this.jsonRpc = jsonRpc;
     this.websocketRpc = websocketRpc;
     this.metrics = metrics;
-    this.pantheonController = pantheonController;
+    this.besuController = besuController;
     this.dataDir = dataDir;
   }
 
@@ -80,12 +80,12 @@ public class Runner implements AutoCloseable {
       }
       networkRunner.start();
       if (networkRunner.getNetwork().isP2pEnabled()) {
-        pantheonController.getSynchronizer().start();
+        besuController.getSynchronizer().start();
       }
       vertx.setPeriodic(
           TimeUnit.MINUTES.toMillis(1),
           time ->
-              pantheonController
+              besuController
                   .getTransactionPool()
                   .getPendingTransactions()
                   .evictOldTransactions());
@@ -94,7 +94,7 @@ public class Runner implements AutoCloseable {
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.start()));
       metrics.ifPresent(service -> waitForServiceToStart("metrics", service.start()));
       LOG.info("Ethereum main loop is up.");
-      writePantheonPortsToFile();
+      writeBesuPortsToFile();
     } catch (final Exception ex) {
       LOG.error("Startup failed", ex);
       throw new IllegalStateException(ex);
@@ -114,7 +114,7 @@ public class Runner implements AutoCloseable {
   public void close() throws Exception {
     try {
       if (networkRunner.getNetwork().isP2pEnabled()) {
-        pantheonController.getSynchronizer().stop();
+        besuController.getSynchronizer().stop();
       }
 
       networkRunner.stop();
@@ -132,7 +132,7 @@ public class Runner implements AutoCloseable {
       try {
         vertx.close();
       } finally {
-        pantheonController.close();
+        besuController.close();
       }
     }
   }
@@ -168,7 +168,7 @@ public class Runner implements AutoCloseable {
     }
   }
 
-  private void writePantheonPortsToFile() {
+  private void writeBesuPortsToFile() {
     final Properties properties = new Properties();
     if (networkRunner.getNetwork().isP2pEnabled()) {
       networkRunner
@@ -200,13 +200,13 @@ public class Runner implements AutoCloseable {
       properties.setProperty("metrics", String.valueOf(getMetricsPort().get()));
     }
 
-    final File portsFile = new File(dataDir.toFile(), "pantheon.ports");
+    final File portsFile = new File(dataDir.toFile(), "besu.ports");
     portsFile.deleteOnExit();
 
     try (final FileOutputStream fileOutputStream = new FileOutputStream(portsFile)) {
       properties.store(
           fileOutputStream,
-          "This file contains the ports used by the running instance of Pantheon. This file will be deleted after the node is shutdown.");
+          "This file contains the ports used by the running instance of Besu. This file will be deleted after the node is shutdown.");
     } catch (final Exception e) {
       LOG.warn("Error writing ports file", e);
     }

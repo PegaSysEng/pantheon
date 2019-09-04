@@ -155,9 +155,9 @@ public class PrivateTransactionHandlerTest {
   }
 
   @Test
-  public void validPantheonTransactionThroughHandler() throws Exception {
+  public void validBesuTransactionThroughHandler() throws Exception {
 
-    final PrivateTransaction transaction = buildPantheonPrivateTransaction(1);
+    final PrivateTransaction transaction = buildBesuPrivateTransaction(1);
 
     final String enclaveKey = privateTransactionHandler.sendToOrion(transaction);
 
@@ -236,7 +236,7 @@ public class PrivateTransactionHandlerTest {
         .signAndBuild(KEY_PAIR);
   }
 
-  private static PrivateTransaction buildPantheonPrivateTransaction(final long nonce) {
+  private static PrivateTransaction buildBesuPrivateTransaction(final long nonce) {
 
     return buildPrivateTransaction(nonce)
         .privateFrom(BytesValues.fromBase64("A1aVtMxLCUHmBVHXoZzzBgPbW/wj5axDpW9X8l91SGo="))

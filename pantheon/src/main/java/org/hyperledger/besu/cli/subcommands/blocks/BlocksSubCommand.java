@@ -32,10 +32,10 @@ import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.chainexport.RlpBlockExporter;
 import org.hyperledger.besu.chainimport.JsonBlockImporter;
 import org.hyperledger.besu.chainimport.RlpBlockImporter;
-import org.hyperledger.besu.cli.PantheonCommand;
+import org.hyperledger.besu.cli.BesuCommand;
 import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.ExportSubCommand;
 import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.ImportSubCommand;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -67,7 +67,7 @@ public class BlocksSubCommand implements Runnable {
 
   @SuppressWarnings("unused")
   @ParentCommand
-  private PantheonCommand parentCommand; // Picocli injects reference to parent command
+  private BesuCommand parentCommand; // Picocli injects reference to parent command
 
   @SuppressWarnings("unused")
   @Spec
@@ -145,7 +145,7 @@ public class BlocksSubCommand implements Runnable {
         // mandatory. So we are sure it's always not null, we can remove the warning.
         //noinspection ConstantConditions
         final Path path = blocksImportFile.toPath();
-        final PantheonController<?> controller = createController();
+        final BesuController<?> controller = createController();
         switch (format) {
           case RLP:
             importRlpBlocks(controller, path);
@@ -173,7 +173,7 @@ public class BlocksSubCommand implements Runnable {
       checkNotNull(parentCommand.parentCommand);
     }
 
-    private PantheonController<?> createController() {
+    private BesuController<?> createController() {
       try {
         // Set some defaults
         return parentCommand
@@ -196,7 +196,7 @@ public class BlocksSubCommand implements Runnable {
       return new MiningParameters(coinbase, minTransactionGasPrice, extraData, false);
     }
 
-    private <T> void importJsonBlocks(final PantheonController<T> controller, final Path path)
+    private <T> void importJsonBlocks(final BesuController<T> controller, final Path path)
         throws IOException {
 
       JsonBlockImporter<T> importer = parentCommand.jsonBlockImporterFactory.get(controller);
@@ -204,7 +204,7 @@ public class BlocksSubCommand implements Runnable {
       importer.importChain(jsonData);
     }
 
-    private <T> void importRlpBlocks(final PantheonController<T> controller, final Path path)
+    private <T> void importRlpBlocks(final BesuController<T> controller, final Path path)
         throws IOException {
       parentCommand.rlpBlockImporter.importBlockchain(path, controller);
     }
@@ -267,7 +267,7 @@ public class BlocksSubCommand implements Runnable {
       checkCommand(this, startBlock, endBlock);
       final Optional<MetricsService> metricsService = initMetrics(parentCommand);
 
-      final PantheonController<?> controller = createPantheonController();
+      final BesuController<?> controller = createBesuController();
       try {
         switch (format) {
           case RLP:
@@ -285,11 +285,11 @@ public class BlocksSubCommand implements Runnable {
       }
     }
 
-    private PantheonController<?> createPantheonController() {
+    private BesuController<?> createBesuController() {
       return parentCommand.parentCommand.buildController();
     }
 
-    private void exportRlpFormat(final PantheonController<?> controller) throws IOException {
+    private void exportRlpFormat(final BesuController<?> controller) throws IOException {
       final ProtocolContext<?> context = controller.getProtocolContext();
       RlpBlockExporter exporter =
           parentCommand.rlpBlockExporterFactory.get(context.getBlockchain());
@@ -341,7 +341,7 @@ public class BlocksSubCommand implements Runnable {
       Path databasePath =
           Paths.get(
               parentCommand.parentCommand.dataDir().toAbsolutePath().toString(),
-              PantheonController.DATABASE_PATH);
+              BesuController.DATABASE_PATH);
       File databaseDirectory = new File(databasePath.toString());
       if (!databaseDirectory.isDirectory() || databaseDirectory.list().length == 0) {
         // Empty data directory, nothing to export
@@ -379,7 +379,7 @@ public class BlocksSubCommand implements Runnable {
 
   @FunctionalInterface
   public interface JsonBlockImporterFactory {
-    <T> JsonBlockImporter<T> get(PantheonController<T> controller);
+    <T> JsonBlockImporter<T> get(BesuController<T> controller);
   }
 
   @FunctionalInterface

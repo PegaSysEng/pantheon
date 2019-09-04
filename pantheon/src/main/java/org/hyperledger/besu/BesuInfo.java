@@ -14,18 +14,18 @@ package org.hyperledger.besu;
 
 import org.hyperledger.besu.util.PlatformDetector;
 
-public final class PantheonInfo {
-  private static final String CLIENT_IDENTITY = "pantheon";
+public final class BesuInfo {
+  private static final String CLIENT_IDENTITY = "besu";
   private static final String VERSION =
       CLIENT_IDENTITY
           + "/v"
-          + PantheonInfo.class.getPackage().getImplementationVersion()
+          + BesuInfo.class.getPackage().getImplementationVersion()
           + "/"
           + PlatformDetector.getOS()
           + "/"
           + PlatformDetector.getVM();
 
-  private PantheonInfo() {}
+  private BesuInfo() {}
 
   public static String version() {
     return VERSION;

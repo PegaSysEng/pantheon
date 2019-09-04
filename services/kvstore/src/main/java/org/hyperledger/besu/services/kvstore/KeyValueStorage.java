@@ -20,7 +20,7 @@ import java.util.function.Predicate;
 
 import org.hyperledger.besu.util.bytes.BytesValue;
 
-/** Service provided by pantheon to facilitate persistent data storage. */
+/** Service provided by besu to facilitate persistent data storage. */
 public interface KeyValueStorage extends Closeable {
 
   void clear();

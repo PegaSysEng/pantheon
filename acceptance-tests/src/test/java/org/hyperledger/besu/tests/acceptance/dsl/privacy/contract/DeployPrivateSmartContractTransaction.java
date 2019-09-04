@@ -26,13 +26,13 @@ import org.web3j.tx.LegacyPrivateTransactionManager;
 import org.web3j.tx.PrivateTransactionManager;
 import org.web3j.tx.TransactionManager;
 import org.web3j.tx.gas.ContractGasProvider;
-import org.web3j.tx.gas.PantheonPrivacyGasProvider;
+import org.web3j.tx.gas.BesuPrivacyGasProvider;
 import org.web3j.utils.Base64String;
 
 public class DeployPrivateSmartContractTransaction<T extends Contract> implements Transaction<T> {
 
-  private static final PantheonPrivacyGasProvider GAS_PROVIDER =
-      new PantheonPrivacyGasProvider(BigInteger.valueOf(1000));
+  private static final BesuPrivacyGasProvider GAS_PROVIDER =
+      new BesuPrivacyGasProvider(BigInteger.valueOf(1000));
   private static final Object METHOD_IS_STATIC = null;
 
   private final Class<T> clazz;
@@ -58,7 +58,7 @@ public class DeployPrivateSmartContractTransaction<T extends Contract> implement
   public T execute(final NodeRequests node) {
     final PrivateTransactionManager privateTransactionManager =
         new LegacyPrivateTransactionManager(
-            node.privacy().getPantheonClient(),
+            node.privacy().getBesuClient(),
             GAS_PROVIDER,
             senderCredentials,
             chainId,
@@ -72,7 +72,7 @@ public class DeployPrivateSmartContractTransaction<T extends Contract> implement
       final Object invoked =
           method.invoke(
               METHOD_IS_STATIC,
-              node.privacy().getPantheonClient(),
+              node.privacy().getBesuClient(),
               privateTransactionManager,
               GAS_PROVIDER);
 

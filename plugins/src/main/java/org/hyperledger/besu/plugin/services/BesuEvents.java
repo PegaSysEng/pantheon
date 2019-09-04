@@ -17,7 +17,7 @@ import org.hyperledger.besu.plugin.data.BlockHeader;
 import org.hyperledger.besu.plugin.data.Transaction;
 
 /**
- * This service allows plugins to attach to various events during the normal operation of Pantheon.
+ * This service allows plugins to attach to various events during the normal operation of Besu.
  *
  * <p>Currently supported events
  *
@@ -29,7 +29,7 @@ import org.hyperledger.besu.plugin.data.Transaction;
  * </ul>
  */
 @Unstable
-public interface PantheonEvents {
+public interface BesuEvents {
 
   /**
    * Add a listener watching new blocks propagated.
@@ -40,7 +40,7 @@ public interface PantheonEvents {
   Object addNewBlockPropagatedListener(NewBlockPropagatedListener newBlockPropagatedListener);
 
   /**
-   * Remove the blockAdded listener from pantheon notifications.
+   * Remove the blockAdded listener from besu notifications.
    *
    * @param listenerIdentifier The instance that was returned from addBlockAddedListener;
    */
@@ -56,7 +56,7 @@ public interface PantheonEvents {
   Object addNewTransactionAddedListener(NewTransactionAddedListener newTransactionAddedListener);
 
   /**
-   * Remove the blockAdded listener from pantheon notifications.
+   * Remove the blockAdded listener from besu notifications.
    *
    * @param listenerIdentifier The instance that was returned from addNewTransactionAddedListener;
    */
@@ -72,7 +72,7 @@ public interface PantheonEvents {
   Object addNewTransactionDroppedListener(TransactionDroppedListener newTransactionDroppedListener);
 
   /**
-   * Remove the transactionDropped listener from pantheon notifications.
+   * Remove the transactionDropped listener from besu notifications.
    *
    * @param listenerIdentifier The instance that was returned from addTransactionDroppedListener;
    */

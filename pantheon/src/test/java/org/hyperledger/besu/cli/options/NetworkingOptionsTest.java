@@ -22,7 +22,7 @@ public class NetworkingOptionsTest
 
   @Test
   public void checkMaintainedConnectionsFrequencyFlag_isSet() {
-    final TestPantheonCommand cmd =
+    final TestBesuCommand cmd =
         parseCommand("--Xp2p-check-maintained-connections-frequency", "2");
 
     final NetworkingOptions options = cmd.getNetworkingOptions();
@@ -35,7 +35,7 @@ public class NetworkingOptionsTest
 
   @Test
   public void checkMaintainedFrequencyConnectionsFlag_isNotSet() {
-    final TestPantheonCommand cmd = parseCommand();
+    final TestBesuCommand cmd = parseCommand();
 
     final NetworkingOptions options = cmd.getNetworkingOptions();
     final NetworkingConfiguration networkingConfig = options.toDomainObject();
@@ -47,7 +47,7 @@ public class NetworkingOptionsTest
 
   @Test
   public void initiateConnectionsFrequencyFlag_isSet() {
-    final TestPantheonCommand cmd = parseCommand("--Xp2p-initiate-connections-frequency", "2");
+    final TestBesuCommand cmd = parseCommand("--Xp2p-initiate-connections-frequency", "2");
 
     final NetworkingOptions options = cmd.getNetworkingOptions();
     final NetworkingConfiguration networkingConfig = options.toDomainObject();
@@ -59,7 +59,7 @@ public class NetworkingOptionsTest
 
   @Test
   public void initiateConnectionsFrequencyFlag_isNotSet() {
-    final TestPantheonCommand cmd = parseCommand();
+    final TestBesuCommand cmd = parseCommand();
 
     final NetworkingOptions options = cmd.getNetworkingOptions();
     final NetworkingConfiguration networkingConfig = options.toDomainObject();
@@ -90,7 +90,7 @@ public class NetworkingOptionsTest
   }
 
   @Override
-  NetworkingOptions getOptionsFromPantheonCommand(final TestPantheonCommand pantheonCommand) {
-    return pantheonCommand.getNetworkingOptions();
+  NetworkingOptions getOptionsFromBesuCommand(final TestBesuCommand besuCommand) {
+    return besuCommand.getNetworkingOptions();
   }
 }

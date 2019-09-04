@@ -23,7 +23,7 @@ import java.nio.file.StandardOpenOption;
 
 import com.google.common.io.Resources;
 import org.hyperledger.besu.config.GenesisConfigFile;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
 import org.hyperledger.besu.ethereum.core.MiningParametersTestBuilder;
@@ -51,8 +51,8 @@ public final class RlpBlockImporterTest {
     final Path dataDir = folder.newFolder().toPath();
     final Path source = dataDir.resolve("1000.blocks");
     BlockTestUtil.write1000Blocks(source);
-    final PantheonController<?> targetController =
-        new PantheonController.Builder()
+    final BesuController<?> targetController =
+        new BesuController.Builder()
             .fromGenesisConfig(GenesisConfigFile.mainnet())
             .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
             .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
@@ -90,8 +90,8 @@ public final class RlpBlockImporterTest {
       throw new IllegalStateException(ex);
     }
 
-    final PantheonController<?> controller =
-        new PantheonController.Builder()
+    final BesuController<?> controller =
+        new BesuController.Builder()
             .fromGenesisConfig(GenesisConfigFile.fromConfig(config))
             .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
             .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())

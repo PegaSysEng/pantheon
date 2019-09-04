@@ -40,7 +40,7 @@ public class RocksDBOptionsTest
   }
 
   @Override
-  RocksDBOptions getOptionsFromPantheonCommand(final TestPantheonCommand command) {
+  RocksDBOptions getOptionsFromBesuCommand(final TestBesuCommand command) {
     return command.getRocksDBOptions();
   }
 

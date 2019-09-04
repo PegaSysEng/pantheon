@@ -16,8 +16,8 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.util.Optional;
 
-/** Generally useful configuration provided by Pantheon. */
-public interface PantheonConfiguration {
+/** Generally useful configuration provided by Besu. */
+public interface BesuConfiguration {
 
   /**
    * Location of the working directory of the storage in the file system running the client.
@@ -29,7 +29,7 @@ public interface PantheonConfiguration {
   /**
    * Url of the enclave that stores private transaction data.
    *
-   * @return an optional containing the url of the enclave Pantheon is connected to, or empty if
+   * @return an optional containing the url of the enclave Besu is connected to, or empty if
    *     privacy is not enabled.
    */
   Optional<URI> getEnclaveUrl();

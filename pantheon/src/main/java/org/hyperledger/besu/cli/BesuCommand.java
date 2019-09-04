@@ -16,14 +16,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultPantheonDataPath;
+import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultBesuDataPath;
 import static org.hyperledger.besu.cli.config.NetworkName.MAINNET;
 import static org.hyperledger.besu.cli.util.CommandLineUtils.checkOptionDependencies;
 import static org.hyperledger.besu.ethereum.graphql.GraphQLConfiguration.DEFAULT_GRAPHQL_HTTP_PORT;
 import static org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static org.hyperledger.besu.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
 import static org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration.DEFAULT_WEBSOCKET_PORT;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.DEFAULT_METRIC_CATEGORIES;
 import static org.hyperledger.besu.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PORT;
 import static org.hyperledger.besu.metrics.prometheus.MetricsConfiguration.DEFAULT_METRICS_PUSH_PORT;
 
@@ -56,7 +56,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.hyperledger.besu.PantheonInfo;
+import org.hyperledger.besu.BesuInfo;
 import org.hyperledger.besu.Runner;
 import org.hyperledger.besu.RunnerBuilder;
 import org.hyperledger.besu.chainimport.RlpBlockImporter;
@@ -68,7 +68,7 @@ import org.hyperledger.besu.cli.converter.RpcApisConverter;
 import org.hyperledger.besu.cli.custom.CorsAllowedOriginsProperty;
 import org.hyperledger.besu.cli.custom.JsonRPCWhitelistHostsProperty;
 import org.hyperledger.besu.cli.custom.RpcAuthFileValidator;
-import org.hyperledger.besu.cli.error.PantheonExceptionHandler;
+import org.hyperledger.besu.cli.error.BesuExceptionHandler;
 import org.hyperledger.besu.cli.options.EthProtocolOptions;
 import org.hyperledger.besu.cli.options.MetricsCLIOptions;
 import org.hyperledger.besu.cli.options.NetworkingOptions;
@@ -85,8 +85,8 @@ import org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler;
 import org.hyperledger.besu.cli.util.VersionProvider;
 import org.hyperledger.besu.config.GenesisConfigFile;
 import org.hyperledger.besu.controller.KeyPairUtil;
-import org.hyperledger.besu.controller.PantheonController;
-import org.hyperledger.besu.controller.PantheonControllerBuilder;
+import org.hyperledger.besu.controller.BesuController;
+import org.hyperledger.besu.controller.BesuControllerBuilder;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
@@ -108,18 +108,18 @@ import org.hyperledger.besu.ethereum.permissioning.PermissioningConfigurationBui
 import org.hyperledger.besu.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import org.hyperledger.besu.ethereum.worldstate.PruningConfiguration;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.StandardMetricCategory;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.metrics.prometheus.PrometheusMetricsSystem;
 import org.hyperledger.besu.metrics.vertx.VertxMetricsAdapterFactory;
 import org.hyperledger.besu.nat.NatMethod;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
-import org.hyperledger.besu.plugin.services.PantheonEvents;
+import org.hyperledger.besu.plugin.services.BesuEvents;
 import org.hyperledger.besu.plugin.services.PicoCLIOptions;
 import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
-import org.hyperledger.besu.services.PantheonEventsImpl;
-import org.hyperledger.besu.services.PantheonPluginContextImpl;
+import org.hyperledger.besu.services.BesuEventsImpl;
+import org.hyperledger.besu.services.BesuPluginContextImpl;
 import org.hyperledger.besu.services.PicoCLIOptionsImpl;
 import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
 import org.hyperledger.besu.util.PermissioningConfigurationValidator;
@@ -136,9 +136,9 @@ import picocli.CommandLine.ParameterException;
 
 @SuppressWarnings("FieldCanBeLocal") // because Picocli injected fields report false positives
 @Command(
-    description = "This command runs the Pantheon Ethereum client full node.",
+    description = "This command runs the Besu Ethereum client full node.",
     abbreviateSynopsis = true,
-    name = "pantheon",
+    name = "besu",
     mixinStandardHelpOptions = true,
     versionProvider = VersionProvider.class,
     header = "Usage:",
@@ -146,8 +146,8 @@ import picocli.CommandLine.ParameterException;
     descriptionHeading = "%nDescription:%n%n",
     optionListHeading = "%nOptions:%n",
     footerHeading = "%n",
-    footer = "Pantheon is licensed under the Apache License 2.0")
-public class PantheonCommand implements DefaultCommandValues, Runnable {
+    footer = "Besu is licensed under the Apache License 2.0")
+public class BesuCommand implements DefaultCommandValues, Runnable {
 
   private final Logger logger;
 
@@ -164,8 +164,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   final RocksDBOptions rocksDBOptions = RocksDBOptions.create();
   final TransactionPoolOptions transactionPoolOptions = TransactionPoolOptions.create();
   private final RunnerBuilder runnerBuilder;
-  private final PantheonController.Builder controllerBuilderFactory;
-  private final PantheonPluginContextImpl pantheonPluginContext;
+  private final BesuController.Builder controllerBuilderFactory;
+  private final BesuPluginContextImpl besuPluginContext;
   private final Map<String, String> environment;
 
   protected PublicKeySubCommand.KeyLoader getKeyLoader() {
@@ -175,13 +175,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   // Public IP stored to prevent having to research it each time we need it.
   private InetAddress autoDiscoveredDefaultIP = null;
 
-  // Property to indicate whether Pantheon has been launched via docker
-  private final boolean isDocker = Boolean.getBoolean("pantheon.docker");
+  // Property to indicate whether Besu has been launched via docker
+  private final boolean isDocker = Boolean.getBoolean("besu.docker");
 
   // CLI options defined by user at runtime.
   // Options parsing is done with CLI library Picocli https://picocli.info/
 
-  // Completely disables P2P within Pantheon.
+  // Completely disables P2P within Besu.
   @Option(
       names = {"--p2p-enabled"},
       description = "Enable P2P functionality (default: ${DEFAULT-VALUE})",
@@ -498,7 +498,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--metrics-push-prometheus-job"},
       description = "Job name to use when in push mode (default: ${DEFAULT-VALUE})",
       arity = "1")
-  private String metricsPrometheusJob = "pantheon-client";
+  private String metricsPrometheusJob = "besu-client";
 
   @Option(
       names = {"--host-whitelist"},
@@ -652,19 +652,19 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private MetricsConfiguration metricsConfiguration;
   private Optional<PermissioningConfiguration> permissioningConfiguration;
   private Collection<EnodeURL> staticNodes;
-  private PantheonController<?> pantheonController;
+  private BesuController<?> besuController;
 
   private final Supplier<ObservableMetricsSystem> metricsSystem =
       Suppliers.memoize(() -> PrometheusMetricsSystem.init(metricsConfiguration()));
 
-  public PantheonCommand(
+  public BesuCommand(
       final Logger logger,
       final RlpBlockImporter rlpBlockImporter,
       final BlocksSubCommand.JsonBlockImporterFactory jsonBlockImporterFactory,
       final BlocksSubCommand.RlpBlockExporterFactory rlpBlockExporterFactory,
       final RunnerBuilder runnerBuilder,
-      final PantheonController.Builder controllerBuilderFactory,
-      final PantheonPluginContextImpl pantheonPluginContext,
+      final BesuController.Builder controllerBuilderFactory,
+      final BesuPluginContextImpl besuPluginContext,
       final Map<String, String> environment) {
     this.logger = logger;
     this.rlpBlockImporter = rlpBlockImporter;
@@ -672,7 +672,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     this.jsonBlockImporterFactory = jsonBlockImporterFactory;
     this.runnerBuilder = runnerBuilder;
     this.controllerBuilderFactory = controllerBuilderFactory;
-    this.pantheonPluginContext = pantheonPluginContext;
+    this.besuPluginContext = besuPluginContext;
     this.environment = environment;
   }
 
@@ -680,7 +680,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   public void parse(
       final AbstractParseResultHandler<List<Object>> resultHandler,
-      final PantheonExceptionHandler exceptionHandler,
+      final BesuExceptionHandler exceptionHandler,
       final InputStream in,
       final String... args) {
     commandLine = new CommandLine(this).setCaseInsensitiveEnumValuesAllowed(true);
@@ -696,14 +696,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   public void run() {
     try {
       prepareLogging();
-      logger.info("Starting Pantheon version: {}", PantheonInfo.version());
+      logger.info("Starting Besu version: {}", BesuInfo.version());
       checkOptions().configure().controller().startPlugins().startSynchronization();
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
     }
   }
 
-  private PantheonCommand handleStandaloneCommand() {
+  private BesuCommand handleStandaloneCommand() {
     standaloneCommands = new StandaloneCommand();
     if (isFullInstantiation()) {
       commandLine.addMixin("standaloneCommands", standaloneCommands);
@@ -711,7 +711,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand addSubCommands(
+  private BesuCommand addSubCommands(
       final AbstractParseResultHandler<List<Object>> resultHandler, final InputStream in) {
     commandLine.addSubcommand(
         BlocksSubCommand.COMMAND_NAME,
@@ -733,7 +733,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand registerConverters() {
+  private BesuCommand registerConverters() {
     commandLine.registerConverter(Address.class, Address::fromHexStringStrict);
     commandLine.registerConverter(BytesValue.class, BytesValue::fromHexString);
     commandLine.registerConverter(Level.class, Level::valueOf);
@@ -743,13 +743,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
 
     final MetricCategoryConverter metricCategoryConverter = new MetricCategoryConverter();
-    metricCategoryConverter.addCategories(PantheonMetricCategory.class);
+    metricCategoryConverter.addCategories(BesuMetricCategory.class);
     metricCategoryConverter.addCategories(StandardMetricCategory.class);
     commandLine.registerConverter(MetricCategory.class, metricCategoryConverter);
     return this;
   }
 
-  private PantheonCommand handleUnstableOptions() {
+  private BesuCommand handleUnstableOptions() {
     // Add unstable options
     final ImmutableMap.Builder<String, Object> unstableOptionsBuild = ImmutableMap.builder();
     final ImmutableMap<String, Object> unstableOptions =
@@ -766,16 +766,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand preparePlugins() {
-    pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
-    pantheonPluginContext.addService(MetricsSystem.class, getMetricsSystem());
-    pantheonPluginContext.registerPlugins(pluginsDir());
+  private BesuCommand preparePlugins() {
+    besuPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
+    besuPluginContext.addService(MetricsSystem.class, getMetricsSystem());
+    besuPluginContext.registerPlugins(pluginsDir());
     return this;
   }
 
   private void parse(
       final AbstractParseResultHandler<List<Object>> resultHandler,
-      final PantheonExceptionHandler exceptionHandler,
+      final BesuExceptionHandler exceptionHandler,
       final String... args) {
     // Create a handler that will search for a config file option and use it for
     // default values
@@ -788,7 +788,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private void startSynchronization() {
     synchronize(
-        pantheonController,
+        besuController,
         p2pEnabled,
         peerDiscoveryEnabled,
         ethNetworkConfig,
@@ -803,13 +803,13 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         staticNodes);
   }
 
-  private PantheonCommand startPlugins() {
-    pantheonPluginContext.addService(
-        PantheonEvents.class,
-        new PantheonEventsImpl(
-            (pantheonController.getProtocolManager().getBlockBroadcaster()),
-            pantheonController.getTransactionPool()));
-    pantheonPluginContext.startPlugins();
+  private BesuCommand startPlugins() {
+    besuPluginContext.addService(
+        BesuEvents.class,
+        new BesuEventsImpl(
+            (besuController.getProtocolManager().getBlockBroadcaster()),
+            besuController.getTransactionPool()));
+    besuPluginContext.startPlugins();
     return this;
   }
 
@@ -821,7 +821,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private PantheonCommand checkOptions() {
+  private BesuCommand checkOptions() {
     // Check that P2P options are able to work or send an error
     checkOptionDependencies(
         logger,
@@ -867,7 +867,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  private PantheonCommand configure() throws Exception {
+  private BesuCommand configure() throws Exception {
     ethNetworkConfig = updateNetworkConfig(getNetwork());
     jsonRpcConfiguration = jsonRpcConfiguration();
     graphQLConfiguration = graphQLConfiguration();
@@ -909,12 +909,12 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  private PantheonCommand controller() {
-    pantheonController = buildController();
+  private BesuCommand controller() {
+    besuController = buildController();
     return this;
   }
 
-  public PantheonController<?> buildController() {
+  public BesuController<?> buildController() {
     try {
       return getControllerBuilder().build();
     } catch (final IOException e) {
@@ -924,7 +924,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  public PantheonControllerBuilder<?> getControllerBuilder() {
+  public BesuControllerBuilder<?> getControllerBuilder() {
     try {
       return controllerBuilderFactory
           .fromEthNetworkConfig(updateNetworkConfig(getNetwork()))
@@ -1202,7 +1202,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private RocksDbConfiguration buildRocksDbConfiguration() {
     return rocksDBOptions
         .toDomainObject()
-        .databaseDir(dataDir().resolve(PantheonController.DATABASE_PATH))
+        .databaseDir(dataDir().resolve(BesuController.DATABASE_PATH))
         .build();
   }
 
@@ -1220,7 +1220,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   // Blockchain synchronisation from peers.
   private void synchronize(
-      final PantheonController<?> controller,
+      final BesuController<?> controller,
       final boolean p2pEnabled,
       final boolean peerDiscoveryEnabled,
       final EthNetworkConfig ethNetworkConfig,
@@ -1242,7 +1242,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     final Runner runner =
         runnerBuilder
             .vertx(Vertx.vertx(createVertxOptions(metricsSystem)))
-            .pantheonController(controller)
+            .besuController(controller)
             .p2pEnabled(p2pEnabled)
             .natMethod(natMethod)
             .discovery(peerDiscoveryEnabled)
@@ -1283,11 +1283,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
             new Thread(
                 () -> {
                   try {
-                    pantheonPluginContext.stopPlugins();
+                    besuPluginContext.stopPlugins();
                     runner.close();
                     LogManager.shutdown();
                   } catch (final Exception e) {
-                    logger.error("Failed to stop Pantheon");
+                    logger.error("Failed to stop Besu");
                   }
                 }));
   }
@@ -1415,15 +1415,15 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     } else if (isDocker) {
       return Paths.get(DOCKER_DATADIR_LOCATION);
     } else {
-      return getDefaultPantheonDataPath(this);
+      return getDefaultBesuDataPath(this);
     }
   }
 
   private Path pluginsDir() {
     if (isFullInstantiation()) {
-      final String pluginsDir = System.getProperty("pantheon.plugins.dir");
+      final String pluginsDir = System.getProperty("besu.plugins.dir");
       if (pluginsDir == null) {
-        return new File(System.getProperty("pantheon.home", "."), "plugins").toPath();
+        return new File(System.getProperty("besu.home", "."), "plugins").toPath();
       } else {
         return new File(pluginsDir).toPath();
       }
@@ -1534,8 +1534,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return StaticNodesParser.fromPath(staticNodesPath);
   }
 
-  public PantheonExceptionHandler exceptionHandler() {
-    return new PantheonExceptionHandler(this::getLogLevel);
+  public BesuExceptionHandler exceptionHandler() {
+    return new BesuExceptionHandler(this::getLogLevel);
   }
 
   private Level getLogLevel() {

@@ -18,13 +18,13 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.Level;
 import picocli.CommandLine;
 
-public class PantheonExceptionHandler
-    extends CommandLine.AbstractHandler<List<Object>, PantheonExceptionHandler>
+public class BesuExceptionHandler
+    extends CommandLine.AbstractHandler<List<Object>, BesuExceptionHandler>
     implements CommandLine.IExceptionHandler2<List<Object>> {
 
   private final Supplier<Level> levelSupplier;
 
-  public PantheonExceptionHandler(final Supplier<Level> levelSupplier) {
+  public BesuExceptionHandler(final Supplier<Level> levelSupplier) {
     this.levelSupplier = levelSupplier;
   }
 
@@ -50,7 +50,7 @@ public class PantheonExceptionHandler
   }
 
   @Override
-  protected PantheonExceptionHandler self() {
+  protected BesuExceptionHandler self() {
     return this;
   }
 }

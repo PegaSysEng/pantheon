@@ -14,8 +14,8 @@ package org.hyperledger.besu.plugin;
 
 import java.util.Optional;
 
-/** Allows plugins to access Pantheon services. */
-public interface PantheonContext {
+/** Allows plugins to access Besu services. */
+public interface BesuContext {
 
   /**
    * Get the requested service, if it is available. There are a number of reasons that a service may
@@ -23,8 +23,8 @@ public interface PantheonContext {
    *
    * <ul>
    *   <li>The service may not have started yet. Most services are not available before the {@link
-   *       PantheonPlugin#start()} method is called
-   *   <li>The service is not supported by this version of Pantheon
+   *       BesuPlugin#start()} method is called
+   *   <li>The service is not supported by this version of Besu
    *   <li>The service may not be applicable to the current configuration. For example some services
    *       may only be available when a proof of authority network is in use
    * </ul>

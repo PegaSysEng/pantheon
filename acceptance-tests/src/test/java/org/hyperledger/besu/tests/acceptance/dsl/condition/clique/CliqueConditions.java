@@ -30,7 +30,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -45,17 +45,17 @@ public class CliqueConditions {
     this.clique = clique;
   }
 
-  public Condition validatorsEqual(final PantheonNode... validators) {
+  public Condition validatorsEqual(final BesuNode... validators) {
     return new ExpectValidators(clique, validatorAddresses(validators));
   }
 
   public Condition validatorsAtBlockEqual(
-      final String blockNumber, final PantheonNode... validators) {
+      final String blockNumber, final BesuNode... validators) {
     return new ExpectValidatorsAtBlock(clique, blockNumber, validatorAddresses(validators));
   }
 
   public Condition validatorsAtBlockHashFromBlockNumberEqual(
-      final Node node, final long blockNumber, final PantheonNode... validators) {
+      final Node node, final long blockNumber, final BesuNode... validators) {
     final DefaultBlockParameter blockParameter =
         DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
     final String blockHash = node.execute(eth.block(blockParameter)).getHash();
@@ -75,7 +75,7 @@ public class CliqueConditions {
     return new ExpectNonceVote(eth, clique_nonce_vote);
   }
 
-  public Condition noNewBlockCreated(final PantheonNode node) {
+  public Condition noNewBlockCreated(final BesuNode node) {
     final int blockPeriodSeconds = cliqueBlockPeriod(node);
     final int blockPeriodWait = blockPeriodSeconds * 1000;
     return new ExpectBlockNotCreated(eth, blockPeriodWait, blockPeriodWait);
@@ -86,7 +86,7 @@ public class CliqueConditions {
         node.execute(clique.createGetSigners(CliqueTransactions.LATEST)), clique);
   }
 
-  private int cliqueBlockPeriod(final PantheonNode node) {
+  private int cliqueBlockPeriod(final BesuNode node) {
     final String config = node.getGenesisConfigProvider().create(emptyList()).get();
     final GenesisConfigFile genesisConfigFile = GenesisConfigFile.fromConfig(config);
     final CliqueConfigOptions cliqueConfigOptions =
@@ -94,29 +94,29 @@ public class CliqueConditions {
     return cliqueConfigOptions.getBlockPeriodSeconds();
   }
 
-  private Address[] validatorAddresses(final PantheonNode[] validators) {
-    return Arrays.stream(validators).map(PantheonNode::getAddress).sorted().toArray(Address[]::new);
+  private Address[] validatorAddresses(final BesuNode[] validators) {
+    return Arrays.stream(validators).map(BesuNode::getAddress).sorted().toArray(Address[]::new);
   }
 
-  public Condition blockIsCreatedByProposer(final PantheonNode proposer) {
+  public Condition blockIsCreatedByProposer(final BesuNode proposer) {
     return new ExpectedBlockHasProposer(eth, proposer.getAddress());
   }
 
   public static class ProposalsConfig {
 
-    private final Map<PantheonNode, Boolean> proposals = new HashMap<>();
+    private final Map<BesuNode, Boolean> proposals = new HashMap<>();
     private final CliqueTransactions clique;
 
     public ProposalsConfig(final CliqueTransactions clique) {
       this.clique = clique;
     }
 
-    public ProposalsConfig addProposal(final PantheonNode node) {
+    public ProposalsConfig addProposal(final BesuNode node) {
       proposals.put(node, true);
       return this;
     }
 
-    public ProposalsConfig removeProposal(final PantheonNode node) {
+    public ProposalsConfig removeProposal(final BesuNode node) {
       proposals.put(node, false);
       return this;
     }

@@ -43,8 +43,8 @@ import org.awaitility.Awaitility;
 import org.hyperledger.besu.cli.config.EthNetworkConfig;
 import org.hyperledger.besu.config.GenesisConfigFile;
 import org.hyperledger.besu.controller.KeyPairUtil;
-import org.hyperledger.besu.controller.MainnetPantheonControllerBuilder;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.MainnetBesuControllerBuilder;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.Block;
@@ -120,8 +120,8 @@ public final class RunnerTest {
     final BigInteger networkId = BigInteger.valueOf(2929);
 
     // Setup state with block data
-    try (final PantheonController<Void> controller =
-        new MainnetPantheonControllerBuilder()
+    try (final BesuController<Void> controller =
+        new MainnetBesuControllerBuilder()
             .genesisConfigFile(GenesisConfigFile.mainnet())
             .synchronizerConfiguration(syncConfigAhead)
             .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
@@ -139,8 +139,8 @@ public final class RunnerTest {
     }
 
     // Setup Runner with blocks
-    final PantheonController<Void> controllerAhead =
-        new MainnetPantheonControllerBuilder()
+    final BesuController<Void> controllerAhead =
+        new MainnetBesuControllerBuilder()
             .genesisConfigFile(GenesisConfigFile.mainnet())
             .synchronizerConfiguration(syncConfigAhead)
             .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
@@ -172,7 +172,7 @@ public final class RunnerTest {
     Runner runnerBehind = null;
     final Runner runnerAhead =
         runnerBuilder
-            .pantheonController(controllerAhead)
+            .besuController(controllerAhead)
             .ethNetworkConfig(EthNetworkConfig.getNetworkConfig(DEV))
             .jsonRpcConfiguration(aheadJsonRpcConfiguration)
             .graphQLConfiguration(aheadGraphQLConfiguration)
@@ -197,8 +197,8 @@ public final class RunnerTest {
       final MetricsConfiguration behindMetricsConfiguration = metricsConfiguration();
 
       // Setup runner with no block data
-      final PantheonController<Void> controllerBehind =
-          new MainnetPantheonControllerBuilder()
+      final BesuController<Void> controllerBehind =
+          new MainnetBesuControllerBuilder()
               .genesisConfigFile(GenesisConfigFile.mainnet())
               .synchronizerConfiguration(syncConfigBehind)
               .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
@@ -218,7 +218,7 @@ public final class RunnerTest {
               EthNetworkConfig.jsonConfig(DEV), DEV_NETWORK_ID, Collections.singletonList(enode));
       runnerBehind =
           runnerBuilder
-              .pantheonController(controllerBehind)
+              .besuController(controllerBehind)
               .ethNetworkConfig(behindEthNetworkConfiguration)
               .jsonRpcConfiguration(behindJsonRpcConfiguration)
               .graphQLConfiguration(behindGraphQLConfiguration)

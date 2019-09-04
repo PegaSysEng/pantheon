@@ -35,7 +35,7 @@ import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.worldstate.Pruner;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.util.ExceptionUtils;
 import org.hyperledger.besu.util.Subscribers;
@@ -101,12 +101,12 @@ public class DefaultSynchronizer<C> implements Synchronizer {
             clock);
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.ETHEREUM,
+        BesuMetricCategory.ETHEREUM,
         "best_known_block_number",
         "The estimated highest block available",
         () -> syncState.syncStatus().getHighestBlock());
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.SYNCHRONIZER,
+        BesuMetricCategory.SYNCHRONIZER,
         "in_sync",
         "Whether or not the local node has caught up to the best known peer",
         () -> getSyncStatus().isPresent() ? 0 : 1);

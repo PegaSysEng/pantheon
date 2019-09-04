@@ -27,7 +27,7 @@ import java.nio.file.Path;
 import java.util.Scanner;
 
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import org.hyperledger.besu.cli.PantheonCommand;
+import org.hyperledger.besu.cli.BesuCommand;
 import org.hyperledger.besu.cli.subcommands.rlp.RLPSubCommand.EncodeSubCommand;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import picocli.CommandLine.Command;
@@ -52,7 +52,7 @@ public class RLPSubCommand implements Runnable {
 
   @SuppressWarnings("unused")
   @ParentCommand
-  private PantheonCommand parentCommand;
+  private BesuCommand parentCommand;
 
   @SuppressWarnings("unused")
   @Spec

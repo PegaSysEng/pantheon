@@ -28,7 +28,7 @@ import java.util.function.BiFunction;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.hyperledger.besu.ethereum.eth.manager.bounded.BoundedQueue;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 
@@ -108,31 +108,31 @@ public class MonitoredExecutors {
             new ThreadFactoryBuilder().setNameFormat(name + "-%d").build());
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.EXECUTORS,
+        BesuMetricCategory.EXECUTORS,
         metricName + "_queue_length_current",
         "Current number of tasks awaiting execution",
         executor.getQueue()::size);
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.EXECUTORS,
+        BesuMetricCategory.EXECUTORS,
         metricName + "_active_threads_current",
         "Current number of threads executing tasks",
         executor::getActiveCount);
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.EXECUTORS,
+        BesuMetricCategory.EXECUTORS,
         metricName + "_pool_size_current",
         "Current number of threads in the thread pool",
         executor::getPoolSize);
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.EXECUTORS,
+        BesuMetricCategory.EXECUTORS,
         metricName + "_completed_tasks_total",
         "Total number of tasks executed",
         executor::getCompletedTaskCount);
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.EXECUTORS,
+        BesuMetricCategory.EXECUTORS,
         metricName + "_submitted_tasks_total",
         "Total number of tasks executed",
         executor::getTaskCount);
@@ -151,7 +151,7 @@ public class MonitoredExecutors {
     public CountingAbortPolicy(final String metricName, final MetricsSystem metricsSystem) {
       this.rejectedTaskCounter =
           metricsSystem.createCounter(
-              PantheonMetricCategory.EXECUTORS,
+              BesuMetricCategory.EXECUTORS,
               metricName + "_rejected_tasks_total",
               "Total number of tasks rejected by this executor");
     }

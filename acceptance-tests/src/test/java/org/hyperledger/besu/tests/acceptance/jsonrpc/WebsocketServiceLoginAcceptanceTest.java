@@ -16,16 +16,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.junit.Before;
 import org.junit.Test;
 
 public class WebsocketServiceLoginAcceptanceTest extends AcceptanceTestBase {
-  private PantheonNode node;
+  private BesuNode node;
 
   @Before
   public void setUp() throws IOException, URISyntaxException {
-    node = pantheon.createArchiveNodeWithAuthenticationOverWebSocket("node1");
+    node = besu.createArchiveNodeWithAuthenticationOverWebSocket("node1");
     cluster.start(node);
     node.useWebSocketsForJsonRpc();
   }

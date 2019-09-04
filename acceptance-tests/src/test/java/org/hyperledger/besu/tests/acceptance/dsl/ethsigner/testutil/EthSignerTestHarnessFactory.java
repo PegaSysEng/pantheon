@@ -42,7 +42,7 @@ public class EthSignerTestHarnessFactory {
   private static final String HOST = "127.0.0.1";
 
   public static EthSignerTestHarness create(
-      final Path tempDir, final String keyPath, final Integer pantheonPort, final long chainId)
+      final Path tempDir, final String keyPath, final Integer besuPort, final long chainId)
       throws IOException, CipherException {
 
     final Path keyFilePath = copyResource(keyPath, tempDir.resolve(keyPath));
@@ -51,7 +51,7 @@ public class EthSignerTestHarnessFactory {
         new EthSignerConfig(
             Level.DEBUG,
             InetAddress.getByName(HOST),
-            pantheonPort,
+            besuPort,
             Duration.ofSeconds(10),
             InetAddress.getByName(HOST),
             0,

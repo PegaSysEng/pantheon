@@ -25,8 +25,8 @@ public class CreateAccountAcceptanceTest extends AcceptanceTestBase {
 
   @Before
   public void setUp() throws Exception {
-    minerNode = pantheon.createMinerNode("minerNode");
-    cluster.start(minerNode, pantheon.createArchiveNode("archiveNode"));
+    minerNode = besu.createMinerNode("minerNode");
+    cluster.start(minerNode, besu.createArchiveNode("archiveNode"));
   }
 
   @Test

@@ -46,7 +46,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethodFacto
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 
-public class CliquePantheonControllerBuilder extends PantheonControllerBuilder<CliqueContext> {
+public class CliqueBesuControllerBuilder extends BesuControllerBuilder<CliqueContext> {
   private static final Logger LOG = LogManager.getLogger();
 
   private Address localAddress;

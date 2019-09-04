@@ -22,33 +22,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.google.auto.service.AutoService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hyperledger.besu.plugin.PantheonContext;
-import org.hyperledger.besu.plugin.PantheonPlugin;
+import org.hyperledger.besu.plugin.BesuContext;
+import org.hyperledger.besu.plugin.BesuPlugin;
 import org.hyperledger.besu.plugin.data.BlockHeader;
-import org.hyperledger.besu.plugin.services.PantheonEvents;
+import org.hyperledger.besu.plugin.services.BesuEvents;
 
-@AutoService(PantheonPlugin.class)
-public class TestPantheonEventsPlugin implements PantheonPlugin {
+@AutoService(BesuPlugin.class)
+public class TestBesuEventsPlugin implements BesuPlugin {
   private static final Logger LOG = LogManager.getLogger();
 
-  private PantheonContext context;
+  private BesuContext context;
 
   private Optional<Object> subscriptionId;
   private final AtomicInteger blockCounter = new AtomicInteger();
   private File callbackDir;
 
   @Override
-  public void register(final PantheonContext context) {
+  public void register(final BesuContext context) {
     this.context = context;
     LOG.info("Registered");
-    callbackDir = new File(System.getProperty("pantheon.plugins.dir", "plugins"));
+    callbackDir = new File(System.getProperty("besu.plugins.dir", "plugins"));
   }
 
   @Override
   public void start() {
     subscriptionId =
         context
-            .getService(PantheonEvents.class)
+            .getService(BesuEvents.class)
             .map(events -> events.addNewBlockPropagatedListener(this::onBlockAnnounce));
     LOG.info("Listening with ID#" + subscriptionId);
   }
@@ -58,8 +58,8 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
     subscriptionId.ifPresent(
         id ->
             context
-                .getService(PantheonEvents.class)
-                .ifPresent(pantheonEvents -> pantheonEvents.removeNewBlockPropagatedListener(id)));
+                .getService(BesuEvents.class)
+                .ifPresent(besuEvents -> besuEvents.removeNewBlockPropagatedListener(id)));
     LOG.info("No longer listening with ID#" + subscriptionId);
   }
 

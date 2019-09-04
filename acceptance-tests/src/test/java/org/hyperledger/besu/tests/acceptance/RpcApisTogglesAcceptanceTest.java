@@ -17,22 +17,22 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.junit.Before;
 import org.junit.Test;
 
 public class RpcApisTogglesAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode rpcEnabledNode;
-  private PantheonNode rpcDisabledNode;
-  private PantheonNode ethApiDisabledNode;
+  private BesuNode rpcEnabledNode;
+  private BesuNode rpcDisabledNode;
+  private BesuNode ethApiDisabledNode;
 
   @Before
   public void before() throws Exception {
-    rpcEnabledNode = pantheon.createArchiveNode("rpc-enabled");
-    rpcDisabledNode = pantheon.createArchiveNodeWithRpcDisabled("rpc-disabled");
-    ethApiDisabledNode = pantheon.createArchiveNodeWithRpcApis("eth-api-disabled", RpcApis.NET);
+    rpcEnabledNode = besu.createArchiveNode("rpc-enabled");
+    rpcDisabledNode = besu.createArchiveNodeWithRpcDisabled("rpc-disabled");
+    ethApiDisabledNode = besu.createArchiveNodeWithRpcApis("eth-api-disabled", RpcApis.NET);
     cluster.start(rpcEnabledNode, rpcDisabledNode, ethApiDisabledNode);
   }
 

@@ -23,7 +23,7 @@ import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.OptionSpec;
 
 public class EnvironmentVariableDefaultProvider implements IDefaultValueProvider {
-  private static final String ENV_VAR_PREFIX = "PANTHEON_";
+  private static final String ENV_VAR_PREFIX = "BESU_";
 
   private final Map<String, String> environment;
 

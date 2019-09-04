@@ -27,13 +27,13 @@ public class StaticNodesAcceptanceTest extends AcceptanceTestBase {
 
   @Before
   public void setUp() throws Exception {
-    otherNode = pantheon.createNodeWithNoDiscovery("other-node");
+    otherNode = besu.createNodeWithNoDiscovery("other-node");
     cluster.start(otherNode);
   }
 
   @Test
   public void shouldConnectToNodeAddedAsStaticNode() throws Exception {
-    node = pantheon.createNodeWithStaticNodes("node", Arrays.asList(otherNode));
+    node = besu.createNodeWithStaticNodes("node", Arrays.asList(otherNode));
     cluster.addNode(node);
 
     node.verify(net.awaitPeerCount(1));

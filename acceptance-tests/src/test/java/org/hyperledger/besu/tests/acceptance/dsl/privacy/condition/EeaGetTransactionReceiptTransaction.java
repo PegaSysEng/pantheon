@@ -20,7 +20,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.web3j.protocol.eea.response.PrivateTransactionReceipt;
 import org.web3j.protocol.exceptions.TransactionException;
-import org.web3j.protocol.pantheon.Pantheon;
+import org.web3j.protocol.besu.Besu;
 import org.web3j.tx.response.PollingPrivateTransactionReceiptProcessor;
 
 public class EeaGetTransactionReceiptTransaction implements Transaction<PrivateTransactionReceipt> {
@@ -33,9 +33,9 @@ public class EeaGetTransactionReceiptTransaction implements Transaction<PrivateT
 
   @Override
   public PrivateTransactionReceipt execute(final NodeRequests node) {
-    final Pantheon pantheon = node.privacy().getPantheonClient();
+    final Besu besu = node.privacy().getBesuClient();
     final PollingPrivateTransactionReceiptProcessor receiptProcessor =
-        new PollingPrivateTransactionReceiptProcessor(pantheon, 3, 3);
+        new PollingPrivateTransactionReceiptProcessor(besu, 3, 3);
     try {
       final PrivateTransactionReceipt result =
           receiptProcessor.waitForTransactionReceipt(transactionHash);

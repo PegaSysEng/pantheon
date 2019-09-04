@@ -47,7 +47,7 @@ public class CommandLineUtilsTest {
       commandLine = new CommandLine(this);
     }
 
-    // Completely disables p2p within Pantheon.
+    // Completely disables p2p within Besu.
     @Option(
         names = {"--option-enabled"},
         arity = "1")

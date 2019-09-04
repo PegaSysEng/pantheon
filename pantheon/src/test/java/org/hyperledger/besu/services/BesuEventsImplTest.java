@@ -57,7 +57,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PantheonEventsImplTest {
+public class BesuEventsImplTest {
 
   private static final KeyPair KEY_PAIR1 = KeyPair.generate();
   private static final org.hyperledger.besu.ethereum.core.Transaction TX1 = createTransaction(1);
@@ -78,7 +78,7 @@ public class PantheonEventsImplTest {
   private org.hyperledger.besu.ethereum.core.BlockHeader fakeBlockHeader;
   private TransactionPool transactionPool;
   private BlockBroadcaster blockBroadcaster;
-  private PantheonEventsImpl serviceImpl;
+  private BesuEventsImpl serviceImpl;
 
   @Before
   public void setUp() {
@@ -112,7 +112,7 @@ public class PantheonEventsImplTest {
             Wei.ZERO,
             TransactionPoolConfiguration.builder().build());
 
-    serviceImpl = new PantheonEventsImpl(blockBroadcaster, transactionPool);
+    serviceImpl = new BesuEventsImpl(blockBroadcaster, transactionPool);
   }
 
   @Test

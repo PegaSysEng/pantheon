@@ -17,7 +17,7 @@ import static org.hyperledger.besu.cli.subcommands.PasswordSubCommand.COMMAND_NA
 
 import java.io.PrintStream;
 
-import org.hyperledger.besu.cli.PantheonCommand;
+import org.hyperledger.besu.cli.BesuCommand;
 import org.hyperledger.besu.cli.subcommands.PasswordSubCommand.HashSubCommand;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import picocli.CommandLine.Command;
@@ -37,7 +37,7 @@ public class PasswordSubCommand implements Runnable {
 
   @SuppressWarnings("unused")
   @ParentCommand
-  private PantheonCommand parentCommand;
+  private BesuCommand parentCommand;
 
   @SuppressWarnings("unused")
   @Spec

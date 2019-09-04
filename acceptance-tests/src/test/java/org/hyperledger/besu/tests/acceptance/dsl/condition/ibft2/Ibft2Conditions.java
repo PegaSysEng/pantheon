@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableMap;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2Transactions;
 
@@ -36,20 +36,20 @@ public class Ibft2Conditions {
     this.ibftTwo = ibftTwo;
   }
 
-  public List<PantheonNode> validators(final PantheonNode[] nodes) {
-    final Comparator<PantheonNode> compareByAddress =
-        Comparator.comparing(PantheonNode::getAddress);
-    List<PantheonNode> pantheonNodes = Arrays.asList(nodes);
-    pantheonNodes.sort(compareByAddress);
-    return pantheonNodes;
+  public List<BesuNode> validators(final BesuNode[] nodes) {
+    final Comparator<BesuNode> compareByAddress =
+        Comparator.comparing(BesuNode::getAddress);
+    List<BesuNode> besuNodes = Arrays.asList(nodes);
+    besuNodes.sort(compareByAddress);
+    return besuNodes;
   }
 
-  public ExpectValidators validatorsEqual(final PantheonNode... validators) {
+  public ExpectValidators validatorsEqual(final BesuNode... validators) {
     return new ExpectValidators(ibftTwo, validatorAddresses(validators));
   }
 
-  private Address[] validatorAddresses(final PantheonNode[] validators) {
-    return Arrays.stream(validators).map(PantheonNode::getAddress).sorted().toArray(Address[]::new);
+  private Address[] validatorAddresses(final BesuNode[] validators) {
+    return Arrays.stream(validators).map(BesuNode::getAddress).sorted().toArray(Address[]::new);
   }
 
   public Condition awaitValidatorSetChange(final Node node) {
@@ -66,19 +66,19 @@ public class Ibft2Conditions {
   }
 
   public static class PendingVotesConfig {
-    private final Map<PantheonNode, Boolean> proposals = new HashMap<>();
+    private final Map<BesuNode, Boolean> proposals = new HashMap<>();
     private final Ibft2Transactions ibft;
 
     private PendingVotesConfig(final Ibft2Transactions ibft) {
       this.ibft = ibft;
     }
 
-    public PendingVotesConfig addProposal(final PantheonNode node) {
+    public PendingVotesConfig addProposal(final BesuNode node) {
       proposals.put(node, true);
       return this;
     }
 
-    public PendingVotesConfig removeProposal(final PantheonNode node) {
+    public PendingVotesConfig removeProposal(final BesuNode node) {
       proposals.put(node, false);
       return this;
     }

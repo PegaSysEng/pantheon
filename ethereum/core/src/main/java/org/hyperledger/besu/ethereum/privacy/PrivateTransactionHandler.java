@@ -24,7 +24,7 @@ import org.hyperledger.besu.enclave.types.ReceiveRequest;
 import org.hyperledger.besu.enclave.types.ReceiveResponse;
 import org.hyperledger.besu.enclave.types.SendRequest;
 import org.hyperledger.besu.enclave.types.SendRequestLegacy;
-import org.hyperledger.besu.enclave.types.SendRequestPantheon;
+import org.hyperledger.besu.enclave.types.SendRequestBesu;
 import org.hyperledger.besu.enclave.types.SendResponse;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -127,7 +127,7 @@ public class PrivateTransactionHandler {
     final String payload = BytesValues.asBase64String(bvrlp.encoded());
 
     if (privateTransaction.getPrivacyGroupId().isPresent()) {
-      return new SendRequestPantheon(
+      return new SendRequestBesu(
           payload,
           enclavePublicKey,
           BytesValues.asBase64String(privateTransaction.getPrivacyGroupId().get()));

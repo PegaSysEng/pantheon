@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 
 import com.google.common.base.Stopwatch;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
@@ -49,7 +49,7 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
   private static OperationTimer buildOperationTimer(final MetricsSystem metricsSystem) {
     final LabelledMetric<OperationTimer> ethTasksTimer =
         metricsSystem.createLabelledTimer(
-            PantheonMetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName");
+            BesuMetricCategory.SYNCHRONIZER, "task", "Internal processing tasks", "taskName");
     if (ethTasksTimer == NoOpMetricsSystem.NO_OP_LABELLED_1_OPERATION_TIMER) {
       return () ->
           new OperationTimer.TimingContext() {

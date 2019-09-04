@@ -24,20 +24,20 @@ import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
-import org.hyperledger.besu.plugin.PantheonPlugin;
+import org.hyperledger.besu.plugin.BesuPlugin;
 import org.hyperledger.besu.plugins.TestPicoCLIPlugin;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class PantheonPluginContextImplTest {
+public class BesuPluginContextImplTest {
 
   @BeforeClass
   public static void createFakePluginDir() throws IOException {
-    if (System.getProperty("pantheon.plugins.dir") == null) {
-      final Path pluginDir = Files.createTempDirectory("pantheonTest");
+    if (System.getProperty("besu.plugins.dir") == null) {
+      final Path pluginDir = Files.createTempDirectory("besuTest");
       pluginDir.toFile().deleteOnExit();
-      System.setProperty("pantheon.plugins.dir", pluginDir.toAbsolutePath().toString());
+      System.setProperty("besu.plugins.dir", pluginDir.toAbsolutePath().toString());
     }
   }
 
@@ -48,7 +48,7 @@ public class PantheonPluginContextImplTest {
 
   @Test
   public void verifyEverythingGoesSmoothly() {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
 
     Assertions.assertThat(contextImpl.getPlugins()).isEmpty();
     contextImpl.registerPlugins(new File(".").toPath());
@@ -68,7 +68,7 @@ public class PantheonPluginContextImplTest {
 
   @Test
   public void registrationErrorsHandledSmoothly() {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
     System.setProperty("testPicoCLIPlugin.testOption", "FAILREGISTER");
 
     Assertions.assertThat(contextImpl.getPlugins()).isEmpty();
@@ -84,7 +84,7 @@ public class PantheonPluginContextImplTest {
 
   @Test
   public void startErrorsHandledSmoothly() {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
     System.setProperty("testPicoCLIPlugin.testOption", "FAILSTART");
 
     Assertions.assertThat(contextImpl.getPlugins()).isEmpty();
@@ -108,7 +108,7 @@ public class PantheonPluginContextImplTest {
 
   @Test
   public void stopErrorsHandledSmoothly() {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
     System.setProperty("testPicoCLIPlugin.testOption", "FAILSTOP");
 
     Assertions.assertThat(contextImpl.getPlugins()).isEmpty();
@@ -131,7 +131,7 @@ public class PantheonPluginContextImplTest {
 
   @Test
   public void lifecycleExceptions() throws Throwable {
-    final PantheonPluginContextImpl contextImpl = new PantheonPluginContextImpl();
+    final BesuPluginContextImpl contextImpl = new BesuPluginContextImpl();
     final ThrowableAssert.ThrowingCallable registerPlugins =
         () -> contextImpl.registerPlugins(new File(".").toPath());
 
@@ -152,7 +152,7 @@ public class PantheonPluginContextImplTest {
     assertThatExceptionOfType(IllegalStateException.class).isThrownBy(contextImpl::stopPlugins);
   }
 
-  private Optional<TestPicoCLIPlugin> findTestPlugin(final List<PantheonPlugin> plugins) {
+  private Optional<TestPicoCLIPlugin> findTestPlugin(final List<BesuPlugin> plugins) {
     return plugins.stream()
         .filter(p -> p instanceof TestPicoCLIPlugin)
         .map(p -> (TestPicoCLIPlugin) p)

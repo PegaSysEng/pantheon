@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import org.web3j.protocol.pantheon.Pantheon;
+import org.web3j.protocol.besu.Besu;
 import org.web3j.utils.Base64String;
 
 public class CreatePrivacyGroupTransaction implements Transaction<String> {
@@ -40,9 +40,9 @@ public class CreatePrivacyGroupTransaction implements Transaction<String> {
 
   @Override
   public String execute(final NodeRequests node) {
-    final Pantheon pantheon = node.privacy().getPantheonClient();
+    final Besu besu = node.privacy().getBesuClient();
     try {
-      return pantheon
+      return besu
           .privCreatePrivacyGroup(addresses, name, description)
           .send()
           .getPrivacyGroupId()

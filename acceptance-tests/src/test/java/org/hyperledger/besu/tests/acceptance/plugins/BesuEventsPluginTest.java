@@ -21,19 +21,19 @@ import java.util.stream.Stream;
 
 import org.awaitility.Awaitility;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PantheonEventsPluginTest extends AcceptanceTestBase {
-  private PantheonNode pluginNode;
-  private PantheonNode minerNode;
+public class BesuEventsPluginTest extends AcceptanceTestBase {
+  private BesuNode pluginNode;
+  private BesuNode minerNode;
 
   @Before
   public void setUp() throws Exception {
-    minerNode = pantheon.createMinerNode("minerNode");
+    minerNode = besu.createMinerNode("minerNode");
     pluginNode =
-        pantheon.createPluginsNode(
+        besu.createPluginsNode(
             "node1", Collections.singletonList("testPlugins"), Collections.emptyList());
     cluster.start(pluginNode, minerNode);
   }

@@ -20,26 +20,26 @@ import java.util.stream.Stream;
 
 import org.awaitility.Awaitility;
 
-public interface PantheonNodeRunner {
+public interface BesuNodeRunner {
 
-  static PantheonNodeRunner instance() {
-    if (Boolean.getBoolean("acctests.runPantheonAsProcess")) {
-      return new ProcessPantheonNodeRunner();
+  static BesuNodeRunner instance() {
+    if (Boolean.getBoolean("acctests.runBesuAsProcess")) {
+      return new ProcessBesuNodeRunner();
     } else {
-      return new ThreadPantheonNodeRunner();
+      return new ThreadBesuNodeRunner();
     }
   }
 
-  void startNode(PantheonNode node);
+  void startNode(BesuNode node);
 
-  void stopNode(PantheonNode node);
+  void stopNode(BesuNode node);
 
   void shutdown();
 
   boolean isActive(String nodeName);
 
   default void waitForPortsFile(final Path dataDir) {
-    final File file = new File(dataDir.toFile(), "pantheon.ports");
+    final File file = new File(dataDir.toFile(), "besu.ports");
     Awaitility.waitAtMost(30, TimeUnit.SECONDS)
         .until(
             () -> {

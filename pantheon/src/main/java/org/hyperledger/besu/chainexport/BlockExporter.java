@@ -25,7 +25,7 @@ import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 
-/** Pantheon Block Export Util. */
+/** Besu Block Export Util. */
 public abstract class BlockExporter {
   private static final Logger LOG = LogManager.getLogger();
   private final Blockchain blockchain;
@@ -35,7 +35,7 @@ public abstract class BlockExporter {
   }
 
   /**
-   * Export blocks that are stored in Pantheon's block storage.
+   * Export blocks that are stored in Besu's block storage.
    *
    * @param outputFile the path at which to save the exported block data
    * @param maybeStartBlock the starting index of the block list to export (inclusive)

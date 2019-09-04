@@ -47,8 +47,8 @@ import org.hyperledger.besu.cli.options.SynchronizerOptions;
 import org.hyperledger.besu.cli.options.TransactionPoolOptions;
 import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand;
 import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand;
-import org.hyperledger.besu.controller.PantheonController;
-import org.hyperledger.besu.controller.PantheonControllerBuilder;
+import org.hyperledger.besu.controller.BesuController;
+import org.hyperledger.besu.controller.BesuControllerBuilder;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
@@ -61,7 +61,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-import org.hyperledger.besu.services.PantheonPluginContextImpl;
+import org.hyperledger.besu.services.BesuPluginContextImpl;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.After;
 import org.junit.Before;
@@ -92,20 +92,20 @@ public abstract class CommandTestAbstract {
   @Mock protected RunnerBuilder mockRunnerBuilder;
   @Mock protected Runner mockRunner;
 
-  @Mock protected PantheonController.Builder mockControllerBuilderFactory;
+  @Mock protected BesuController.Builder mockControllerBuilderFactory;
 
-  @Mock protected PantheonControllerBuilder<Void> mockControllerBuilder;
+  @Mock protected BesuControllerBuilder<Void> mockControllerBuilder;
   @Mock protected EthProtocolManager mockEthProtocolManager;
   @Mock protected ProtocolSchedule<Object> mockProtocolSchedule;
   @Mock protected ProtocolContext<Object> mockProtocolContext;
   @Mock protected BlockBroadcaster mockBlockBroadcaster;
-  @Mock protected PantheonController<Object> mockController;
+  @Mock protected BesuController<Object> mockController;
   @Mock protected RlpBlockExporter rlpBlockExporter;
   @Mock protected JsonBlockImporter<?> jsonBlockImporter;
   @Mock protected RlpBlockImporter rlpBlockImporter;
 
   @Mock protected Logger mockLogger;
-  @Mock protected PantheonPluginContextImpl mockPantheonPluginContext;
+  @Mock protected BesuPluginContextImpl mockBesuPluginContext;
 
   @Captor protected ArgumentCaptor<Collection<BytesValue>> bytesValueCollectionCollector;
   @Captor protected ArgumentCaptor<Path> pathArgumentCaptor;
@@ -130,13 +130,13 @@ public abstract class CommandTestAbstract {
   @Before
   @After
   public void resetSystemProps() {
-    System.setProperty("pantheon.docker", "false");
+    System.setProperty("besu.docker", "false");
   }
 
   @Before
   public void initMocks() throws Exception {
 
-    // doReturn used because of generic PantheonController
+    // doReturn used because of generic BesuController
     doReturn(mockControllerBuilder).when(mockControllerBuilderFactory).fromEthNetworkConfig(any());
     when(mockControllerBuilder.synchronizerConfiguration(any())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.ethProtocolConfiguration(any())).thenReturn(mockControllerBuilder);
@@ -153,7 +153,7 @@ public abstract class CommandTestAbstract {
     when(mockControllerBuilder.isPruningEnabled(anyBoolean())).thenReturn(mockControllerBuilder);
     when(mockControllerBuilder.pruningConfiguration(any())).thenReturn(mockControllerBuilder);
 
-    // doReturn used because of generic PantheonController
+    // doReturn used because of generic BesuController
     doReturn(mockController).when(mockControllerBuilder).build();
     lenient().when(mockController.getProtocolManager()).thenReturn(mockEthProtocolManager);
     lenient().when(mockController.getProtocolSchedule()).thenReturn(mockProtocolSchedule);
@@ -162,7 +162,7 @@ public abstract class CommandTestAbstract {
     when(mockEthProtocolManager.getBlockBroadcaster()).thenReturn(mockBlockBroadcaster);
 
     when(mockRunnerBuilder.vertx(any())).thenReturn(mockRunnerBuilder);
-    when(mockRunnerBuilder.pantheonController(any())).thenReturn(mockRunnerBuilder);
+    when(mockRunnerBuilder.besuController(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.discovery(anyBoolean())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.ethNetworkConfig(any())).thenReturn(mockRunnerBuilder);
     when(mockRunnerBuilder.networkingConfiguration(any())).thenReturn(mockRunnerBuilder);
@@ -203,32 +203,32 @@ public abstract class CommandTestAbstract {
     environment.put(name, value);
   }
 
-  protected TestPantheonCommand parseCommand(final String... args) {
+  protected TestBesuCommand parseCommand(final String... args) {
     return parseCommand(System.in, args);
   }
 
-  protected TestPantheonCommand parseCommand(
+  protected TestBesuCommand parseCommand(
       final PublicKeySubCommand.KeyLoader keyLoader, final String... args) {
     return parseCommand(keyLoader, System.in, args);
   }
 
-  protected TestPantheonCommand parseCommand(final InputStream in, final String... args) {
+  protected TestBesuCommand parseCommand(final InputStream in, final String... args) {
     return parseCommand(f -> KeyPair.generate(), in, args);
   }
 
   @SuppressWarnings("unchecked")
   private <T> JsonBlockImporter<T> jsonBlockImporterFactory(
-      final PantheonController<T> controller) {
+      final BesuController<T> controller) {
     return (JsonBlockImporter<T>) jsonBlockImporter;
   }
 
-  private TestPantheonCommand parseCommand(
+  private TestBesuCommand parseCommand(
       final PublicKeySubCommand.KeyLoader keyLoader, final InputStream in, final String... args) {
     // turn off ansi usage globally in picocli
     System.setProperty("picocli.ansi", "false");
 
-    final TestPantheonCommand pantheonCommand =
-        new TestPantheonCommand(
+    final TestBesuCommand besuCommand =
+        new TestBesuCommand(
             mockLogger,
             rlpBlockImporter,
             this::jsonBlockImporterFactory,
@@ -236,20 +236,20 @@ public abstract class CommandTestAbstract {
             mockRunnerBuilder,
             mockControllerBuilderFactory,
             keyLoader,
-            mockPantheonPluginContext,
+            mockBesuPluginContext,
             environment);
 
     // parse using Ansi.OFF to be able to assert on non formatted output results
-    pantheonCommand.parse(
+    besuCommand.parse(
         new RunLast().useOut(outPrintStream).useAnsi(Ansi.OFF),
-        pantheonCommand.exceptionHandler().useErr(errPrintStream).useAnsi(Ansi.OFF),
+        besuCommand.exceptionHandler().useErr(errPrintStream).useAnsi(Ansi.OFF),
         in,
         args);
-    return pantheonCommand;
+    return besuCommand;
   }
 
   @CommandLine.Command
-  public static class TestPantheonCommand extends PantheonCommand {
+  public static class TestBesuCommand extends BesuCommand {
     @CommandLine.Spec CommandLine.Model.CommandSpec spec;
     private final PublicKeySubCommand.KeyLoader keyLoader;
 
@@ -258,15 +258,15 @@ public abstract class CommandTestAbstract {
       return keyLoader;
     }
 
-    TestPantheonCommand(
+    TestBesuCommand(
         final Logger mockLogger,
         final RlpBlockImporter mockBlockImporter,
         final BlocksSubCommand.JsonBlockImporterFactory jsonBlockImporterFactory,
         final BlocksSubCommand.RlpBlockExporterFactory rlpBlockExporterFactory,
         final RunnerBuilder mockRunnerBuilder,
-        final PantheonController.Builder controllerBuilderFactory,
+        final BesuController.Builder controllerBuilderFactory,
         final PublicKeySubCommand.KeyLoader keyLoader,
-        final PantheonPluginContextImpl pantheonPluginContext,
+        final BesuPluginContextImpl besuPluginContext,
         final Map<String, String> environment) {
       super(
           mockLogger,
@@ -275,7 +275,7 @@ public abstract class CommandTestAbstract {
           rlpBlockExporterFactory,
           mockRunnerBuilder,
           controllerBuilderFactory,
-          pantheonPluginContext,
+          besuPluginContext,
           environment);
       this.keyLoader = keyLoader;
     }

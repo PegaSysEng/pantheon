@@ -20,13 +20,13 @@ import java.util.Collections;
 import com.google.auto.service.AutoService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hyperledger.besu.plugin.PantheonContext;
-import org.hyperledger.besu.plugin.PantheonPlugin;
+import org.hyperledger.besu.plugin.BesuContext;
+import org.hyperledger.besu.plugin.BesuPlugin;
 import org.hyperledger.besu.plugin.services.PicoCLIOptions;
 import picocli.CommandLine.Option;
 
-@AutoService(PantheonPlugin.class)
-public class TestPicoCLIPlugin implements PantheonPlugin {
+@AutoService(BesuPlugin.class)
+public class TestPicoCLIPlugin implements BesuPlugin {
   private static final Logger LOG = LogManager.getLogger();
 
   @Option(names = "--Xtest-option", hidden = true, defaultValue = "UNSET")
@@ -36,7 +36,7 @@ public class TestPicoCLIPlugin implements PantheonPlugin {
   private File callbackDir;
 
   @Override
-  public void register(final PantheonContext context) {
+  public void register(final BesuContext context) {
     LOG.info("Registering.  Test Option is '{}'", testOption);
     state = "registering";
 
@@ -51,7 +51,7 @@ public class TestPicoCLIPlugin implements PantheonPlugin {
             picoCLIOptions ->
                 picoCLIOptions.addPicoCLIOptions("Test PicoCLI Plugin", TestPicoCLIPlugin.this));
 
-    callbackDir = new File(System.getProperty("pantheon.plugins.dir", "plugins"));
+    callbackDir = new File(System.getProperty("besu.plugins.dir", "plugins"));
     writeSignal("registered");
     state = "registered";
   }

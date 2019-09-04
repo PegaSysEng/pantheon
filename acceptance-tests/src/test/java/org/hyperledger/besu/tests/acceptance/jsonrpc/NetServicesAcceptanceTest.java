@@ -31,8 +31,8 @@ public class NetServicesAcceptanceTest extends AcceptanceTestBase {
     final ClusterConfiguration clusterConfiguration =
         new ClusterConfigurationBuilder().awaitPeerDiscovery(false).build();
     noDiscoveryCluster = new Cluster(clusterConfiguration, net);
-    nodeA = pantheon.createArchiveNodeNetServicesEnabled("nodeA");
-    nodeB = pantheon.createArchiveNodeNetServicesEnabled("nodeB");
+    nodeA = besu.createArchiveNodeNetServicesEnabled("nodeA");
+    nodeB = besu.createArchiveNodeNetServicesEnabled("nodeB");
     noDiscoveryCluster.start(nodeA, nodeB);
 
     nodeA.verify(net.netServicesAllActive());
@@ -44,8 +44,8 @@ public class NetServicesAcceptanceTest extends AcceptanceTestBase {
     final ClusterConfiguration clusterConfiguration =
         new ClusterConfigurationBuilder().awaitPeerDiscovery(false).build();
     noDiscoveryCluster = new Cluster(clusterConfiguration, net);
-    nodeA = pantheon.createArchiveNodeNetServicesDisabled("nodeA");
-    nodeB = pantheon.createArchiveNodeNetServicesDisabled("nodeB");
+    nodeA = besu.createArchiveNodeNetServicesDisabled("nodeA");
+    nodeB = besu.createArchiveNodeNetServicesDisabled("nodeB");
     noDiscoveryCluster.start(nodeA, nodeB);
 
     nodeA.verify(net.netServicesOnlyJsonRpcEnabled());

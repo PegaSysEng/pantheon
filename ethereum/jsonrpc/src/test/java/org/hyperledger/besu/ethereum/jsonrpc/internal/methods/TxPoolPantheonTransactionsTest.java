@@ -34,18 +34,18 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TxPoolPantheonTransactionsTest {
+public class TxPoolBesuTransactionsTest {
 
   @Mock private PendingTransactions pendingTransactions;
-  private TxPoolPantheonTransactions method;
+  private TxPoolBesuTransactions method;
   private final String JSON_RPC_VERSION = "2.0";
-  private final String TXPOOL_PENDING_TRANSACTIONS_METHOD = "txpool_pantheonTransactions";
+  private final String TXPOOL_PENDING_TRANSACTIONS_METHOD = "txpool_besuTransactions";
   private static final String TRANSACTION_HASH =
       "0xbac263fb39f2a51053fb5e1e52aeb4e980fba9e151aa7e4f12eca95a697aeac9";
 
   @Before
   public void setUp() {
-    method = new TxPoolPantheonTransactions(pendingTransactions);
+    method = new TxPoolBesuTransactions(pendingTransactions);
   }
 
   @Test

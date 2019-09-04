@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.cli;
 
-import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultPantheonDataPath;
+import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultBesuDataPath;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -33,8 +33,8 @@ class StandaloneCommand implements DefaultCommandValues {
   @CommandLine.Option(
       names = {"--data-path"},
       paramLabel = MANDATORY_PATH_FORMAT_HELP,
-      description = "The path to Pantheon data directory (default: ${DEFAULT-VALUE})")
-  final Path dataPath = getDefaultPantheonDataPath(this);
+      description = "The path to Besu data directory (default: ${DEFAULT-VALUE})")
+  final Path dataPath = getDefaultBesuDataPath(this);
 
   // Genesis file path with null default option if the option
   // is not defined on command line as this default is handled by Runner
@@ -52,7 +52,7 @@ class StandaloneCommand implements DefaultCommandValues {
       names = {"--node-private-key-file"},
       paramLabel = MANDATORY_PATH_FORMAT_HELP,
       description =
-          "The node's private key file (default: a file named \"key\" in the Pantheon data folder)")
+          "The node's private key file (default: a file named \"key\" in the Besu data folder)")
   final File nodePrivateKeyFile = null;
 
   @CommandLine.Option(
@@ -79,12 +79,12 @@ class StandaloneCommand implements DefaultCommandValues {
   @CommandLine.Option(
       names = {"--permissions-nodes-config-file"},
       description =
-          "Node permissioning config TOML file (default: a file named \"permissions_config.toml\" in the Pantheon data folder)")
+          "Node permissioning config TOML file (default: a file named \"permissions_config.toml\" in the Besu data folder)")
   String nodePermissionsConfigFile = null;
 
   @CommandLine.Option(
       names = {"--permissions-accounts-config-file"},
       description =
-          "Account permissioning config TOML file (default: a file named \"permissions_config.toml\" in the Pantheon data folder)")
+          "Account permissioning config TOML file (default: a file named \"permissions_config.toml\" in the Besu data folder)")
   String accountPermissionsConfigFile = null;
 }

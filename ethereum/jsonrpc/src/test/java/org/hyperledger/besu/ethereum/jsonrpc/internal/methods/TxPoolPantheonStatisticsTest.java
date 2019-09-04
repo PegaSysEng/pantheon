@@ -30,16 +30,16 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TxPoolPantheonStatisticsTest {
+public class TxPoolBesuStatisticsTest {
 
   @Mock private PendingTransactions pendingTransactions;
-  private TxPoolPantheonStatistics method;
+  private TxPoolBesuStatistics method;
   private final String JSON_RPC_VERSION = "2.0";
-  private final String TXPOOL_PENDING_TRANSACTIONS_METHOD = "txpool_pantheonStatistics";
+  private final String TXPOOL_PENDING_TRANSACTIONS_METHOD = "txpool_besuStatistics";
 
   @Before
   public void setUp() {
-    method = new TxPoolPantheonStatistics(pendingTransactions);
+    method = new TxPoolBesuStatistics(pendingTransactions);
   }
 
   @Test

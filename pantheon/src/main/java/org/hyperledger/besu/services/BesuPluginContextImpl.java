@@ -34,10 +34,10 @@ import java.util.stream.Stream;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hyperledger.besu.plugin.PantheonContext;
-import org.hyperledger.besu.plugin.PantheonPlugin;
+import org.hyperledger.besu.plugin.BesuContext;
+import org.hyperledger.besu.plugin.BesuPlugin;
 
-public class PantheonPluginContextImpl implements PantheonContext {
+public class BesuPluginContextImpl implements BesuContext {
 
   private static final Logger LOG = LogManager.getLogger();
 
@@ -53,7 +53,7 @@ public class PantheonPluginContextImpl implements PantheonContext {
 
   private Lifecycle state = Lifecycle.UNINITIALIZED;
   private final Map<Class<?>, ? super Object> serviceRegistry = new HashMap<>();
-  private final List<PantheonPlugin> plugins = new ArrayList<>();
+  private final List<BesuPlugin> plugins = new ArrayList<>();
 
   public <T> void addService(final Class<T> serviceType, final T service) {
     checkArgument(serviceType.isInterface(), "Services must be Java interfaces.");
@@ -72,7 +72,7 @@ public class PantheonPluginContextImpl implements PantheonContext {
   public void registerPlugins(final Path pluginsDir) {
     checkState(
         state == Lifecycle.UNINITIALIZED,
-        "Pantheon plugins have already been registered.  Cannot register additional plugins.");
+        "Besu plugins have already been registered.  Cannot register additional plugins.");
     if (pluginsDir == null) {
       LOG.debug("Plugins are disabled.");
       return;
@@ -85,14 +85,14 @@ public class PantheonPluginContextImpl implements PantheonContext {
         final URL[] pluginJarURLs =
             pluginFilesList
                 .filter(p -> p.getFileName().toString().endsWith(".jar"))
-                .map(PantheonPluginContextImpl::pathToURIOrNull)
+                .map(BesuPluginContextImpl::pathToURIOrNull)
                 .toArray(URL[]::new);
-        final ServiceLoader<PantheonPlugin> serviceLoader =
+        final ServiceLoader<BesuPlugin> serviceLoader =
             ServiceLoader.load(
-                PantheonPlugin.class,
+                BesuPlugin.class,
                 new URLClassLoader(pluginJarURLs, this.getClass().getClassLoader()));
 
-        for (final PantheonPlugin plugin : serviceLoader) {
+        for (final BesuPlugin plugin : serviceLoader) {
           try {
             plugin.register(this);
             LOG.debug("Registered plugin of type {}.", plugin.getClass().getName());
@@ -121,14 +121,14 @@ public class PantheonPluginContextImpl implements PantheonContext {
   public void startPlugins() {
     checkState(
         state == Lifecycle.REGISTERED,
-        "PantheonContext should be in state %s but it was in %s",
+        "BesuContext should be in state %s but it was in %s",
         Lifecycle.REGISTERED,
         state);
     state = Lifecycle.STARTING;
-    final Iterator<PantheonPlugin> pluginsIterator = plugins.iterator();
+    final Iterator<BesuPlugin> pluginsIterator = plugins.iterator();
 
     while (pluginsIterator.hasNext()) {
-      final PantheonPlugin plugin = pluginsIterator.next();
+      final BesuPlugin plugin = pluginsIterator.next();
 
       try {
         plugin.start();
@@ -149,12 +149,12 @@ public class PantheonPluginContextImpl implements PantheonContext {
   public void stopPlugins() {
     checkState(
         state == Lifecycle.STARTED,
-        "PantheonContext should be in state %s but it was in %s",
+        "BesuContext should be in state %s but it was in %s",
         Lifecycle.STARTED,
         state);
     state = Lifecycle.STOPPING;
 
-    for (final PantheonPlugin plugin : plugins) {
+    for (final BesuPlugin plugin : plugins) {
       try {
         plugin.stop();
         LOG.debug("Stopped plugin of type {}.", plugin.getClass().getName());
@@ -176,7 +176,7 @@ public class PantheonPluginContextImpl implements PantheonContext {
   }
 
   @VisibleForTesting
-  List<PantheonPlugin> getPlugins() {
+  List<BesuPlugin> getPlugins() {
     return Collections.unmodifiableList(plugins);
   }
 }

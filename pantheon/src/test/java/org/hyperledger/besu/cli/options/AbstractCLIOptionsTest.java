@@ -55,8 +55,8 @@ public abstract class AbstractCLIOptionsTest<D, T extends CLIOptions<D>>
     T options = optionsFromDomainObject(domainObject);
     final String[] cliOptions = options.getCLIOptions().toArray(new String[0]);
 
-    final TestPantheonCommand cmd = parseCommand(cliOptions);
-    final T optionsFromCommand = getOptionsFromPantheonCommand(cmd);
+    final TestBesuCommand cmd = parseCommand(cliOptions);
+    final T optionsFromCommand = getOptionsFromBesuCommand(cmd);
 
     assertThat(optionsFromCommand).isEqualToComparingFieldByField(options);
 
@@ -66,11 +66,11 @@ public abstract class AbstractCLIOptionsTest<D, T extends CLIOptions<D>>
 
   @Test
   public void defaultValues() {
-    final TestPantheonCommand cmd = parseCommand();
+    final TestBesuCommand cmd = parseCommand();
 
     final D defaultDomainObject = createDefaultDomainObject();
     final T defaultOptions = optionsFromDomainObject(defaultDomainObject);
-    final T optionsFromCommand = getOptionsFromPantheonCommand(cmd);
+    final T optionsFromCommand = getOptionsFromBesuCommand(cmd);
 
     // Check default values supplied by CLI match expected default values
     final String[] fieldsToIgnore = getFieldsWithComputedDefaults().toArray(new String[0]);
@@ -91,5 +91,5 @@ public abstract class AbstractCLIOptionsTest<D, T extends CLIOptions<D>>
 
   abstract T optionsFromDomainObject(D domainObject);
 
-  abstract T getOptionsFromPantheonCommand(final TestPantheonCommand pantheonCommand);
+  abstract T getOptionsFromBesuCommand(final TestBesuCommand besuCommand);
 }

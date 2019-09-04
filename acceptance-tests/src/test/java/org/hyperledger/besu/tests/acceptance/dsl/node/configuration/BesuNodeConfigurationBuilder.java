@@ -31,7 +31,7 @@ import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 
-public class PantheonNodeConfigurationBuilder {
+public class BesuNodeConfigurationBuilder {
 
   private String name;
   private MiningParameters miningParameters =
@@ -52,30 +52,30 @@ public class PantheonNodeConfigurationBuilder {
   private List<String> extraCLIOptions = new ArrayList<>();
   private List<String> staticNodes = new ArrayList<>();
 
-  public PantheonNodeConfigurationBuilder() {
+  public BesuNodeConfigurationBuilder() {
     // Check connections more frequently during acceptance tests to cut down on
     // intermittent failures due to the fact that we're running over a real network
     networkingConfiguration.setInitiateConnectionsFrequency(5);
   }
 
-  public PantheonNodeConfigurationBuilder name(final String name) {
+  public BesuNodeConfigurationBuilder name(final String name) {
     this.name = name;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder miningEnabled() {
+  public BesuNodeConfigurationBuilder miningEnabled() {
     this.miningParameters = new MiningParametersTestBuilder().enabled(true).build();
     this.jsonRpcConfiguration.addRpcApi(RpcApis.MINER);
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder jsonRpcConfiguration(
+  public BesuNodeConfigurationBuilder jsonRpcConfiguration(
       final JsonRpcConfiguration jsonRpcConfiguration) {
     this.jsonRpcConfiguration = jsonRpcConfiguration;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder jsonRpcEnabled() {
+  public BesuNodeConfigurationBuilder jsonRpcEnabled() {
     this.jsonRpcConfiguration.setEnabled(true);
     this.jsonRpcConfiguration.setPort(0);
     this.jsonRpcConfiguration.setHostsWhitelist(singletonList("*"));
@@ -83,13 +83,13 @@ public class PantheonNodeConfigurationBuilder {
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder enablePrivateTransactions() {
+  public BesuNodeConfigurationBuilder enablePrivateTransactions() {
     this.jsonRpcConfiguration.addRpcApi(RpcApis.EEA);
     this.jsonRpcConfiguration.addRpcApi(RpcApis.PRIV);
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder jsonRpcAuthenticationEnabled() throws URISyntaxException {
+  public BesuNodeConfigurationBuilder jsonRpcAuthenticationEnabled() throws URISyntaxException {
     final String authTomlPath =
         Paths.get(ClassLoader.getSystemResource("authentication/auth.toml").toURI())
             .toAbsolutePath()
@@ -101,19 +101,19 @@ public class PantheonNodeConfigurationBuilder {
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder webSocketConfiguration(
+  public BesuNodeConfigurationBuilder webSocketConfiguration(
       final WebSocketConfiguration webSocketConfiguration) {
     this.webSocketConfiguration = webSocketConfiguration;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder metricsConfiguration(
+  public BesuNodeConfigurationBuilder metricsConfiguration(
       final MetricsConfiguration metricsConfiguration) {
     this.metricsConfiguration = metricsConfiguration;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder webSocketEnabled() {
+  public BesuNodeConfigurationBuilder webSocketEnabled() {
     final WebSocketConfiguration config = WebSocketConfiguration.createDefault();
     config.setEnabled(true);
     config.setPort(0);
@@ -123,12 +123,12 @@ public class PantheonNodeConfigurationBuilder {
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder bootnodeEligible(final boolean bootnodeEligible) {
+  public BesuNodeConfigurationBuilder bootnodeEligible(final boolean bootnodeEligible) {
     this.bootnodeEligible = bootnodeEligible;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder webSocketAuthenticationEnabled()
+  public BesuNodeConfigurationBuilder webSocketAuthenticationEnabled()
       throws URISyntaxException {
     final String authTomlPath =
         Paths.get(ClassLoader.getSystemResource("authentication/auth.toml").toURI())
@@ -141,62 +141,62 @@ public class PantheonNodeConfigurationBuilder {
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder permissioningConfiguration(
+  public BesuNodeConfigurationBuilder permissioningConfiguration(
       final PermissioningConfiguration permissioningConfiguration) {
     this.permissioningConfiguration = Optional.of(permissioningConfiguration);
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder keyFilePath(final String keyFilePath) {
+  public BesuNodeConfigurationBuilder keyFilePath(final String keyFilePath) {
     this.keyFilePath = Optional.of(keyFilePath);
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder devMode(final boolean devMode) {
+  public BesuNodeConfigurationBuilder devMode(final boolean devMode) {
     this.devMode = devMode;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder genesisConfigProvider(
+  public BesuNodeConfigurationBuilder genesisConfigProvider(
       final GenesisConfigurationProvider genesisConfigProvider) {
     this.genesisConfigProvider = genesisConfigProvider;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder p2pEnabled(final Boolean p2pEnabled) {
+  public BesuNodeConfigurationBuilder p2pEnabled(final Boolean p2pEnabled) {
     this.p2pEnabled = p2pEnabled;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder discoveryEnabled(final boolean discoveryEnabled) {
+  public BesuNodeConfigurationBuilder discoveryEnabled(final boolean discoveryEnabled) {
     this.discoveryEnabled = discoveryEnabled;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder plugins(final List<String> plugins) {
+  public BesuNodeConfigurationBuilder plugins(final List<String> plugins) {
     this.plugins.clear();
     this.plugins.addAll(plugins);
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder extraCLIOptions(final List<String> extraCLIOptions) {
+  public BesuNodeConfigurationBuilder extraCLIOptions(final List<String> extraCLIOptions) {
     this.extraCLIOptions.clear();
     this.extraCLIOptions.addAll(extraCLIOptions);
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder revertReasonEnabled() {
+  public BesuNodeConfigurationBuilder revertReasonEnabled() {
     this.revertReasonEnabled = true;
     return this;
   }
 
-  public PantheonNodeConfigurationBuilder staticNodes(final List<String> staticNodes) {
+  public BesuNodeConfigurationBuilder staticNodes(final List<String> staticNodes) {
     this.staticNodes = staticNodes;
     return this;
   }
 
-  public PantheonNodeConfiguration build() {
-    return new PantheonNodeConfiguration(
+  public BesuNodeConfiguration build() {
+    return new BesuNodeConfiguration(
         name,
         miningParameters,
         jsonRpcConfiguration,

@@ -24,7 +24,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.condition.perm.PermissioningCon
 import org.hyperledger.besu.tests.acceptance.dsl.condition.web3.Web3Conditions;
 import org.hyperledger.besu.tests.acceptance.dsl.contract.ContractVerifier;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.Cluster;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuNodeFactory;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.permissioning.PermissionedNodeBuilder;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.account.AccountTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.admin.AdminTransactions;
@@ -56,7 +56,7 @@ public class AcceptanceTestBase {
   protected final Ibft2Conditions ibftTwo;
   protected final LoginConditions login;
   protected final NetConditions net;
-  protected final PantheonNodeFactory pantheon;
+  protected final BesuNodeFactory besu;
   protected final PermissioningConditions perm;
   protected final PermissionedNodeBuilder permissionedNodeBuilder;
   protected final PermissioningTransactions permissioningTransactions;
@@ -84,7 +84,7 @@ public class AcceptanceTestBase {
     perm = new PermissioningConditions(permissioningTransactions);
     admin = new AdminConditions(adminTransactions);
     web3 = new Web3Conditions(new Web3Transactions());
-    pantheon = new PantheonNodeFactory();
+    besu = new BesuNodeFactory();
     contractVerifier = new ContractVerifier(accounts.getPrimaryBenefactor());
     permissionedNodeBuilder = new PermissionedNodeBuilder();
   }

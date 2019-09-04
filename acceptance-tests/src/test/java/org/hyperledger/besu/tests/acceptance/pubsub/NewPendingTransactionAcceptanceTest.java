@@ -16,7 +16,7 @@ import io.vertx.core.Vertx;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.pubsub.Subscription;
 import org.hyperledger.besu.tests.acceptance.dsl.pubsub.WebSocket;
 import org.junit.After;
@@ -29,14 +29,14 @@ public class NewPendingTransactionAcceptanceTest extends AcceptanceTestBase {
   private Account accountOne;
   private WebSocket minerWebSocket;
   private WebSocket archiveWebSocket;
-  private PantheonNode minerNode;
-  private PantheonNode archiveNode;
+  private BesuNode minerNode;
+  private BesuNode archiveNode;
 
   @Before
   public void setUp() throws Exception {
     vertx = Vertx.vertx();
-    minerNode = pantheon.createMinerNode("miner-node1");
-    archiveNode = pantheon.createArchiveNode("full-node1");
+    minerNode = besu.createMinerNode("miner-node1");
+    archiveNode = besu.createArchiveNode("full-node1");
     cluster.start(minerNode, archiveNode);
     accountOne = accounts.createAccount("account-one");
     minerWebSocket = new WebSocket(vertx, minerNode.getConfiguration());

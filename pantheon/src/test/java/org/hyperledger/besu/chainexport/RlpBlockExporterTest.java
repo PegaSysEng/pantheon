@@ -23,7 +23,7 @@ import java.util.Optional;
 
 import org.hyperledger.besu.chainimport.RlpBlockImporter;
 import org.hyperledger.besu.config.GenesisConfigFile;
-import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Block;
@@ -56,7 +56,7 @@ public final class RlpBlockExporterTest {
 
   @BeforeClass
   public static void setupBlockchain() throws IOException {
-    final PantheonController<?> controller = createController();
+    final BesuController<?> controller = createController();
     final Path blocks = folder.newFile("1000.blocks").toPath();
     BlockTestUtil.write1000Blocks(blocks);
     blockchain = importBlocks(controller, blocks);
@@ -65,16 +65,16 @@ public final class RlpBlockExporterTest {
   }
 
   private static Blockchain importBlocks(
-      final PantheonController<?> controller, final Path blocksFile) throws IOException {
+      final BesuController<?> controller, final Path blocksFile) throws IOException {
     final RlpBlockImporter blockImporter = new RlpBlockImporter();
 
     blockImporter.importBlockchain(blocksFile, controller);
     return controller.getProtocolContext().getBlockchain();
   }
 
-  private static PantheonController<?> createController() throws IOException {
+  private static BesuController<?> createController() throws IOException {
     final Path dataDir = folder.newFolder().toPath();
-    return new PantheonController.Builder()
+    return new BesuController.Builder()
         .fromGenesisConfig(GenesisConfigFile.mainnet())
         .synchronizerConfiguration(SynchronizerConfiguration.builder().build())
         .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())

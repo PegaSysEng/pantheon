@@ -16,10 +16,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({"payload", "from", "privacyGroupId"})
-public class SendRequestPantheon extends SendRequest {
+public class SendRequestBesu extends SendRequest {
   private String privacyGroupId;
 
-  public SendRequestPantheon(
+  public SendRequestBesu(
       @JsonProperty(value = "payload") final String payload,
       @JsonProperty(value = "from") final String from,
       @JsonProperty(value = "to") final String privacyGroupId) {

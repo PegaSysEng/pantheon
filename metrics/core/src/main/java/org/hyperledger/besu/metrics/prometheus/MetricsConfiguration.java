@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.metrics.prometheus;
 
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.DEFAULT_METRIC_CATEGORIES;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -178,7 +178,7 @@ public class MetricsConfiguration {
     private int pushPort = DEFAULT_METRICS_PUSH_PORT;
     private String pushHost = DEFAULT_METRICS_PUSH_HOST;
     private int pushInterval = 15;
-    private String prometheusJob = "pantheon-client";
+    private String prometheusJob = "besu-client";
     private List<String> hostsWhitelist = Arrays.asList("localhost", "127.0.0.1");
     private boolean timersEnabled = DEFAULT_TIMERS_ENABLED;
 

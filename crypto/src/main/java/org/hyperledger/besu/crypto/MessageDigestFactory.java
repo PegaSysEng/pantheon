@@ -21,7 +21,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 public class MessageDigestFactory {
 
   static {
-    Security.addProvider(new PantheonProvider());
+    Security.addProvider(new BesuProvider());
     Security.addProvider(new BouncyCastleProvider());
   }
 

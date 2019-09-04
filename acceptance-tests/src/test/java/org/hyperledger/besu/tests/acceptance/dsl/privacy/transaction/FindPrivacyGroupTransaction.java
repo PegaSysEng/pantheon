@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import org.web3j.protocol.pantheon.Pantheon;
-import org.web3j.protocol.pantheon.response.privacy.PrivacyGroup;
+import org.web3j.protocol.besu.Besu;
+import org.web3j.protocol.besu.response.privacy.PrivacyGroup;
 import org.web3j.utils.Base64String;
 
 public class FindPrivacyGroupTransaction implements Transaction<List<PrivacyGroup>> {
@@ -32,9 +32,9 @@ public class FindPrivacyGroupTransaction implements Transaction<List<PrivacyGrou
 
   @Override
   public List<PrivacyGroup> execute(final NodeRequests node) {
-    final Pantheon pantheon = node.privacy().getPantheonClient();
+    final Besu besu = node.privacy().getBesuClient();
     try {
-      return pantheon.privFindPrivacyGroup(nodes).send().getGroups();
+      return besu.privFindPrivacyGroup(nodes).send().getGroups();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
