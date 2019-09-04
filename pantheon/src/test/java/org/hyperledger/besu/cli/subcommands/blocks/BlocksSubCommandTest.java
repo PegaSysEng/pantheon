@@ -70,10 +70,11 @@ public class BlocksSubCommandTest extends CommandTestAbstract {
           + "  -V, --version       Print version information and exit."
           + System.lineSeparator();
 
+
   private static final String EXPECTED_BLOCK_EXPORT_USAGE =
       "Usage: besu blocks export [-hV] [--end-block=<LONG>] [--start-block=<LONG>]"
           + System.lineSeparator()
-          + "                              --to=<FILE>"
+          + "                          --to=<FILE>"
           + System.lineSeparator()
           + "This command exports a specific block, or list of blocks from storage."
           + System.lineSeparator()
