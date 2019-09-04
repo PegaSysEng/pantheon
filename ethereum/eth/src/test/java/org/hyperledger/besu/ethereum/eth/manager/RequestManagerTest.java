@@ -14,10 +14,10 @@ package org.hyperledger.besu.ethereum.eth.manager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.RequestSender;
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseCallback;
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
+import org.hyperledger.besu.ethereum.eth.EthProtocol;
+import org.hyperledger.besu.ethereum.eth.manager.RequestManager.RequestSender;
+import org.hyperledger.besu.ethereum.eth.manager.RequestManager.ResponseCallback;
+import org.hyperledger.besu.ethereum.eth.manager.RequestManager.ResponseStream;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;

@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.graphql;
 
 import static graphql.schema.idl.TypeRuntimeWiring.newTypeWiring;
 
-import tech.pegasys.pantheon.ethereum.graphql.internal.Scalars;
+import org.hyperledger.besu.ethereum.graphql.internal.Scalars;
 
 import java.io.IOException;
 import java.net.URL;

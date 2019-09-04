@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.eth.messages;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.eth.EthProtocol.EthVersion;
+import org.hyperledger.besu.ethereum.eth.EthProtocol.EthVersion;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.UInt256;

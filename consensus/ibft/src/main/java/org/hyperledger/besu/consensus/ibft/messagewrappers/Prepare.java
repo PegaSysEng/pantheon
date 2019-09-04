@@ -15,7 +15,7 @@ package org.hyperledger.besu.consensus.ibft.messagewrappers;
 import org.hyperledger.besu.consensus.ibft.payload.SignedData;
 import org.hyperledger.besu.consensus.ibft.payload.PreparePayload;
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class Prepare extends IbftMessage<PreparePayload> {

@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.hyperledger.besu.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 

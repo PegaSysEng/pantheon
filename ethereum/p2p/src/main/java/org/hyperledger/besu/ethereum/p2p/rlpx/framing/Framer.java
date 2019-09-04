@@ -20,7 +20,7 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.Handshaker;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.HandshakeSecrets;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Arrays;

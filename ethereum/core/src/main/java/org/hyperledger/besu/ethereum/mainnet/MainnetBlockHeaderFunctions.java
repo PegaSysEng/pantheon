@@ -16,7 +16,7 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.ParsedExtraData;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 /** Implements the block hashing algorithm for MainNet as per the yellow paper. */

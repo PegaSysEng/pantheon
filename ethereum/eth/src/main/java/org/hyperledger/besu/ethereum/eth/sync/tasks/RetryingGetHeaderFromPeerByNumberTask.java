@@ -13,11 +13,11 @@
 package org.hyperledger.besu.ethereum.eth.sync.tasks;
 
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractGetHeadersFromPeerTask;
-import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractRetryingPeerTask;
-import tech.pegasys.pantheon.ethereum.eth.manager.task.GetHeadersFromPeerByNumberTask;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.task.AbstractGetHeadersFromPeerTask;
+import org.hyperledger.besu.ethereum.eth.manager.task.AbstractRetryingPeerTask;
+import org.hyperledger.besu.ethereum.eth.manager.task.GetHeadersFromPeerByNumberTask;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 

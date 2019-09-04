@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerDisconnectedException;
+import org.hyperledger.besu.ethereum.eth.manager.RequestManager.ResponseStream;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.PeerDisconnectedException;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
 
 import java.util.Optional;

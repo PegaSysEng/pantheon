@@ -14,10 +14,10 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages;
 
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.AbstractMessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
-import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
+import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
+import org.hyperledger.besu.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Optional;

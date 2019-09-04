@@ -13,11 +13,11 @@
 package org.hyperledger.besu.ethereum.p2p.discovery.internal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.ethereum.p2p.peers.PeerTestHelper.enode;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enode;
 
 import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
+import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Arrays;

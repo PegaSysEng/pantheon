@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;

@@ -14,7 +14,7 @@ package org.hyperledger.besu.cli.options;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.p2p.config.NetworkingConfiguration;
+import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
 
 import org.junit.Test;
 

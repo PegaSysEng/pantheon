@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.eth.manager.task;
 
 import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
+import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;

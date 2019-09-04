@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.jsonrpc;
 
 import org.hyperledger.besu.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.util.NonceProvider;
 

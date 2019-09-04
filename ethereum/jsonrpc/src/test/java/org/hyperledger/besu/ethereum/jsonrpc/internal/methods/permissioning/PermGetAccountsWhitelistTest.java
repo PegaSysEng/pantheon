@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
+import org.hyperledger.besu.ethereum.permissioning.AccountLocalConfigPermissioningController;
 
 import java.util.ArrayList;
 import java.util.Arrays;

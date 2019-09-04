@@ -18,7 +18,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.StaticNodesUtils;
 import org.hyperledger.besu.cli.options.NetworkingOptions;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 
 import java.io.BufferedReader;
 import java.io.File;

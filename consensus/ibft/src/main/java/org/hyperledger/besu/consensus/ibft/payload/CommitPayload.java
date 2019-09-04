@@ -16,8 +16,8 @@ import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
-import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -40,7 +40,7 @@ public class CommitPayload implements Payload {
   public static CommitPayload readFrom(final RLPInput rlpInput) {
     rlpInput.enterList();
     final ConsensusRoundIdentifier roundIdentifier = ConsensusRoundIdentifier.readFrom(rlpInput);
-    final Hash digest = readDigest(rlpInput);
+    final Hash digest = Payload.readDigest(rlpInput);
     final Signature commitSeal = rlpInput.readBytesValue(Signature::decode);
     rlpInput.leaveList();
 

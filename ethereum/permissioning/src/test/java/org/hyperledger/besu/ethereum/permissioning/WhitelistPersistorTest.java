@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.permissioning;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
+import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
 
 import java.io.File;
 import java.io.IOException;

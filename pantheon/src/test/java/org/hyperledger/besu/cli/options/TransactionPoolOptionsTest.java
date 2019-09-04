@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.cli.CommandTestAbstract;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
 
 import org.junit.Test;
 

@@ -66,7 +66,7 @@ public abstract class AbstractBytesValue implements BytesValue {
 
   @Override
   public BytesValue copy() {
-    return wrap(extractArray());
+    return BytesValue.wrap(extractArray());
   }
 
   @Override

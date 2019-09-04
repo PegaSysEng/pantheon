@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions.TransactionInfo;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions.TransactionInfo;
 
 import java.util.Set;
 import java.util.stream.Collectors;

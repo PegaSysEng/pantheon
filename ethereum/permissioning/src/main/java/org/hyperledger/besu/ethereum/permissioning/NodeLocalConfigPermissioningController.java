@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.permissioning;
 
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
+import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningProvider;
 import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;

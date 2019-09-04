@@ -17,10 +17,10 @@ import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 import org.hyperledger.besu.ethereum.core.WorldState;
-import tech.pegasys.pantheon.ethereum.graphql.internal.BlockchainQuery;
-import tech.pegasys.pantheon.ethereum.graphql.internal.LogWithMetadata;
-import tech.pegasys.pantheon.ethereum.graphql.internal.TransactionReceiptWithMetadata;
-import tech.pegasys.pantheon.ethereum.graphql.internal.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
+import org.hyperledger.besu.ethereum.graphql.internal.LogWithMetadata;
+import org.hyperledger.besu.ethereum.graphql.internal.TransactionReceiptWithMetadata;
+import org.hyperledger.besu.ethereum.graphql.internal.TransactionWithMetadata;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
 

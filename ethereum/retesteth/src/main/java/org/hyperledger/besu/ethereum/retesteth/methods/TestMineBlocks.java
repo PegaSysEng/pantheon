@@ -25,8 +25,8 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.retesteth.RetestethClock;
-import tech.pegasys.pantheon.ethereum.retesteth.RetestethContext;
+import org.hyperledger.besu.ethereum.retesteth.RetestethClock;
+import org.hyperledger.besu.ethereum.retesteth.RetestethContext;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import com.google.common.base.Functions;

@@ -18,8 +18,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactions.TransactionInfo;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions.TransactionInfo;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.PendingTransactionsResult;

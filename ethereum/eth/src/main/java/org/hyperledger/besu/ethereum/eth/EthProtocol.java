@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.eth;
 
-import tech.pegasys.pantheon.ethereum.eth.messages.EthPV62;
-import tech.pegasys.pantheon.ethereum.eth.messages.EthPV63;
+import org.hyperledger.besu.ethereum.eth.messages.EthPV62;
+import org.hyperledger.besu.ethereum.eth.messages.EthPV63;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
 

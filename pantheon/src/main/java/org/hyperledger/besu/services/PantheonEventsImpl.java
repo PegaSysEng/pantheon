@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.services;
 
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.eth.sync.BlockBroadcaster;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import org.hyperledger.besu.plugin.services.PantheonEvents;
 
 public class PantheonEventsImpl implements PantheonEvents {

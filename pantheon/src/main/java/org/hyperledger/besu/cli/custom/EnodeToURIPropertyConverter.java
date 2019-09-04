@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.cli.custom;
 
-import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 
 import java.net.URI;
 import java.util.function.Function;

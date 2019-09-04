@@ -14,9 +14,9 @@ package org.hyperledger.besu.ethereum.trie;
 
 import static java.lang.String.format;
 
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.ethereum.rlp.RLPException;
-import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.RLPException;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

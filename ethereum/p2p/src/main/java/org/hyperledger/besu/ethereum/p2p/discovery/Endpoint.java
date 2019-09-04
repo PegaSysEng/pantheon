@@ -16,8 +16,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.hyperledger.besu.util.Preconditions.checkGuard;
 
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
-import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 import org.hyperledger.besu.util.NetworkUtility;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

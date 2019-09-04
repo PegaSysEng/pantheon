@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.jsonrpc.MockPeerConnection;
+import org.hyperledger.besu.ethereum.jsonrpc.MockPeerConnection;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;

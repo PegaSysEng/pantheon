@@ -14,9 +14,9 @@ package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.LogTopic;
-import tech.pegasys.pantheon.ethereum.graphql.internal.BlockchainQuery;
-import tech.pegasys.pantheon.ethereum.graphql.internal.LogWithMetadata;
-import tech.pegasys.pantheon.ethereum.graphql.internal.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
+import org.hyperledger.besu.ethereum.graphql.internal.LogWithMetadata;
+import org.hyperledger.besu.ethereum.graphql.internal.TransactionWithMetadata;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

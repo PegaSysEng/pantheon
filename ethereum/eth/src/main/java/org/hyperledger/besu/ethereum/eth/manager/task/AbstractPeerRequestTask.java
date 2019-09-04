@@ -12,15 +12,15 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager.task;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.PeerRequest;
-import tech.pegasys.pantheon.ethereum.eth.manager.PendingPeerRequest;
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.PeerBreachedProtocolException;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.PeerRequest;
+import org.hyperledger.besu.ethereum.eth.manager.PendingPeerRequest;
+import org.hyperledger.besu.ethereum.eth.manager.RequestManager.ResponseStream;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.PeerBreachedProtocolException;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.ethereum.rlp.RLPException;
+import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.util.ExceptionUtils;
 

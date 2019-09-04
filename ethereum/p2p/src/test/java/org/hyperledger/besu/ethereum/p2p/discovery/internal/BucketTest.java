@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryTestHelper;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryTestHelper;
 
 import java.util.List;
 import java.util.Optional;

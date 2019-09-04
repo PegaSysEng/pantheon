@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.cli.options;
 
-import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
-import tech.pegasys.pantheon.util.number.PositiveNumber;
+import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
+import org.hyperledger.besu.util.number.PositiveNumber;
 
 import java.util.Arrays;
 import java.util.List;

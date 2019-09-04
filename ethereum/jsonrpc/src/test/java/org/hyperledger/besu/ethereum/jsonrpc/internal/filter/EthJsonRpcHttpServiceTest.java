@@ -18,7 +18,7 @@ import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.jsonrpc.AbstractJsonRpcHttpServiceTest;
+import org.hyperledger.besu.ethereum.jsonrpc.AbstractJsonRpcHttpServiceTest;
 
 import java.io.IOException;
 

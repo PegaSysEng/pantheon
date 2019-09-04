@@ -13,9 +13,9 @@
 package org.hyperledger.besu.ethereum.eth.sync.state;
 
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.eth.manager.ChainState;
-import tech.pegasys.pantheon.ethereum.eth.manager.ChainState.EstimatedHeightListener;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.ChainState;
+import org.hyperledger.besu.ethereum.eth.manager.ChainState.EstimatedHeightListener;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 
 import java.util.Objects;
 

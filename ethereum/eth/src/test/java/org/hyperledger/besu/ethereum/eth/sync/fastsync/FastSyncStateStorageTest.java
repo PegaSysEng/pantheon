@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastSyncState.EMPTY_SYNC_STATE;
+import static org.hyperledger.besu.ethereum.eth.sync.fastsync.FastSyncState.EMPTY_SYNC_STATE;
 
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;

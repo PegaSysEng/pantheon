@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.eth.messages;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static tech.pegasys.pantheon.ethereum.eth.messages.LimitedTransactionsMessages.LIMIT;
+import static org.hyperledger.besu.ethereum.eth.messages.LimitedTransactionsMessages.LIMIT;
 
 import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import org.hyperledger.besu.ethereum.core.Transaction;

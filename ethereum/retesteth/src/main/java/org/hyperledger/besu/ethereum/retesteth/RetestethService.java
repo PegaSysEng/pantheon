@@ -29,12 +29,12 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.Web3ClientVersion;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResultFactory;
-import tech.pegasys.pantheon.ethereum.retesteth.methods.TestGetLogHash;
-import tech.pegasys.pantheon.ethereum.retesteth.methods.TestImportRawBlock;
-import tech.pegasys.pantheon.ethereum.retesteth.methods.TestMineBlocks;
-import tech.pegasys.pantheon.ethereum.retesteth.methods.TestModifyTimestamp;
-import tech.pegasys.pantheon.ethereum.retesteth.methods.TestRewindToBlock;
-import tech.pegasys.pantheon.ethereum.retesteth.methods.TestSetChainParams;
+import org.hyperledger.besu.ethereum.retesteth.methods.TestGetLogHash;
+import org.hyperledger.besu.ethereum.retesteth.methods.TestImportRawBlock;
+import org.hyperledger.besu.ethereum.retesteth.methods.TestMineBlocks;
+import org.hyperledger.besu.ethereum.retesteth.methods.TestModifyTimestamp;
+import org.hyperledger.besu.ethereum.retesteth.methods.TestRewindToBlock;
+import org.hyperledger.besu.ethereum.retesteth.methods.TestSetChainParams;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import java.util.HashMap;

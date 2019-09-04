@@ -20,12 +20,12 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
-import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.NodePermissioningControllerFactory;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeSmartContractPermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.SmartContractPermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController;
+import org.hyperledger.besu.ethereum.permissioning.NodePermissioningControllerFactory;
+import org.hyperledger.besu.ethereum.permissioning.NodeSmartContractPermissioningController;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 

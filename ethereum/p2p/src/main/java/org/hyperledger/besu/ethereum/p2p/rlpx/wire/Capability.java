@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.wire;
 
 import static org.hyperledger.besu.util.bytes.BytesValue.wrap;
 
-import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
-import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValues;
 
 import java.nio.charset.StandardCharsets;

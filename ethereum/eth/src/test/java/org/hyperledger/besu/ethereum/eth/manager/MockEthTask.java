@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.task.AbstractEthTask;
+import org.hyperledger.besu.ethereum.eth.manager.task.AbstractEthTask;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
 import java.util.concurrent.CountDownLatch;

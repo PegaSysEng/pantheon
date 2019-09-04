@@ -24,7 +24,7 @@ import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.jsonrpc.SimpleTestTransactionBuilder;
+import org.hyperledger.besu.ethereum.jsonrpc.SimpleTestTransactionBuilder;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.Subscription;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;

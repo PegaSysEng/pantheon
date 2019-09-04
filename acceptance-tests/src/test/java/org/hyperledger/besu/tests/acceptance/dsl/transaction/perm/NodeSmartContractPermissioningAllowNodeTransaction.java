@@ -18,7 +18,7 @@ import static org.web3j.utils.Numeric.toHexString;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeSmartContractPermissioningController;
+import org.hyperledger.besu.ethereum.permissioning.NodeSmartContractPermissioningController;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;

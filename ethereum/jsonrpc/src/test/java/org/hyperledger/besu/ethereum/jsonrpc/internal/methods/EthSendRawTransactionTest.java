@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;

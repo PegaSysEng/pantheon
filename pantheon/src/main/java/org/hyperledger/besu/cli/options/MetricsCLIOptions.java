@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.cli.options;
 
-import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 
 import java.util.Arrays;
 import java.util.List;

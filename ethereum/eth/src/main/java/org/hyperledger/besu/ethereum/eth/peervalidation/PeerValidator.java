@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.peervalidation;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 
 import java.time.Duration;

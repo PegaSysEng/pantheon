@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
+import org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController;
 
 import java.util.ArrayList;
 import java.util.List;

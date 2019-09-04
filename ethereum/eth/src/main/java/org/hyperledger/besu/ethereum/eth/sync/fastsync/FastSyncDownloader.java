@@ -15,11 +15,11 @@ package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 import static org.hyperledger.besu.util.FutureUtils.exceptionallyCompose;
 
-import tech.pegasys.pantheon.ethereum.eth.sync.ChainDownloader;
-import tech.pegasys.pantheon.ethereum.eth.sync.TrailingPeerRequirements;
-import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.NodeDataRequest;
-import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.StalledDownloadException;
-import tech.pegasys.pantheon.ethereum.eth.sync.worldstate.WorldStateDownloader;
+import org.hyperledger.besu.ethereum.eth.sync.ChainDownloader;
+import org.hyperledger.besu.ethereum.eth.sync.TrailingPeerRequirements;
+import org.hyperledger.besu.ethereum.eth.sync.worldstate.NodeDataRequest;
+import org.hyperledger.besu.ethereum.eth.sync.worldstate.StalledDownloadException;
+import org.hyperledger.besu.ethereum.eth.sync.worldstate.WorldStateDownloader;
 import org.hyperledger.besu.services.tasks.TaskCollection;
 import org.hyperledger.besu.util.ExceptionUtils;
 

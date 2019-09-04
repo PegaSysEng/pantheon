@@ -17,9 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.BlockingAsyncExecutor;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.MockPeerDiscoveryAgent;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.internal.MockTimerUtil;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.BlockingAsyncExecutor;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.MockPeerDiscoveryAgent;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.MockTimerUtil;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.Packet;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.PacketType;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.PeerDiscoveryController;

@@ -13,9 +13,9 @@
 package org.hyperledger.besu.ethereum.eth.manager;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.ethereum.eth.manager.PeerReputation.USELESS_RESPONSE_WINDOW_IN_MILLIS;
-import static tech.pegasys.pantheon.ethereum.eth.messages.EthPV62.GET_BLOCK_BODIES;
-import static tech.pegasys.pantheon.ethereum.eth.messages.EthPV62.GET_BLOCK_HEADERS;
+import static org.hyperledger.besu.ethereum.eth.manager.PeerReputation.USELESS_RESPONSE_WINDOW_IN_MILLIS;
+import static org.hyperledger.besu.ethereum.eth.messages.EthPV62.GET_BLOCK_BODIES;
+import static org.hyperledger.besu.ethereum.eth.messages.EthPV62.GET_BLOCK_HEADERS;
 import static org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason.TIMEOUT;
 import static org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason.USELESS_PEER;
 

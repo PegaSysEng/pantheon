@@ -28,10 +28,10 @@ import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthScheduler;
-import tech.pegasys.pantheon.ethereum.eth.manager.exceptions.NoAvailablePeersException;
-import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointRangeSource.SyncTargetChecker;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;
+import org.hyperledger.besu.ethereum.eth.sync.CheckpointRangeSource.SyncTargetChecker;
 
 import java.time.Duration;
 import java.util.List;

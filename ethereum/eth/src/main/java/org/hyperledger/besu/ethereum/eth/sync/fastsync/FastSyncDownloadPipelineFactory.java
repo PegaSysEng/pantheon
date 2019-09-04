@@ -21,16 +21,16 @@ import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.SKIP_DE
 
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderFetcher;
-import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointHeaderValidationStep;
-import tech.pegasys.pantheon.ethereum.eth.sync.CheckpointRangeSource;
-import tech.pegasys.pantheon.ethereum.eth.sync.DownloadBodiesStep;
-import tech.pegasys.pantheon.ethereum.eth.sync.DownloadHeadersStep;
-import tech.pegasys.pantheon.ethereum.eth.sync.DownloadPipelineFactory;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.sync.CheckpointHeaderFetcher;
+import org.hyperledger.besu.ethereum.eth.sync.CheckpointHeaderValidationStep;
+import org.hyperledger.besu.ethereum.eth.sync.CheckpointRangeSource;
+import org.hyperledger.besu.ethereum.eth.sync.DownloadBodiesStep;
+import org.hyperledger.besu.ethereum.eth.sync.DownloadHeadersStep;
+import org.hyperledger.besu.ethereum.eth.sync.DownloadPipelineFactory;
+import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
+import org.hyperledger.besu.ethereum.eth.sync.state.SyncTarget;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;

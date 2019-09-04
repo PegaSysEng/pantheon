@@ -17,7 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.hyperledger.besu.ethereum.core.SyncStatus;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
+import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningProvider;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;

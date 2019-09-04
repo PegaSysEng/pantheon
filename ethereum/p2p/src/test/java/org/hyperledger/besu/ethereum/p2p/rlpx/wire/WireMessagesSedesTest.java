@@ -15,8 +15,8 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.wire;
 import static io.netty.buffer.ByteBufUtil.decodeHexDump;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
+import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import org.junit.Test;

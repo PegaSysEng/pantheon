@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.rlp;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import tech.pegasys.pantheon.ethereum.rlp.RLPDecodingHelpers.Kind;
-import tech.pegasys.pantheon.ethereum.rlp.RLPDecodingHelpers.RLPElementMetadata;
+import org.hyperledger.besu.ethereum.rlp.RLPDecodingHelpers.Kind;
+import org.hyperledger.besu.ethereum.rlp.RLPDecodingHelpers.RLPElementMetadata;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.MutableBytes32;

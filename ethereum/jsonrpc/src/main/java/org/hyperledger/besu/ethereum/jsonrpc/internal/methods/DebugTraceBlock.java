@@ -27,8 +27,8 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorRespo
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugTraceTransactionResult;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
-import tech.pegasys.pantheon.ethereum.rlp.RLPException;
+import org.hyperledger.besu.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.ethereum.vm.DebugOperationTracer;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

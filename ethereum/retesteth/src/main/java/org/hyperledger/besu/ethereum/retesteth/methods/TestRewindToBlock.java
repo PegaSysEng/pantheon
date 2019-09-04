@@ -17,7 +17,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.retesteth.RetestethContext;
+import org.hyperledger.besu.ethereum.retesteth.RetestethContext;
 
 public class TestRewindToBlock implements JsonRpcMethod {
   private final RetestethContext context;

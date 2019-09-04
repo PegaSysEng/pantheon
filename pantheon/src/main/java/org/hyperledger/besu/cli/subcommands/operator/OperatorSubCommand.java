@@ -20,13 +20,13 @@ import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_PATH_FORMA
 import static org.hyperledger.besu.cli.subcommands.operator.OperatorSubCommand.COMMAND_NAME;
 
 import org.hyperledger.besu.cli.PantheonCommand;
-import tech.pegasys.pantheon.config.JsonGenesisConfigOptions;
-import tech.pegasys.pantheon.config.JsonUtil;
-import tech.pegasys.pantheon.consensus.ibft.IbftExtraData;
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Util;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.config.JsonGenesisConfigOptions;
+import org.hyperledger.besu.config.JsonUtil;
+import org.hyperledger.besu.consensus.ibft.IbftExtraData;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Util;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.io.File;
 import java.io.IOException;

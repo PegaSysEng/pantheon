@@ -14,9 +14,9 @@ package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.consensus.common.VoteType;
 import org.hyperledger.besu.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.rlp.RLPException;
-import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
-import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
+import org.hyperledger.besu.ethereum.rlp.RLPException;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 
 import java.util.Objects;
 

@@ -36,19 +36,19 @@ public class EventMultiplexer {
   public void handleIbftEvent(final IbftEvent ibftEvent) {
     try {
       switch (ibftEvent.getType()) {
-        case IbftEvents.Type.MESSAGE:
+        case MESSAGE:
           final IbftReceivedMessageEvent rxEvent = (IbftReceivedMessageEvent) ibftEvent;
           ibftController.handleMessageEvent(rxEvent);
           break;
-        case IbftEvents.Type.ROUND_EXPIRY:
+        case ROUND_EXPIRY:
           final RoundExpiry roundExpiryEvent = (RoundExpiry) ibftEvent;
           ibftController.handleRoundExpiry(roundExpiryEvent);
           break;
-        case IbftEvents.Type.NEW_CHAIN_HEAD:
+        case NEW_CHAIN_HEAD:
           final NewChainHead newChainHead = (NewChainHead) ibftEvent;
           ibftController.handleNewBlockEvent(newChainHead);
           break;
-        case IbftEvents.Type.BLOCK_TIMER_EXPIRY:
+        case BLOCK_TIMER_EXPIRY:
           final BlockTimerExpiry blockTimerExpiry = (BlockTimerExpiry) ibftEvent;
           ibftController.handleBlockTimerExpiry(blockTimerExpiry);
           break;

@@ -16,8 +16,8 @@ import static java.util.Collections.emptySet;
 
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer.DisconnectCallback;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer.DisconnectCallback;
 
 import java.util.Collection;
 import java.util.Collections;

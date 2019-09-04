@@ -16,7 +16,7 @@ import static org.junit.Assume.assumeTrue;
 
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
 import org.hyperledger.besu.ethereum.vm.ReferenceTestProtocolSchedules;
-import tech.pegasys.pantheon.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.testutil.JsonTestParameters;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

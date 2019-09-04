@@ -26,7 +26,7 @@ import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockBody;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
-import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
+import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 
 import java.util.Collections;
 

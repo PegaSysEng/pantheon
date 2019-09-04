@@ -16,11 +16,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Streams.stream;
 import static org.hyperledger.besu.util.NetworkUtility.urlForSocketAddress;
 
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLErrorResponse;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLJsonRequest;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponse;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLResponseType;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLSuccessResponse;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLErrorResponse;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLJsonRequest;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLResponse;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLResponseType;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLSuccessResponse;
 import org.hyperledger.besu.util.NetworkUtility;
 
 import java.net.InetSocketAddress;

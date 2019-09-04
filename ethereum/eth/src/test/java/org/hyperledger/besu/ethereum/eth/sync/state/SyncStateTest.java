@@ -32,9 +32,9 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Synchronizer.SyncStatusListener;
-import tech.pegasys.pantheon.ethereum.eth.manager.ChainState;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
+import org.hyperledger.besu.ethereum.eth.manager.ChainState;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
 import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.Collections;

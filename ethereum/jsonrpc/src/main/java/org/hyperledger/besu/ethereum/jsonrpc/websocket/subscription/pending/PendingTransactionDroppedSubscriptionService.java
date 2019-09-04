@@ -16,7 +16,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.Subscription
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.eth.transactions.PendingTransactionDroppedListener;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactionDroppedListener;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 
 import java.util.List;

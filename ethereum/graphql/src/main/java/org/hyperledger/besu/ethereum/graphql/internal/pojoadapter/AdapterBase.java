@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
-import tech.pegasys.pantheon.ethereum.graphql.GraphQLDataFetcherContext;
-import tech.pegasys.pantheon.ethereum.graphql.internal.BlockchainQuery;
+import org.hyperledger.besu.ethereum.graphql.GraphQLDataFetcherContext;
+import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
 
 import graphql.schema.DataFetchingEnvironment;
 

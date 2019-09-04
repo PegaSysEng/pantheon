@@ -17,7 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static org.apache.logging.log4j.util.Strings.join;
 import static org.assertj.core.api.Assertions.assertThat;
-import static tech.pegasys.pantheon.ethereum.eth.transactions.TestNode.shortId;
+import static org.hyperledger.besu.ethereum.eth.transactions.TestNode.shortId;
 
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;

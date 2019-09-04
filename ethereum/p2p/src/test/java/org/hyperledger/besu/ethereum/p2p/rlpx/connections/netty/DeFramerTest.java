@@ -32,12 +32,12 @@ import org.hyperledger.besu.ethereum.p2p.peers.LocalNode;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.netty.testhelpers.NettyMocks;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty.testhelpers.NettyMocks;
 import org.hyperledger.besu.ethereum.p2p.rlpx.framing.Framer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.framing.FramingException;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MockSubProtocol;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MockSubProtocol;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
@@ -45,7 +45,7 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.Di
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.HelloMessage;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.PingMessage;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.WireMessageCodes;
-import tech.pegasys.pantheon.ethereum.rlp.RLPException;
+import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

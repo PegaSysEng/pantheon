@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.graphql.internal.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.graphql.internal.BlockWithMetadata;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Optional;

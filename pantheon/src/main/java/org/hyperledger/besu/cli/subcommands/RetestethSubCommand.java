@@ -17,13 +17,13 @@ import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_PATH_FORMA
 import static org.hyperledger.besu.cli.DefaultCommandValues.MANDATORY_PORT_FORMAT_HELP;
 import static org.hyperledger.besu.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 import static org.hyperledger.besu.cli.subcommands.RetestethSubCommand.COMMAND_NAME;
-import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
+import static org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 
 import org.hyperledger.besu.PantheonInfo;
 import org.hyperledger.besu.cli.custom.JsonRPCWhitelistHostsProperty;
-import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.retesteth.RetestethConfiguration;
-import tech.pegasys.pantheon.ethereum.retesteth.RetestethService;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.retesteth.RetestethConfiguration;
+import org.hyperledger.besu.ethereum.retesteth.RetestethService;
 
 import java.net.InetAddress;
 import java.nio.file.Path;

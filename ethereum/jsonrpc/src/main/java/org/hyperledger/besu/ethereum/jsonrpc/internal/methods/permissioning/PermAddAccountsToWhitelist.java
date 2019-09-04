@@ -20,8 +20,8 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountLocalConfigPermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.WhitelistOperationResult;
+import org.hyperledger.besu.ethereum.permissioning.AccountLocalConfigPermissioningController;
+import org.hyperledger.besu.ethereum.permissioning.WhitelistOperationResult;
 
 import java.util.List;
 import java.util.Optional;

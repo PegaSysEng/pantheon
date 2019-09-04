@@ -40,7 +40,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessRes
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.privacy.PrivateTransactionLegacyResult;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
 import org.hyperledger.besu.ethereum.privacy.Restriction;
-import tech.pegasys.pantheon.ethereum.rlp.BytesValueRLPOutput;
+import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
 

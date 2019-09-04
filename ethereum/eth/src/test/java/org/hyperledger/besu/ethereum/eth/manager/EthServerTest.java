@@ -20,9 +20,9 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
-import tech.pegasys.pantheon.ethereum.eth.messages.GetNodeDataMessage;
-import tech.pegasys.pantheon.ethereum.eth.messages.NodeDataMessage;
+import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
+import org.hyperledger.besu.ethereum.eth.messages.GetNodeDataMessage;
+import org.hyperledger.besu.ethereum.eth.messages.NodeDataMessage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

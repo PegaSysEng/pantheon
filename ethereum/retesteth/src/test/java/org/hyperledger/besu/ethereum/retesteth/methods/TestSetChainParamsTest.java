@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.retesteth.RetestethContext;
+import org.hyperledger.besu.ethereum.retesteth.RetestethContext;
 
 import java.io.IOException;
 

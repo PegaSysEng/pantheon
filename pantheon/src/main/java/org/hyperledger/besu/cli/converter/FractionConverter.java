@@ -13,7 +13,7 @@
 package org.hyperledger.besu.cli.converter;
 
 import org.hyperledger.besu.cli.converter.exception.FractionConversionException;
-import tech.pegasys.pantheon.util.number.Fraction;
+import org.hyperledger.besu.util.number.Fraction;
 
 import picocli.CommandLine;
 

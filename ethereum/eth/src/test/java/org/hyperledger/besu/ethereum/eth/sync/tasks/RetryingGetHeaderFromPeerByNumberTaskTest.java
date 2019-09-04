@@ -15,8 +15,8 @@ package org.hyperledger.besu.ethereum.eth.sync.tasks;
 import static java.util.Collections.singletonList;
 
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
-import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
+import org.hyperledger.besu.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
+import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
 
 import java.util.List;
 

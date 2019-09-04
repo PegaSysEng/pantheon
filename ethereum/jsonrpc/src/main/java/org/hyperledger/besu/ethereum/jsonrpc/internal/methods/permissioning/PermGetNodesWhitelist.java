@@ -20,7 +20,7 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorRespo
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.p2p.network.exceptions.P2PDisabledException;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
+import org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController;
 
 import java.util.List;
 import java.util.Optional;

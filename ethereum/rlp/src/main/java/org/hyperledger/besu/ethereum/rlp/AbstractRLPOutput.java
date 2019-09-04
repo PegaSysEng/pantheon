@@ -13,10 +13,10 @@
 package org.hyperledger.besu.ethereum.rlp;
 
 import static com.google.common.base.Preconditions.checkState;
-import static tech.pegasys.pantheon.ethereum.rlp.RLPEncodingHelpers.elementSize;
-import static tech.pegasys.pantheon.ethereum.rlp.RLPEncodingHelpers.listSize;
-import static tech.pegasys.pantheon.ethereum.rlp.RLPEncodingHelpers.writeElement;
-import static tech.pegasys.pantheon.ethereum.rlp.RLPEncodingHelpers.writeListHeader;
+import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.elementSize;
+import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.listSize;
+import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.writeElement;
+import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.writeListHeader;
 
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.MutableBytesValue;

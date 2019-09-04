@@ -23,7 +23,7 @@ import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
 import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
-import tech.pegasys.pantheon.ethereum.p2p.discovery.PeerDiscoveryTestHelper;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryTestHelper;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.bytes.BytesValue;

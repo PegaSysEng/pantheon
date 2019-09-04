@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.p2p.peers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static tech.pegasys.pantheon.ethereum.p2p.peers.PeerTestHelper.enodeBuilder;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enodeBuilder;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedQueue;
+import org.hyperledger.besu.ethereum.eth.manager.bounded.BoundedQueue;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;

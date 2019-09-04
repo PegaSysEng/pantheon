@@ -13,7 +13,7 @@
 package org.hyperledger.besu.cli.options;
 
 import org.hyperledger.besu.cli.CommandTestAbstract;
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 
 import java.util.Arrays;
 import java.util.List;

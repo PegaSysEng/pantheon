@@ -15,8 +15,8 @@ package org.hyperledger.besu.consensus.ibft.payload;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.rlp.RLPInput;
-import tech.pegasys.pantheon.ethereum.rlp.RLPOutput;
+import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -34,7 +34,7 @@ public class PreparePayload implements Payload {
   public static PreparePayload readFrom(final RLPInput rlpInput) {
     rlpInput.enterList();
     final ConsensusRoundIdentifier roundIdentifier = ConsensusRoundIdentifier.readFrom(rlpInput);
-    final Hash digest = readDigest(rlpInput);
+    final Hash digest = Payload.readDigest(rlpInput);
     rlpInput.leaveList();
     return new PreparePayload(roundIdentifier, digest);
   }

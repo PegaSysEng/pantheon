@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController.NodesWhitelistResult;
+import static org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController.NodesWhitelistResult;
 
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;

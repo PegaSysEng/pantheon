@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.eth.peervalidation;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 
 import java.time.Duration;
 

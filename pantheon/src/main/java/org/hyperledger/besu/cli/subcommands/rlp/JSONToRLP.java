@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.cli.subcommands.rlp;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.io.IOException;
 

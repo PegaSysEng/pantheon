@@ -18,7 +18,7 @@ import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;

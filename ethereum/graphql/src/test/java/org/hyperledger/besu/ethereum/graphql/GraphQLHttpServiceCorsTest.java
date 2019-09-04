@@ -18,9 +18,9 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.blockcreation.EthHashMiningCoordinator;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
-import tech.pegasys.pantheon.ethereum.eth.EthProtocol;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
-import tech.pegasys.pantheon.ethereum.graphql.internal.BlockchainQuery;
+import org.hyperledger.besu.ethereum.eth.EthProtocol;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 
 import java.util.HashSet;

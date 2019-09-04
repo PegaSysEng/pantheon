@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.graphql;
 
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLError;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLError;
 
 import java.util.LinkedHashMap;
 import java.util.List;

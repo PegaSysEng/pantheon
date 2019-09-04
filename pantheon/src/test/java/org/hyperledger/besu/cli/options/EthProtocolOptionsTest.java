@@ -17,8 +17,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.cli.CommandTestAbstract;
-import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
-import tech.pegasys.pantheon.util.number.PositiveNumber;
+import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
+import org.hyperledger.besu.util.number.PositiveNumber;
 
 import org.junit.Test;
 

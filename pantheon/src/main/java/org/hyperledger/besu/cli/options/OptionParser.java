@@ -14,7 +14,7 @@ package org.hyperledger.besu.cli.options;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.math.BigInteger;
 import java.util.Iterator;

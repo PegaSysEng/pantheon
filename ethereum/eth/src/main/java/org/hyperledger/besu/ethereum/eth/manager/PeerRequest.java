@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.RequestManager.ResponseStream;
+import org.hyperledger.besu.ethereum.eth.manager.RequestManager.ResponseStream;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
 
 public interface PeerRequest {

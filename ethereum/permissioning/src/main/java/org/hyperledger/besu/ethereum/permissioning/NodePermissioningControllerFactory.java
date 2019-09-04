@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.permissioning;
 
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningController;
-import tech.pegasys.pantheon.ethereum.permissioning.node.NodePermissioningProvider;
+import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningController;
+import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningProvider;
 import org.hyperledger.besu.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
 import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
 import org.hyperledger.besu.plugin.services.MetricsSystem;

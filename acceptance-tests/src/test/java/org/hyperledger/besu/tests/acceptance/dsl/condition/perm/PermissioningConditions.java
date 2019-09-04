@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toList;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-import tech.pegasys.pantheon.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
+import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.PermissioningTransactions;
 
 import java.net.URI;

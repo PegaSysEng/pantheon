@@ -17,9 +17,9 @@ import static org.assertj.core.api.Assertions.fail;
 
 import org.hyperledger.besu.cli.config.EthNetworkConfig;
 import org.hyperledger.besu.cli.config.NetworkName;
-import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.ethereum.permissioning.LocalPermissioningConfiguration;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfigurationBuilder;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfigurationBuilder;
 
 import java.net.URI;
 import java.net.URL;

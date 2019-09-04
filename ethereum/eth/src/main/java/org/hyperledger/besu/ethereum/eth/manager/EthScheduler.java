@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newBoundedThreadPool;
-import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newCachedThreadPool;
-import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newFixedThreadPool;
-import static tech.pegasys.pantheon.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
+import static org.hyperledger.besu.ethereum.eth.manager.MonitoredExecutors.newBoundedThreadPool;
+import static org.hyperledger.besu.ethereum.eth.manager.MonitoredExecutors.newCachedThreadPool;
+import static org.hyperledger.besu.ethereum.eth.manager.MonitoredExecutors.newFixedThreadPool;
+import static org.hyperledger.besu.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 import static org.hyperledger.besu.util.FutureUtils.propagateResult;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.task.EthTask;
+import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.services.pipeline.Pipeline;
 import org.hyperledger.besu.util.ExceptionUtils;

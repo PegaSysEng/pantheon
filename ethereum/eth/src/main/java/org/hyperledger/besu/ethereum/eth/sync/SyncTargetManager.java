@@ -15,11 +15,11 @@ package org.hyperledger.besu.ethereum.eth.sync;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
 import org.hyperledger.besu.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.task.WaitForPeerTask;
-import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
-import tech.pegasys.pantheon.ethereum.eth.sync.tasks.DetermineCommonAncestorTask;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.task.WaitForPeerTask;
+import org.hyperledger.besu.ethereum.eth.sync.state.SyncTarget;
+import org.hyperledger.besu.ethereum.eth.sync.tasks.DetermineCommonAncestorTask;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 

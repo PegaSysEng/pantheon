@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager.exceptions;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 
 public class PeerDisconnectedException extends EthTaskException {
 

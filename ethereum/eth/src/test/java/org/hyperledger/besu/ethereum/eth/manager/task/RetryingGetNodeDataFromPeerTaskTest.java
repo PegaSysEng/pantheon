@@ -17,9 +17,9 @@ import static org.hyperledger.besu.ethereum.core.BlockHeader.GENESIS_BLOCK_NUMBE
 
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthProtocolManagerTestUtil;
-import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
+import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
+import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.List;

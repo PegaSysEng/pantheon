@@ -13,7 +13,7 @@
 package org.hyperledger.besu.cli.options;
 
 import org.hyperledger.besu.cli.CommandTestAbstract;
-import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 
 public class MetricsCLIOptionsTest
     extends AbstractCLIOptionsTest<MetricsConfiguration.Builder, MetricsCLIOptions> {

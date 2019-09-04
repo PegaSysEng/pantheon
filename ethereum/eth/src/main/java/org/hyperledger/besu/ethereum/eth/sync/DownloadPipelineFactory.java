@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync;
 
-import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncTarget;
+import org.hyperledger.besu.ethereum.eth.sync.state.SyncTarget;
 import org.hyperledger.besu.services.pipeline.Pipeline;
 
 public interface DownloadPipelineFactory {

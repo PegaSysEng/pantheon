@@ -16,18 +16,18 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import org.hyperledger.besu.controller.PantheonController;
-import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.chain.MutableBlockchain;
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
-import tech.pegasys.pantheon.ethereum.mainnet.BlockHeaderValidator;
-import tech.pegasys.pantheon.ethereum.mainnet.HeaderValidationMode;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSpec;
-import tech.pegasys.pantheon.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.util.RawBlockIterator;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.mainnet.BlockHeaderValidator;
+import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
+import org.hyperledger.besu.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
+import org.hyperledger.besu.ethereum.util.RawBlockIterator;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -175,7 +175,7 @@ public class RlpBlockImporter {
       final BlockHeader header,
       final ProtocolSpec<C> protocolSpec) {
     try {
-      final tech.pegasys.pantheon.ethereum.core.BlockImporter<C> blockImporter =
+      final org.hyperledger.besu.ethereum.core.BlockImporter<C> blockImporter =
           protocolSpec.getBlockImporter();
       final boolean blockImported =
           blockImporter.importBlock(context, block, HeaderValidationMode.SKIP_DETACHED);
