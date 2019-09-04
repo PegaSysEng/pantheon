@@ -12,18 +12,17 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.Lists;
+import org.bouncycastle.util.Arrays;
 import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.enclave.types.FindPrivacyGroupRequest;
 import org.hyperledger.besu.enclave.types.PrivacyGroup;
 import org.hyperledger.besu.enclave.types.PrivacyGroup.Type;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionHandler;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.google.common.collect.Lists;
-import org.bouncycastle.util.Arrays;
 
 public class EeaPrivateNonceProvider {
 

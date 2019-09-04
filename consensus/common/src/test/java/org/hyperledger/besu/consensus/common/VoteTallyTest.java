@@ -19,7 +19,6 @@ import static org.hyperledger.besu.consensus.common.VoteType.ADD;
 import static org.hyperledger.besu.consensus.common.VoteType.DROP;
 
 import org.hyperledger.besu.ethereum.core.Address;
-
 import org.junit.Test;
 
 public class VoteTallyTest {

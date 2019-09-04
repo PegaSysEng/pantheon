@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 
 public interface JsonRpcMethod {
 

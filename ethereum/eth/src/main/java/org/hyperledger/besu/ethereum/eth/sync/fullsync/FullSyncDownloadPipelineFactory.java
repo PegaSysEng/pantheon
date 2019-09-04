@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.fullsync;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
@@ -31,8 +33,6 @@ import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.services.pipeline.Pipeline;
 import org.hyperledger.besu.services.pipeline.PipelineBuilder;
-
-import java.util.Optional;
 
 public class FullSyncDownloadPipelineFactory<C> implements DownloadPipelineFactory {
 

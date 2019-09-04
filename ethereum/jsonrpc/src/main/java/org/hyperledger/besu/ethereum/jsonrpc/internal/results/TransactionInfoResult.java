@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions.TransactionInfo;
-
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions.TransactionInfo;
 
 @JsonPropertyOrder({"hash", "isReceivedFromLocalSource"})
 public class TransactionInfoResult implements TransactionResult {

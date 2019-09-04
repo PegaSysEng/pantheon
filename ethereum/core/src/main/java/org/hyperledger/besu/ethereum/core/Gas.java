@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.math.BigInteger;
 import javax.annotation.concurrent.Immutable;
 
 import com.google.common.primitives.Longs;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.uint.UInt256;
 
 /** A particular quantity of Gas as used by the Ethereum VM. */
 @Immutable

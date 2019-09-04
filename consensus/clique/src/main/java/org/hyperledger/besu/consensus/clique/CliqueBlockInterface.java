@@ -12,6 +12,10 @@
  */
 package org.hyperledger.besu.consensus.clique;
 
+import java.util.Collection;
+import java.util.Optional;
+
+import com.google.common.collect.ImmutableBiMap;
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.consensus.common.ValidatorVote;
 import org.hyperledger.besu.consensus.common.VoteType;
@@ -19,11 +23,6 @@ import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderBuilder;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Collection;
-import java.util.Optional;
-
-import com.google.common.collect.ImmutableBiMap;
 
 public class CliqueBlockInterface implements BlockInterface {
 

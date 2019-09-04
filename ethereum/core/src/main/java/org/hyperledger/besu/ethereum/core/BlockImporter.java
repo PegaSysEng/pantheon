@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
-
-import java.util.List;
 
 /**
  * An interface for a block importer.

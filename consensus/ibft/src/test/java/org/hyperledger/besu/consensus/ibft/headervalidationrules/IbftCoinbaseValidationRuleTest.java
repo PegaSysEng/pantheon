@@ -15,9 +15,13 @@ package org.hyperledger.besu.consensus.ibft.headervalidationrules;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.consensus.ibft.IbftContextBuilder.setupContextWithValidators;
 
-import org.hyperledger.besu.consensus.ibft.IbftExtraDataFixture;
+import java.util.List;
+import java.util.Optional;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.consensus.ibft.IbftExtraData;
+import org.hyperledger.besu.consensus.ibft.IbftExtraDataFixture;
 import org.hyperledger.besu.consensus.ibft.Vote;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.ProtocolContext;
@@ -27,11 +31,6 @@ import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Util;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.List;
-import java.util.Optional;
-
-import com.google.common.collect.Lists;
 import org.junit.Test;
 
 public class IbftCoinbaseValidationRuleTest {

@@ -12,6 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -28,13 +34,6 @@ import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.ethereum.vm.OperationTracer;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Optional;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class MainnetTransactionProcessor implements TransactionProcessor {
 

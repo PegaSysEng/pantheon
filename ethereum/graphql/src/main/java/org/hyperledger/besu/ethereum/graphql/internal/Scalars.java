@@ -12,11 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal;
 
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.uint.UInt256;
-
 import graphql.language.IntValue;
 import graphql.language.StringValue;
 import graphql.schema.Coercing;
@@ -24,6 +19,10 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class Scalars {
 

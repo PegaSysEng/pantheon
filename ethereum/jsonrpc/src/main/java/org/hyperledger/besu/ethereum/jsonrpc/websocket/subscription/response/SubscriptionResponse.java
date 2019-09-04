@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.response;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
-
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
 
 @JsonPropertyOrder({"jsonrpc", "method", "params"})
 public class SubscriptionResponse {

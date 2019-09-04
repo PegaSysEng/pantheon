@@ -14,17 +14,17 @@ package org.hyperledger.besu.ethereum.eth.transactions;
 
 import static java.util.Collections.emptySet;
 
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.core.Transaction;
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer.DisconnectCallback;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer.DisconnectCallback;
 
 public class PeerTransactionTracker implements DisconnectCallback {
   private static final int MAX_TRACKED_SEEN_TRANSACTIONS = 10_000;

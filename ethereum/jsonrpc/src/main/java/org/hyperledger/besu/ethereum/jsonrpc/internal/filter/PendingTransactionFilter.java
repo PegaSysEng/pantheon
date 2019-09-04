@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
-import org.hyperledger.besu.ethereum.core.Hash;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hyperledger.besu.ethereum.core.Hash;
 
 /** Tracks new pending transactions that have arrived in the transaction pool */
 class PendingTransactionFilter extends Filter {

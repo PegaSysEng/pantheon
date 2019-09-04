@@ -16,6 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -28,15 +36,6 @@ import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-
 import org.junit.Test;
 
 public class DefaultBlockchainTest {
@@ -153,7 +152,9 @@ public class DefaultBlockchainTest {
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
     final BlockDataGenerator.BlockOptions options =
-        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+        new BlockDataGenerator.BlockOptions()
+            .setBlockNumber(1L)
+            .setParentHash(genesisBlock.getHash());
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
     blockchain.appendBlock(newBlock, receipts);
@@ -171,7 +172,8 @@ public class DefaultBlockchainTest {
     final Block genesisBlock = gen.genesisBlock();
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
-    final BlockDataGenerator.BlockOptions options = new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(Hash.ZERO);
+    final BlockDataGenerator.BlockOptions options =
+        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(Hash.ZERO);
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
     blockchain.appendBlock(newBlock, receipts);
@@ -186,7 +188,9 @@ public class DefaultBlockchainTest {
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
     final BlockDataGenerator.BlockOptions options =
-        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+        new BlockDataGenerator.BlockOptions()
+            .setBlockNumber(1L)
+            .setParentHash(genesisBlock.getHash());
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
     receipts.add(gen.receipt());
@@ -706,7 +710,9 @@ public class DefaultBlockchainTest {
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
     final BlockDataGenerator.BlockOptions options =
-        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+        new BlockDataGenerator.BlockOptions()
+            .setBlockNumber(1L)
+            .setParentHash(genesisBlock.getHash());
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
 
@@ -727,7 +733,9 @@ public class DefaultBlockchainTest {
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
     final BlockDataGenerator.BlockOptions options =
-        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+        new BlockDataGenerator.BlockOptions()
+            .setBlockNumber(1L)
+            .setParentHash(genesisBlock.getHash());
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
 

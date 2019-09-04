@@ -15,6 +15,7 @@ package org.hyperledger.besu.consensus.ibft.statemachine;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hyperledger.besu.consensus.ibft.IbftContextBuilder.setupContextWithValidators;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -25,9 +26,20 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.consensus.ibft.IbftContextBuilder.setupContextWithValidators;
 
+import java.math.BigInteger;
+import java.time.Clock;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import com.google.common.collect.Lists;
 import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.consensus.ibft.BlockTimer;
+import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
+import org.hyperledger.besu.consensus.ibft.IbftContext;
+import org.hyperledger.besu.consensus.ibft.IbftExtraData;
+import org.hyperledger.besu.consensus.ibft.RoundTimer;
 import org.hyperledger.besu.consensus.ibft.TestHelpers;
 import org.hyperledger.besu.consensus.ibft.blockcreation.IbftBlockCreator;
 import org.hyperledger.besu.consensus.ibft.ibftevent.RoundExpiry;
@@ -35,17 +47,12 @@ import org.hyperledger.besu.consensus.ibft.messagewrappers.Commit;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
+import org.hyperledger.besu.consensus.ibft.network.IbftMessageTransmitter;
+import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.consensus.ibft.payload.RoundChangeCertificate;
 import org.hyperledger.besu.consensus.ibft.validation.FutureRoundProposalMessageValidator;
 import org.hyperledger.besu.consensus.ibft.validation.MessageValidator;
 import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
-import org.hyperledger.besu.consensus.ibft.BlockTimer;
-import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
-import org.hyperledger.besu.consensus.ibft.IbftContext;
-import org.hyperledger.besu.consensus.ibft.IbftExtraData;
-import org.hyperledger.besu.consensus.ibft.RoundTimer;
-import org.hyperledger.besu.consensus.ibft.network.IbftMessageTransmitter;
-import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import org.hyperledger.besu.ethereum.ProtocolContext;
@@ -59,14 +66,6 @@ import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Util;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.math.BigInteger;
-import java.time.Clock;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -212,7 +211,8 @@ public class IbftBlockHeightManagerTest {
 
   @Test
   public void onRoundChangeReceptionRoundChangeManagerIsInvokedAndNewRoundStarted() {
-    final ConsensusRoundIdentifier futureRoundIdentifier = TestHelpers.createFrom(roundIdentifier, 0, +2);
+    final ConsensusRoundIdentifier futureRoundIdentifier =
+        TestHelpers.createFrom(roundIdentifier, 0, +2);
     final RoundChange roundChange =
         messageFactory.createRoundChange(futureRoundIdentifier, Optional.empty());
     when(roundChangeManager.appendRoundChangeMessage(any()))
@@ -254,7 +254,8 @@ public class IbftBlockHeightManagerTest {
 
   @Test
   public void whenSufficientRoundChangesAreReceivedAProposalMessageIsTransmitted() {
-    final ConsensusRoundIdentifier futureRoundIdentifier = TestHelpers.createFrom(roundIdentifier, 0, +2);
+    final ConsensusRoundIdentifier futureRoundIdentifier =
+        TestHelpers.createFrom(roundIdentifier, 0, +2);
     final RoundChange roundChange =
         messageFactory.createRoundChange(futureRoundIdentifier, Optional.empty());
     final RoundChangeCertificate roundChangCert =
@@ -282,7 +283,8 @@ public class IbftBlockHeightManagerTest {
 
   @Test
   public void messagesForFutureRoundsAreBufferedAndUsedToPreloadNewRoundWhenItIsStarted() {
-    final ConsensusRoundIdentifier futureRoundIdentifier = TestHelpers.createFrom(roundIdentifier, 0, +2);
+    final ConsensusRoundIdentifier futureRoundIdentifier =
+        TestHelpers.createFrom(roundIdentifier, 0, +2);
 
     final IbftBlockHeightManager manager =
         new IbftBlockHeightManager(
@@ -363,7 +365,8 @@ public class IbftBlockHeightManagerTest {
   public void illegalFutureRoundProposalDoesNotTriggerNewRound() {
     when(futureRoundProposalMessageValidator.validateProposalMessage(any())).thenReturn(false);
 
-    final ConsensusRoundIdentifier futureRoundIdentifier = TestHelpers.createFrom(roundIdentifier, 0, +2);
+    final ConsensusRoundIdentifier futureRoundIdentifier =
+        TestHelpers.createFrom(roundIdentifier, 0, +2);
 
     final IbftBlockHeightManager manager =
         new IbftBlockHeightManager(

@@ -12,10 +12,9 @@
  */
 package org.hyperledger.besu.services.util;
 
-import org.hyperledger.besu.util.InvalidConfigurationException;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.util.InvalidConfigurationException;
 import org.rocksdb.RocksDB;
 
 public class RocksDbUtil {

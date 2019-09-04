@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.ProcessableBlockHeader;
 import org.hyperledger.besu.ethereum.vm.operations.BlockHashOperation;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Calculates and caches block hashes by number following the chain for a specific branch. This is

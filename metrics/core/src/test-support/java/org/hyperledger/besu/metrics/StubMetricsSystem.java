@@ -14,17 +14,17 @@ package org.hyperledger.besu.metrics;
 
 import static java.util.Arrays.asList;
 
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import org.hyperledger.besu.plugin.services.metrics.Counter;
-import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
-import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
-import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;
+
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
+import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
 
 public class StubMetricsSystem implements ObservableMetricsSystem {
 

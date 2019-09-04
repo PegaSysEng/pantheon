@@ -18,14 +18,17 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 
+import java.io.IOException;
+import java.math.BigInteger;
+
+import com.google.common.io.Resources;
 import org.hyperledger.besu.config.GenesisConfigFile;
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
-import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
 import org.hyperledger.besu.ethereum.chain.GenesisState;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
@@ -36,11 +39,6 @@ import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.io.IOException;
-import java.math.BigInteger;
-
-import com.google.common.io.Resources;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -62,8 +60,10 @@ public class TransactionSmartContractPermissioningControllerTest {
     final GenesisState genesisState =
         GenesisState.fromConfig(GenesisConfigFile.fromConfig(emptyContractFile), protocolSchedule);
 
-    final MutableBlockchain blockchain = InMemoryStorageProvider.createInMemoryBlockchain(genesisState.getBlock());
-    final WorldStateArchive worldArchive = InMemoryStorageProvider.createInMemoryWorldStateArchive();
+    final MutableBlockchain blockchain =
+        InMemoryStorageProvider.createInMemoryBlockchain(genesisState.getBlock());
+    final WorldStateArchive worldArchive =
+        InMemoryStorageProvider.createInMemoryWorldStateArchive();
 
     genesisState.writeStateTo(worldArchive.getMutable());
 

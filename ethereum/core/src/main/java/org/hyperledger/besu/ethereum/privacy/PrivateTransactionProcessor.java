@@ -12,6 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.privacy;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -32,13 +38,6 @@ import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.ethereum.vm.OperationTracer;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Optional;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class PrivateTransactionProcessor {
 
@@ -292,7 +291,8 @@ public class PrivateTransactionProcessor {
     } else {
       return Result.failed(
           0,
-          ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.PRIVATE_TRANSACTION_FAILED),
+          ValidationResult.invalid(
+              TransactionValidator.TransactionInvalidReason.PRIVATE_TRANSACTION_FAILED),
           initialFrame.getRevertReason());
     }
   }
@@ -323,7 +323,7 @@ public class PrivateTransactionProcessor {
 
   @SuppressWarnings("unused")
   private static Gas refunded(
-          final Transaction transaction, final Gas gasRemaining, final Gas gasRefund) {
+      final Transaction transaction, final Gas gasRemaining, final Gas gasRefund) {
     // Integer truncation takes care of the the floor calculation needed after the divide.
     final Gas maxRefundAllowance =
         Gas.of(transaction.getGasLimit()).minus(gasRemaining).dividedBy(2);

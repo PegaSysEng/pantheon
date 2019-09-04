@@ -14,13 +14,13 @@ package org.hyperledger.besu.ethereum.trie;
 
 import static org.hyperledger.besu.crypto.Hash.keccak256;
 
-import org.hyperledger.besu.ethereum.rlp.RLP;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import org.hyperledger.besu.ethereum.rlp.RLP;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /** An Merkle Patricial Trie. */
 public interface MerklePatriciaTrie<K, V> {

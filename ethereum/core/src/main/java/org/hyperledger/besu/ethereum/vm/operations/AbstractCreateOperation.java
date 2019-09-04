@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.vm.operations;
 
+import java.util.EnumSet;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.core.MutableAccount;
@@ -26,9 +29,6 @@ import org.hyperledger.besu.ethereum.vm.Words;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.EnumSet;
-import java.util.Optional;
 
 public abstract class AbstractCreateOperation extends AbstractOperation {
 

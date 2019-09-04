@@ -12,6 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
+import static org.hyperledger.besu.ethereum.trie.CompactEncoding.bytesToPath;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -20,14 +21,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.trie.CompactEncoding.bytesToPath;
-
-import org.hyperledger.besu.crypto.Hash;
-import org.hyperledger.besu.ethereum.trie.TrieIterator.LeafHandler;
-import org.hyperledger.besu.ethereum.trie.TrieIterator.State;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.uint.UInt256;
 
 import java.nio.charset.StandardCharsets;
 import java.util.NavigableSet;
@@ -35,6 +28,12 @@ import java.util.Random;
 import java.util.TreeSet;
 import java.util.function.Function;
 
+import org.hyperledger.besu.crypto.Hash;
+import org.hyperledger.besu.ethereum.trie.TrieIterator.LeafHandler;
+import org.hyperledger.besu.ethereum.trie.TrieIterator.State;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 import org.junit.Test;
 import org.mockito.InOrder;
 

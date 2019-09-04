@@ -12,16 +12,15 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results.privacy;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionReceiptLogResult;
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.core.Log;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Log;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionReceiptLogResult;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 @JsonPropertyOrder({
   "contractAddress",

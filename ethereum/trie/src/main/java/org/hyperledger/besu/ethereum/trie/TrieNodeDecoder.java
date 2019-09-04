@@ -14,9 +14,6 @@ package org.hyperledger.besu.ethereum.trie;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,6 +24,8 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Streams;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class TrieNodeDecoder {
   private static final StoredNodeFactory<BytesValue> emptyNodeFactory =

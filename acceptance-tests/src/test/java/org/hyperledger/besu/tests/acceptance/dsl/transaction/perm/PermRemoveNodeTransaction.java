@@ -14,13 +14,13 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory.RemoveNodeResponse;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.PermissioningJsonRpcRequestFactory.RemoveNodeResponse;
 
 public class PermRemoveNodeTransaction implements Transaction<String> {
   private final List<URI> enodeList;

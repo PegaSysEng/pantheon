@@ -14,14 +14,13 @@ package org.hyperledger.besu.services.tasks;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
 
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 abstract class AbstractTaskQueueTest<T extends TaskCollection<BytesValue>> {

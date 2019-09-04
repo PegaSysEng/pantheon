@@ -14,6 +14,8 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
@@ -23,9 +25,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorRespo
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
-import org.hyperledger.besu.ethereum.core.Address;
-
-import org.apache.logging.log4j.Logger;
 
 public class EeaGetTransactionCount implements JsonRpcMethod {
 

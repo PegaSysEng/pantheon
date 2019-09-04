@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.permissioning.node;
 
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-
 import java.util.Optional;
+
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 
 /** A permissioning provider that only answers under some conditions */
 public interface ContextualNodePermissioningProvider {

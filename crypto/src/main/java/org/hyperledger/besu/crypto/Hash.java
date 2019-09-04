@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.crypto;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /** Various utilities for providing hashes (digests) of arbitrary data. */
 public abstract class Hash {

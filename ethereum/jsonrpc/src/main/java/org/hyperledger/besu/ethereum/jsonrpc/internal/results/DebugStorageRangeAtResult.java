@@ -12,10 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import org.hyperledger.besu.ethereum.core.AccountStorageEntry;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.util.NavigableMap;
 import java.util.Objects;
 import java.util.TreeMap;
@@ -23,6 +19,9 @@ import java.util.TreeMap;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.core.AccountStorageEntry;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class DebugStorageRangeAtResult implements JsonRpcResult {
 

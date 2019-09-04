@@ -14,6 +14,9 @@ package org.hyperledger.besu.ethereum.chain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
+import org.bouncycastle.util.encoders.Hex;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -24,10 +27,6 @@ import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 
 public final class GenesisStateTest {

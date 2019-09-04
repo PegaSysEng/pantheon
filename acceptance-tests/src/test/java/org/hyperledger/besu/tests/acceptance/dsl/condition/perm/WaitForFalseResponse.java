@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.perm;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;

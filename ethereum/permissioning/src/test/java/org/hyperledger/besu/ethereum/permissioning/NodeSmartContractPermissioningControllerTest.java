@@ -18,27 +18,25 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
-
-import org.hyperledger.besu.config.GenesisConfigFile;
-import org.hyperledger.besu.config.JsonUtil;
-import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.chain.GenesisState;
-import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
-import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
-import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import org.hyperledger.besu.plugin.services.MetricsSystem;
-import org.hyperledger.besu.plugin.services.metrics.Counter;
 
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.Resources;
+import org.hyperledger.besu.config.GenesisConfigFile;
+import org.hyperledger.besu.config.JsonUtil;
+import org.hyperledger.besu.ethereum.chain.GenesisState;
+import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
+import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -62,8 +60,10 @@ public class NodeSmartContractPermissioningControllerTest {
     final GenesisState genesisState =
         GenesisState.fromConfig(GenesisConfigFile.fromConfig(jsonData), protocolSchedule);
 
-    final MutableBlockchain blockchain = InMemoryStorageProvider.createInMemoryBlockchain(genesisState.getBlock());
-    final WorldStateArchive worldArchive = InMemoryStorageProvider.createInMemoryWorldStateArchive();
+    final MutableBlockchain blockchain =
+        InMemoryStorageProvider.createInMemoryBlockchain(genesisState.getBlock());
+    final WorldStateArchive worldArchive =
+        InMemoryStorageProvider.createInMemoryWorldStateArchive();
 
     genesisState.writeStateTo(worldArchive.getMutable());
 

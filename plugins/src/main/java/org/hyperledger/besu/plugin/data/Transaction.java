@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.plugin.data;
 
-import org.hyperledger.besu.plugin.Unstable;
-
 import java.math.BigInteger;
 import java.util.Optional;
+
+import org.hyperledger.besu.plugin.Unstable;
 
 /**
  * A transaction is a single cryptographically-signed instruction constructed by an actor externally

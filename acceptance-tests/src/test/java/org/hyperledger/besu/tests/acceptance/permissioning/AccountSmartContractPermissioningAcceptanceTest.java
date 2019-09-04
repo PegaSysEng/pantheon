@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.tests.acceptance.permissioning;
 
-import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-
 import java.util.Collections;
 
+import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.junit.Before;
 import org.junit.Test;
 

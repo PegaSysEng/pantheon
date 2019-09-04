@@ -14,24 +14,23 @@ package org.hyperledger.besu.ethereum.jsonrpc.methods;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.jsonrpc.BlockchainImporter;
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcResponseKey;
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcResponseUtils;
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcTestMethodsFactory;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionResult;
-import org.hyperledger.besu.testutil.BlockTestUtil;
-
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.jsonrpc.BlockchainImporter;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcResponseKey;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcResponseUtils;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcTestMethodsFactory;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionResult;
+import org.hyperledger.besu.testutil.BlockTestUtil;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -80,21 +79,27 @@ public class EthGetBlockByHashIntegrationTest {
     final Map<JsonRpcResponseKey, String> expectedResult = new EnumMap<>(JsonRpcResponseKey.class);
     expectedResult.put(JsonRpcResponseKey.NUMBER, "0x1");
     expectedResult.put(
-        JsonRpcResponseKey.MIX_HASH, "0x552dd5ae3ccb7a278c6cedda27e48963101be56526a8ee8d70e8227f2c08edf0");
+        JsonRpcResponseKey.MIX_HASH,
+        "0x552dd5ae3ccb7a278c6cedda27e48963101be56526a8ee8d70e8227f2c08edf0");
     expectedResult.put(
-        JsonRpcResponseKey.PARENT_HASH, "0xf8f01382f5636d02edac7fff679a6feb7a572d37a395daaab77938feb6fe217f");
+        JsonRpcResponseKey.PARENT_HASH,
+        "0xf8f01382f5636d02edac7fff679a6feb7a572d37a395daaab77938feb6fe217f");
     expectedResult.put(JsonRpcResponseKey.NONCE, "0xbd2b1f0ebba7b989");
     expectedResult.put(
-        JsonRpcResponseKey.OMMERS_HASH, "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347");
+        JsonRpcResponseKey.OMMERS_HASH,
+        "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347");
     expectedResult.put(
         JsonRpcResponseKey.LOGS_BLOOM,
         "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
     expectedResult.put(
-        JsonRpcResponseKey.TRANSACTION_ROOT, "0x3ccbb984a0a736604acae327d9b643f8e75c7931cb2c6ac10dab4226e2e4c5a3");
+        JsonRpcResponseKey.TRANSACTION_ROOT,
+        "0x3ccbb984a0a736604acae327d9b643f8e75c7931cb2c6ac10dab4226e2e4c5a3");
     expectedResult.put(
-        JsonRpcResponseKey.STATE_ROOT, "0xee57559895449b8dbd0a096b2999cf97b517b645ec8db33c7f5934778672263e");
+        JsonRpcResponseKey.STATE_ROOT,
+        "0xee57559895449b8dbd0a096b2999cf97b517b645ec8db33c7f5934778672263e");
     expectedResult.put(
-        JsonRpcResponseKey.RECEIPTS_ROOT, "0xa2bd925fcbb8b1ec39612553b17c9265ab198f5af25cc564655114bf5a28c75d");
+        JsonRpcResponseKey.RECEIPTS_ROOT,
+        "0xa2bd925fcbb8b1ec39612553b17c9265ab198f5af25cc564655114bf5a28c75d");
     expectedResult.put(JsonRpcResponseKey.COINBASE, "0x8888f1f195afa192cfee860698584c030f4c9db1");
     expectedResult.put(JsonRpcResponseKey.DIFFICULTY, "0x20000");
     expectedResult.put(JsonRpcResponseKey.TOTAL_DIFFICULTY, "0x40000");
@@ -136,21 +141,27 @@ public class EthGetBlockByHashIntegrationTest {
     final Map<JsonRpcResponseKey, String> expectedResult = new EnumMap<>(JsonRpcResponseKey.class);
     expectedResult.put(JsonRpcResponseKey.NUMBER, "0x1");
     expectedResult.put(
-        JsonRpcResponseKey.MIX_HASH, "0x552dd5ae3ccb7a278c6cedda27e48963101be56526a8ee8d70e8227f2c08edf0");
+        JsonRpcResponseKey.MIX_HASH,
+        "0x552dd5ae3ccb7a278c6cedda27e48963101be56526a8ee8d70e8227f2c08edf0");
     expectedResult.put(
-        JsonRpcResponseKey.PARENT_HASH, "0xf8f01382f5636d02edac7fff679a6feb7a572d37a395daaab77938feb6fe217f");
+        JsonRpcResponseKey.PARENT_HASH,
+        "0xf8f01382f5636d02edac7fff679a6feb7a572d37a395daaab77938feb6fe217f");
     expectedResult.put(JsonRpcResponseKey.NONCE, "0xbd2b1f0ebba7b989");
     expectedResult.put(
-        JsonRpcResponseKey.OMMERS_HASH, "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347");
+        JsonRpcResponseKey.OMMERS_HASH,
+        "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347");
     expectedResult.put(
         JsonRpcResponseKey.LOGS_BLOOM,
         "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
     expectedResult.put(
-        JsonRpcResponseKey.TRANSACTION_ROOT, "0x3ccbb984a0a736604acae327d9b643f8e75c7931cb2c6ac10dab4226e2e4c5a3");
+        JsonRpcResponseKey.TRANSACTION_ROOT,
+        "0x3ccbb984a0a736604acae327d9b643f8e75c7931cb2c6ac10dab4226e2e4c5a3");
     expectedResult.put(
-        JsonRpcResponseKey.STATE_ROOT, "0xee57559895449b8dbd0a096b2999cf97b517b645ec8db33c7f5934778672263e");
+        JsonRpcResponseKey.STATE_ROOT,
+        "0xee57559895449b8dbd0a096b2999cf97b517b645ec8db33c7f5934778672263e");
     expectedResult.put(
-        JsonRpcResponseKey.RECEIPTS_ROOT, "0xa2bd925fcbb8b1ec39612553b17c9265ab198f5af25cc564655114bf5a28c75d");
+        JsonRpcResponseKey.RECEIPTS_ROOT,
+        "0xa2bd925fcbb8b1ec39612553b17c9265ab198f5af25cc564655114bf5a28c75d");
     expectedResult.put(JsonRpcResponseKey.COINBASE, "0x8888f1f195afa192cfee860698584c030f4c9db1");
     expectedResult.put(JsonRpcResponseKey.DIFFICULTY, "0x20000");
     expectedResult.put(JsonRpcResponseKey.TOTAL_DIFFICULTY, "0x40000");

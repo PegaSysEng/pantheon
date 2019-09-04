@@ -17,15 +17,6 @@ import static org.hyperledger.besu.crypto.Hash.keccak256;
 import static org.hyperledger.besu.util.bytes.Bytes32s.xor;
 import static org.hyperledger.besu.util.bytes.BytesValues.concatenate;
 
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
-import org.hyperledger.besu.crypto.SecureRandomProvider;
-import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.HandshakeException;
-import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.HandshakeSecrets;
-import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.Handshaker;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -36,6 +27,14 @@ import io.netty.buffer.Unpooled;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
+import org.hyperledger.besu.crypto.SecureRandomProvider;
+import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.HandshakeException;
+import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.HandshakeSecrets;
+import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.Handshaker;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * An Elliptic Curve Integrated Encryption Scheme implementation, following the handshake ceremony

@@ -12,15 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.mainnet.headervalidationrules;
 
-import org.hyperledger.besu.ethereum.ProtocolContext;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-import org.hyperledger.besu.ethereum.mainnet.AttachedBlockHeaderValidationRule;
-import org.hyperledger.besu.ethereum.mainnet.DifficultyCalculator;
-
 import java.math.BigInteger;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.mainnet.AttachedBlockHeaderValidationRule;
+import org.hyperledger.besu.ethereum.mainnet.DifficultyCalculator;
 
 public class CalculatedDifficultyValidationRule<C> implements AttachedBlockHeaderValidationRule<C> {
   private final Logger LOG = LogManager.getLogger(CalculatedDifficultyValidationRule.class);
@@ -32,7 +31,7 @@ public class CalculatedDifficultyValidationRule<C> implements AttachedBlockHeade
 
   @Override
   public boolean validate(
-          final BlockHeader header, final BlockHeader parent, final ProtocolContext<C> context) {
+      final BlockHeader header, final BlockHeader parent, final ProtocolContext<C> context) {
     final BigInteger actualDifficulty =
         new BigInteger(1, header.getDifficulty().getBytes().extractArray());
     final BigInteger expectedDifficulty =

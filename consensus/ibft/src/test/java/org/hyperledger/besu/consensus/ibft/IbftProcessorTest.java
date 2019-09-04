@@ -22,13 +22,12 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.hyperledger.besu.consensus.ibft.ibftevent.RoundExpiry;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.hyperledger.besu.consensus.ibft.ibftevent.RoundExpiry;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -12,16 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-
-import java.util.Optional;
 
 public class EthCoinbase implements JsonRpcMethod {
 

@@ -15,7 +15,6 @@ package org.hyperledger.besu.services.kvstore;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.util.bytes.BytesValue;
-
 import org.junit.Test;
 
 public class LimitedInMemoryKeyValueStorageTest extends AbstractKeyValueStorageTest {

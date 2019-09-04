@@ -17,15 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.consensus.ibft.IbftContextBuilder.setupContextWithValidators;
 import static org.hyperledger.besu.consensus.ibft.headervalidationrules.HeaderValidationTestHelpers.createProposedBlockHeader;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.AddressHelpers;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-
-import java.util.List;
-
-import com.google.common.collect.Lists;
 import org.junit.Test;
 
 public class IbftValidatorsValidationRuleTest {

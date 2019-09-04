@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.methods;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionRequestMapper;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class WebSocketMethodsFactory {
 

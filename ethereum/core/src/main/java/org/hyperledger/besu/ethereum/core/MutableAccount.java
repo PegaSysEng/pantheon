@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
+import java.util.Map;
+
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Map;
 
 /** A mutable world state account. */
 public interface MutableAccount extends Account {

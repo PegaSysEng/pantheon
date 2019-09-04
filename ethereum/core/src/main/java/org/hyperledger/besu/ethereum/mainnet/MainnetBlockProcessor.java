@@ -12,6 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -25,20 +31,13 @@ import org.hyperledger.besu.ethereum.core.WorldState;
 import org.hyperledger.besu.ethereum.core.WorldUpdater;
 import org.hyperledger.besu.ethereum.vm.BlockHashLookup;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 public class MainnetBlockProcessor implements BlockProcessor {
 
   @FunctionalInterface
   public interface TransactionReceiptFactory {
 
     TransactionReceipt create(
-            TransactionProcessor.Result result, WorldState worldState, long gasUsed);
+        TransactionProcessor.Result result, WorldState worldState, long gasUsed);
   }
 
   private static final Logger LOG = LogManager.getLogger();

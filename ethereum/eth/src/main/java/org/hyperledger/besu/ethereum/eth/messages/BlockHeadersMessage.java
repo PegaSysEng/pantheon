@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.eth.messages;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
@@ -21,9 +24,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Arrays;
-import java.util.List;
 
 public final class BlockHeadersMessage extends AbstractMessageData {
 

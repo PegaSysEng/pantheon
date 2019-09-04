@@ -14,11 +14,10 @@ package org.hyperledger.besu.ethereum.p2p.config;
 
 import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-
 import java.util.Collections;
 
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.junit.Test;
 
 public class DiscoveryConfigurationTest {

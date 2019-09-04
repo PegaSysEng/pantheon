@@ -12,12 +12,6 @@
  */
 package org.hyperledger.besu.cli;
 
-import org.hyperledger.besu.ethereum.core.Wei;
-import org.hyperledger.besu.ethereum.eth.sync.SyncMode;
-import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
-import org.hyperledger.besu.nat.NatMethod;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -26,6 +20,11 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.eth.sync.SyncMode;
+import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
+import org.hyperledger.besu.nat.NatMethod;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import picocli.CommandLine;
 
 public interface DefaultCommandValues {

@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction;
 
-import org.hyperledger.besu.tests.acceptance.dsl.account.Accounts;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Collections;
 
+import org.hyperledger.besu.tests.acceptance.dsl.account.Accounts;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.crypto.Credentials;

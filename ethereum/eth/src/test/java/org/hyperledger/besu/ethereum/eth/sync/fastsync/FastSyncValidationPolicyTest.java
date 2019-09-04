@@ -19,7 +19,6 @@ import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.LIGHT;
 import static org.hyperledger.besu.metrics.noop.NoOpMetricsSystem.NO_OP_LABELLED_1_COUNTER;
 
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
-
 import org.junit.Test;
 
 public class FastSyncValidationPolicyTest {

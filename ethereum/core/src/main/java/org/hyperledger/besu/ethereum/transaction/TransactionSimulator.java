@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.transaction;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Account;
@@ -28,8 +30,6 @@ import org.hyperledger.besu.ethereum.mainnet.TransactionValidationParams;
 import org.hyperledger.besu.ethereum.vm.BlockHashLookup;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Optional;
 
 /*
  * Used to process transactions for eth_call and eth_estimateGas.

@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.metrics;
 
-import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
-
 import java.util.Optional;
+
+import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
 
 public enum StandardMetricCategory implements MetricCategory {
   JVM("jvm"),

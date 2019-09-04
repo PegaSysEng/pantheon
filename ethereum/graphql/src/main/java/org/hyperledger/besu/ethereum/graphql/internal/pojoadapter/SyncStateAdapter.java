@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
-import org.hyperledger.besu.ethereum.core.SyncStatus;
-
 import java.util.Optional;
+
+import org.hyperledger.besu.ethereum.core.SyncStatus;
 
 @SuppressWarnings("unused") // reflected by GraphQL
 public class SyncStateAdapter {

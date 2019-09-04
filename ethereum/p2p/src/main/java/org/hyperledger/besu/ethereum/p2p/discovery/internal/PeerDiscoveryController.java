@@ -18,22 +18,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerBondedObserver;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryEvent;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.ethereum.p2p.peers.PeerId;
-import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import org.hyperledger.besu.plugin.services.MetricsSystem;
-import org.hyperledger.besu.plugin.services.metrics.Counter;
-import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
-import org.hyperledger.besu.util.Subscribers;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,6 +38,21 @@ import java.util.stream.Stream;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerBondedObserver;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryEvent;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.ethereum.p2p.peers.PeerId;
+import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.util.Subscribers;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * This component is the entrypoint for managing the lifecycle of peers.
@@ -380,7 +379,8 @@ public class PeerDiscoveryController {
   }
 
   private void notifyPeerBonded(final DiscoveryPeer peer, final long now) {
-    final PeerDiscoveryEvent.PeerBondedEvent event = new PeerDiscoveryEvent.PeerBondedEvent(peer, now);
+    final PeerDiscoveryEvent.PeerBondedEvent event =
+        new PeerDiscoveryEvent.PeerBondedEvent(peer, now);
     dispatchPeerBondedEvent(peerBondedObservers, event);
   }
 
@@ -546,7 +546,8 @@ public class PeerDiscoveryController {
 
   // Dispatches an event to a set of observers.
   private void dispatchPeerBondedEvent(
-      final Subscribers<PeerBondedObserver> observers, final PeerDiscoveryEvent.PeerBondedEvent event) {
+      final Subscribers<PeerBondedObserver> observers,
+      final PeerDiscoveryEvent.PeerBondedEvent event) {
     observers.forEach(observer -> observer.onPeerBonded(event));
   }
 

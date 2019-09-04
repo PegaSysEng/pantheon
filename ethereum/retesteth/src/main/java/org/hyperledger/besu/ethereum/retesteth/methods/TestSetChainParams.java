@@ -12,14 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.retesteth.methods;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import org.hyperledger.besu.ethereum.retesteth.RetestethContext;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +19,13 @@ import java.util.Optional;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.retesteth.RetestethContext;
 
 public class TestSetChainParams implements JsonRpcMethod {
 

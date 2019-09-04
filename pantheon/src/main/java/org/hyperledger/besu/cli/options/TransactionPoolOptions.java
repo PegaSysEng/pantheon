@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.cli.options;
 
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
-
 import java.util.Arrays;
 import java.util.List;
 
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
 import picocli.CommandLine;
 
 public class TransactionPoolOptions implements CLIOptions<TransactionPoolConfiguration.Builder> {

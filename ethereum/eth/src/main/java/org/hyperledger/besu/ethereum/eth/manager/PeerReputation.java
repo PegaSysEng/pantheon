@@ -14,8 +14,6 @@ package org.hyperledger.besu.ethereum.eth.manager;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
@@ -26,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 
 public class PeerReputation {
   private static final Logger LOG = getLogger();

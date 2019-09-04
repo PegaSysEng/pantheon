@@ -12,7 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -25,7 +24,6 @@ import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.Hash;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,8 +50,13 @@ public class MainnetBlockImporterTest {
   public void doNotImportBlockIfBlockchainAlreadyHasBlock() {
     when(blockchain.contains(hash)).thenReturn(true);
 
-    AssertionsForClassTypes.assertThat(blockImporter.importBlock(context, block, HeaderValidationMode.FULL, HeaderValidationMode.FULL)).isTrue();
-    verify(blockValidator, never()).validateAndProcessBlock(context, block, HeaderValidationMode.FULL, HeaderValidationMode.FULL);
+    AssertionsForClassTypes.assertThat(
+            blockImporter.importBlock(
+                context, block, HeaderValidationMode.FULL, HeaderValidationMode.FULL))
+        .isTrue();
+    verify(blockValidator, never())
+        .validateAndProcessBlock(
+            context, block, HeaderValidationMode.FULL, HeaderValidationMode.FULL);
     verify(blockchain, never()).appendBlock(eq(block), any());
   }
 }

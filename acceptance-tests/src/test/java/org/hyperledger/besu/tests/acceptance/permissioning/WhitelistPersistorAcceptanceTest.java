@@ -14,15 +14,14 @@ package org.hyperledger.besu.tests.acceptance.permissioning;
 
 import static org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
 
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
+import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.junit.Before;
 import org.junit.Test;
 

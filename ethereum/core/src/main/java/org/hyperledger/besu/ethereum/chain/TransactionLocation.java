@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.chain;
 
+import java.util.Objects;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-
-import java.util.Objects;
 
 /**
  * Specifies the location of a transaction within the blockchain (where the transaction was included

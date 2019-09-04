@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.health;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.SyncStatus;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService.HealthCheck;
 import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService.ParamSource;
 import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class ReadinessCheck implements HealthCheck {
   private static final Logger LOG = LogManager.getLogger();

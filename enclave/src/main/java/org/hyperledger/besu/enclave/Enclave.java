@@ -12,16 +12,6 @@
  */
 package org.hyperledger.besu.enclave;
 
-import org.hyperledger.besu.enclave.types.DeletePrivacyGroupRequest;
-import org.hyperledger.besu.enclave.types.FindPrivacyGroupRequest;
-import org.hyperledger.besu.enclave.types.PrivacyGroup;
-import org.hyperledger.besu.enclave.types.ReceiveRequest;
-import org.hyperledger.besu.enclave.types.ReceiveResponse;
-import org.hyperledger.besu.enclave.types.SendRequest;
-import org.hyperledger.besu.enclave.types.SendResponse;
-import org.hyperledger.besu.enclave.types.CreatePrivacyGroupRequest;
-import org.hyperledger.besu.enclave.types.ErrorResponse;
-
 import java.io.IOException;
 import java.net.URI;
 
@@ -36,6 +26,15 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.enclave.types.CreatePrivacyGroupRequest;
+import org.hyperledger.besu.enclave.types.DeletePrivacyGroupRequest;
+import org.hyperledger.besu.enclave.types.ErrorResponse;
+import org.hyperledger.besu.enclave.types.FindPrivacyGroupRequest;
+import org.hyperledger.besu.enclave.types.PrivacyGroup;
+import org.hyperledger.besu.enclave.types.ReceiveRequest;
+import org.hyperledger.besu.enclave.types.ReceiveResponse;
+import org.hyperledger.besu.enclave.types.SendRequest;
+import org.hyperledger.besu.enclave.types.SendResponse;
 
 public class Enclave {
   private static final Logger LOG = LogManager.getLogger();

@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.cli.options;
 
-import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
-import org.hyperledger.besu.util.number.PositiveNumber;
-
 import java.util.Arrays;
 import java.util.List;
 
+import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
+import org.hyperledger.besu.util.number.PositiveNumber;
 import picocli.CommandLine;
 
 public class EthProtocolOptions implements CLIOptions<EthProtocolConfiguration> {

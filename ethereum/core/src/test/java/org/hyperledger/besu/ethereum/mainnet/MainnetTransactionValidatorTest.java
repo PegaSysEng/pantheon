@@ -19,6 +19,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -28,10 +31,6 @@ import org.hyperledger.besu.ethereum.core.TransactionFilter;
 import org.hyperledger.besu.ethereum.core.TransactionTestFixture;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
-
-import java.math.BigInteger;
-import java.util.Optional;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -62,7 +61,9 @@ public class MainnetTransactionValidatorTest {
     when(gasCalculator.transactionIntrinsicGasCost(transaction)).thenReturn(Gas.of(50));
 
     assertThat(validator.validate(transaction))
-        .isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.INTRINSIC_GAS_EXCEEDS_GAS_LIMIT));
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.INTRINSIC_GAS_EXCEEDS_GAS_LIMIT));
   }
 
   @Test
@@ -70,7 +71,10 @@ public class MainnetTransactionValidatorTest {
     final MainnetTransactionValidator validator =
         new MainnetTransactionValidator(gasCalculator, false, Optional.empty());
     assertThat(validator.validate(basicTransaction))
-        .isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.REPLAY_PROTECTED_SIGNATURES_NOT_SUPPORTED));
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason
+                    .REPLAY_PROTECTED_SIGNATURES_NOT_SUPPORTED));
   }
 
   @Test
@@ -78,7 +82,8 @@ public class MainnetTransactionValidatorTest {
     final MainnetTransactionValidator validator =
         new MainnetTransactionValidator(gasCalculator, false, Optional.of(BigInteger.valueOf(2)));
     assertThat(validator.validate(basicTransaction))
-        .isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID));
+        .isEqualTo(
+            ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID));
   }
 
   @Test
@@ -86,7 +91,9 @@ public class MainnetTransactionValidatorTest {
     final MainnetTransactionValidator validator =
         new MainnetTransactionValidator(gasCalculator, false, Optional.of(BigInteger.ONE));
     assertThat(validator.validateForSender(basicTransaction, null, false))
-        .isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.UPFRONT_COST_EXCEEDS_BALANCE));
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.UPFRONT_COST_EXCEEDS_BALANCE));
   }
 
   @Test
@@ -96,7 +103,8 @@ public class MainnetTransactionValidatorTest {
 
     final Account account = accountWithNonce(basicTransaction.getNonce() + 1);
     assertThat(validator.validateForSender(basicTransaction, account, false))
-        .isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW));
+        .isEqualTo(
+            ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW));
   }
 
   @Test
@@ -107,7 +115,9 @@ public class MainnetTransactionValidatorTest {
 
     final Account account = accountWithNonce(basicTransaction.getNonce() - 1);
     assertThat(validator.validateForSender(basicTransaction, account, false))
-        .isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE));
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE));
   }
 
   @Test
@@ -131,7 +141,9 @@ public class MainnetTransactionValidatorTest {
     final Account account = accountWithNonce(5);
 
     assertThat(validator.validateForSender(transaction, account, false))
-        .isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE));
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE));
   }
 
   @Test
@@ -155,7 +167,9 @@ public class MainnetTransactionValidatorTest {
     validator.setTransactionFilter(transactionFilter(false));
 
     assertThat(validator.validateForSender(basicTransaction, accountWithNonce(0), true))
-        .isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED));
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.TX_SENDER_NOT_AUTHORIZED));
   }
 
   @Test

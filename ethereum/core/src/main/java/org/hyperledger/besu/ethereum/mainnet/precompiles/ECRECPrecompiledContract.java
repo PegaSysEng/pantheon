@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.mainnet.precompiles;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
 import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import org.hyperledger.besu.ethereum.core.Gas;
@@ -24,9 +27,6 @@ import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
 import org.hyperledger.besu.util.bytes.MutableBytes32;
 import org.hyperledger.besu.util.bytes.MutableBytesValue;
-
-import java.math.BigInteger;
-import java.util.Optional;
 
 public class ECRECPrecompiledContract extends AbstractPrecompiledContract {
 

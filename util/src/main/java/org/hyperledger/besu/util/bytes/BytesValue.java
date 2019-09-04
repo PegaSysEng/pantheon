@@ -15,13 +15,12 @@ package org.hyperledger.besu.util.bytes;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 
-import org.hyperledger.besu.plugin.data.UnformattedData;
-
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 
 import com.google.common.annotations.VisibleForTesting;
 import io.vertx.core.buffer.Buffer;
+import org.hyperledger.besu.plugin.data.UnformattedData;
 
 /**
  * A value made of bytes.

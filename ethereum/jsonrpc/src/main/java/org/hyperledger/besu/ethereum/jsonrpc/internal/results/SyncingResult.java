@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import org.hyperledger.besu.ethereum.core.SyncStatus;
-
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.hyperledger.besu.ethereum.core.SyncStatus;
 
 @JsonPropertyOrder({"startingBlock", "currentBlock", "highestBlock"})
 public class SyncingResult implements JsonRpcResult {

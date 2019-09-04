@@ -17,26 +17,6 @@ import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Collectors.toList;
 import static org.hyperledger.besu.util.NetworkUtility.urlForSocketAddress;
 
-import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationService;
-import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationUtils;
-import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequestId;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcNoResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponseType;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcUnauthorizedResponse;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import org.hyperledger.besu.nat.upnp.UpnpNatManager;
-import org.hyperledger.besu.plugin.services.MetricsSystem;
-import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
-import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
-import org.hyperledger.besu.util.NetworkUtility;
-
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.file.Path;
@@ -69,6 +49,25 @@ import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationService;
+import org.hyperledger.besu.ethereum.jsonrpc.authentication.AuthenticationUtils;
+import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequestId;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcNoResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponseType;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcUnauthorizedResponse;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.nat.upnp.UpnpNatManager;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
+import org.hyperledger.besu.util.NetworkUtility;
 
 public class JsonRpcHttpService {
 

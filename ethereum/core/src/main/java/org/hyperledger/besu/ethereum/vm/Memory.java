@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Objects;
+
+import com.google.common.base.Joiner;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
@@ -20,12 +25,6 @@ import org.hyperledger.besu.util.bytes.MutableBytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
 import org.hyperledger.besu.util.uint.UInt256Value;
 import org.hyperledger.besu.util.uint.UInt256s;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Objects;
-
-import com.google.common.base.Joiner;
 
 /**
  * A EVM memory implementation.

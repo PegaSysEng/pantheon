@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.p2p.peers;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-
 import java.util.List;
+
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 
 public interface MutableLocalNode extends LocalNode {
   static MutableLocalNode create(

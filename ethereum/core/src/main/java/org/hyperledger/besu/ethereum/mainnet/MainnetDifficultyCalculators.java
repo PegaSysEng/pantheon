@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.math.BigInteger;
 
 import com.google.common.primitives.Ints;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.util.uint.UInt256;
 
 /** Provides the various difficultly calculates used on mainnet hard forks. */
 public abstract class MainnetDifficultyCalculators {
@@ -74,7 +73,7 @@ public abstract class MainnetDifficultyCalculators {
           calculateByzantiumDifficulty(time, parent, CONSTANTINOPLE_FAKE_BLOCK_OFFSET);
 
   private static BigInteger calculateByzantiumDifficulty(
-          final long time, final BlockHeader parent, final long fakeBlockOffset) {
+      final long time, final BlockHeader parent, final long fakeBlockOffset) {
     final BigInteger parentDifficulty = difficulty(parent.getDifficulty());
     final boolean hasOmmers = !parent.getOmmersHash().equals(Hash.EMPTY_LIST_HASH);
     final BigInteger difficulty =

@@ -12,11 +12,6 @@
  */
 package org.hyperledger.besu.plugins;
 
-import org.hyperledger.besu.plugin.PantheonContext;
-import org.hyperledger.besu.plugin.PantheonPlugin;
-import org.hyperledger.besu.plugin.data.BlockHeader;
-import org.hyperledger.besu.plugin.services.PantheonEvents;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,6 +22,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.google.auto.service.AutoService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.plugin.PantheonContext;
+import org.hyperledger.besu.plugin.PantheonPlugin;
+import org.hyperledger.besu.plugin.data.BlockHeader;
+import org.hyperledger.besu.plugin.services.PantheonEvents;
 
 @AutoService(PantheonPlugin.class)
 public class TestPantheonEventsPlugin implements PantheonPlugin {

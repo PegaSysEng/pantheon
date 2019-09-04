@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import org.hyperledger.besu.ethereum.core.Gas;
-import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltPredicate;
-
 import java.util.EnumSet;
 import java.util.Optional;
+
+import org.hyperledger.besu.ethereum.core.Gas;
+import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltPredicate;
 
 public interface Operation extends ExceptionalHaltPredicate {
 

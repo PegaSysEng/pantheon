@@ -21,7 +21,6 @@ import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.LogsBloomFilter;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
 
 public class BlockUtils {

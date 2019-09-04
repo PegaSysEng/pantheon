@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
-
-import java.util.Optional;
 
 public class TransactionWithMetadata {
 

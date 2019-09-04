@@ -12,6 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.blockcreation;
 
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
+
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MinedBlockObserver;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -22,10 +26,6 @@ import org.hyperledger.besu.ethereum.mainnet.EthHashSolver;
 import org.hyperledger.besu.ethereum.mainnet.EthHasher;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.util.Subscribers;
-
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.function.Function;
 
 public class EthHashMinerExecutor extends AbstractMinerExecutor<Void, EthHashBlockMiner> {
 

@@ -12,16 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import org.hyperledger.besu.ethereum.eth.manager.RequestManager.ResponseStream;
-import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;
-import org.hyperledger.besu.ethereum.eth.manager.exceptions.PeerDisconnectedException;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
-
 import java.util.Optional;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
+
+import org.hyperledger.besu.ethereum.eth.manager.RequestManager.ResponseStream;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.PeerDisconnectedException;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
 
 public class PendingPeerRequest {
   private final EthPeers ethPeers;

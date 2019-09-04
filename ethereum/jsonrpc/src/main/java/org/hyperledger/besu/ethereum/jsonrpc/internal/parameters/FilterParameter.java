@@ -12,9 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.Hash;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 public class FilterParameter {
 

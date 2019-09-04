@@ -21,37 +21,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.chainexport.RlpBlockExporter;
-import org.hyperledger.besu.chainimport.JsonBlockImporter;
-import org.hyperledger.besu.chainimport.RlpBlockImporter;
-import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand;
-import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand;
-import org.hyperledger.besu.controller.PantheonController;
-import org.hyperledger.besu.controller.PantheonControllerBuilder;
-import org.hyperledger.besu.services.PantheonPluginContextImpl;
-import org.hyperledger.besu.Runner;
-import org.hyperledger.besu.RunnerBuilder;
-import org.hyperledger.besu.cli.config.EthNetworkConfig;
-import org.hyperledger.besu.cli.options.EthProtocolOptions;
-import org.hyperledger.besu.cli.options.MetricsCLIOptions;
-import org.hyperledger.besu.cli.options.NetworkingOptions;
-import org.hyperledger.besu.cli.options.RocksDBOptions;
-import org.hyperledger.besu.cli.options.SynchronizerOptions;
-import org.hyperledger.besu.cli.options.TransactionPoolOptions;
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.hyperledger.besu.ethereum.ProtocolContext;
-import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
-import org.hyperledger.besu.ethereum.eth.sync.BlockBroadcaster;
-import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
-import org.hyperledger.besu.ethereum.graphql.GraphQLConfiguration;
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
-import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +33,36 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.Runner;
+import org.hyperledger.besu.RunnerBuilder;
+import org.hyperledger.besu.chainexport.RlpBlockExporter;
+import org.hyperledger.besu.chainimport.JsonBlockImporter;
+import org.hyperledger.besu.chainimport.RlpBlockImporter;
+import org.hyperledger.besu.cli.config.EthNetworkConfig;
+import org.hyperledger.besu.cli.options.EthProtocolOptions;
+import org.hyperledger.besu.cli.options.MetricsCLIOptions;
+import org.hyperledger.besu.cli.options.NetworkingOptions;
+import org.hyperledger.besu.cli.options.RocksDBOptions;
+import org.hyperledger.besu.cli.options.SynchronizerOptions;
+import org.hyperledger.besu.cli.options.TransactionPoolOptions;
+import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand;
+import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand;
+import org.hyperledger.besu.controller.PantheonController;
+import org.hyperledger.besu.controller.PantheonControllerBuilder;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
+import org.hyperledger.besu.ethereum.eth.sync.BlockBroadcaster;
+import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
+import org.hyperledger.besu.ethereum.graphql.GraphQLConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
+import org.hyperledger.besu.services.PantheonPluginContextImpl;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -208,7 +207,8 @@ public abstract class CommandTestAbstract {
     return parseCommand(System.in, args);
   }
 
-  protected TestPantheonCommand parseCommand(final PublicKeySubCommand.KeyLoader keyLoader, final String... args) {
+  protected TestPantheonCommand parseCommand(
+      final PublicKeySubCommand.KeyLoader keyLoader, final String... args) {
     return parseCommand(keyLoader, System.in, args);
   }
 
@@ -223,7 +223,7 @@ public abstract class CommandTestAbstract {
   }
 
   private TestPantheonCommand parseCommand(
-          final PublicKeySubCommand.KeyLoader keyLoader, final InputStream in, final String... args) {
+      final PublicKeySubCommand.KeyLoader keyLoader, final InputStream in, final String... args) {
     // turn off ansi usage globally in picocli
     System.setProperty("picocli.ansi", "false");
 

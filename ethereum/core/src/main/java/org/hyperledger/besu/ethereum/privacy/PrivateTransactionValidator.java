@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.privacy;
 
-import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
-import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
-
 import java.math.BigInteger;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
+import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 
 public class PrivateTransactionValidator {
 
@@ -65,8 +64,8 @@ public class PrivateTransactionValidator {
     return ValidationResult.valid();
   }
 
-  public ValidationResult<TransactionValidator.TransactionInvalidReason> validateTransactionSignature(
-      final PrivateTransaction transaction) {
+  public ValidationResult<TransactionValidator.TransactionInvalidReason>
+      validateTransactionSignature(final PrivateTransaction transaction) {
     if (chainId.isPresent()
         && (transaction.getChainId().isPresent() && !transaction.getChainId().equals(chainId))) {
       return ValidationResult.invalid(
@@ -88,7 +87,8 @@ public class PrivateTransactionValidator {
       transaction.getSender();
     } catch (final IllegalArgumentException e) {
       return ValidationResult.invalid(
-          TransactionValidator.TransactionInvalidReason.INVALID_SIGNATURE, "sender could not be extracted from transaction signature");
+          TransactionValidator.TransactionInvalidReason.INVALID_SIGNATURE,
+          "sender could not be extracted from transaction signature");
     }
 
     return ValidationResult.valid();

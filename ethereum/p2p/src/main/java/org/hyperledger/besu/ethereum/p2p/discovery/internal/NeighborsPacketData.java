@@ -14,11 +14,11 @@ package org.hyperledger.besu.ethereum.p2p.discovery.internal;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-
-import java.util.List;
 
 public class NeighborsPacketData implements PacketData {
 

@@ -14,11 +14,10 @@ package org.hyperledger.besu.ethereum.rlp;
 
 import static org.junit.Assume.assumeTrue;
 
-import org.hyperledger.besu.ethereum.rlp.util.RLPTestUtil;
-import org.hyperledger.besu.testutil.JsonTestParameters;
-
 import java.util.Collection;
 
+import org.hyperledger.besu.ethereum.rlp.util.RLPTestUtil;
+import org.hyperledger.besu.testutil.JsonTestParameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -30,7 +29,7 @@ public class InvalidRLPRefTest {
 
   private static final String[] TEST_CONFIG_FILES = {
     // TODO: upstream these additional tests to the ethereum tests repo
-          "org/hyperledger/besu/ethereum/rlp/invalidRLPTest.json", "RLPTests/invalidRLPTest.json"
+    "org/hyperledger/besu/ethereum/rlp/invalidRLPTest.json", "RLPTests/invalidRLPTest.json"
   };
 
   private final InvalidRLPRefTestCaseSpec spec;

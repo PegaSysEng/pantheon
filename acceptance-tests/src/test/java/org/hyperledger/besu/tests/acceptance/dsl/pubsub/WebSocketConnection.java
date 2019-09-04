@@ -14,9 +14,6 @@ package org.hyperledger.besu.tests.acceptance.dsl.pubsub;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -28,6 +25,8 @@ import io.vertx.core.http.RequestOptions;
 import io.vertx.core.http.WebSocket;
 import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.Json;
+import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
 
 public class WebSocketConnection {
 

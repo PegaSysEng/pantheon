@@ -16,13 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.blockcreation.EthHashMiningCoordinator;
-import org.hyperledger.besu.ethereum.core.Synchronizer;
-import org.hyperledger.besu.ethereum.eth.EthProtocol;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
-import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,6 +29,12 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import org.hyperledger.besu.ethereum.blockcreation.EthHashMiningCoordinator;
+import org.hyperledger.besu.ethereum.core.Synchronizer;
+import org.hyperledger.besu.ethereum.eth.EthProtocol;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;

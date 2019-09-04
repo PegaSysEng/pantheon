@@ -14,15 +14,14 @@ package org.hyperledger.besu.ethereum.trie;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
-import org.hyperledger.besu.services.kvstore.KeyValueStorage;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.nio.charset.Charset;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
+import org.hyperledger.besu.services.kvstore.KeyValueStorage;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 public class StoredMerklePatriciaTrieTest extends AbstractMerklePatriciaTrieTest {

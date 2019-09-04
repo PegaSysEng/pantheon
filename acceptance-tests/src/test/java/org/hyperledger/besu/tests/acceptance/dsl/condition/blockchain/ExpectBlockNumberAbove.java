@@ -13,14 +13,13 @@
 package org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
+
+import java.math.BigInteger;
 
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
-
-import java.math.BigInteger;
 
 public class ExpectBlockNumberAbove implements Condition {
   private final EthTransactions eth;

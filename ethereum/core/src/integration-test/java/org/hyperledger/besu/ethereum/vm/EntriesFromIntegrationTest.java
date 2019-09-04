@@ -14,20 +14,19 @@ package org.hyperledger.besu.ethereum.vm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
+
 import org.hyperledger.besu.ethereum.core.AccountStorageEntry;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
 import org.hyperledger.besu.ethereum.core.MutableAccount;
 import org.hyperledger.besu.ethereum.core.MutableWorldState;
 import org.hyperledger.besu.ethereum.core.WorldUpdater;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
 import org.junit.Test;
 
 public class EntriesFromIntegrationTest {
@@ -35,7 +34,8 @@ public class EntriesFromIntegrationTest {
   @Test
   @SuppressWarnings("MathAbsoluteRandom")
   public void shouldCollectStateEntries() {
-    final MutableWorldState worldState = InMemoryStorageProvider.createInMemoryWorldStateArchive().getMutable();
+    final MutableWorldState worldState =
+        InMemoryStorageProvider.createInMemoryWorldStateArchive().getMutable();
     final WorldUpdater updater = worldState.updater();
     MutableAccount account = updater.getOrCreate(Address.fromHexString("0x56"));
     final Map<Bytes32, AccountStorageEntry> expectedValues = new TreeMap<>();

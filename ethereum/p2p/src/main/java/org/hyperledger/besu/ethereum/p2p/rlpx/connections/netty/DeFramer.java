@@ -12,6 +12,21 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.timeout.IdleStateHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.p2p.network.exceptions.BreachOfProtocolException;
 import org.hyperledger.besu.ethereum.p2p.network.exceptions.IncompatiblePeerException;
 import org.hyperledger.besu.ethereum.p2p.network.exceptions.PeerDisconnectedException;
@@ -36,22 +51,6 @@ import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
-import io.netty.handler.codec.DecoderException;
-import io.netty.handler.timeout.IdleStateHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 final class DeFramer extends ByteToMessageDecoder {
 
@@ -178,7 +177,9 @@ final class DeFramer extends ByteToMessageDecoder {
             message.getData().toString());
         ctx.writeAndFlush(
                 new OutboundMessage(
-                    null, DisconnectMessage.create(DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL)))
+                    null,
+                    DisconnectMessage.create(
+                        DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL)))
             .addListener((f) -> ctx.close());
         connectFuture.completeExceptionally(
             new BreachOfProtocolException("Message received before HELLO's exchanged"));
@@ -219,7 +220,9 @@ final class DeFramer extends ByteToMessageDecoder {
       LOG.error("Exception while processing incoming message", throwable);
     }
     if (connectFuture.isDone() && !connectFuture.isCompletedExceptionally()) {
-      connectFuture.get().terminateConnection(DisconnectMessage.DisconnectReason.TCP_SUBSYSTEM_ERROR, false);
+      connectFuture
+          .get()
+          .terminateConnection(DisconnectMessage.DisconnectReason.TCP_SUBSYSTEM_ERROR, false);
     } else {
       connectFuture.completeExceptionally(throwable);
       ctx.close();

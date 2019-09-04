@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcRequestException;
-
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -25,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcRequestException;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JsonRpcRequest {

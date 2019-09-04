@@ -19,7 +19,6 @@ import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.cli.CommandTestAbstract;
 import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
 import org.hyperledger.besu.util.number.PositiveNumber;
-
 import org.junit.Test;
 
 public class EthProtocolOptionsTest
@@ -28,7 +27,8 @@ public class EthProtocolOptionsTest
   @Test
   public void parsesValidEwpMaxGetHeadersOptions() {
 
-    final CommandTestAbstract.TestPantheonCommand cmd = parseCommand("--Xewp-max-get-headers", "13");
+    final CommandTestAbstract.TestPantheonCommand cmd =
+        parseCommand("--Xewp-max-get-headers", "13");
 
     final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
@@ -71,7 +71,8 @@ public class EthProtocolOptionsTest
 
   @Test
   public void parsesValidEwpMaxGetReceiptsOptions() {
-    final CommandTestAbstract.TestPantheonCommand cmd = parseCommand("--Xewp-max-get-receipts", "15");
+    final CommandTestAbstract.TestPantheonCommand cmd =
+        parseCommand("--Xewp-max-get-receipts", "15");
 
     final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
@@ -94,7 +95,8 @@ public class EthProtocolOptionsTest
 
   @Test
   public void parsesValidEwpMaxGetNodeDataOptions() {
-    final CommandTestAbstract.TestPantheonCommand cmd = parseCommand("--Xewp-max-get-node-data", "16");
+    final CommandTestAbstract.TestPantheonCommand cmd =
+        parseCommand("--Xewp-max-get-node-data", "16");
 
     final EthProtocolOptions options = getOptionsFromPantheonCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
@@ -139,7 +141,8 @@ public class EthProtocolOptionsTest
   }
 
   @Override
-  EthProtocolOptions getOptionsFromPantheonCommand(final CommandTestAbstract.TestPantheonCommand pantheonCommand) {
+  EthProtocolOptions getOptionsFromPantheonCommand(
+      final CommandTestAbstract.TestPantheonCommand pantheonCommand) {
     return pantheonCommand.getEthProtocolOptions();
   }
 }

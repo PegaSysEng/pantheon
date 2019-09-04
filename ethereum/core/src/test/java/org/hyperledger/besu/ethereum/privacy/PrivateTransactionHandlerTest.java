@@ -18,16 +18,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.core.Account;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.core.MutableWorldState;
-import org.hyperledger.besu.ethereum.core.Transaction;
-import org.hyperledger.besu.ethereum.core.Wei;
-import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
-import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
-import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import org.hyperledger.orion.testutil.OrionKeyUtils;
+import java.math.BigInteger;
+import java.util.Optional;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.enclave.Enclave;
@@ -36,14 +30,19 @@ import org.hyperledger.besu.enclave.types.ReceiveRequest;
 import org.hyperledger.besu.enclave.types.ReceiveResponse;
 import org.hyperledger.besu.enclave.types.SendRequest;
 import org.hyperledger.besu.enclave.types.SendResponse;
+import org.hyperledger.besu.ethereum.core.Account;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.MutableWorldState;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
+import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.ethereum.privacy.markertransaction.FixedKeySigningPrivateMarkerTransactionFactory;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.math.BigInteger;
-import java.util.Optional;
-
-import com.google.common.collect.Lists;
+import org.hyperledger.orion.testutil.OrionKeyUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -187,7 +186,9 @@ public class PrivateTransactionHandlerTest {
   @Test
   public void nonceTooLowError() throws Exception {
     when(privateTransactionValidator.validate(any(), any()))
-        .thenReturn(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.PRIVATE_NONCE_TOO_LOW));
+        .thenReturn(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.PRIVATE_NONCE_TOO_LOW));
 
     final PrivateTransaction transaction = buildLegacyPrivateTransaction(0);
     final String enclaveKey = privateTransactionHandler.sendToOrion(transaction);
@@ -195,13 +196,18 @@ public class PrivateTransactionHandlerTest {
         privateTransactionHandler.getPrivacyGroup(enclaveKey, transaction);
     final ValidationResult<TransactionValidator.TransactionInvalidReason> validationResult =
         privateTransactionHandler.validatePrivateTransaction(transaction, privacyGroupId);
-    assertThat(validationResult).isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.PRIVATE_NONCE_TOO_LOW));
+    assertThat(validationResult)
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.PRIVATE_NONCE_TOO_LOW));
   }
 
   @Test
   public void incorrectNonceError() throws Exception {
     when(privateTransactionValidator.validate(any(), any()))
-        .thenReturn(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.INCORRECT_PRIVATE_NONCE));
+        .thenReturn(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.INCORRECT_PRIVATE_NONCE));
 
     final PrivateTransaction transaction = buildLegacyPrivateTransaction(2);
 
@@ -210,7 +216,10 @@ public class PrivateTransactionHandlerTest {
         privateTransactionHandler.getPrivacyGroup(enclaveKey, transaction);
     final ValidationResult<TransactionValidator.TransactionInvalidReason> validationResult =
         privateTransactionHandler.validatePrivateTransaction(transaction, privacyGroupId);
-    assertThat(validationResult).isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.INCORRECT_PRIVATE_NONCE));
+    assertThat(validationResult)
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.INCORRECT_PRIVATE_NONCE));
   }
 
   private static PrivateTransaction buildLegacyPrivateTransaction() {

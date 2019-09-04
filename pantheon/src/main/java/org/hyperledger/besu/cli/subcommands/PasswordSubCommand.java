@@ -15,11 +15,10 @@ package org.hyperledger.besu.cli.subcommands;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hyperledger.besu.cli.subcommands.PasswordSubCommand.COMMAND_NAME;
 
-import org.hyperledger.besu.cli.PantheonCommand;
-import org.hyperledger.besu.cli.subcommands.PasswordSubCommand.HashSubCommand;
-
 import java.io.PrintStream;
 
+import org.hyperledger.besu.cli.PantheonCommand;
+import org.hyperledger.besu.cli.subcommands.PasswordSubCommand.HashSubCommand;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;

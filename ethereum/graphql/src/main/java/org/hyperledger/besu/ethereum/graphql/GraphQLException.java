@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.graphql;
 
-import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLError;
-
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import graphql.ErrorType;
 import graphql.language.SourceLocation;
+import org.hyperledger.besu.ethereum.graphql.internal.response.GraphQLError;
 
 class GraphQLException extends RuntimeException implements graphql.GraphQLError {
   private final GraphQLError error;

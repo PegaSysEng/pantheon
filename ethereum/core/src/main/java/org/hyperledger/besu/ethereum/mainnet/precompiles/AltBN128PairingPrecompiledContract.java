@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.mainnet.precompiles;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.hyperledger.besu.crypto.altbn128.AltBn128Fq12Pairer;
 import org.hyperledger.besu.crypto.altbn128.AltBn128Fq2Point;
 import org.hyperledger.besu.crypto.altbn128.AltBn128Point;
@@ -23,11 +28,6 @@ import org.hyperledger.besu.ethereum.mainnet.AbstractPrecompiledContract;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class AltBN128PairingPrecompiledContract extends AbstractPrecompiledContract {
 
@@ -45,7 +45,7 @@ public class AltBN128PairingPrecompiledContract extends AbstractPrecompiledContr
   private final Gas baseGasCost;
 
   private AltBN128PairingPrecompiledContract(
-          final GasCalculator gasCalculator, final Gas pairingGasCost, final Gas baseGasCost) {
+      final GasCalculator gasCalculator, final Gas pairingGasCost, final Gas baseGasCost) {
     super("AltBN128Pairing", gasCalculator);
     this.pairingGasCost = pairingGasCost;
     this.baseGasCost = baseGasCost;

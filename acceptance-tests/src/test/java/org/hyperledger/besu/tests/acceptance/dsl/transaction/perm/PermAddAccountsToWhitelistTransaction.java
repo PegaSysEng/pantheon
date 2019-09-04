@@ -14,11 +14,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 import java.util.List;
+
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 
 public class PermAddAccountsToWhitelistTransaction implements Transaction<String> {
 
@@ -31,7 +31,8 @@ public class PermAddAccountsToWhitelistTransaction implements Transaction<String
   @Override
   public String execute(final NodeRequests node) {
     try {
-      PermissioningJsonRpcRequestFactory.AddAccountsToWhitelistResponse response = node.perm().addAccountsToWhitelist(accounts).send();
+      PermissioningJsonRpcRequestFactory.AddAccountsToWhitelistResponse response =
+          node.perm().addAccountsToWhitelist(accounts).send();
       assertThat(response.getResult()).isEqualTo("Success");
       return response.getResult();
     } catch (IOException e) {

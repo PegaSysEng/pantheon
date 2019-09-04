@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
-import org.hyperledger.besu.ethereum.core.LogTopic;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.hyperledger.besu.ethereum.core.LogTopic;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
 
 /** A single log result. */
 @JsonPropertyOrder({

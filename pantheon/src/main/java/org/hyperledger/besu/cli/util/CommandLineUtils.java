@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.cli.util;
 
-import org.hyperledger.besu.util.StringUtils;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.util.StringUtils;
 import picocli.CommandLine;
 
 public class CommandLineUtils {

@@ -13,7 +13,6 @@
 package org.hyperledger.besu.services;
 
 import org.hyperledger.besu.plugin.services.PicoCLIOptions;
-
 import picocli.CommandLine;
 
 public class PicoCLIOptionsImpl implements PicoCLIOptions {

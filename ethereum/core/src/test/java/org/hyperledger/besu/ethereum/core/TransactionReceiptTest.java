@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
 import org.junit.Test;
 
 public class TransactionReceiptTest {

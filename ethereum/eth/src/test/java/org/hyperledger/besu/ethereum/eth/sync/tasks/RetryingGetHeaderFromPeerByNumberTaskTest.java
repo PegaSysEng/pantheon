@@ -14,12 +14,11 @@ package org.hyperledger.besu.ethereum.eth.sync.tasks;
 
 import static java.util.Collections.singletonList;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.ethtaskutils.RetryingMessageTaskTest;
 import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
-
-import java.util.List;
-
 import org.junit.Ignore;
 import org.junit.Test;
 

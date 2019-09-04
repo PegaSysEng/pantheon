@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.web3;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;

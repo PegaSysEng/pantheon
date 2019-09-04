@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.mainnet.headervalidationrules;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-import org.hyperledger.besu.ethereum.mainnet.DetachedBlockHeaderValidationRule;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.mainnet.DetachedBlockHeaderValidationRule;
 
 /**
  * Validates the gas used in executing the block (defined by the supplied header) is less than or

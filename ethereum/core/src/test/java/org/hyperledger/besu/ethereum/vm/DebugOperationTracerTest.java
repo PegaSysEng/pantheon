@@ -18,6 +18,11 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
@@ -31,12 +36,6 @@ import org.hyperledger.besu.ethereum.debug.TraceOptions;
 import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltException;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.TreeMap;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -154,7 +153,8 @@ public class DebugOperationTracerTest {
 
   @Test
   public void shouldCaptureFrameWhenExceptionalHaltOccurs() throws Exception {
-    final EnumSet<ExceptionalHaltReason> expectedHaltReasons = EnumSet.of(ExceptionalHaltReason.INSUFFICIENT_GAS);
+    final EnumSet<ExceptionalHaltReason> expectedHaltReasons =
+        EnumSet.of(ExceptionalHaltReason.INSUFFICIENT_GAS);
     final ExceptionalHaltException expectedException =
         new ExceptionalHaltException(expectedHaltReasons);
     doThrow(expectedException).when(executeOperationAction).execute();

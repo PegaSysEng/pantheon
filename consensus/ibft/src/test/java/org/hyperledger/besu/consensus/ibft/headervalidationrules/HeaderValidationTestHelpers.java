@@ -12,17 +12,17 @@
  */
 package org.hyperledger.besu.consensus.ibft.headervalidationrules;
 
-import org.hyperledger.besu.consensus.ibft.IbftExtraDataFixture;
+import java.util.List;
+import java.util.Optional;
+
 import org.hyperledger.besu.consensus.ibft.IbftExtraData;
+import org.hyperledger.besu.consensus.ibft.IbftExtraDataFixture;
 import org.hyperledger.besu.consensus.ibft.Vote;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.List;
-import java.util.Optional;
 
 public class HeaderValidationTestHelpers {
 

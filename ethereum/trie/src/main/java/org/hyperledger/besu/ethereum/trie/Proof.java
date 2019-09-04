@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class Proof<V> {
 

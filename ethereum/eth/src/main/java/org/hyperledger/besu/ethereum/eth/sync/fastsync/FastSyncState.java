@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalLong;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 public class FastSyncState {
 

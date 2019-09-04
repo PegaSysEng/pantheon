@@ -23,7 +23,6 @@ import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.uint.UInt256;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

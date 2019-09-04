@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.consensus.ibft.blockcreation;
 
+import java.util.function.Function;
+
 import org.hyperledger.besu.consensus.ibft.IbftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.consensus.ibft.IbftHelpers;
@@ -24,8 +26,6 @@ import org.hyperledger.besu.ethereum.core.SealableBlockHeader;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-
-import java.util.function.Function;
 
 // This class is responsible for creating a block without committer seals (basically it was just
 // too hard to coordinate with the state machine).

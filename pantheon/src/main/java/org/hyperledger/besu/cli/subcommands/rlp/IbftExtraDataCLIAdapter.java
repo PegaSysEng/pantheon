@@ -12,16 +12,15 @@
  */
 package org.hyperledger.besu.cli.subcommands.rlp;
 
-import org.hyperledger.besu.consensus.ibft.IbftExtraData;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hyperledger.besu.consensus.ibft.IbftExtraData;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * Adapter to convert a typed JSON to an IbftExtraData object This adapter handles the JSON to RLP

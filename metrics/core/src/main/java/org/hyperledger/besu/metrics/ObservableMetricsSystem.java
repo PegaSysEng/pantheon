@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.metrics;
 
+import java.util.stream.Stream;
+
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
-
-import java.util.stream.Stream;
 
 public interface ObservableMetricsSystem extends MetricsSystem {
 

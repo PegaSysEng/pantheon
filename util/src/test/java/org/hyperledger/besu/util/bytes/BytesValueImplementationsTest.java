@@ -14,12 +14,12 @@ package org.hyperledger.besu.util.bytes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
-import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;

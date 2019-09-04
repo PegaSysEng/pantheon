@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
+import java.util.Collection;
+import java.util.Optional;
+
 import org.hyperledger.besu.consensus.ibft.payload.PreparedCertificate;
 import org.hyperledger.besu.consensus.ibft.payload.RoundChangePayload;
 import org.hyperledger.besu.consensus.ibft.payload.SignedData;
@@ -21,9 +24,6 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderBuilder;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Util;
-
-import java.util.Collection;
-import java.util.Optional;
 
 public class IbftHelpers {
 

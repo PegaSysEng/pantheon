@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.storage.keyvalue;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.worldstate.WorldStatePreimageStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage.Transaction;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Optional;
 
 public class WorldStatePreimageKeyValueStorage implements WorldStatePreimageStorage {
   private final KeyValueStorage keyValueStorage;

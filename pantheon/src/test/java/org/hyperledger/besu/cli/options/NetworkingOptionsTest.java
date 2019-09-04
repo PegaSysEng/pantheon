@@ -15,7 +15,6 @@ package org.hyperledger.besu.cli.options;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
-
 import org.junit.Test;
 
 public class NetworkingOptionsTest

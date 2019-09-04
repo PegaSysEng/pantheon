@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.cli.options;
 
-import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
-
 import java.util.Arrays;
 import java.util.List;
 
+import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
 import picocli.CommandLine;
 
 public class NetworkingOptions implements CLIOptions<NetworkingConfiguration> {

@@ -14,10 +14,6 @@ package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
 import static java.util.Collections.emptyList;
 
-import org.hyperledger.besu.tests.acceptance.dsl.condition.net.NetConditions;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNodeRunner;
-import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,6 +22,9 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.net.NetConditions;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNodeRunner;
+import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 
 public class PrivacyCluster {
   private static final Logger LOG = LogManager.getLogger();

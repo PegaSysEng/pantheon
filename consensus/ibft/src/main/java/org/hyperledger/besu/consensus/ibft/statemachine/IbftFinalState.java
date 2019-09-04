@@ -14,6 +14,9 @@ package org.hyperledger.besu.consensus.ibft.statemachine;
 
 import static org.hyperledger.besu.consensus.ibft.IbftHelpers.calculateRequiredValidatorQuorum;
 
+import java.time.Clock;
+import java.util.Collection;
+
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
 import org.hyperledger.besu.consensus.ibft.BlockTimer;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
@@ -25,9 +28,6 @@ import org.hyperledger.besu.consensus.ibft.network.ValidatorMulticaster;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.core.Address;
-
-import java.time.Clock;
-import java.util.Collection;
 
 /** This is the full data set, or context, required for many of the aspects of the IBFT workflow. */
 public class IbftFinalState {

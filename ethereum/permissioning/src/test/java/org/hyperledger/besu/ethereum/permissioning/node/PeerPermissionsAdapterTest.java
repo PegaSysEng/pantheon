@@ -16,6 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
+import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
 import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
@@ -23,14 +30,6 @@ import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
 import org.hyperledger.besu.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
-import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
-import org.hyperledger.besu.ethereum.core.Block;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 
@@ -181,7 +180,8 @@ public class PeerPermissionsAdapterTest {
   public void allowOutboundNeighborsRequest_inSyncRemoteIsBootnode() {
     mockSyncStatusNodePermissioning(true, true);
     bootNodes.add(remoteNode.getEnodeURL());
-    final PeerPermissions.Action action = PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
+    final PeerPermissions.Action action =
+        PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
 
     mockControllerPermissions(true, false);
     assertThat(adapter.isPermitted(localNode, remoteNode, action)).isTrue();
@@ -199,7 +199,8 @@ public class PeerPermissionsAdapterTest {
   @Test
   public void allowOutboundNeighborsRequest_inSyncRemoteIsNotABootnode() {
     mockSyncStatusNodePermissioning(true, true);
-    final PeerPermissions.Action action = PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
+    final PeerPermissions.Action action =
+        PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
 
     mockControllerPermissions(true, false);
     assertThat(adapter.isPermitted(localNode, remoteNode, action)).isTrue();
@@ -218,7 +219,8 @@ public class PeerPermissionsAdapterTest {
   public void allowOutboundNeighborsRequest_outOfSyncRemoteIsABootnode() {
     mockSyncStatusNodePermissioning(true, false);
     bootNodes.add(remoteNode.getEnodeURL());
-    final PeerPermissions.Action action = PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
+    final PeerPermissions.Action action =
+        PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
 
     mockControllerPermissions(true, false);
     assertThat(adapter.isPermitted(localNode, remoteNode, action)).isFalse();
@@ -236,7 +238,8 @@ public class PeerPermissionsAdapterTest {
   @Test
   public void allowOutboundNeighborsRequest_outOfSyncRemoteIsNotABootnode() {
     mockSyncStatusNodePermissioning(true, false);
-    final PeerPermissions.Action action = PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
+    final PeerPermissions.Action action =
+        PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
 
     mockControllerPermissions(true, false);
     assertThat(adapter.isPermitted(localNode, remoteNode, action)).isFalse();
@@ -254,7 +257,8 @@ public class PeerPermissionsAdapterTest {
   @Test
   public void allowOutboundNeighborsRequest_noSyncPermissioning() {
     mockSyncStatusNodePermissioning(false, false);
-    final PeerPermissions.Action action = PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
+    final PeerPermissions.Action action =
+        PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_NEIGHBORS_REQUEST;
 
     mockControllerPermissions(true, false);
     assertThat(adapter.isPermitted(localNode, remoteNode, action)).isTrue();
@@ -271,7 +275,8 @@ public class PeerPermissionsAdapterTest {
 
   @Test
   public void allowInboundNeighborsRequest() {
-    final PeerPermissions.Action action = PeerPermissions.Action.DISCOVERY_SERVE_INBOUND_NEIGHBORS_REQUEST;
+    final PeerPermissions.Action action =
+        PeerPermissions.Action.DISCOVERY_SERVE_INBOUND_NEIGHBORS_REQUEST;
 
     mockControllerPermissions(true, false);
     assertThat(adapter.isPermitted(localNode, remoteNode, action)).isFalse();
@@ -322,7 +327,8 @@ public class PeerPermissionsAdapterTest {
 
   @Test
   public void allowOngoingLocallyInitiatedConnection() {
-    final PeerPermissions.Action action = PeerPermissions.Action.RLPX_ALLOW_ONGOING_LOCALLY_INITIATED_CONNECTION;
+    final PeerPermissions.Action action =
+        PeerPermissions.Action.RLPX_ALLOW_ONGOING_LOCALLY_INITIATED_CONNECTION;
 
     mockControllerPermissions(true, false);
     assertThat(adapter.isPermitted(localNode, remoteNode, action)).isTrue();
@@ -339,7 +345,8 @@ public class PeerPermissionsAdapterTest {
 
   @Test
   public void allowOngoingRemotelyInitiatedConnection() {
-    final PeerPermissions.Action action = PeerPermissions.Action.RLPX_ALLOW_ONGOING_REMOTELY_INITIATED_CONNECTION;
+    final PeerPermissions.Action action =
+        PeerPermissions.Action.RLPX_ALLOW_ONGOING_REMOTELY_INITIATED_CONNECTION;
 
     mockControllerPermissions(true, false);
     assertThat(adapter.isPermitted(localNode, remoteNode, action)).isFalse();

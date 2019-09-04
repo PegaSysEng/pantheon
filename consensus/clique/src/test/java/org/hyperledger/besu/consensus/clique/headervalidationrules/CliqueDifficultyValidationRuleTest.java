@@ -17,8 +17,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.consensus.clique.TestHelpers;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.consensus.clique.CliqueContext;
+import org.hyperledger.besu.consensus.clique.TestHelpers;
 import org.hyperledger.besu.consensus.common.VoteProposer;
 import org.hyperledger.besu.consensus.common.VoteTally;
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
@@ -30,10 +33,6 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.Util;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.List;
-
-import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,11 +65,13 @@ public class CliqueDifficultyValidationRuleTest {
 
     blockHeaderBuilder.number(IN_TURN_BLOCK_NUMBER - 1L);
     final BlockHeader parentHeader =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     blockHeaderBuilder.number(IN_TURN_BLOCK_NUMBER).difficulty(REPORTED_DIFFICULTY);
     final BlockHeader newBlock =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     final CliqueDifficultyValidationRule diffValidationRule = new CliqueDifficultyValidationRule();
     assertThat(diffValidationRule.validate(newBlock, parentHeader, cliqueProtocolContext)).isTrue();
@@ -83,11 +84,13 @@ public class CliqueDifficultyValidationRuleTest {
 
     blockHeaderBuilder.number(OUT_OF_TURN_BLOCK_NUMBER - 1L);
     final BlockHeader parentHeader =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     blockHeaderBuilder.number(OUT_OF_TURN_BLOCK_NUMBER).difficulty(REPORTED_DIFFICULTY);
     final BlockHeader newBlock =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     final CliqueDifficultyValidationRule diffValidationRule = new CliqueDifficultyValidationRule();
     assertThat(diffValidationRule.validate(newBlock, parentHeader, cliqueProtocolContext)).isTrue();
@@ -100,11 +103,13 @@ public class CliqueDifficultyValidationRuleTest {
 
     blockHeaderBuilder.number(OUT_OF_TURN_BLOCK_NUMBER - 1L);
     final BlockHeader parentHeader =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     blockHeaderBuilder.number(OUT_OF_TURN_BLOCK_NUMBER).difficulty(REPORTED_DIFFICULTY);
     final BlockHeader newBlock =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     final CliqueDifficultyValidationRule diffValidationRule = new CliqueDifficultyValidationRule();
     assertThat(diffValidationRule.validate(newBlock, parentHeader, cliqueProtocolContext))
@@ -118,11 +123,13 @@ public class CliqueDifficultyValidationRuleTest {
 
     blockHeaderBuilder.number(IN_TURN_BLOCK_NUMBER - 1L);
     final BlockHeader parentHeader =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     blockHeaderBuilder.number(IN_TURN_BLOCK_NUMBER).difficulty(REPORTED_DIFFICULTY);
     final BlockHeader newBlock =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     final CliqueDifficultyValidationRule diffValidationRule = new CliqueDifficultyValidationRule();
     assertThat(diffValidationRule.validate(newBlock, parentHeader, cliqueProtocolContext))

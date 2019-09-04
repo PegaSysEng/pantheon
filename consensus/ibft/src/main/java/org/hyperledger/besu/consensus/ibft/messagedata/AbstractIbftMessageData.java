@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.consensus.ibft.messagedata;
 
+import java.util.function.Function;
+
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.AbstractMessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.function.Function;
 
 public abstract class AbstractIbftMessageData extends AbstractMessageData {
   protected AbstractIbftMessageData(final BytesValue data) {

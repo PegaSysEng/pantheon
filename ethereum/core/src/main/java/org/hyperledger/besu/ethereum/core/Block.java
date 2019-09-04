@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
+import java.util.List;
+import java.util.Objects;
+
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.List;
-import java.util.Objects;
 
 public class Block {
 

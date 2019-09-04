@@ -12,18 +12,18 @@
  */
 package org.hyperledger.besu.ethereum.vm.ehalt;
 
+import java.util.EnumSet;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.vm.EVM;
 import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
-
-import java.util.EnumSet;
-import java.util.Optional;
 
 public class InsufficientGasExceptionalHaltPredicate implements ExceptionalHaltPredicate {
 
   @Override
   public Optional<ExceptionalHaltReason> exceptionalHaltCondition(
-          final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
+      final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
     // Should not execute, as the cost function could depend on the stack items.
     if (prevReasons.contains(ExceptionalHaltReason.INSUFFICIENT_STACK_ITEMS)) {
       return Optional.empty();

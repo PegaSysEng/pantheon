@@ -15,13 +15,12 @@ package org.hyperledger.besu.services.tasks;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Before;
 import org.junit.Test;
 

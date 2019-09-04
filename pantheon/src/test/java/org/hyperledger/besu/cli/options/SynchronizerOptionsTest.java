@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.cli.options;
 
-import org.hyperledger.besu.cli.CommandTestAbstract;
-import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
-
 import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Range;
+import org.hyperledger.besu.cli.CommandTestAbstract;
+import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 
 public class SynchronizerOptionsTest
     extends AbstractCLIOptionsTest<SynchronizerConfiguration.Builder, SynchronizerOptions> {
@@ -68,7 +67,8 @@ public class SynchronizerOptionsTest
   }
 
   @Override
-  SynchronizerOptions getOptionsFromPantheonCommand(final CommandTestAbstract.TestPantheonCommand pantheonCommand) {
+  SynchronizerOptions getOptionsFromPantheonCommand(
+      final CommandTestAbstract.TestPantheonCommand pantheonCommand) {
     return pantheonCommand.getSynchronizerOptions();
   }
 

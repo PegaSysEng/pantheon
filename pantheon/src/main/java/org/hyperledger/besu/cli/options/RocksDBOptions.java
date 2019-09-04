@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.cli.options;
 
-import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
-
 import java.util.Arrays;
 import java.util.List;
 
+import org.hyperledger.besu.services.kvstore.RocksDbConfiguration;
 import picocli.CommandLine;
 
 public class RocksDBOptions implements CLIOptions<RocksDbConfiguration.Builder> {

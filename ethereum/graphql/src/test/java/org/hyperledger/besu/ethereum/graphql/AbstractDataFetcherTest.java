@@ -14,15 +14,14 @@ package org.hyperledger.besu.ethereum.graphql;
 
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
-import org.hyperledger.besu.ethereum.graphql.internal.pojoadapter.NormalBlockAdapter;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-
 import java.util.Optional;
 import java.util.Set;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
+import org.hyperledger.besu.ethereum.graphql.internal.pojoadapter.NormalBlockAdapter;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;

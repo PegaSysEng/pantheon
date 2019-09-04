@@ -12,14 +12,18 @@
  */
 package org.hyperledger.besu.consensus.clique.jsonrpc;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.hyperledger.besu.consensus.clique.CliqueBlockInterface;
 import org.hyperledger.besu.consensus.clique.CliqueContext;
 import org.hyperledger.besu.consensus.clique.jsonrpc.methods.CliqueGetSignerMetrics;
 import org.hyperledger.besu.consensus.clique.jsonrpc.methods.CliqueGetSigners;
 import org.hyperledger.besu.consensus.clique.jsonrpc.methods.CliqueGetSignersAtHash;
+import org.hyperledger.besu.consensus.clique.jsonrpc.methods.CliqueProposals;
 import org.hyperledger.besu.consensus.clique.jsonrpc.methods.Discard;
 import org.hyperledger.besu.consensus.clique.jsonrpc.methods.Propose;
-import org.hyperledger.besu.consensus.clique.jsonrpc.methods.CliqueProposals;
 import org.hyperledger.besu.consensus.common.EpochManager;
 import org.hyperledger.besu.consensus.common.VoteProposer;
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
@@ -32,10 +36,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethodFacto
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CliqueJsonRpcMethodsFactory implements JsonRpcMethodFactory {
 

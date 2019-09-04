@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.p2p.network;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-
-import java.util.List;
 
 /** Represents an object responsible for managing a wire subprotocol. */
 public interface ProtocolManager extends AutoCloseable {

@@ -12,17 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
+import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
-
-import java.util.function.Supplier;
-
-import com.google.common.base.Suppliers;
 
 public class EthGetBalance extends AbstractBlockParameterMethod {
 

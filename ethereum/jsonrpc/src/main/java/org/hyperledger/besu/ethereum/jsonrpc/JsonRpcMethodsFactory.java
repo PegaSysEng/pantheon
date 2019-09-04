@@ -12,6 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc;
 
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import org.hyperledger.besu.config.GenesisConfigOptions;
 import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
@@ -125,13 +132,6 @@ import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-
-import java.math.BigInteger;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 public class JsonRpcMethodsFactory {
 

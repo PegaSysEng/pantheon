@@ -12,10 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import org.hyperledger.besu.ethereum.debug.TraceFrame;
 import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
-
-import com.fasterxml.jackson.annotation.JsonGetter;
 
 public class StructLogWithError extends StructLog {
 

@@ -12,6 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.privacy.methods.eea;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcEnclaveErrorConverter;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcErrorConverter;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
@@ -23,17 +27,12 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-import org.hyperledger.besu.ethereum.core.Transaction;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionHandler;
 import org.hyperledger.besu.ethereum.privacy.Restriction;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class EeaSendRawTransaction implements JsonRpcMethod {
 
@@ -84,7 +83,9 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
     try {
       enclaveKey = privateTransactionHandler.sendToOrion(privateTransaction);
     } catch (final Exception e) {
-      return new JsonRpcErrorResponse(request.getId(), JsonRpcEnclaveErrorConverter.convertEnclaveInvalidReason(e.getMessage()));
+      return new JsonRpcErrorResponse(
+          request.getId(),
+          JsonRpcEnclaveErrorConverter.convertEnclaveInvalidReason(e.getMessage()));
     }
 
     final String privacyGroupId;
@@ -92,7 +93,9 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
       privacyGroupId = privateTransactionHandler.getPrivacyGroup(enclaveKey, privateTransaction);
 
     } catch (final Exception e) {
-      return new JsonRpcErrorResponse(request.getId(), JsonRpcEnclaveErrorConverter.convertEnclaveInvalidReason(e.getMessage()));
+      return new JsonRpcErrorResponse(
+          request.getId(),
+          JsonRpcEnclaveErrorConverter.convertEnclaveInvalidReason(e.getMessage()));
     }
 
     return privateTransactionHandler
@@ -110,11 +113,13 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
                               request.getId(), privacyMarkerTransaction.hash().toString()),
                       errorReason ->
                           new JsonRpcErrorResponse(
-                              request.getId(), JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
+                              request.getId(),
+                              JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
             },
             (errorReason) ->
                 new JsonRpcErrorResponse(
-                    request.getId(), JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
+                    request.getId(),
+                    JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
   }
 
   private PrivateTransaction decodeRawTransaction(final String hash)

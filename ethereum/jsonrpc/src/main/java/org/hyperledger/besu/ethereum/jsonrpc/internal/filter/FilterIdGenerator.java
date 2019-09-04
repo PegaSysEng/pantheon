@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
+import java.security.SecureRandom;
+
 import org.hyperledger.besu.crypto.SecureRandomProvider;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.Quantity;
-
-import java.security.SecureRandom;
 
 public class FilterIdGenerator {
 

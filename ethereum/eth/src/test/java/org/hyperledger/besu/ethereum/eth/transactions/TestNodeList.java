@@ -19,11 +19,6 @@ import static org.apache.logging.log4j.util.Strings.join;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.ethereum.eth.transactions.TestNode.shortId;
 
-import org.hyperledger.besu.crypto.SECP256K1;
-import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,6 +37,10 @@ import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.awaitility.Duration;
 import org.awaitility.core.ConditionTimeoutException;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 
 public class TestNodeList implements Closeable {
   private static final Logger LOG = LogManager.getLogger();

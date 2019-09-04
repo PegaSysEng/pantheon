@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.consensus.ibft.statemachine;
 
-import org.hyperledger.besu.consensus.ibft.payload.PreparedCertificate;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
-import org.hyperledger.besu.ethereum.core.Block;
-
 import java.util.Collection;
 import java.util.stream.Collectors;
+
+import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
+import org.hyperledger.besu.consensus.ibft.payload.PreparedCertificate;
+import org.hyperledger.besu.ethereum.core.Block;
 
 public class PreparedRoundArtifacts {
 

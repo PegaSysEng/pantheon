@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.eth.messages;
 
+import java.util.Iterator;
+import java.util.function.Function;
+
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.AbstractMessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
@@ -19,9 +22,6 @@ import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Iterator;
-import java.util.function.Function;
 
 public class TransactionsMessage extends AbstractMessageData {
 

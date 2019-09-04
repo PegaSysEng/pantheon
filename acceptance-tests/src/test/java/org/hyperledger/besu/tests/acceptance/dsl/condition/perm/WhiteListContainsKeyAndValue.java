@@ -14,12 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.perm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor;
-
 import java.nio.file.Path;
 import java.util.Collection;
+
+import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 
 public class WhiteListContainsKeyAndValue implements Condition {
   private final WhitelistPersistor.WHITELIST_TYPE whitelistType;

@@ -14,15 +14,14 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.net;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetServicesTransaction;
-import org.hyperledger.besu.util.NetworkUtility;
-
 import java.util.Arrays;
 import java.util.Map;
 
 import com.google.common.net.InetAddresses;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetServicesTransaction;
+import org.hyperledger.besu.util.NetworkUtility;
 
 public class ExpectNetServicesReturnsAllServicesAsActive implements Condition {
 

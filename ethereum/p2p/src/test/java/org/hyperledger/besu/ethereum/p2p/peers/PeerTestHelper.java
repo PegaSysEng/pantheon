@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.p2p.peers;
 
+import java.util.Arrays;
+
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Arrays;
 
 public class PeerTestHelper {
 

@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-
 import java.util.Collection;
 import java.util.Optional;
+
+import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 
 @FunctionalInterface
 public interface GenesisConfigurationProvider {

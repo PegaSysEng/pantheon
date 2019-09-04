@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.metrics;
 
-import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
-
 import java.util.List;
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
 
 public class Observation {
   private final MetricCategory category;

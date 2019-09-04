@@ -12,10 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.p2p.discovery.internal;
 
-import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -29,6 +25,9 @@ import java.util.stream.Collectors;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
+import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class RecursivePeerRefreshState {
   private static final Logger LOG = LogManager.getLogger();
@@ -192,7 +191,9 @@ public class RecursivePeerRefreshState {
     for (final DiscoveryPeer receivedDiscoPeer : peers) {
       if (satisfiesMapAdditionCriteria(receivedDiscoPeer)) {
         final MetadataPeer receivedMetadataPeer =
-            new MetadataPeer(receivedDiscoPeer, PeerDistanceCalculator.distance(target, receivedDiscoPeer.getId()));
+            new MetadataPeer(
+                receivedDiscoPeer,
+                PeerDistanceCalculator.distance(target, receivedDiscoPeer.getId()));
         oneTrueMap.put(receivedDiscoPeer.getId(), receivedMetadataPeer);
       }
     }

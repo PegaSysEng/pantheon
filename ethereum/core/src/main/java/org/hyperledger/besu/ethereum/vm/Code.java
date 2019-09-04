@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import org.hyperledger.besu.ethereum.vm.operations.JumpDestOperation;
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.util.BitSet;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.vm.operations.JumpDestOperation;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.uint.UInt256;
 
 /** Represents EVM code associated with an account. */
 public class Code {

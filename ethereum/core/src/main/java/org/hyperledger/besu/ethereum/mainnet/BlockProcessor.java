@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.MutableWorldState;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
-
-import java.util.List;
 
 /** Processes a block. */
 public interface BlockProcessor {
@@ -53,7 +53,7 @@ public interface BlockProcessor {
    * @return the block processing result
    */
   default Result processBlock(
-          final Blockchain blockchain, final MutableWorldState worldState, final Block block) {
+      final Blockchain blockchain, final MutableWorldState worldState, final Block block) {
     return processBlock(
         blockchain,
         worldState,

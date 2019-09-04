@@ -15,13 +15,6 @@ package org.hyperledger.besu.ethereum.p2p.discovery;
 import static com.google.common.net.InetAddresses.isInetAddress;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.FindNeighborsPacketData;
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.NeighborsPacketData;
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.Packet;
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.PingPacketData;
-import org.hyperledger.besu.ethereum.p2p.discovery.internal.PongPacketData;
-import org.hyperledger.besu.util.NetworkUtility;
-
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -31,6 +24,12 @@ import java.util.List;
 import io.pkts.Pcap;
 import io.pkts.protocol.Protocol;
 import io.vertx.core.buffer.Buffer;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.FindNeighborsPacketData;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.NeighborsPacketData;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.Packet;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.PingPacketData;
+import org.hyperledger.besu.ethereum.p2p.discovery.internal.PongPacketData;
+import org.hyperledger.besu.util.NetworkUtility;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

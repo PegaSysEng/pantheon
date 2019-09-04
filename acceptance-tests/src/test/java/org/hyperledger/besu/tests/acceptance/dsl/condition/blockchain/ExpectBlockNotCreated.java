@@ -14,15 +14,14 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain;
 
 import static junit.framework.TestCase.fail;
 
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
-
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.awaitility.Awaitility;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 public class ExpectBlockNotCreated implements Condition {
   private final EthTransactions eth;

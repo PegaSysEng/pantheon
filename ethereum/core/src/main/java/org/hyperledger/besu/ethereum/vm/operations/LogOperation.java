@@ -12,6 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.vm.operations;
 
+import java.util.EnumSet;
+import java.util.Optional;
+
+import com.google.common.collect.ImmutableList;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.core.Log;
@@ -23,11 +27,6 @@ import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.EnumSet;
-import java.util.Optional;
-
-import com.google.common.collect.ImmutableList;
 
 public class LogOperation extends AbstractOperation {
 

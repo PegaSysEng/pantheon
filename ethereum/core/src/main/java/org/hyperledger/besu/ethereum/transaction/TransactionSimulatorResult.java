@@ -12,20 +12,21 @@
  */
 package org.hyperledger.besu.ethereum.transaction;
 
+import java.util.Objects;
+
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
 import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
-import java.util.Objects;
-
 public class TransactionSimulatorResult {
 
   private final Transaction transaction;
   private final TransactionProcessor.Result result;
 
-  TransactionSimulatorResult(final Transaction transaction, final TransactionProcessor.Result result) {
+  TransactionSimulatorResult(
+      final Transaction transaction, final TransactionProcessor.Result result) {
     this.transaction = transaction;
     this.result = result;
   }

@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.util.Objects;
 import java.util.OptionalLong;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 // Represents a block parameter that can be a special value ("pending", "earliest", "latest") or
 // a number formatted as a hex string.

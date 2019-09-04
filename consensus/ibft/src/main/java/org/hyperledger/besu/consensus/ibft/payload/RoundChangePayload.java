@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.consensus.ibft.payload;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.StringJoiner;
+
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.messagedata.IbftV2;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-
-import java.util.Objects;
-import java.util.Optional;
-import java.util.StringJoiner;
 
 public class RoundChangePayload implements Payload {
   private static final int TYPE = IbftV2.ROUND_CHANGE;

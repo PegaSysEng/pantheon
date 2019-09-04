@@ -14,11 +14,10 @@ package org.hyperledger.besu.cli;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.cli.util.EnvironmentVariableDefaultProvider;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hyperledger.besu.cli.util.EnvironmentVariableDefaultProvider;
 import org.junit.Test;
 import picocli.CommandLine.Model.OptionSpec;
 

@@ -15,11 +15,10 @@ package org.hyperledger.besu.ethereum.rlp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import org.hyperledger.besu.ethereum.rlp.util.RLPTestUtil;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Random;
 
+import org.hyperledger.besu.ethereum.rlp.util.RLPTestUtil;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 public class RLPTest {

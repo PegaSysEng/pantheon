@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.hyperledger.besu.ethereum.ProtocolContext;
-
 import org.junit.Test;
 
 /** Tests for {@link MainnetBlockHeaderValidator}. */

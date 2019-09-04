@@ -35,7 +35,8 @@ public class MetricsCLIOptionsTest
   }
 
   @Override
-  MetricsCLIOptions getOptionsFromPantheonCommand(final CommandTestAbstract.TestPantheonCommand pantheonCommand) {
+  MetricsCLIOptions getOptionsFromPantheonCommand(
+      final CommandTestAbstract.TestPantheonCommand pantheonCommand) {
     return pantheonCommand.getMetricsCLIOptions();
   }
 }

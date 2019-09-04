@@ -12,16 +12,14 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.consensus.ibft.ibftevent.BlockTimerExpiry;
 import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvent;
-import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvents;
 import org.hyperledger.besu.consensus.ibft.ibftevent.IbftReceivedMessageEvent;
 import org.hyperledger.besu.consensus.ibft.ibftevent.NewChainHead;
 import org.hyperledger.besu.consensus.ibft.ibftevent.RoundExpiry;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftController;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class EventMultiplexer {
 

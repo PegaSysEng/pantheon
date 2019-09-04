@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.metrics.vertx;
 
+import io.vertx.core.spi.metrics.PoolMetrics;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
-
-import io.vertx.core.spi.metrics.PoolMetrics;
 
 final class PoolMetricsAdapter implements PoolMetrics<Object> {
 

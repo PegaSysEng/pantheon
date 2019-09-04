@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 
-import org.hyperledger.besu.ethereum.core.Hash;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hyperledger.besu.ethereum.core.Hash;
 
 /** Tracks new blocks being added to the blockchain. */
 class BlockFilter extends Filter {

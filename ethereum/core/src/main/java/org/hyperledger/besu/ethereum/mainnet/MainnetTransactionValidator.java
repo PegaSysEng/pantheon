@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Gas;
@@ -19,9 +22,6 @@ import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.TransactionFilter;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
-
-import java.math.BigInteger;
-import java.util.Optional;
 
 /**
  * Validates a transaction based on Frontier protocol runtime requirements.
@@ -147,7 +147,8 @@ public class MainnetTransactionValidator implements TransactionValidator {
       transaction.getSender();
     } catch (final IllegalArgumentException e) {
       return ValidationResult.invalid(
-          TransactionInvalidReason.INVALID_SIGNATURE, "sender could not be extracted from transaction signature");
+          TransactionInvalidReason.INVALID_SIGNATURE,
+          "sender could not be extracted from transaction signature");
     }
 
     return ValidationResult.valid();

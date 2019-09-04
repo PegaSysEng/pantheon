@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.consensus.ibft.network;
 
+import java.util.Collection;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-
-import java.util.Collection;
 
 public interface ValidatorMulticaster {
 

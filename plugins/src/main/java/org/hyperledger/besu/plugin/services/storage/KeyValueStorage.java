@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.plugin.services.storage;
 
-import org.hyperledger.besu.plugin.Unstable;
-import org.hyperledger.besu.plugin.services.exception.StorageException;
-
 import java.io.Closeable;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import org.hyperledger.besu.plugin.Unstable;
+import org.hyperledger.besu.plugin.services.exception.StorageException;
 
 /**
  * Responsible for storing values against keys.

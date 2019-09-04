@@ -14,6 +14,10 @@ package org.hyperledger.besu.ethereum.p2p.rlpx;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createMutableLocalNode;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enode;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enodeBuilder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -22,10 +26,15 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createMutableLocalNode;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enode;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enodeBuilder;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
@@ -50,16 +59,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.PingMessage;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
-
 import org.junit.Before;
 import org.junit.Test;
 

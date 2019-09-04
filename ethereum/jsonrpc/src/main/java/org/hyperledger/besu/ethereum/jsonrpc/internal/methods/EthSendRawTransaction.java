@@ -12,12 +12,17 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcErrorConverter;
-import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcErrorConverter;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcRequestException;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
@@ -29,12 +34,6 @@ import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.function.Supplier;
-
-import com.google.common.base.Suppliers;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class EthSendRawTransaction implements JsonRpcMethod {
 
@@ -85,7 +84,8 @@ public class EthSendRawTransaction implements JsonRpcMethod {
             sendEmptyHashOnInvalidBlock
                 ? new JsonRpcSuccessResponse(request.getId(), Hash.EMPTY.toString())
                 : new JsonRpcErrorResponse(
-                    request.getId(), JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
+                    request.getId(),
+                    JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
   }
 
   private Transaction decodeRawTransaction(final String hash)

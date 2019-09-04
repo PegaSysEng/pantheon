@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.health;
 
-import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService.HealthCheck;
-import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService.ParamSource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService.HealthCheck;
+import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService.ParamSource;
 
 public class LivenessCheck implements HealthCheck {
   private static final Logger LOG = LogManager.getLogger();

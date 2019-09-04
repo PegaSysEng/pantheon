@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.eth.messages;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.AbstractMessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
@@ -22,8 +24,6 @@ import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.math.BigInteger;
 
 public final class StatusMessage extends AbstractMessageData {
 

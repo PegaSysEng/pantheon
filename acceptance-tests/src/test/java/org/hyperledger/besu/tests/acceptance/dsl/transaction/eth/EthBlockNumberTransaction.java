@@ -14,11 +14,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 import java.math.BigInteger;
+
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 
 public class EthBlockNumberTransaction implements Transaction<BigInteger> {
 

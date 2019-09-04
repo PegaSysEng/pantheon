@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.storage.keyvalue;
 
+import java.io.IOException;
+
 import org.hyperledger.besu.ethereum.chain.BlockchainStorage;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
@@ -23,8 +25,6 @@ import org.hyperledger.besu.ethereum.storage.StorageProvider;
 import org.hyperledger.besu.ethereum.worldstate.WorldStatePreimageStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;
-
-import java.io.IOException;
 
 public class KeyValueStorageProvider implements StorageProvider {
 

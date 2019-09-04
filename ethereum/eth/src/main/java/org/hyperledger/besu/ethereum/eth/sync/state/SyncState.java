@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.state;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.chain.ChainHead;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -21,8 +23,6 @@ import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.util.Subscribers;
-
-import java.util.Optional;
 
 public class SyncState {
   private static final long SYNC_TOLERANCE = 5;

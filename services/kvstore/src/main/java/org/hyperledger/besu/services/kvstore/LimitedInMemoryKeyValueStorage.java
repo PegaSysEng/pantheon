@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.services.kvstore;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +24,7 @@ import java.util.function.Predicate;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * This KeyValueStorage will keep data in memory up to some maximum number of elements. Elements are

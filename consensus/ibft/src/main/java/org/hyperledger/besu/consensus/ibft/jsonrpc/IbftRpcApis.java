@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.consensus.ibft.jsonrpc;
 
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
-
 import java.util.Optional;
+
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
 
 public class IbftRpcApis {
   public static final RpcApi IBFT = new RpcApi("IBFT");

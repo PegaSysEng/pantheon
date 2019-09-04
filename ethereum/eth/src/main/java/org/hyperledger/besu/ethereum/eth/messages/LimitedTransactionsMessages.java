@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.eth.messages;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public final class LimitedTransactionsMessages {
 

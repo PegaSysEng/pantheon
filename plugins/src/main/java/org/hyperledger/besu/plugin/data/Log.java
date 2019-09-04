@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.plugin.data;
 
-import org.hyperledger.besu.plugin.Unstable;
-
 import java.util.List;
+
+import org.hyperledger.besu.plugin.Unstable;
 
 /** A Log entry from a transaction execution. */
 @Unstable

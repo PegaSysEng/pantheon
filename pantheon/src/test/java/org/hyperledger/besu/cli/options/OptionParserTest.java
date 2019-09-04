@@ -15,11 +15,10 @@ package org.hyperledger.besu.cli.options;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.math.BigInteger;
 
 import com.google.common.collect.Range;
+import org.hyperledger.besu.util.uint.UInt256;
 import org.junit.Test;
 
 public class OptionParserTest {

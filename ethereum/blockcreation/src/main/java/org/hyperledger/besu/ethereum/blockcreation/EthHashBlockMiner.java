@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.blockcreation;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MinedBlockObserver;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -19,9 +22,6 @@ import org.hyperledger.besu.ethereum.mainnet.EthHashSolution;
 import org.hyperledger.besu.ethereum.mainnet.EthHashSolverInputs;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.util.Subscribers;
-
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * Provides the EthHash specific aspects of the mining operation - i.e. getting the work definition,

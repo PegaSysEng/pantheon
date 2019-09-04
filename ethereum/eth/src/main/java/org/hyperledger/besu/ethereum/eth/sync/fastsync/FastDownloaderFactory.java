@@ -12,6 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.time.Clock;
+import java.util.Optional;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
@@ -27,14 +34,6 @@ import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.services.tasks.CachingTaskCollection;
 import org.hyperledger.besu.services.tasks.FlatFileTaskCollection;
-
-import java.io.File;
-import java.nio.file.Path;
-import java.time.Clock;
-import java.util.Optional;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class FastDownloaderFactory {
   private static final Logger LOG = LogManager.getLogger();

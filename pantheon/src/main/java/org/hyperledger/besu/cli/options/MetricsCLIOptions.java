@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.cli.options;
 
-import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-
 import java.util.Arrays;
 import java.util.List;
 
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import picocli.CommandLine;
 
 public class MetricsCLIOptions implements CLIOptions<MetricsConfiguration.Builder> {

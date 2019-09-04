@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.worldstate;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.Optional;
 
 public interface WorldStatePreimageStorage {
 

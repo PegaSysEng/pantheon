@@ -16,15 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.core.SyncStatus;
-import org.hyperledger.besu.ethereum.core.Synchronizer;
-import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService.ParamSource;
-import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hyperledger.besu.ethereum.core.SyncStatus;
+import org.hyperledger.besu.ethereum.core.Synchronizer;
+import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService.ParamSource;
+import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 import org.junit.Test;
 
 public class ReadinessCheckTest {

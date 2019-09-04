@@ -14,10 +14,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
-import java.io.IOException;
 
 public class CliquePropose implements Transaction<Boolean> {
   private final String address;
@@ -31,7 +31,8 @@ public class CliquePropose implements Transaction<Boolean> {
   @Override
   public Boolean execute(final NodeRequests node) {
     try {
-      final CliqueRequestFactory.ProposeResponse result = node.clique().cliquePropose(address, auth).send();
+      final CliqueRequestFactory.ProposeResponse result =
+          node.clique().cliquePropose(address, auth).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

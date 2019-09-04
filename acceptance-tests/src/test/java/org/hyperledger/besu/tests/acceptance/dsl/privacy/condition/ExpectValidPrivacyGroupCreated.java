@@ -14,12 +14,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.privacy.condition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.privacy.transaction.PrivacyTransactions;
-import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNode;
-
 import java.util.List;
 
 import org.awaitility.Awaitility;
+import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNode;
+import org.hyperledger.besu.tests.acceptance.dsl.privacy.transaction.PrivacyTransactions;
 import org.web3j.protocol.pantheon.response.privacy.PrivacyGroup;
 import org.web3j.utils.Base64String;
 

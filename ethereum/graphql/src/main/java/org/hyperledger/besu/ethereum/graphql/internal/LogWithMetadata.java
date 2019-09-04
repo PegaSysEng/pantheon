@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal;
 
+import java.util.List;
+
+import com.google.common.base.MoreObjects;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.LogTopic;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.List;
-
-import com.google.common.base.MoreObjects;
 
 public class LogWithMetadata {
 

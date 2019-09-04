@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
 
 /** The result set from querying the logs from one or more blocks. */
 public class LogsResult {

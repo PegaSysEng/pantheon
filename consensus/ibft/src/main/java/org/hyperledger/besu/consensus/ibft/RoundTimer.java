@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.consensus.ibft.ibftevent.RoundExpiry;
-
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import org.hyperledger.besu.consensus.ibft.ibftevent.RoundExpiry;
 
 /** Class for starting and keeping organised round timers */
 public class RoundTimer {

@@ -14,8 +14,8 @@ package org.hyperledger.besu.util.uint;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.AbstractBytes32Backed;
+import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.MutableBytes32;
 
 /**

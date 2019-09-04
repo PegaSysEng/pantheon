@@ -12,10 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.FilterManager;
-import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.LogWithMetadata;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
@@ -23,9 +26,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorRespo
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.LogsResult;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class EthGetFilterChanges implements JsonRpcMethod {
 

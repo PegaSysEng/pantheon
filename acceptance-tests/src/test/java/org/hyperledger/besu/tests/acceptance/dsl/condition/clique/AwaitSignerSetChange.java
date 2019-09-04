@@ -12,17 +12,14 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.clique;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
+import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
-import org.hyperledger.besu.ethereum.core.Address;
-
-import java.util.List;
 
 public class AwaitSignerSetChange implements Condition {
 
@@ -39,6 +36,7 @@ public class AwaitSignerSetChange implements Condition {
     WaitUtils.waitFor(
         60,
         () ->
-            Assertions.assertThat(node.execute(clique.createGetSigners(CliqueTransactions.LATEST))).isNotEqualTo(initialSigners));
+            Assertions.assertThat(node.execute(clique.createGetSigners(CliqueTransactions.LATEST)))
+                .isNotEqualTo(initialSigners));
   }
 }

@@ -14,6 +14,11 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.net.InetSocketAddress;
+import java.util.concurrent.Callable;
+
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.AbstractPeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEventDispatcher;
@@ -24,12 +29,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
-
-import java.net.InetSocketAddress;
-import java.util.concurrent.Callable;
-
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
 
 final class NettyPeerConnection extends AbstractPeerConnection {
 
@@ -53,7 +52,11 @@ final class NettyPeerConnection extends AbstractPeerConnection {
         outboundMessagesCounter);
 
     this.ctx = ctx;
-    ctx.channel().closeFuture().addListener(f -> terminateConnection(DisconnectMessage.DisconnectReason.TCP_SUBSYSTEM_ERROR, false));
+    ctx.channel()
+        .closeFuture()
+        .addListener(
+            f ->
+                terminateConnection(DisconnectMessage.DisconnectReason.TCP_SUBSYSTEM_ERROR, false));
   }
 
   @Override

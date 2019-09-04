@@ -15,7 +15,6 @@ package org.hyperledger.besu.tests.web3j;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.hyperledger.besu.tests.web3j.generated.RevertReason;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
@@ -37,7 +36,8 @@ public class RevertReasonAcceptanceTest extends AcceptanceTestBase {
     final EthSendTransaction transaction =
         minerNode.execute(
             contractTransactions.callSmartContract(
-                RevertReason.FUNC_REVERTWITHREVERTREASON, revertReasonContract.getContractAddress()));
+                RevertReason.FUNC_REVERTWITHREVERTREASON,
+                revertReasonContract.getContractAddress()));
     minerNode.verify(
         eth.expectSuccessfulTransactionReceiptWithReason(
             transaction.getTransactionHash(), "RevertReason"));
@@ -50,7 +50,8 @@ public class RevertReasonAcceptanceTest extends AcceptanceTestBase {
     final EthSendTransaction transaction =
         minerNode.execute(
             contractTransactions.callSmartContract(
-                RevertReason.FUNC_REVERTWITHOUTREVERTREASON, revertReasonContract.getContractAddress()));
+                RevertReason.FUNC_REVERTWITHOUTREVERTREASON,
+                revertReasonContract.getContractAddress()));
     minerNode.verify(
         eth.expectSuccessfulTransactionReceiptWithoutReason(transaction.getTransactionHash()));
   }

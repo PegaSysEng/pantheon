@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.consensus.common;
 
-import org.hyperledger.besu.ethereum.core.Address;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,6 +23,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import com.google.common.collect.Maps;
+import org.hyperledger.besu.ethereum.core.Address;
 
 /** Tracks the current list of validators and votes to add or drop validators. */
 public class VoteTally implements ValidatorProvider {

@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 public class TrailingPeerRequirements {
   public static TrailingPeerRequirements UNRESTRICTED =

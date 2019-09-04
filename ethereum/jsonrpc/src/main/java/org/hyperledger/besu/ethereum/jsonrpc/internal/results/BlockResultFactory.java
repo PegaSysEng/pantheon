@@ -12,15 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockWithMetadata;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionWithMetadata;
-import org.hyperledger.besu.ethereum.core.Hash;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionWithMetadata;
 
 public class BlockResultFactory {
 

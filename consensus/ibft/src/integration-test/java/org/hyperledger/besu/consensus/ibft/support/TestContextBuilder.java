@@ -13,24 +13,28 @@
 package org.hyperledger.besu.consensus.ibft.support;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.mockito.Mockito.mock;
 import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
+import static org.mockito.Mockito.mock;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.Iterables;
 import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.consensus.common.EpochManager;
 import org.hyperledger.besu.consensus.common.VoteProposer;
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
 import org.hyperledger.besu.consensus.common.VoteTallyUpdater;
-import org.hyperledger.besu.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
-import org.hyperledger.besu.consensus.ibft.blockcreation.ProposerSelector;
-import org.hyperledger.besu.consensus.ibft.statemachine.FutureMessageBuffer;
-import org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
-import org.hyperledger.besu.consensus.ibft.statemachine.IbftController;
-import org.hyperledger.besu.consensus.ibft.statemachine.IbftFinalState;
-import org.hyperledger.besu.consensus.ibft.statemachine.IbftRoundFactory;
-import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
 import org.hyperledger.besu.consensus.ibft.BlockTimer;
 import org.hyperledger.besu.consensus.ibft.EventMultiplexer;
 import org.hyperledger.besu.consensus.ibft.Gossiper;
@@ -46,7 +50,15 @@ import org.hyperledger.besu.consensus.ibft.MessageTracker;
 import org.hyperledger.besu.consensus.ibft.RoundTimer;
 import org.hyperledger.besu.consensus.ibft.SynchronizerUpdater;
 import org.hyperledger.besu.consensus.ibft.UniqueMessageMulticaster;
+import org.hyperledger.besu.consensus.ibft.blockcreation.IbftBlockCreatorFactory;
+import org.hyperledger.besu.consensus.ibft.blockcreation.ProposerSelector;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
+import org.hyperledger.besu.consensus.ibft.statemachine.FutureMessageBuffer;
+import org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
+import org.hyperledger.besu.consensus.ibft.statemachine.IbftController;
+import org.hyperledger.besu.consensus.ibft.statemachine.IbftFinalState;
+import org.hyperledger.besu.consensus.ibft.statemachine.IbftRoundFactory;
+import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MinedBlockObserver;
@@ -71,19 +83,6 @@ import org.hyperledger.besu.testutil.TestClock;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
-import com.google.common.collect.Iterables;
 
 public class TestContextBuilder {
 

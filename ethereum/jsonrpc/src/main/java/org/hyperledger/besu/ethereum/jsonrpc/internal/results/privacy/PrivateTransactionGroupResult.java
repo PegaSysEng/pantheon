@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results.privacy;
 
-import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
-import org.hyperledger.besu.util.bytes.BytesValues;
-
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 @JsonPropertyOrder({
   "from",

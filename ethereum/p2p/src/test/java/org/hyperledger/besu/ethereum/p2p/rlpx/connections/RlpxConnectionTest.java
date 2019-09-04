@@ -14,16 +14,15 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.connections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
+
+import java.util.concurrent.CompletableFuture;
 
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.RlpxConnection.ConnectionNotEstablishedException;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-
-import java.util.concurrent.CompletableFuture;
-
 import org.junit.Test;
 
 public class RlpxConnectionTest {

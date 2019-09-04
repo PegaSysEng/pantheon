@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.account;
 
-import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-import org.hyperledger.besu.tests.acceptance.dsl.account.Accounts;
-import org.hyperledger.besu.tests.acceptance.dsl.blockchain.Amount;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
+import org.hyperledger.besu.tests.acceptance.dsl.account.Accounts;
+import org.hyperledger.besu.tests.acceptance.dsl.blockchain.Amount;
 
 public class AccountTransactions {
 

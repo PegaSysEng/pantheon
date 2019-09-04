@@ -14,14 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.account;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.web3j.utils.Convert.toWei;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
-
 import org.web3j.utils.Convert.Unit;
 
 public class ExpectAccountBalance implements Condition {

@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.retesteth;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.BlockValidator;
 import org.hyperledger.besu.ethereum.MainnetBlockValidator;
 import org.hyperledger.besu.ethereum.core.BlockImporter;
@@ -22,9 +25,6 @@ import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockProcessor;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
-
-import java.math.BigInteger;
-import java.util.Optional;
 
 public class NoRewardProtocolScheduleWrapper<C> implements ProtocolSchedule<C> {
 

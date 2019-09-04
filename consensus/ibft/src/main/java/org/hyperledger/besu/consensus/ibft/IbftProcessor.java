@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvent;
-
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvent;
 
 /** Execution context for draining queued ibft events and applying them to a maintained state */
 public class IbftProcessor implements Runnable {

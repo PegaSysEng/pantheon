@@ -14,11 +14,10 @@ package org.hyperledger.besu.ethereum.mainnet.headervalidationrules;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-import org.hyperledger.besu.ethereum.mainnet.DetachedBlockHeaderValidationRule;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.mainnet.DetachedBlockHeaderValidationRule;
 
 /** Responsible for ensuring the timestamp of a block is newer than its parent. */
 public class TimestampMoreRecentThanParent implements DetachedBlockHeaderValidationRule {

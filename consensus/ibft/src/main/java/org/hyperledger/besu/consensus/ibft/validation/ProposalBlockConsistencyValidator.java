@@ -12,21 +12,20 @@
  */
 package org.hyperledger.besu.consensus.ibft.validation;
 
-import org.hyperledger.besu.consensus.ibft.payload.SignedData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.IbftExtraData;
 import org.hyperledger.besu.consensus.ibft.payload.ProposalPayload;
+import org.hyperledger.besu.consensus.ibft.payload.SignedData;
 import org.hyperledger.besu.ethereum.core.Block;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class ProposalBlockConsistencyValidator {
 
   private static final Logger LOG = LogManager.getLogger();
 
   public boolean validateProposalMatchesBlock(
-          final SignedData<ProposalPayload> signedPayload, final Block proposedBlock) {
+      final SignedData<ProposalPayload> signedPayload, final Block proposedBlock) {
 
     if (!signedPayload.getPayload().getDigest().equals(proposedBlock.getHash())) {
       LOG.info("Invalid Proposal, embedded digest does not match block's hash.");

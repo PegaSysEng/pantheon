@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.consensus.clique;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.config.CliqueConfigOptions;
 import org.hyperledger.besu.config.GenesisConfigOptions;
 import org.hyperledger.besu.consensus.common.EpochManager;
@@ -26,8 +28,6 @@ import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecBuilder;
-
-import java.math.BigInteger;
 
 /** Defines the protocol behaviours for a blockchain using Clique. */
 public class CliqueProtocolSchedule {
@@ -70,8 +70,12 @@ public class CliqueProtocolSchedule {
       final ProtocolSpecBuilder<Void> specBuilder) {
     return specBuilder
         .changeConsensusContextType(
-            difficultyCalculator -> BlockHeaderValidationRulesetFactory.cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
-            difficultyCalculator -> BlockHeaderValidationRulesetFactory.cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
+            difficultyCalculator ->
+                BlockHeaderValidationRulesetFactory.cliqueBlockHeaderValidator(
+                    secondsBetweenBlocks, epochManager),
+            difficultyCalculator ->
+                BlockHeaderValidationRulesetFactory.cliqueBlockHeaderValidator(
+                    secondsBetweenBlocks, epochManager),
             MainnetBlockBodyValidator::new,
             MainnetBlockValidator::new,
             MainnetBlockImporter::new,

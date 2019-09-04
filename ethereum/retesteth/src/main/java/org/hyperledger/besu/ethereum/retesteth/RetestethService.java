@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.retesteth;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import io.vertx.core.Vertx;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcHttpService;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcMethodsFactory;
@@ -36,12 +41,6 @@ import org.hyperledger.besu.ethereum.retesteth.methods.TestModifyTimestamp;
 import org.hyperledger.besu.ethereum.retesteth.methods.TestRewindToBlock;
 import org.hyperledger.besu.ethereum.retesteth.methods.TestSetChainParams;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import io.vertx.core.Vertx;
 
 public class RetestethService {
 

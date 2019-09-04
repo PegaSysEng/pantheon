@@ -12,9 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionReceiptWithMetadata;
-
 import com.fasterxml.jackson.annotation.JsonGetter;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionReceiptWithMetadata;
 
 public class TransactionReceiptRootResult extends TransactionReceiptResult {
 

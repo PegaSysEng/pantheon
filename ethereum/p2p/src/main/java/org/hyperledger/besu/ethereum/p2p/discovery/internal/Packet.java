@@ -17,6 +17,11 @@ import static org.hyperledger.besu.crypto.Hash.keccak256;
 import static org.hyperledger.besu.util.Preconditions.checkGuard;
 import static org.hyperledger.besu.util.bytes.BytesValues.asUnsignedBigInteger;
 
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Optional;
+
+import io.vertx.core.buffer.Buffer;
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
@@ -27,12 +32,6 @@ import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.MutableBytesValue;
 import org.hyperledger.besu.util.uint.UInt256Bytes;
-
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Optional;
-
-import io.vertx.core.buffer.Buffer;
 
 public class Packet {
 

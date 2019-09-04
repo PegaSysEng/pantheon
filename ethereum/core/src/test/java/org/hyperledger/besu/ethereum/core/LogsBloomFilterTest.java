@@ -14,11 +14,10 @@ package org.hyperledger.besu.ethereum.core;
 
 import static org.junit.Assert.assertEquals;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 public class LogsBloomFilterTest {

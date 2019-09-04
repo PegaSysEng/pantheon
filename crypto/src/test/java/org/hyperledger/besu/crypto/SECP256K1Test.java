@@ -13,14 +13,11 @@
 package org.hyperledger.besu.crypto;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
-
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -28,6 +25,8 @@ import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

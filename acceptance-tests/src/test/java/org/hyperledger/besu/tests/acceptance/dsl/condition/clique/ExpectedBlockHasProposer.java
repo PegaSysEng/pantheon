@@ -13,18 +13,16 @@
 package org.hyperledger.besu.tests.acceptance.dsl.condition.clique;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
-import org.hyperledger.besu.tests.acceptance.dsl.BlockUtils;
-import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.consensus.clique.CliqueBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.clique.CliqueExtraData;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.tests.acceptance.dsl.BlockUtils;
+import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
-
 import org.web3j.protocol.core.methods.response.EthBlock.Block;
 
 public class ExpectedBlockHasProposer implements Condition {
@@ -43,7 +41,8 @@ public class ExpectedBlockHasProposer implements Condition {
 
   private Address proposerAddress(final Node node) {
     final Block block = node.execute(eth.block());
-    final BlockHeader blockHeader = BlockUtils.createBlockHeader(block, new CliqueBlockHeaderFunctions());
+    final BlockHeader blockHeader =
+        BlockUtils.createBlockHeader(block, new CliqueBlockHeaderFunctions());
     final CliqueExtraData cliqueExtraData = CliqueExtraData.decode(blockHeader);
     return cliqueExtraData.getProposerAddress();
   }

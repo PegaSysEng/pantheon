@@ -12,17 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.p2p.permissions;
 
-import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.util.LimitedSet;
-import org.hyperledger.besu.util.LimitedSet.Mode;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Collections;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
 import io.vertx.core.impl.ConcurrentHashSet;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
+import org.hyperledger.besu.util.LimitedSet;
+import org.hyperledger.besu.util.LimitedSet.Mode;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class PeerPermissionsBlacklist extends PeerPermissions {
   private static int DEFAULT_INITIAL_CAPACITY = 20;

@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions.TransactionInfo;
-
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions.TransactionInfo;
 
 public class PendingTransactionsResult implements TransactionResult {
 

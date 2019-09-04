@@ -12,17 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
+import java.util.OptionalLong;
+import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-
-import java.util.OptionalLong;
-import java.util.function.Supplier;
-
-import com.google.common.base.Suppliers;
 
 public abstract class AbstractBlockParameterMethod implements JsonRpcMethod {
 

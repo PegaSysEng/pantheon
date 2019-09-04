@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.rlp;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.math.BigInteger;
 
 /** An {@link RLPInput} that reads RLP encoded data from a {@link BytesValue}. */
 public class BytesValueRLPInput extends AbstractRLPInput {

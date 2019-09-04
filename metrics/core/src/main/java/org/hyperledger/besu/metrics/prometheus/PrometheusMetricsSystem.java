@@ -15,14 +15,6 @@ package org.hyperledger.besu.metrics.prometheus;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 
-import org.hyperledger.besu.metrics.ObservableMetricsSystem;
-import org.hyperledger.besu.metrics.Observation;
-import org.hyperledger.besu.metrics.StandardMetricCategory;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
-import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
-import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,6 +39,13 @@ import io.prometheus.client.hotspot.GarbageCollectorExports;
 import io.prometheus.client.hotspot.MemoryPoolsExports;
 import io.prometheus.client.hotspot.StandardExports;
 import io.prometheus.client.hotspot.ThreadExports;
+import org.hyperledger.besu.metrics.ObservableMetricsSystem;
+import org.hyperledger.besu.metrics.Observation;
+import org.hyperledger.besu.metrics.StandardMetricCategory;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
+import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
 
 public class PrometheusMetricsSystem implements ObservableMetricsSystem {
 
@@ -92,12 +91,11 @@ public class PrometheusMetricsSystem implements ObservableMetricsSystem {
   }
 
   @Override
-  public LabelledMetric<org.hyperledger.besu.plugin.services.metrics.Counter>
-      createLabelledCounter(
-          final MetricCategory category,
-          final String name,
-          final String help,
-          final String... labelNames) {
+  public LabelledMetric<org.hyperledger.besu.plugin.services.metrics.Counter> createLabelledCounter(
+      final MetricCategory category,
+      final String name,
+      final String help,
+      final String... labelNames) {
     final String metricName = convertToPrometheusName(category, name);
     return cachedCounters.computeIfAbsent(
         metricName,

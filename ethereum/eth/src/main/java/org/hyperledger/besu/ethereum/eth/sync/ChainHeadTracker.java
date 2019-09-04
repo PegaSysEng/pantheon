@@ -14,6 +14,9 @@ package org.hyperledger.besu.ethereum.eth.sync;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
+import java.util.function.Supplier;
+
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
@@ -24,10 +27,6 @@ import org.hyperledger.besu.ethereum.eth.manager.task.GetHeadersFromPeerByHashTa
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
-
-import java.util.function.Supplier;
-
-import org.apache.logging.log4j.Logger;
 
 public class ChainHeadTracker implements ConnectCallback {
 

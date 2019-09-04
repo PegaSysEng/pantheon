@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.privacy.contract;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.pantheon.Pantheon;
 import org.web3j.tx.LegacyPrivateTransactionManager;

@@ -14,14 +14,14 @@ package org.hyperledger.besu.ethereum.mainnet;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.ethereum.core.TransactionFilter;
-
 import java.math.BigInteger;
 import java.util.Comparator;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import org.hyperledger.besu.ethereum.core.TransactionFilter;
 
 public class MutableProtocolSchedule<C> implements ProtocolSchedule<C> {
 

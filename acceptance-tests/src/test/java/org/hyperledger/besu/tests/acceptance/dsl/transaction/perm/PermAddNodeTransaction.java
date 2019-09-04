@@ -14,12 +14,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 
 public class PermAddNodeTransaction implements Transaction<String> {
   private final List<URI> enodeList;
@@ -31,7 +31,8 @@ public class PermAddNodeTransaction implements Transaction<String> {
   @Override
   public String execute(final NodeRequests node) {
     try {
-      final PermissioningJsonRpcRequestFactory.AddNodeResponse result = node.perm().addNodesToWhitelist(enodeList).send();
+      final PermissioningJsonRpcRequestFactory.AddNodeResponse result =
+          node.perm().addNodesToWhitelist(enodeList).send();
       assertThat(result).isNotNull();
       return result.getResult();
     } catch (final IOException e) {

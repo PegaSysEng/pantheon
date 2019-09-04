@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.tests.acceptance.clique;
 
+import java.io.IOException;
+
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-
-import java.io.IOException;
-
 import org.junit.Test;
 
 public class CliqueMiningAcceptanceTest extends AcceptanceTestBase {

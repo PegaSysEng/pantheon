@@ -14,16 +14,16 @@ package org.hyperledger.besu.consensus.ibftlegacy.protocol;
 
 import static java.util.Collections.singletonList;
 
+import java.math.BigInteger;
+import java.time.Clock;
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
-
-import java.math.BigInteger;
-import java.time.Clock;
-import java.util.List;
 
 /** This allows for interoperability with Quorum, but shouldn't be used otherwise. */
 public class Istanbul64ProtocolManager extends EthProtocolManager {

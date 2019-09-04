@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
 import org.hyperledger.besu.cli.converter.exception.PercentageConversionException;
-
 import org.junit.Test;
 
 public class PercentageConverterTest {

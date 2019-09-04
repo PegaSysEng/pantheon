@@ -21,14 +21,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
-import org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController;
+import org.hyperledger.besu.ethereum.permissioning.node.provider.SyncStatusNodePermissioningProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

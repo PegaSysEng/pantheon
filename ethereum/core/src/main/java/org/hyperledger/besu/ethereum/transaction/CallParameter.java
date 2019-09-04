@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.transaction;
 
+import java.util.Objects;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Objects;
 
 // Represents parameters for a eth_call or eth_estimateGas JSON-RPC methods.
 public class CallParameter {

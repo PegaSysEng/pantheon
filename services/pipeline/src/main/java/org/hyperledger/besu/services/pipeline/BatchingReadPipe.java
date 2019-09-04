@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.services.pipeline;
 
-import org.hyperledger.besu.plugin.services.metrics.Counter;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.hyperledger.besu.plugin.services.metrics.Counter;
 
 public class BatchingReadPipe<T> implements ReadPipe<List<T>> {
 

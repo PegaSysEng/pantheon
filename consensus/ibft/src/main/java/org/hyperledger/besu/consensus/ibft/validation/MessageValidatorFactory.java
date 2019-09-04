@@ -14,6 +14,8 @@ package org.hyperledger.besu.consensus.ibft.validation;
 
 import static org.hyperledger.besu.consensus.ibft.IbftHelpers.prepareMessageCountForQuorum;
 
+import java.util.Collection;
+
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.consensus.ibft.IbftHelpers;
@@ -23,8 +25,6 @@ import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-
-import java.util.Collection;
 
 public class MessageValidatorFactory {
 

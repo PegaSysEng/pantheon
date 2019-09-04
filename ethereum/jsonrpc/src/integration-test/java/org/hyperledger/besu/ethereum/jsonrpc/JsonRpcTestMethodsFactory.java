@@ -13,40 +13,39 @@
 package org.hyperledger.besu.ethereum.jsonrpc;
 
 import static org.mockito.Mockito.mock;
-import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
+
+import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 
 import org.hyperledger.besu.config.StubGenesisConfigOptions;
-import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.FilterIdGenerator;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.FilterManager;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.FilterRepository;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.blockcreation.EthHashMiningCoordinator;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockImporter;
+import org.hyperledger.besu.ethereum.core.InMemoryStorageProvider;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.FilterIdGenerator;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.FilterManager;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.filter.FilterRepository;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
+import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 import org.hyperledger.besu.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
-
-import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
 
 /** Provides a facade to construct the JSON-RPC component. */
 public class JsonRpcTestMethodsFactory {
@@ -61,11 +60,13 @@ public class JsonRpcTestMethodsFactory {
   }
 
   public Map<String, JsonRpcMethod> methods() {
-    final WorldStateArchive stateArchive = InMemoryStorageProvider.createInMemoryWorldStateArchive();
+    final WorldStateArchive stateArchive =
+        InMemoryStorageProvider.createInMemoryWorldStateArchive();
 
     importer.getGenesisState().writeStateTo(stateArchive.getMutable());
 
-    final MutableBlockchain blockchain = InMemoryStorageProvider.createInMemoryBlockchain(importer.getGenesisBlock());
+    final MutableBlockchain blockchain =
+        InMemoryStorageProvider.createInMemoryBlockchain(importer.getGenesisBlock());
     final ProtocolContext<Void> context = new ProtocolContext<>(blockchain, stateArchive, null);
 
     for (final Block block : importer.getBlocks()) {

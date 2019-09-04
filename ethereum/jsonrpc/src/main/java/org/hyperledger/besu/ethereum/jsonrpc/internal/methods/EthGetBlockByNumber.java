@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
+import java.util.function.Supplier;
+
+import com.google.common.base.Suppliers;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
@@ -19,10 +22,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParamete
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResult;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.BlockResultFactory;
-
-import java.util.function.Supplier;
-
-import com.google.common.base.Suppliers;
 
 public class EthGetBlockByNumber extends AbstractBlockParameterMethod {
 

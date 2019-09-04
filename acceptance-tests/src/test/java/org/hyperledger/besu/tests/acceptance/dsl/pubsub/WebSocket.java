@@ -13,12 +13,10 @@
 package org.hyperledger.besu.tests.acceptance.dsl.pubsub;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
-
-import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
 
 import io.vertx.core.Vertx;
+import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
 
 public class WebSocket {
 
@@ -51,6 +49,7 @@ public class WebSocket {
   }
 
   public void verifyTotalEventsReceived(final int expectedTotalEventCount) {
-    WaitUtils.waitFor(() -> assertThat(connection.getSubscriptionEvents()).hasSize(expectedTotalEventCount));
+    WaitUtils.waitFor(
+        () -> assertThat(connection.getSubscriptionEvents()).hasSize(expectedTotalEventCount));
   }
 }

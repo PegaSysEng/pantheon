@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum;
 
+import java.util.function.BiFunction;
+
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.chain.BlockchainStorage;
 import org.hyperledger.besu.ethereum.chain.DefaultBlockchain;
@@ -23,8 +25,6 @@ import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.ethereum.worldstate.WorldStatePreimageStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
-
-import java.util.function.BiFunction;
 
 /**
  * Holds the mutable state used to track the current context of the protocol. This is primarily the

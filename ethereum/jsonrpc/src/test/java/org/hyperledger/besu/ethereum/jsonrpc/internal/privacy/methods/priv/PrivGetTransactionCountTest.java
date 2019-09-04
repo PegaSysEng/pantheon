@@ -24,7 +24,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessRes
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionHandler;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
 import org.junit.Test;
 
 public class PrivGetTransactionCountTest {

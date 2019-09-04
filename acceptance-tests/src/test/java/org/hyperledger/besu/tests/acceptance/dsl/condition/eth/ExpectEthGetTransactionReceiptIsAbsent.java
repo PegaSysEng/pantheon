@@ -14,12 +14,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.eth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthGetTransactionReceiptTransaction;
-
-import java.util.Optional;
-
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 public class ExpectEthGetTransactionReceiptIsAbsent implements Condition {

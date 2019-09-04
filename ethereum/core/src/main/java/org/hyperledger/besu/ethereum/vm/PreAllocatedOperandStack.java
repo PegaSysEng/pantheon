@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
-
 import java.util.Arrays;
+
+import org.hyperledger.besu.util.bytes.Bytes32;
 
 /**
  * An {@link OperandStack} implementations whose capacity is pre-allocated.

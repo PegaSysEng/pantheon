@@ -14,13 +14,12 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.handshake;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Arrays;
 import java.util.Objects;
 
 import org.bouncycastle.crypto.digests.KeccakDigest;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * Encapsulates the secrets generated during the RLPx crypto handshake, and offers a facility for

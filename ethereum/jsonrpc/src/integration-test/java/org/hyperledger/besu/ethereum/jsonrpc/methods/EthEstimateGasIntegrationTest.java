@@ -14,6 +14,10 @@ package org.hyperledger.besu.ethereum.jsonrpc.methods;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 import org.hyperledger.besu.ethereum.jsonrpc.BlockchainImporter;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcTestMethodsFactory;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
@@ -23,11 +27,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.transaction.CallParameter;
 import org.hyperledger.besu.testutil.BlockTestUtil;
-
-import java.util.Map;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

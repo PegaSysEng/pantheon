@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.blockheaders.NewBlockHeadersSubscription;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.logs.LogsSubscription;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscribeRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.syncing.SyncingSubscription;
-
-import java.util.Optional;
-import java.util.function.Function;
 
 public class SubscriptionBuilder {
 

@@ -12,11 +12,16 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
-import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.debug.TraceOptions;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.TraceTypeParameter;
@@ -25,12 +30,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTracer;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.TransactionTrace;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.vm.DebugOperationTracer;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TraceReplayBlockTransactions extends AbstractBlockParameterMethod {
 

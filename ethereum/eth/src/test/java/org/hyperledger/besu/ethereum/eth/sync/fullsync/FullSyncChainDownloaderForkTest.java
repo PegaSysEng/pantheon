@@ -32,7 +32,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.Di
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.util.uint.UInt256;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

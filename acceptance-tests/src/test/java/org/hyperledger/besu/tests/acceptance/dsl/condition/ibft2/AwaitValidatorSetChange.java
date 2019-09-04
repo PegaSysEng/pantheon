@@ -12,18 +12,15 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.ibft2;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
+import java.util.List;
 
 import org.assertj.core.api.Assertions;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2Transactions;
-import org.hyperledger.besu.ethereum.core.Address;
-
-import java.util.List;
 
 public class AwaitValidatorSetChange implements Condition {
 

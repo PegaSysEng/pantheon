@@ -19,7 +19,6 @@ import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -28,10 +27,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class AltBN128PairingPrecompiledContractTest {
 
-  @Mock
-  MessageFrame messageFrame;
-  @Mock
-  GasCalculator gasCalculator;
+  @Mock MessageFrame messageFrame;
+  @Mock GasCalculator gasCalculator;
 
   private final AltBN128PairingPrecompiledContract byzantiumContract =
       AltBN128PairingPrecompiledContract.byzantium(gasCalculator);

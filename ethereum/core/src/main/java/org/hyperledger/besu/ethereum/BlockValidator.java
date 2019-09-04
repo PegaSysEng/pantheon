@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.MutableWorldState;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface BlockValidator<C> {
 

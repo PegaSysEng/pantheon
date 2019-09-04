@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.rlp;
 
-import org.hyperledger.besu.ethereum.rlp.util.RLPTestUtil;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hyperledger.besu.ethereum.rlp.util.RLPTestUtil;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;

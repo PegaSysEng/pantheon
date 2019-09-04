@@ -14,9 +14,6 @@ package org.hyperledger.besu.ethereum.eth.sync.state;
 
 import static java.util.Collections.newSetFromMap;
 
-import org.hyperledger.besu.ethereum.core.Block;
-import org.hyperledger.besu.ethereum.core.Hash;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +21,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 public class PendingBlocks {
 

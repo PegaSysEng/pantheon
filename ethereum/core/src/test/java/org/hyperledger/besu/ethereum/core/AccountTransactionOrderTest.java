@@ -14,10 +14,9 @@ package org.hyperledger.besu.ethereum.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-
 import java.util.stream.Stream;
 
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.junit.Test;
 
 public class AccountTransactionOrderTest {

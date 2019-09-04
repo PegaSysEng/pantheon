@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.p2p.peers;
 
+import java.util.Objects;
+
 import org.hyperledger.besu.crypto.Hash;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Objects;
 
 public class DefaultPeerId implements PeerId {
   protected final BytesValue id;

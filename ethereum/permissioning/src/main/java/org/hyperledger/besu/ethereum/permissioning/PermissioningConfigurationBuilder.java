@@ -12,15 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.permissioning;
 
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import net.consensys.cava.toml.TomlArray;
 import net.consensys.cava.toml.TomlParseResult;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 
 public class PermissioningConfigurationBuilder {
 

@@ -16,13 +16,13 @@ import static java.lang.System.arraycopy;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 
-import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
-import org.hyperledger.besu.ethereum.p2p.peers.PeerId;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
+import org.hyperledger.besu.ethereum.p2p.peers.PeerId;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /**
  * As peers are discovered on the network, they are added to one of the k-buckets described by this

@@ -12,10 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.pending;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
-import org.hyperledger.besu.ethereum.core.Hash;
-
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.results.JsonRpcResult;
 
 public class PendingTransactionResult implements JsonRpcResult {
 

@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.blockcreation;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.time.Clock;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 public class DefaultBlockScheduler extends AbstractBlockScheduler {
 

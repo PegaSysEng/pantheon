@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.connections.netty;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+
+import io.netty.buffer.ByteBuf;
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.ethereum.p2p.peers.LocalNode;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
@@ -19,12 +24,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEventDis
 import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.Handshaker;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-
-import io.netty.buffer.ByteBuf;
 
 final class HandshakeHandlerInbound extends AbstractHandshakeHandler {
 

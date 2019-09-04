@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.services.kvstore;
 
-import org.hyperledger.besu.services.kvstore.SegmentedKeyValueStorage.Segment;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Predicate;
+
+import org.hyperledger.besu.services.kvstore.SegmentedKeyValueStorage.Segment;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class SegmentedKeyValueStorageAdapter<S> implements KeyValueStorage {
 

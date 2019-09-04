@@ -14,14 +14,13 @@ package org.hyperledger.besu.ethereum.core;
 
 import static org.junit.Assume.assumeTrue;
 
-import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
-import org.hyperledger.besu.ethereum.vm.ReferenceTestProtocolSchedules;
-import org.hyperledger.besu.ethereum.rlp.RLP;
-import org.hyperledger.besu.testutil.JsonTestParameters;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Collection;
 
+import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
+import org.hyperledger.besu.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.vm.ReferenceTestProtocolSchedules;
+import org.hyperledger.besu.testutil.JsonTestParameters;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

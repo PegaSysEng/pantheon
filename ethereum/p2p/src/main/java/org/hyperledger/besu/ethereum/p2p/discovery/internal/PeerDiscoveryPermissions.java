@@ -30,15 +30,18 @@ class PeerDiscoveryPermissions {
   }
 
   public boolean isAllowedInPeerTable(final Peer peer) {
-    return peerPermissions.isPermitted(localNode, peer, PeerPermissions.Action.DISCOVERY_ALLOW_IN_PEER_TABLE);
+    return peerPermissions.isPermitted(
+        localNode, peer, PeerPermissions.Action.DISCOVERY_ALLOW_IN_PEER_TABLE);
   }
 
   public boolean allowOutboundBonding(final Peer peer) {
-    return peerPermissions.isPermitted(localNode, peer, PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_BONDING);
+    return peerPermissions.isPermitted(
+        localNode, peer, PeerPermissions.Action.DISCOVERY_ALLOW_OUTBOUND_BONDING);
   }
 
   public boolean allowInboundBonding(final Peer peer) {
-    return peerPermissions.isPermitted(localNode, peer, PeerPermissions.Action.DISCOVERY_ACCEPT_INBOUND_BONDING);
+    return peerPermissions.isPermitted(
+        localNode, peer, PeerPermissions.Action.DISCOVERY_ACCEPT_INBOUND_BONDING);
   }
 
   public boolean allowOutboundNeighborsRequest(final Peer peer) {

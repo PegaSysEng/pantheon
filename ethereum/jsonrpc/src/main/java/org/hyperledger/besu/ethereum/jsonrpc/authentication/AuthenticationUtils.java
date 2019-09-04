@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.authentication;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,6 +21,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 
 public class AuthenticationUtils {
   private static final Logger LOG = LogManager.getLogger();

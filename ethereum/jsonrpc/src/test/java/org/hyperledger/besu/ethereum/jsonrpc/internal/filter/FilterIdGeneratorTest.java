@@ -15,7 +15,6 @@ package org.hyperledger.besu.ethereum.jsonrpc.internal.filter;
 import static org.junit.Assert.assertEquals;
 
 import org.hyperledger.besu.util.uint.UInt256;
-
 import org.junit.Test;
 
 public class FilterIdGeneratorTest {

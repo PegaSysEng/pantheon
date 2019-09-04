@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.metrics;
 
-import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
-
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
 
 public enum PantheonMetricCategory implements MetricCategory {
   BLOCKCHAIN("blockchain"),

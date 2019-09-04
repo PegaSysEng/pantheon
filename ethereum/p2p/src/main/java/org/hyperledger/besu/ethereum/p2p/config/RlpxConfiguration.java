@@ -14,12 +14,12 @@ package org.hyperledger.besu.ethereum.p2p.config;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
 
 public class RlpxConfiguration {
   public static final float DEFAULT_FRACTION_REMOTE_CONNECTIONS_ALLOWED = 0.6f;

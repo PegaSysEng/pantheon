@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.consensus.ibft.support;
 
-import org.hyperledger.besu.consensus.ibft.network.ValidatorMulticaster;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-
 import java.util.Collection;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import org.hyperledger.besu.consensus.ibft.network.ValidatorMulticaster;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 
 public class StubValidatorMulticaster implements ValidatorMulticaster {
 

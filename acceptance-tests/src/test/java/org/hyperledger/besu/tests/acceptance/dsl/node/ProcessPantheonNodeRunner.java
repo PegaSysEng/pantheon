@@ -14,12 +14,6 @@ package org.hyperledger.besu.tests.acceptance.dsl.node;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import org.hyperledger.besu.tests.acceptance.dsl.StaticNodesUtils;
-import org.hyperledger.besu.cli.options.NetworkingOptions;
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
-import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +35,11 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
+import org.hyperledger.besu.cli.options.NetworkingOptions;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApis;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.StaticNodesUtils;
 
 public class ProcessPantheonNodeRunner implements PantheonNodeRunner {
 

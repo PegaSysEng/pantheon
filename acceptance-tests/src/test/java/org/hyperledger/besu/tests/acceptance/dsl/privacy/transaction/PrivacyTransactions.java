@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.privacy.transaction;
 
+import java.util.List;
+
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNode;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.condition.EeaGetTransactionReceiptTransaction;
-
-import java.util.List;
 
 public class PrivacyTransactions {
 

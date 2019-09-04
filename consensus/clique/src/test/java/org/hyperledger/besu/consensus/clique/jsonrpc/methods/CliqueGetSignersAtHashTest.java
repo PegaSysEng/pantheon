@@ -15,10 +15,15 @@ package org.hyperledger.besu.consensus.clique.jsonrpc.methods;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hyperledger.besu.ethereum.core.Address.fromHexString;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.core.Address.fromHexString;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.bouncycastle.util.encoders.Hex;
 import org.hyperledger.besu.consensus.clique.CliqueBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.common.VoteTally;
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
@@ -36,12 +41,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.consensus.clique.jsonrpc;
 
-import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
-
 import java.util.Optional;
+
+import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
 
 public class CliqueRpcApis {
   public static final RpcApi CLIQUE = new RpcApi("CLIQUE");

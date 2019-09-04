@@ -63,7 +63,7 @@ public class IstanbulGasCalculator extends ConstantinopleFixGasCalculator {
   @Override
   // As per https://eips.ethereum.org/EIPS/eip-2200
   public Gas calculateStorageCost(
-          final Account account, final UInt256 key, final UInt256 newValue) {
+      final Account account, final UInt256 key, final UInt256 newValue) {
 
     final UInt256 currentValue = account.getStorageValue(key);
     if (currentValue.equals(newValue)) {

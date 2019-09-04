@@ -16,14 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.core.PrivateTransactionTestFixture;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
 import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
-
-import java.math.BigInteger;
-import java.util.Optional;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,7 +42,10 @@ public class PrivateTransactionValidatorTest {
     ValidationResult<TransactionValidator.TransactionInvalidReason> validationResult =
         validator.validate(privateTransactionWithNonce(1L), 2L);
 
-    assertThat(validationResult).isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.PRIVATE_NONCE_TOO_LOW));
+    assertThat(validationResult)
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.PRIVATE_NONCE_TOO_LOW));
   }
 
   @Test
@@ -51,7 +53,10 @@ public class PrivateTransactionValidatorTest {
     ValidationResult<TransactionValidator.TransactionInvalidReason> validationResult =
         validator.validate(privateTransactionWithNonce(3L), 2L);
 
-    assertThat(validationResult).isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.INCORRECT_PRIVATE_NONCE));
+    assertThat(validationResult)
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.INCORRECT_PRIVATE_NONCE));
   }
 
   @Test
@@ -69,7 +74,9 @@ public class PrivateTransactionValidatorTest {
     ValidationResult<TransactionValidator.TransactionInvalidReason> validationResult =
         validator.validate(privateTransactionWithChainId(999), 0L);
 
-    assertThat(validationResult).isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID));
+    assertThat(validationResult)
+        .isEqualTo(
+            ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID));
   }
 
   @Test
@@ -81,7 +88,10 @@ public class PrivateTransactionValidatorTest {
         validator.validate(privateTransactionWithChainId(999), 0L);
 
     assertThat(validationResult)
-        .isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.REPLAY_PROTECTED_SIGNATURES_NOT_SUPPORTED));
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason
+                    .REPLAY_PROTECTED_SIGNATURES_NOT_SUPPORTED));
   }
 
   @Test
@@ -92,7 +102,10 @@ public class PrivateTransactionValidatorTest {
     ValidationResult<TransactionValidator.TransactionInvalidReason> validationResult =
         validator.validate(transactionWithInvalidSignature, 1L);
 
-    assertThat(validationResult).isEqualTo(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.INVALID_SIGNATURE));
+    assertThat(validationResult)
+        .isEqualTo(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.INVALID_SIGNATURE));
   }
 
   private PrivateTransaction privateTransactionWithNonce(final long nonce) {

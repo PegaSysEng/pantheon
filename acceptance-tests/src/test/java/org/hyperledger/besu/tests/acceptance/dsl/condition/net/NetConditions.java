@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.condition.net;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.net.NetTransactions;
-
-import java.math.BigInteger;
 
 public class NetConditions {
 

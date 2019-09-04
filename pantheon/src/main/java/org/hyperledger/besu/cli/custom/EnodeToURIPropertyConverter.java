@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.cli.custom;
 
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-
 import java.net.URI;
 import java.util.function.Function;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import picocli.CommandLine.ITypeConverter;
 
 public class EnodeToURIPropertyConverter implements ITypeConverter<URI> {

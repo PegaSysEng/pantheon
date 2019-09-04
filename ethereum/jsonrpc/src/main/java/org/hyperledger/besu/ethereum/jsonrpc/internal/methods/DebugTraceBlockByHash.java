@@ -12,10 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
-import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
+import java.util.Collection;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.debug.TraceOptions;
+import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.TransactionTraceParams;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.BlockTrace;
@@ -24,8 +26,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.DebugTraceTransactionResult;
 import org.hyperledger.besu.ethereum.vm.DebugOperationTracer;
-
-import java.util.Collection;
 
 public class DebugTraceBlockByHash implements JsonRpcMethod {
 

@@ -16,12 +16,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.OptionalLong;
+
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
-
-import java.util.OptionalLong;
-
 import org.junit.Test;
 
 public class LatestNonceProviderTest {

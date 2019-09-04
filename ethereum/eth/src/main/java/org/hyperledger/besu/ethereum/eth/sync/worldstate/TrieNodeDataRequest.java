@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.trie.Node;
 import org.hyperledger.besu.ethereum.trie.TrieNodeDecoder;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 abstract class TrieNodeDataRequest extends NodeDataRequest {
 

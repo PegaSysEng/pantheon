@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.PrivacyNode;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.protocol.pantheon.response.privacy.PrivacyGroup;

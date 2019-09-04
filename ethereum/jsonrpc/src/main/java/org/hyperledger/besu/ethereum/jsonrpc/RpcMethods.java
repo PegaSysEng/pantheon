@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
-
 import java.util.Map;
+
+import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 
 public class RpcMethods {
 

@@ -14,11 +14,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
-
-import java.math.BigInteger;
 
 public class ExpectMinimumBlockNumber implements Condition {
 

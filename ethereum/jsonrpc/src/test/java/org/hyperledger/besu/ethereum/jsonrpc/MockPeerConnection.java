@@ -15,10 +15,10 @@ package org.hyperledger.besu.ethereum.jsonrpc;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.InetSocketAddress;
+
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
-
-import java.net.InetSocketAddress;
 
 public class MockPeerConnection {
   PeerInfo peerInfo;

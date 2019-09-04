@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.tests.acceptance;
 
+import java.util.Arrays;
+
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-
-import java.util.Arrays;
-
 import org.junit.Before;
 import org.junit.Test;
 

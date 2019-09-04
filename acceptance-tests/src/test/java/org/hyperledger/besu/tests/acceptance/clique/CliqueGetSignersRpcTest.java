@@ -13,9 +13,8 @@
 package org.hyperledger.besu.tests.acceptance.clique;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -41,7 +40,8 @@ public class CliqueGetSignersRpcTest extends AcceptanceTestBase {
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode2));
     cluster.verify(blockchain.reachesHeight(minerNode1, 1));
     cluster.verify(clique.validatorsAtBlockEqual("0x2", minerNode1, minerNode2));
-    cluster.verify(clique.validatorsAtBlockEqual(CliqueTransactions.LATEST, minerNode1, minerNode2));
+    cluster.verify(
+        clique.validatorsAtBlockEqual(CliqueTransactions.LATEST, minerNode1, minerNode2));
   }
 
   @Test

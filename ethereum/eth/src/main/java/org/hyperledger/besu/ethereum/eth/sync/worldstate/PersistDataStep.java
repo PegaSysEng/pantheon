@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
+import java.util.List;
+
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage.Updater;
 import org.hyperledger.besu.services.tasks.Task;
-
-import java.util.List;
 
 public class PersistDataStep {
   private final WorldStateStorage worldStateStorage;

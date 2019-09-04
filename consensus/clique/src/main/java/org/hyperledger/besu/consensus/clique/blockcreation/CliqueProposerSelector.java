@@ -14,13 +14,13 @@ package org.hyperledger.besu.consensus.clique.blockcreation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hyperledger.besu.consensus.common.VoteTally;
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Responsible for determining which member of the validator pool should create the next block.

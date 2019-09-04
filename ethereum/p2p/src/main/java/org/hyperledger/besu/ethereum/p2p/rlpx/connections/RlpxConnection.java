@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.connections;
 
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 
 public abstract class RlpxConnection {
 
@@ -34,7 +34,7 @@ public abstract class RlpxConnection {
   }
 
   public static RlpxConnection outboundConnection(
-          final Peer peer, final CompletableFuture<PeerConnection> future) {
+      final Peer peer, final CompletableFuture<PeerConnection> future) {
     return new LocallyInitiatedRlpxConnection(peer, future);
   }
 

@@ -16,21 +16,6 @@ import static org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightMa
 import static org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.FUTURE_ROUND;
 import static org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManager.MessageAge.PRIOR_ROUND;
 
-import org.hyperledger.besu.consensus.ibft.ibftevent.RoundExpiry;
-import org.hyperledger.besu.consensus.ibft.validation.FutureRoundProposalMessageValidator;
-import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
-import org.hyperledger.besu.consensus.ibft.BlockTimer;
-import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.Commit;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.IbftMessage;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
-import org.hyperledger.besu.consensus.ibft.network.IbftMessageTransmitter;
-import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
-import org.hyperledger.besu.consensus.ibft.payload.Payload;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-
 import java.time.Clock;
 import java.util.Collection;
 import java.util.Map;
@@ -43,6 +28,20 @@ import java.util.function.Function;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.consensus.ibft.BlockTimer;
+import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
+import org.hyperledger.besu.consensus.ibft.ibftevent.RoundExpiry;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.Commit;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.IbftMessage;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.Prepare;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
+import org.hyperledger.besu.consensus.ibft.network.IbftMessageTransmitter;
+import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
+import org.hyperledger.besu.consensus.ibft.payload.Payload;
+import org.hyperledger.besu.consensus.ibft.validation.FutureRoundProposalMessageValidator;
+import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 /**
  * Responsible for starting/clearing Consensus rounds at a given block height. One of these is

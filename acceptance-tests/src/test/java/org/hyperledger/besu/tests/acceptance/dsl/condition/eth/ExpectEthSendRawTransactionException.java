@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthSendRawTransactionTransaction;
-
 import org.web3j.protocol.exceptions.ClientConnectionException;
 
 public class ExpectEthSendRawTransactionException implements Condition {

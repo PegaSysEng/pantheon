@@ -24,5 +24,5 @@ public interface PeerConnectionEventDispatcher {
       final boolean initiatedByPeer);
 
   void dispatchMessage(
-          final Capability capability, final PeerConnection connection, final MessageData message);
+      final Capability capability, final PeerConnection connection, final MessageData message);
 }

@@ -15,13 +15,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.eth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.web3j.protocol.core.DefaultBlockParameterName.LATEST;
 
-import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 import java.math.BigInteger;
 
+import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 
 public class EthGetBalanceTransaction implements Transaction<BigInteger> {

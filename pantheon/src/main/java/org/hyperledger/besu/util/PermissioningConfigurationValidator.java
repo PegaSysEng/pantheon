@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.util;
 
-import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
 
 public class PermissioningConfigurationValidator {
 

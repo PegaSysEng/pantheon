@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager.bounded;
 
+import java.util.concurrent.LinkedBlockingDeque;
+
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
-
-import java.util.concurrent.LinkedBlockingDeque;
 
 public class BoundedQueue extends LinkedBlockingDeque<Runnable> {
   private final MetricsSystem metricsSystem;

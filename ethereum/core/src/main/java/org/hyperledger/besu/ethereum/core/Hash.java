@@ -14,12 +14,11 @@ package org.hyperledger.besu.ethereum.core;
 
 import static org.hyperledger.besu.crypto.Hash.keccak256;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.DelegatingBytes32;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
 
 /** A 32-bytes hash value as used in Ethereum blocks, that is the result of the KEC algorithm. */
 public class Hash extends DelegatingBytes32 implements org.hyperledger.besu.plugin.data.Hash {

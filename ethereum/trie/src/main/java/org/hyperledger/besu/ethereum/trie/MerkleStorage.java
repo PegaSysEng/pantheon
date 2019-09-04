@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Optional;
 
 /** Storage for use in a {@link StoredMerklePatriciaTrie}. */
 public interface MerkleStorage {

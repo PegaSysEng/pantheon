@@ -14,9 +14,6 @@ package org.hyperledger.besu.ethereum.jsonrpc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService;
-import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -25,6 +22,8 @@ import io.vertx.core.Vertx;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.hyperledger.besu.ethereum.jsonrpc.health.HealthService;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

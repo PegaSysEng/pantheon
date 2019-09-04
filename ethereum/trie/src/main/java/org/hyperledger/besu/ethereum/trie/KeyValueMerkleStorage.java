@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
-import org.hyperledger.besu.services.kvstore.KeyValueStorage;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.hyperledger.besu.services.kvstore.KeyValueStorage;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class KeyValueMerkleStorage implements MerkleStorage {
 

@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.tests.acceptance.pubsub;
 
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
+import io.vertx.core.Vertx;
 import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.hyperledger.besu.tests.acceptance.dsl.pubsub.Subscription;
 import org.hyperledger.besu.tests.acceptance.dsl.pubsub.WebSocket;
-
-import io.vertx.core.Vertx;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

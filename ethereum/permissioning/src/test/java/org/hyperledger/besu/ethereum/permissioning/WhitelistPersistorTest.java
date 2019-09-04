@@ -14,8 +14,6 @@ package org.hyperledger.besu.ethereum.permissioning;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +24,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
+import org.hyperledger.besu.ethereum.permissioning.WhitelistPersistor.WHITELIST_TYPE;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -15,10 +15,6 @@ package org.hyperledger.besu.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import org.assertj.core.api.Assertions;
-import org.hyperledger.besu.plugin.PantheonPlugin;
-import org.hyperledger.besu.plugins.TestPicoCLIPlugin;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +22,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
+import org.hyperledger.besu.plugin.PantheonPlugin;
+import org.hyperledger.besu.plugins.TestPicoCLIPlugin;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -90,7 +89,9 @@ public class PantheonPluginContextImplTest {
 
     Assertions.assertThat(contextImpl.getPlugins()).isEmpty();
     contextImpl.registerPlugins(new File(".").toPath());
-    Assertions.assertThat(contextImpl.getPlugins()).extracting("class").contains(TestPicoCLIPlugin.class);
+    Assertions.assertThat(contextImpl.getPlugins())
+        .extracting("class")
+        .contains(TestPicoCLIPlugin.class);
 
     final Optional<TestPicoCLIPlugin> testPluginOptional = findTestPlugin(contextImpl.getPlugins());
     assertThat(testPluginOptional).isPresent();
@@ -112,7 +113,9 @@ public class PantheonPluginContextImplTest {
 
     Assertions.assertThat(contextImpl.getPlugins()).isEmpty();
     contextImpl.registerPlugins(new File(".").toPath());
-    Assertions.assertThat(contextImpl.getPlugins()).extracting("class").contains(TestPicoCLIPlugin.class);
+    Assertions.assertThat(contextImpl.getPlugins())
+        .extracting("class")
+        .contains(TestPicoCLIPlugin.class);
 
     final Optional<TestPicoCLIPlugin> testPluginOptional = findTestPlugin(contextImpl.getPlugins());
     assertThat(testPluginOptional).isPresent();

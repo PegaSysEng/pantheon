@@ -14,14 +14,14 @@ package org.hyperledger.besu.ethereum.eth.manager.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 import org.hyperledger.besu.ethereum.eth.manager.ethtaskutils.PeerMessageTaskTest;
 import org.hyperledger.besu.ethereum.eth.manager.task.AbstractPeerTask.PeerTaskResult;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class GetReceiptsFromPeerTaskTest
     extends PeerMessageTaskTest<Map<BlockHeader, List<TransactionReceipt>>> {

@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.consensus.common;
 
-import org.hyperledger.besu.ethereum.core.Address;
-
 import java.util.Collection;
+
+import org.hyperledger.besu.ethereum.core.Address;
 
 public interface ValidatorProvider {
 

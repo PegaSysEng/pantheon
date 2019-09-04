@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
+import java.util.NavigableMap;
+
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.NavigableMap;
 
 /**
  * An account state.

@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.syncing;
 
+import org.hyperledger.besu.ethereum.core.SyncStatus;
+import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.SyncingResult;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.Subscription;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
-import org.hyperledger.besu.ethereum.core.SyncStatus;
-import org.hyperledger.besu.ethereum.core.Synchronizer;
 
 public class SyncingSubscriptionService {
 

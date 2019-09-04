@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
+import java.util.Collection;
+import java.util.Optional;
+
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.consensus.common.ValidatorVote;
 import org.hyperledger.besu.consensus.common.VoteType;
@@ -20,9 +23,6 @@ import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderBuilder;
 import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
-
-import java.util.Collection;
-import java.util.Optional;
 
 public class IbftBlockInterface implements BlockInterface {
 

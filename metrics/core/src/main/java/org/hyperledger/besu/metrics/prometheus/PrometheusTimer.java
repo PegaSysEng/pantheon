@@ -12,10 +12,9 @@
  */
 package org.hyperledger.besu.metrics.prometheus;
 
+import io.prometheus.client.Summary;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
 import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
-
-import io.prometheus.client.Summary;
 
 class PrometheusTimer implements LabelledMetric<OperationTimer> {
 

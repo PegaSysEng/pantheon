@@ -12,11 +12,10 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction;
 
-import org.hyperledger.besu.tests.acceptance.dsl.account.Accounts;
-
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 
+import org.hyperledger.besu.tests.acceptance.dsl.account.Accounts;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.RemoteCall;

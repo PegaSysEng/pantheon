@@ -14,10 +14,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.login;
 
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
-import java.io.IOException;
 
 public class LoginTransaction implements Transaction<String> {
   private final String username;

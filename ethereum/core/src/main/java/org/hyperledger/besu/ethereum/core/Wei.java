@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.uint.BaseUInt256Value;
 import org.hyperledger.besu.util.uint.Counter;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.math.BigInteger;
 
 /** A particular quantity of Wei, the Ethereum currency. */
 public final class Wei extends BaseUInt256Value<Wei> {

@@ -12,6 +12,10 @@
  */
 package org.hyperledger.besu.consensus.clique.jsonrpc.methods;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
@@ -25,10 +29,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcSuccessResponse;
-
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class CliqueGetSignersAtHash implements JsonRpcMethod {
   private final BlockchainQueries blockchainQueries;

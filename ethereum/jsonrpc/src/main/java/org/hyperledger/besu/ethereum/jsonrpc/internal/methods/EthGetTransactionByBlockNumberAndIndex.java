@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.methods;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.BlockParameter;
@@ -20,8 +22,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.parameters.UnsignedIntPara
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.queries.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionCompleteResult;
-
-import java.util.Optional;
 
 public class EthGetTransactionByBlockNumberAndIndex extends AbstractBlockParameterMethod {
 

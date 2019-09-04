@@ -12,15 +12,15 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.blockchain;
 
+import java.math.BigInteger;
+
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBeneficiary;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBlockNumberAbove;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectMinimumBlockNumber;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
-
-import java.math.BigInteger;
 
 public class Blockchain {
 

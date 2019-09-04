@@ -12,24 +12,6 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNodeRunner;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeConfiguration;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyNodeConfiguration;
-import org.hyperledger.besu.tests.acceptance.dsl.privacy.condition.PrivateCondition;
-import org.hyperledger.orion.testutil.OrionTestHarness;
-import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
-import org.hyperledger.besu.controller.KeyPairUtil;
-import org.hyperledger.besu.enclave.Enclave;
-import org.hyperledger.besu.enclave.EnclaveException;
-import org.hyperledger.besu.enclave.types.SendRequest;
-import org.hyperledger.besu.enclave.types.SendRequestLegacy;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.PrivacyParameters;
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -42,6 +24,23 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
+import org.hyperledger.besu.controller.KeyPairUtil;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.EnclaveException;
+import org.hyperledger.besu.enclave.types.SendRequest;
+import org.hyperledger.besu.enclave.types.SendRequestLegacy;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNodeRunner;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyNodeConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.privacy.condition.PrivateCondition;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
+import org.hyperledger.orion.testutil.OrionTestHarness;
+import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
 
 public class PrivacyNode implements AutoCloseable {
   private static final Logger LOG = LogManager.getLogger();

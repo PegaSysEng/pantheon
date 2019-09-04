@@ -15,9 +15,6 @@ package org.hyperledger.besu.services;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.hyperledger.besu.plugin.PantheonContext;
-import org.hyperledger.besu.plugin.PantheonPlugin;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -37,6 +34,8 @@ import java.util.stream.Stream;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.plugin.PantheonContext;
+import org.hyperledger.besu.plugin.PantheonPlugin;
 
 public class PantheonPluginContextImpl implements PantheonContext {
 

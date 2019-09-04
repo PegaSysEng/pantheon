@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.vm.ehalt.ExceptionalHaltException;
-
-import java.util.Optional;
 
 public interface OperationTracer {
 

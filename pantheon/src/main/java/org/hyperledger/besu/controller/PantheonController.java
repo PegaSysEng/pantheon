@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.controller;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.hyperledger.besu.cli.config.EthNetworkConfig;
 import org.hyperledger.besu.config.GenesisConfigFile;
 import org.hyperledger.besu.config.GenesisConfigOptions;
@@ -27,9 +30,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.p2p.config.SubProtocolConfiguration;
-
-import java.util.Collection;
-import java.util.Map;
 
 public class PantheonController<C> implements java.io.Closeable {
 

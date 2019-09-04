@@ -12,15 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.results;
 
-import org.hyperledger.besu.ethereum.debug.TraceFrame;
-import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.TransactionTrace;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.hyperledger.besu.ethereum.debug.TraceFrame;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.processor.TransactionTrace;
 
 @JsonPropertyOrder({"gas", "failed", "returnValue", "structLogs"})
 public class DebugTraceTransactionResult {

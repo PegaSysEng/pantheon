@@ -16,6 +16,10 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.math.BigInteger;
+import java.util.Collections;
+import java.util.Optional;
+
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -33,11 +37,6 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.results.TransactionReceipt
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.math.BigInteger;
-import java.util.Collections;
-import java.util.Optional;
-
 import org.junit.Test;
 
 public class EthGetTransactionReceiptTest {

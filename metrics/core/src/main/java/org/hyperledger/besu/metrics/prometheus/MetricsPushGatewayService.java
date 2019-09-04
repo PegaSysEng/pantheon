@@ -14,8 +14,6 @@ package org.hyperledger.besu.metrics.prometheus;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.plugin.services.MetricsSystem;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -26,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import io.prometheus.client.exporter.PushGateway;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
 
 class MetricsPushGatewayService implements MetricsService {
   private static final Logger LOG = LogManager.getLogger();

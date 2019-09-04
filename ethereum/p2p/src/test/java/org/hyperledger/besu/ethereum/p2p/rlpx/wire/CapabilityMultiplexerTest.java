@@ -14,14 +14,13 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.wire;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.CapabilityMultiplexer.ProtocolMessage;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.CapabilityMultiplexer.ProtocolMessage;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 public class CapabilityMultiplexerTest {

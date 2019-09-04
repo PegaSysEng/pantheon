@@ -15,12 +15,6 @@ package org.hyperledger.besu.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-import org.hyperledger.besu.cli.config.EthNetworkConfig;
-import org.hyperledger.besu.cli.config.NetworkName;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
-import org.hyperledger.besu.ethereum.permissioning.PermissioningConfigurationBuilder;
-
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
@@ -30,6 +24,11 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
+import org.hyperledger.besu.cli.config.EthNetworkConfig;
+import org.hyperledger.besu.cli.config.NetworkName;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfigurationBuilder;
 import org.junit.Test;
 
 public class LocalPermissioningConfigurationValidatorTest {

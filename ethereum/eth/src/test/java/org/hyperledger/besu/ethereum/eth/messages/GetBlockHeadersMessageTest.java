@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.eth.messages;
 
+import java.util.Arrays;
+
+import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Arrays;
-
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public final class GetBlockHeadersMessageTest {

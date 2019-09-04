@@ -12,6 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.p2p.testing;
 
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+
+import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 import org.hyperledger.besu.ethereum.p2p.peers.DefaultPeer;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
@@ -23,14 +30,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
-
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 /** Tests for {@link MockNetwork}. */
@@ -57,7 +56,7 @@ public final class MockNetworkTest {
                 .listeningPort(4321)
                 .build());
     try (final P2PNetwork network1 = network.setup(one);
-         final P2PNetwork network2 = network.setup(two)) {
+        final P2PNetwork network2 = network.setup(two)) {
       final CompletableFuture<Message> messageFuture = new CompletableFuture<>();
       network1.subscribe(cap, (capability, msg) -> messageFuture.complete(msg));
       final Predicate<PeerConnection> isPeerOne =
@@ -99,14 +98,17 @@ public final class MockNetworkTest {
       Assertions.assertThat(receivedMessageData.getCode()).isEqualTo(code);
 
       // Validate Disconnect Behaviour
-      final CompletableFuture<DisconnectMessage.DisconnectReason> peer1DisconnectFuture = new CompletableFuture<>();
-      final CompletableFuture<DisconnectMessage.DisconnectReason> peer2DisconnectFuture = new CompletableFuture<>();
+      final CompletableFuture<DisconnectMessage.DisconnectReason> peer1DisconnectFuture =
+          new CompletableFuture<>();
+      final CompletableFuture<DisconnectMessage.DisconnectReason> peer2DisconnectFuture =
+          new CompletableFuture<>();
       network2.subscribeDisconnect(
           (peer, reason, initiatedByPeer) -> peer1DisconnectFuture.complete(reason));
       network1.subscribeDisconnect(
           (peer, reason, initiatedByPeer) -> peer2DisconnectFuture.complete(reason));
       connection.disconnect(DisconnectMessage.DisconnectReason.CLIENT_QUITTING);
-      Assertions.assertThat(peer1DisconnectFuture.get()).isEqualTo(DisconnectMessage.DisconnectReason.REQUESTED);
+      Assertions.assertThat(peer1DisconnectFuture.get())
+          .isEqualTo(DisconnectMessage.DisconnectReason.REQUESTED);
       Assertions.assertThat(peer2DisconnectFuture.get())
           .isEqualTo(DisconnectMessage.DisconnectReason.CLIENT_QUITTING);
       Assertions.assertThat(network1.getPeers().stream().filter(isPeerTwo).findFirst())

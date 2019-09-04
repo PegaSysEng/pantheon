@@ -12,18 +12,17 @@
  */
 package org.hyperledger.besu.ethereum.graphql.internal.pojoadapter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import graphql.schema.DataFetchingEnvironment;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.graphql.internal.BlockWithMetadata;
 import org.hyperledger.besu.ethereum.graphql.internal.BlockchainQuery;
 import org.hyperledger.besu.ethereum.graphql.internal.TransactionWithMetadata;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import graphql.schema.DataFetchingEnvironment;
 
 @SuppressWarnings("unused") // reflected by GraphQL
 public class NormalBlockAdapter extends BlockAdapterBase {

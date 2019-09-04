@@ -12,13 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.vm.ehalt;
 
-import org.hyperledger.besu.ethereum.vm.EVM;
-import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
-import org.hyperledger.besu.ethereum.vm.MessageFrame;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+
+import org.hyperledger.besu.ethereum.vm.EVM;
+import org.hyperledger.besu.ethereum.vm.ExceptionalHaltReason;
+import org.hyperledger.besu.ethereum.vm.MessageFrame;
 
 public class ExceptionalHaltManager {
 
@@ -30,7 +30,7 @@ public class ExceptionalHaltManager {
               new InsufficientGasExceptionalHaltPredicate());
 
   public static EnumSet<ExceptionalHaltReason> evaluateAll(
-          final MessageFrame frame, final EVM evm) {
+      final MessageFrame frame, final EVM evm) {
     final EnumSet<ExceptionalHaltReason> answer = EnumSet.noneOf(ExceptionalHaltReason.class);
     for (final ExceptionalHaltPredicate predicate : GLOBAL) {
       predicate.exceptionalHaltCondition(frame, answer, evm).ifPresent(answer::add);

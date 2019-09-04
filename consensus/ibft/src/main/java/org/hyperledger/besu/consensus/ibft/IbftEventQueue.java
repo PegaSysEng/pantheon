@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvent;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +19,7 @@ import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.consensus.ibft.ibftevent.IbftEvent;
 
 /** Threadsafe queue that lets parts of the system inform the Ibft infrastructure about events */
 public class IbftEventQueue {

@@ -14,11 +14,6 @@ package org.hyperledger.besu.ethereum.trie;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
-import org.hyperledger.besu.services.kvstore.KeyValueStorage.Transaction;
-import org.hyperledger.besu.util.bytes.Bytes32;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,6 +21,10 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
+import org.hyperledger.besu.services.kvstore.KeyValueStorage.Transaction;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.junit.Test;
 
 public class TrieNodeDecoderTest {

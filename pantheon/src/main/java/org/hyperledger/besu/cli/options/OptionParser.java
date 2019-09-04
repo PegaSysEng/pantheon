@@ -14,13 +14,12 @@ package org.hyperledger.besu.cli.options;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.util.uint.UInt256;
-
 import java.math.BigInteger;
 import java.util.Iterator;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Range;
+import org.hyperledger.besu.util.uint.UInt256;
 
 public class OptionParser {
 

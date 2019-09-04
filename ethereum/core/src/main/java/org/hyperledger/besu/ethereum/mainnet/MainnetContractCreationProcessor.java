@@ -12,6 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.util.Collection;
+import java.util.List;
+
+import com.google.common.collect.ImmutableSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Gas;
@@ -20,13 +26,6 @@ import org.hyperledger.besu.ethereum.vm.EVM;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Collection;
-import java.util.List;
-
-import com.google.common.collect.ImmutableSet;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /** A contract creation message processor. */
 public class MainnetContractCreationProcessor extends AbstractMessageProcessor {

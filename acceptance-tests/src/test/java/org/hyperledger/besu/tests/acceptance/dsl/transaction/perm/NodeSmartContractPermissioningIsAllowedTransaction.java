@@ -14,25 +14,23 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.io.IOException;
+
 import org.hyperledger.besu.crypto.Hash;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.permissioning.NodeSmartContractPermissioningController;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import org.hyperledger.besu.ethereum.permissioning.NodeSmartContractPermissioningController;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.io.IOException;
-
 import org.web3j.protocol.core.DefaultBlockParameterName;
 
 public class NodeSmartContractPermissioningIsAllowedTransaction implements Transaction<Boolean> {
 
   private static final BytesValue IS_NODE_ALLOWED_SIGNATURE =
-      Hash.keccak256(
-              BytesValue.of("enodeAllowed(bytes32,bytes32,bytes16,uint16)".getBytes(UTF_8)))
+      Hash.keccak256(BytesValue.of("enodeAllowed(bytes32,bytes32,bytes16,uint16)".getBytes(UTF_8)))
           .slice(0, 4);
 
   private final Address contractAddress;

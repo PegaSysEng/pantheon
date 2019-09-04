@@ -12,15 +12,15 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.BlockValidator;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockImporter;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
-
-import java.util.List;
-import java.util.Optional;
 
 public class MainnetBlockImporter<C> implements BlockImporter<C> {
 

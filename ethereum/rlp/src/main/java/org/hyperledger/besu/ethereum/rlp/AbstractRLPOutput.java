@@ -18,13 +18,13 @@ import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.listSize;
 import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.writeElement;
 import static org.hyperledger.besu.ethereum.rlp.RLPEncodingHelpers.writeListHeader;
 
-import org.hyperledger.besu.util.bytes.BytesValue;
-import org.hyperledger.besu.util.bytes.MutableBytesValue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
+
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
 
 abstract class AbstractRLPOutput implements RLPOutput {
   /*

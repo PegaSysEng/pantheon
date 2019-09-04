@@ -14,6 +14,10 @@ package org.hyperledger.besu.ethereum.privacy;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigInteger;
+import java.util.Optional;
+
+import com.google.common.collect.Lists;
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Wei;
@@ -22,11 +26,6 @@ import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
-
-import java.math.BigInteger;
-import java.util.Optional;
-
-import com.google.common.collect.Lists;
 import org.junit.Test;
 
 public class PrivateTransactionTest {

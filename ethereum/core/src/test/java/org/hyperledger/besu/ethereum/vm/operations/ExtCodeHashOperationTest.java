@@ -36,7 +36,6 @@ import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
 import org.junit.Test;
 
 public class ExtCodeHashOperationTest {
@@ -45,7 +44,8 @@ public class ExtCodeHashOperationTest {
 
   private final Blockchain blockchain = mock(Blockchain.class);
 
-  private final WorldStateArchive worldStateArchive = InMemoryStorageProvider.createInMemoryWorldStateArchive();
+  private final WorldStateArchive worldStateArchive =
+      InMemoryStorageProvider.createInMemoryWorldStateArchive();
   private final WorldUpdater worldStateUpdater = worldStateArchive.getMutable().updater();
 
   private final ExtCodeHashOperation operation =

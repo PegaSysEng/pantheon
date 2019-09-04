@@ -12,9 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import org.hyperledger.besu.ethereum.core.SealableBlockHeader;
-import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
-
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,6 +22,8 @@ import java.util.function.BiConsumer;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
+import org.hyperledger.besu.ethereum.core.SealableBlockHeader;
+import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 
 /** Implementation of EthHash. */
 public final class EthHash {

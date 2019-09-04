@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.metrics;
 
-import org.hyperledger.besu.plugin.services.metrics.Counter;
-
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.hyperledger.besu.plugin.services.metrics.Counter;
 
 /** Counter that triggers a specific task each time a step is hit. */
 public class RunnableCounter implements Counter {

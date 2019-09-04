@@ -12,6 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.MutableAccount;
 import org.hyperledger.besu.ethereum.core.Wei;
@@ -22,12 +27,6 @@ import org.hyperledger.besu.ethereum.worldstate.DefaultMutableWorldState;
 import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /** Represent a mock worldState for testing. */
 public class WorldStateMock extends DefaultMutableWorldState {
@@ -86,7 +85,7 @@ public class WorldStateMock extends DefaultMutableWorldState {
   }
 
   public static void insertAccount(
-          final WorldUpdater updater, final Address address, final AccountMock toCopy) {
+      final WorldUpdater updater, final Address address, final AccountMock toCopy) {
     final MutableAccount account = updater.getOrCreate(address);
     account.setNonce(toCopy.getNonce());
     account.setBalance(toCopy.getBalance());

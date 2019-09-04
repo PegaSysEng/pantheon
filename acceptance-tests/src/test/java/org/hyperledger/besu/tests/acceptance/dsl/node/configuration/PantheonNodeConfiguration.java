@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.node.configuration;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
@@ -19,9 +22,6 @@ import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
-
-import java.util.List;
-import java.util.Optional;
 
 public class PantheonNodeConfiguration {
 

@@ -14,11 +14,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.perm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.perm.PermGetAccountsWhitelistTransaction;
-
-import java.util.List;
 
 public class GetExpectedAccountsWhitelist implements Condition {
 

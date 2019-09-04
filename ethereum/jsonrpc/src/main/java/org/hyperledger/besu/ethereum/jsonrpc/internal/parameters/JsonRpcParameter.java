@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
-import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Optional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hyperledger.besu.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 
 public class JsonRpcParameter {
 

@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import org.hyperledger.besu.ethereum.core.TransactionFilter;
-
 import java.math.BigInteger;
 import java.util.Optional;
+
+import org.hyperledger.besu.ethereum.core.TransactionFilter;
 
 public interface ProtocolSchedule<C> {
 

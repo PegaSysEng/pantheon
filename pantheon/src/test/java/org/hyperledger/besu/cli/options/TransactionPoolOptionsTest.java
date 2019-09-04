@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.cli.CommandTestAbstract;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
-
 import org.junit.Test;
 
 public class TransactionPoolOptionsTest
@@ -57,7 +56,8 @@ public class TransactionPoolOptionsTest
   }
 
   @Override
-  TransactionPoolOptions getOptionsFromPantheonCommand(final CommandTestAbstract.TestPantheonCommand pantheonCommand) {
+  TransactionPoolOptions getOptionsFromPantheonCommand(
+      final CommandTestAbstract.TestPantheonCommand pantheonCommand) {
     return pantheonCommand.getTransactionPoolOptions();
   }
 }

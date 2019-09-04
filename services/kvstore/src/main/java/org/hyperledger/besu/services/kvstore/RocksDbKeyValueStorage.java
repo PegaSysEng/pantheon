@@ -12,11 +12,6 @@
  */
 package org.hyperledger.besu.services.kvstore;
 
-import org.hyperledger.besu.plugin.services.MetricsSystem;
-import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
-import org.hyperledger.besu.services.util.RocksDbUtil;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.io.Closeable;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,6 +19,10 @@ import java.util.function.Predicate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
+import org.hyperledger.besu.services.util.RocksDbUtil;
+import org.hyperledger.besu.util.bytes.BytesValue;
 import org.rocksdb.BlockBasedTableConfig;
 import org.rocksdb.LRUCache;
 import org.rocksdb.Options;

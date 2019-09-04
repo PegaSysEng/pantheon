@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.tests.acceptance.jsonrpc;
 
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.junit.Before;
 import org.junit.Test;
 

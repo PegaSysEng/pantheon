@@ -28,7 +28,6 @@ import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer.Responder;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.util.uint.UInt256;
-
 import org.junit.Test;
 
 public class ChainHeadTrackerTest {

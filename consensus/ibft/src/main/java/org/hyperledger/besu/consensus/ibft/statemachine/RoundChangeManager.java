@@ -12,11 +12,6 @@
  */
 package org.hyperledger.besu.consensus.ibft.statemachine;
 
-import org.hyperledger.besu.consensus.ibft.validation.RoundChangeMessageValidator;
-import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
-import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
-import org.hyperledger.besu.ethereum.core.Address;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +20,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
+import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
+import org.hyperledger.besu.consensus.ibft.validation.RoundChangeMessageValidator;
+import org.hyperledger.besu.ethereum.core.Address;
 
 /**
  * Responsible for handling all RoundChange messages received for a given block height

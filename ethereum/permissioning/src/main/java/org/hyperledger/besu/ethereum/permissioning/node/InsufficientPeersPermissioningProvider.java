@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.permissioning.node;
 
+import java.util.Collection;
+import java.util.Optional;
+
 import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.util.Subscribers;
-
-import java.util.Collection;
-import java.util.Optional;
 
 /**
  * A permissioning provider that only provides an answer when we have no peers outside of our

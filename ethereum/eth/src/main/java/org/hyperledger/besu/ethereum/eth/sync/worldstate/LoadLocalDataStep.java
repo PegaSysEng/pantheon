@@ -12,6 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
@@ -19,9 +22,6 @@ import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.services.pipeline.Pipe;
 import org.hyperledger.besu.services.tasks.Task;
 import org.hyperledger.besu.util.bytes.BytesValue;
-
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public class LoadLocalDataStep {
 

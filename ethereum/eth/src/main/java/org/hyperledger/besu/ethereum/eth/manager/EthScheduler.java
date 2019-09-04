@@ -18,11 +18,6 @@ import static org.hyperledger.besu.ethereum.eth.manager.MonitoredExecutors.newFi
 import static org.hyperledger.besu.ethereum.eth.manager.MonitoredExecutors.newScheduledThreadPool;
 import static org.hyperledger.besu.util.FutureUtils.propagateResult;
 
-import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
-import org.hyperledger.besu.plugin.services.MetricsSystem;
-import org.hyperledger.besu.services.pipeline.Pipeline;
-import org.hyperledger.besu.util.ExceptionUtils;
-
 import java.time.Duration;
 import java.util.Collection;
 import java.util.concurrent.CancellationException;
@@ -41,6 +36,10 @@ import java.util.function.Supplier;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.services.pipeline.Pipeline;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 public class EthScheduler {
   private static final Logger LOG = LogManager.getLogger();

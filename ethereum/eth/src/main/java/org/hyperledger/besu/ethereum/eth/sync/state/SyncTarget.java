@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.state;
 
+import java.util.Objects;
+
+import com.google.common.base.MoreObjects;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.ChainState;
 import org.hyperledger.besu.ethereum.eth.manager.ChainState.EstimatedHeightListener;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-
-import java.util.Objects;
-
-import com.google.common.base.MoreObjects;
 
 public class SyncTarget {
 

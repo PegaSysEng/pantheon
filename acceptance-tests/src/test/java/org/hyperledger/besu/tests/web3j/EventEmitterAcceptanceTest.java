@@ -17,15 +17,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.web3j.generated.EventEmitter;
-
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.Flowable;
 import io.reactivex.disposables.Disposable;
+import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
+import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.web3j.generated.EventEmitter;
 import org.junit.Before;
 import org.junit.Test;
 import org.web3j.protocol.core.methods.request.EthFilter;

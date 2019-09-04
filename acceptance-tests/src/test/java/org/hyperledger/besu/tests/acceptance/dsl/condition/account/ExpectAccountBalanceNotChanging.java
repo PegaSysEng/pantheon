@@ -15,14 +15,13 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.account;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.web3j.utils.Convert.toWei;
 
+import java.util.concurrent.TimeUnit;
+
+import org.awaitility.Awaitility;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
-
-import java.util.concurrent.TimeUnit;
-
-import org.awaitility.Awaitility;
 import org.web3j.utils.Convert.Unit;
 
 public class ExpectAccountBalanceNotChanging implements Condition {

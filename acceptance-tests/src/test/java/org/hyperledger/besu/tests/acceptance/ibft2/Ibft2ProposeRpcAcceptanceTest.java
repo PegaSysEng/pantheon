@@ -12,12 +12,11 @@
  */
 package org.hyperledger.besu.tests.acceptance.ibft2;
 
+import java.io.IOException;
+
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-
-import java.io.IOException;
-
 import org.junit.Test;
 
 // These tests prove the ibft_proposeValidatorVote and ibft_getValidatorsByBlockNumber (implicitly)

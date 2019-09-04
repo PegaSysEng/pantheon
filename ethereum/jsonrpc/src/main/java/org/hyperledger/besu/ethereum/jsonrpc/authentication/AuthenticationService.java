@@ -12,9 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.authentication;
 
-import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
-import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -34,6 +31,8 @@ import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.ext.web.RoutingContext;
+import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 
 /** Provides authentication handlers for use in the http and websocket services */
 public class AuthenticationService {

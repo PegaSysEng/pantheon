@@ -12,13 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.jsonrpc.internal.parameters;
 
-import org.hyperledger.besu.ethereum.core.LogTopic;
-import org.hyperledger.besu.util.bytes.BytesValue;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import org.hyperledger.besu.ethereum.core.LogTopic;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 public class TopicsParameter {
 

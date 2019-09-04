@@ -12,7 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -21,14 +20,13 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.Hash;
-
-import java.util.Optional;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +86,8 @@ public class BlockHashLookupTest {
         new BlockHashLookup(
             new BlockHeaderTestFixture().number(CURRENT_BLOCK_NUMBER + 20).buildHeader(),
             blockchain);
-    Assertions.assertThat(lookupWithUnavailableParent.getBlockHash(CURRENT_BLOCK_NUMBER)).isEqualTo(Hash.ZERO);
+    Assertions.assertThat(lookupWithUnavailableParent.getBlockHash(CURRENT_BLOCK_NUMBER))
+        .isEqualTo(Hash.ZERO);
   }
 
   @Test
@@ -108,7 +107,8 @@ public class BlockHashLookupTest {
   }
 
   private void assertHashForBlockNumber(final int blockNumber) {
-    Assertions.assertThat(lookup.getBlockHash(blockNumber)).isEqualTo(headers[blockNumber].getHash());
+    Assertions.assertThat(lookup.getBlockHash(blockNumber))
+        .isEqualTo(headers[blockNumber].getHash());
   }
 
   private BlockHeader createHeader(final int blockNumber, final BlockHeader parentHeader) {
