@@ -19,7 +19,7 @@ import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.Priv
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.condition.PrivateCondition;
 import org.hyperledger.orion.testutil.OrionTestHarness;
 import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
-import tech.pegasys.pantheon.controller.KeyPairUtil;
+import org.hyperledger.besu.controller.KeyPairUtil;
 import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.enclave.EnclaveException;
 import org.hyperledger.besu.enclave.types.SendRequest;

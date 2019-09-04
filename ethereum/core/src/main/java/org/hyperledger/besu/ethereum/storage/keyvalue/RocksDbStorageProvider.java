@@ -16,7 +16,7 @@ import static java.util.AbstractMap.SimpleEntry;
 import static java.util.Arrays.asList;
 
 import org.hyperledger.besu.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.services.kvstore.ColumnarRocksDbKeyValueStorage;
 import org.hyperledger.besu.services.kvstore.KeyValueStorage;
 import org.hyperledger.besu.services.kvstore.LimitedInMemoryKeyValueStorage;

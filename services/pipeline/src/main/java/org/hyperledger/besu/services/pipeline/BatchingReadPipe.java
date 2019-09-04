@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.services.pipeline;
 
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
 
 import java.util.ArrayList;
 import java.util.Collection;

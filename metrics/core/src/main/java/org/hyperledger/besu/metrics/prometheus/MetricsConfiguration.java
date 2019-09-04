@@ -14,7 +14,7 @@ package org.hyperledger.besu.metrics.prometheus;
 
 import static org.hyperledger.besu.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
 
-import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
+import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
 
 import java.util.Arrays;
 import java.util.Collection;

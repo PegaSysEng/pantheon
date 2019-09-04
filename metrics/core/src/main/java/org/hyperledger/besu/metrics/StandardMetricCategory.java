@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.metrics;
 
-import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
+import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
 
 import java.util.Optional;
 

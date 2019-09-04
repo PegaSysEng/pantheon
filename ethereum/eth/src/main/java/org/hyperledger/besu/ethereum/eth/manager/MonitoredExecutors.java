@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.eth.manager;
 
 import tech.pegasys.pantheon.ethereum.eth.manager.bounded.BoundedQueue;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
 
 import java.util.Locale;
 import java.util.concurrent.BlockingQueue;

@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.metrics.prometheus;
 
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
-import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
 
 class PrometheusCounter implements LabelledMetric<Counter> {
 

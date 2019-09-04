@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.metrics.vertx;
 
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
 
 import io.vertx.core.VertxOptions;
 import io.vertx.core.spi.VertxMetricsFactory;

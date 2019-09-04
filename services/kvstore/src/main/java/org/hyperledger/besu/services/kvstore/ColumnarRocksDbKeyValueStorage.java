@@ -14,8 +14,8 @@ package org.hyperledger.besu.services.kvstore;
 
 import static java.util.Objects.requireNonNullElse;
 
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
 import org.hyperledger.besu.services.util.RocksDbUtil;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

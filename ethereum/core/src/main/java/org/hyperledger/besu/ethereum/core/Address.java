@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 /** A 160-bits account address. */
 public class Address extends DelegatingBytesValue
-    implements tech.pegasys.pantheon.plugin.data.Address {
+    implements org.hyperledger.besu.plugin.data.Address {
 
   public static final int SIZE = 20;
 

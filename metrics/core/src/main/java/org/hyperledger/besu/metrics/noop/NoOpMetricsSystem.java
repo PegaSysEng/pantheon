@@ -14,10 +14,10 @@ package org.hyperledger.besu.metrics.noop;
 
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.metrics.Observation;
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
-import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
-import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
-import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
+import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
 
 import java.util.function.DoubleSupplier;
 import java.util.stream.Stream;

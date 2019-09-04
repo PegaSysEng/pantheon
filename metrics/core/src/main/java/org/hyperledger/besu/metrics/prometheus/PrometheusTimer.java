@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.metrics.prometheus;
 
-import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
-import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
 
 import io.prometheus.client.Summary;
 

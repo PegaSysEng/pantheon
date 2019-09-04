@@ -14,7 +14,7 @@ package org.hyperledger.besu.util.uint;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import tech.pegasys.pantheon.plugin.data.Quantity;
+import org.hyperledger.besu.plugin.data.Quantity;
 import org.hyperledger.besu.util.bytes.Bytes32Backed;
 
 /**

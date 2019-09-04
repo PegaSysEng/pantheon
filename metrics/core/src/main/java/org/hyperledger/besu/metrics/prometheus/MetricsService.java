@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.metrics.prometheus;
 
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.metrics.noop;
 
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
 
 class NoOpCounter implements Counter {
 

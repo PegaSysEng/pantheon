@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableList;
  * A log entry is a tuple of a logger’s address (the address of the contract that added the logs), a
  * series of 32-bytes log topics, and some number of bytes of data.
  */
-public class Log implements tech.pegasys.pantheon.plugin.data.Log {
+public class Log implements org.hyperledger.besu.plugin.data.Log {
 
   private final Address logger;
   private final BytesValue data;

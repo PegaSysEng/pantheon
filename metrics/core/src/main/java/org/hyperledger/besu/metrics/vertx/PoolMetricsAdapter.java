@@ -13,8 +13,8 @@
 package org.hyperledger.besu.metrics.vertx;
 
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
 
 import io.vertx.core.spi.metrics.PoolMetrics;
 

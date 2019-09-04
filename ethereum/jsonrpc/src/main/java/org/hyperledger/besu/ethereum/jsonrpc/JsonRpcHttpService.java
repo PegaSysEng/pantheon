@@ -32,9 +32,9 @@ import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcResponseTy
 import org.hyperledger.besu.ethereum.jsonrpc.internal.response.JsonRpcUnauthorizedResponse;
 import org.hyperledger.besu.metrics.PantheonMetricCategory;
 import org.hyperledger.besu.nat.upnp.UpnpNatManager;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
-import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
 import org.hyperledger.besu.util.NetworkUtility;
 
 import java.net.InetSocketAddress;
