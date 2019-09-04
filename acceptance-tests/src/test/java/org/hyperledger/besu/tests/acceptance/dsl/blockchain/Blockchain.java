@@ -18,8 +18,8 @@ import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBeneficiary;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBlockNumberAbove;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectMinimumBlockNumber;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 public class Blockchain {

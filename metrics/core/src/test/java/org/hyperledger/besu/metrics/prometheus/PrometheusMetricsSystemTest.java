@@ -21,9 +21,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Comparator;
 
 import com.google.common.collect.ImmutableSet;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.metrics.Observation;
-import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.StandardMetricCategory;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
@@ -49,13 +49,11 @@ public class PrometheusMetricsSystemTest {
 
     counter.inc();
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(
-            new Observation(BesuMetricCategory.PEERS, "connected", 1d, emptyList()));
+        .containsExactly(new Observation(BesuMetricCategory.PEERS, "connected", 1d, emptyList()));
 
     counter.inc();
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(
-            new Observation(BesuMetricCategory.PEERS, "connected", 2d, emptyList()));
+        .containsExactly(new Observation(BesuMetricCategory.PEERS, "connected", 2d, emptyList()));
   }
 
   @Test
@@ -70,13 +68,11 @@ public class PrometheusMetricsSystemTest {
 
     counter1.labels().inc();
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(
-            new Observation(BesuMetricCategory.PEERS, "connected", 1d, emptyList()));
+        .containsExactly(new Observation(BesuMetricCategory.PEERS, "connected", 1d, emptyList()));
 
     counter2.labels().inc();
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(
-            new Observation(BesuMetricCategory.PEERS, "connected", 2d, emptyList()));
+        .containsExactly(new Observation(BesuMetricCategory.PEERS, "connected", 2d, emptyList()));
   }
 
   @Test
@@ -92,8 +88,7 @@ public class PrometheusMetricsSystemTest {
     assertThat(metricsSystem.streamObservations())
         .containsExactlyInAnyOrder(
             new Observation(BesuMetricCategory.PEERS, "connected", 2d, singletonList("value1")),
-            new Observation(
-                BesuMetricCategory.PEERS, "connected", 1d, singletonList("value2")));
+            new Observation(BesuMetricCategory.PEERS, "connected", 1d, singletonList("value2")));
   }
 
   @Test
@@ -103,13 +98,11 @@ public class PrometheusMetricsSystemTest {
 
     counter.inc(5);
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(
-            new Observation(BesuMetricCategory.PEERS, "connected", 5d, emptyList()));
+        .containsExactly(new Observation(BesuMetricCategory.PEERS, "connected", 5d, emptyList()));
 
     counter.inc(6);
     assertThat(metricsSystem.streamObservations())
-        .containsExactly(
-            new Observation(BesuMetricCategory.PEERS, "connected", 11d, emptyList()));
+        .containsExactly(new Observation(BesuMetricCategory.PEERS, "connected", 11d, emptyList()));
   }
 
   @Test
@@ -126,10 +119,8 @@ public class PrometheusMetricsSystemTest {
             new Observation(BesuMetricCategory.RPC, "request", null, asList("quantile", "0.2")),
             new Observation(BesuMetricCategory.RPC, "request", null, asList("quantile", "0.5")),
             new Observation(BesuMetricCategory.RPC, "request", null, asList("quantile", "0.8")),
-            new Observation(
-                BesuMetricCategory.RPC, "request", null, asList("quantile", "0.95")),
-            new Observation(
-                BesuMetricCategory.RPC, "request", null, asList("quantile", "0.99")),
+            new Observation(BesuMetricCategory.RPC, "request", null, asList("quantile", "0.95")),
+            new Observation(BesuMetricCategory.RPC, "request", null, asList("quantile", "0.99")),
             new Observation(BesuMetricCategory.RPC, "request", null, asList("quantile", "1.0")),
             new Observation(BesuMetricCategory.RPC, "request", null, singletonList("sum")),
             new Observation(BesuMetricCategory.RPC, "request", null, singletonList("count")));
@@ -169,8 +160,7 @@ public class PrometheusMetricsSystemTest {
             new Observation(
                 BesuMetricCategory.RPC, "request", null, asList("method", "quantile", "1.0")),
             new Observation(BesuMetricCategory.RPC, "request", null, asList("method", "sum")),
-            new Observation(
-                BesuMetricCategory.RPC, "request", null, asList("method", "count")));
+            new Observation(BesuMetricCategory.RPC, "request", null, asList("method", "count")));
   }
 
   @Test
@@ -235,8 +225,7 @@ public class PrometheusMetricsSystemTest {
 
     counterR.labels("op").inc();
     assertThat(localMetricSystem.streamObservations())
-        .containsExactly(
-            new Observation(BesuMetricCategory.RPC, "name", 1.0, singletonList("op")));
+        .containsExactly(new Observation(BesuMetricCategory.RPC, "name", 1.0, singletonList("op")));
   }
 
   @Test

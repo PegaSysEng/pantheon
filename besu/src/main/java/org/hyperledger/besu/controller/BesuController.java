@@ -127,8 +127,7 @@ public class BesuController<C> implements java.io.Closeable {
 
   public static class Builder {
 
-    public BesuControllerBuilder<?> fromEthNetworkConfig(
-        final EthNetworkConfig ethNetworkConfig) {
+    public BesuControllerBuilder<?> fromEthNetworkConfig(final EthNetworkConfig ethNetworkConfig) {
       return fromGenesisConfig(GenesisConfigFile.fromConfig(ethNetworkConfig.getGenesisConfig()))
           .networkId(ethNetworkConfig.getNetworkId());
     }

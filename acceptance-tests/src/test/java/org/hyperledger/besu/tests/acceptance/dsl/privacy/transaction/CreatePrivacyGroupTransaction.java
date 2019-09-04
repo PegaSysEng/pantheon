@@ -42,8 +42,7 @@ public class CreatePrivacyGroupTransaction implements Transaction<String> {
   public String execute(final NodeRequests node) {
     final Pantheon besu = node.privacy().getBesuClient();
     try {
-      return besu
-          .privCreatePrivacyGroup(addresses, name, description)
+      return besu.privCreatePrivacyGroup(addresses, name, description)
           .send()
           .getPrivacyGroupId()
           .toString();

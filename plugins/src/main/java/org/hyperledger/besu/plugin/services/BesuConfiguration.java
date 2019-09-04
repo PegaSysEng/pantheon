@@ -29,8 +29,8 @@ public interface BesuConfiguration {
   /**
    * Url of the enclave that stores private transaction data.
    *
-   * @return an optional containing the url of the enclave Besu is connected to, or empty if
-   *     privacy is not enabled.
+   * @return an optional containing the url of the enclave Besu is connected to, or empty if privacy
+   *     is not enabled.
    */
   Optional<URI> getEnclaveUrl();
 }

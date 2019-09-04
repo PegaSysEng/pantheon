@@ -84,9 +84,7 @@ public class MarkSweepPruner {
 
     sweptNodesCounter =
         metricsSystem.createCounter(
-            BesuMetricCategory.PRUNER,
-            "swept_nodes_total",
-            "Total number of unused nodes removed");
+            BesuMetricCategory.PRUNER, "swept_nodes_total", "Total number of unused nodes removed");
     sweepOperationCounter =
         metricsSystem.createCounter(
             BesuMetricCategory.PRUNER,

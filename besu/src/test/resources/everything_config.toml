@@ -9,7 +9,7 @@
 # Please provide some sensible grouping.
 
 # Node Information
-data-path="~/pantheondata"
+data-path="~/besudata"
 logging="INFO"
 node-private-key-file="./path/to/privateKey"
 
@@ -72,7 +72,7 @@ metrics-push-enabled=false
 metrics-push-host="5.5.5.1"
 metrics-push-port=212
 metrics-push-interval=42
-metrics-push-prometheus-job="pantheon-everything"
+metrics-push-prometheus-job="besu-everything"
 
 # Mining
 miner-enabled=false

@@ -107,8 +107,7 @@ public interface DefaultCommandValues {
       // Only thrown if it exists but is not a directory
       throw new CommandLine.ParameterException(
           new CommandLine(command),
-          String.format(
-              "%s: already exists and is not a directory.", besuHome.toAbsolutePath()),
+          String.format("%s: already exists and is not a directory.", besuHome.toAbsolutePath()),
           e);
     } catch (final Exception e) {
       throw new CommandLine.ParameterException(

@@ -1,9 +1,9 @@
 package org.hyperledger.besu.ethereum.vm.blockchain;
 
-import static BlockchainReferenceTestTools.executeTest;
-import static BlockchainReferenceTestTools.generateTestParametersForConfig;
+import static org.hyperledger.besu.ethereum.vm.BlockchainReferenceTestTools.executeTest;
+import static org.hyperledger.besu.ethereum.vm.BlockchainReferenceTestTools.generateTestParametersForConfig;
 
-import BlockchainReferenceTestCaseSpec;
+import org.hyperledger.besu.ethereum.vm.BlockchainReferenceTestCaseSpec;
 
 import java.util.Collection;
 

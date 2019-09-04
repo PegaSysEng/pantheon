@@ -27,8 +27,7 @@ public class EthProtocolOptionsTest
   @Test
   public void parsesValidEwpMaxGetHeadersOptions() {
 
-    final CommandTestAbstract.TestBesuCommand cmd =
-        parseCommand("--Xewp-max-get-headers", "13");
+    final CommandTestAbstract.TestBesuCommand cmd = parseCommand("--Xewp-max-get-headers", "13");
 
     final EthProtocolOptions options = getOptionsFromBesuCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
@@ -71,8 +70,7 @@ public class EthProtocolOptionsTest
 
   @Test
   public void parsesValidEwpMaxGetReceiptsOptions() {
-    final CommandTestAbstract.TestBesuCommand cmd =
-        parseCommand("--Xewp-max-get-receipts", "15");
+    final CommandTestAbstract.TestBesuCommand cmd = parseCommand("--Xewp-max-get-receipts", "15");
 
     final EthProtocolOptions options = getOptionsFromBesuCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();
@@ -95,8 +93,7 @@ public class EthProtocolOptionsTest
 
   @Test
   public void parsesValidEwpMaxGetNodeDataOptions() {
-    final CommandTestAbstract.TestBesuCommand cmd =
-        parseCommand("--Xewp-max-get-node-data", "16");
+    final CommandTestAbstract.TestBesuCommand cmd = parseCommand("--Xewp-max-get-node-data", "16");
 
     final EthProtocolOptions options = getOptionsFromBesuCommand(cmd);
     final EthProtocolConfiguration config = options.toDomainObject();

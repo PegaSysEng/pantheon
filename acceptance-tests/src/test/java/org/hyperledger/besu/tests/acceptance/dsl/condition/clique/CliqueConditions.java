@@ -29,8 +29,8 @@ import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 import org.web3j.protocol.core.DefaultBlockParameter;
@@ -49,8 +49,7 @@ public class CliqueConditions {
     return new ExpectValidators(clique, validatorAddresses(validators));
   }
 
-  public Condition validatorsAtBlockEqual(
-      final String blockNumber, final BesuNode... validators) {
+  public Condition validatorsAtBlockEqual(final String blockNumber, final BesuNode... validators) {
     return new ExpectValidatorsAtBlock(clique, blockNumber, validatorAddresses(validators));
   }
 

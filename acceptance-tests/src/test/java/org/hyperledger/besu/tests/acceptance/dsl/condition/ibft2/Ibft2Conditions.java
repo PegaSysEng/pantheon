@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableMap;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2Transactions;
 
@@ -37,8 +37,7 @@ public class Ibft2Conditions {
   }
 
   public List<BesuNode> validators(final BesuNode[] nodes) {
-    final Comparator<BesuNode> compareByAddress =
-        Comparator.comparing(BesuNode::getAddress);
+    final Comparator<BesuNode> compareByAddress = Comparator.comparing(BesuNode::getAddress);
     List<BesuNode> besuNodes = Arrays.asList(nodes);
     besuNodes.sort(compareByAddress);
     return besuNodes;

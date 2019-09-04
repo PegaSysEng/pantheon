@@ -217,8 +217,7 @@ public abstract class CommandTestAbstract {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> JsonBlockImporter<T> jsonBlockImporterFactory(
-      final BesuController<T> controller) {
+  private <T> JsonBlockImporter<T> jsonBlockImporterFactory(final BesuController<T> controller) {
     return (JsonBlockImporter<T>) jsonBlockImporter;
   }
 

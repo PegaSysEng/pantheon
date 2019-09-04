@@ -64,8 +64,8 @@ public final class RlpBlockExporterTest {
     protocolSchedule = controller.getProtocolSchedule();
   }
 
-  private static Blockchain importBlocks(
-      final BesuController<?> controller, final Path blocksFile) throws IOException {
+  private static Blockchain importBlocks(final BesuController<?> controller, final Path blocksFile)
+      throws IOException {
     final RlpBlockImporter blockImporter = new RlpBlockImporter();
 
     blockImporter.importBlockchain(blocksFile, controller);

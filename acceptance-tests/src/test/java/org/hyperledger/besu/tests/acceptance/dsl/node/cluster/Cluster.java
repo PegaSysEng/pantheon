@@ -28,9 +28,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.net.NetConditions;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNodeRunner;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 
 public class Cluster implements AutoCloseable {
@@ -148,8 +148,7 @@ public class Cluster implements AutoCloseable {
     // stops nodes but do not shutdown besuNodeRunner
     for (final RunnableNode node : nodes.values()) {
       if (node instanceof BesuNode) {
-        besuNodeRunner.stopNode(
-            (BesuNode) node); // besuNodeRunner.stopNode also calls node.stop
+        besuNodeRunner.stopNode((BesuNode) node); // besuNodeRunner.stopNode also calls node.stop
       } else {
         node.stop();
       }

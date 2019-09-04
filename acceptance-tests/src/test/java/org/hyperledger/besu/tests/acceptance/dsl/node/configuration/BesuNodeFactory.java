@@ -24,8 +24,8 @@ import java.util.Optional;
 import org.hyperledger.besu.ethereum.jsonrpc.JsonRpcConfiguration;
 import org.hyperledger.besu.ethereum.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.jsonrpc.websocket.WebSocketConfiguration;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationFactory;
 
@@ -78,11 +78,7 @@ public class BesuNodeFactory {
 
   public BesuNode createArchiveNode(final String name) throws IOException {
     return create(
-        new BesuNodeConfigurationBuilder()
-            .name(name)
-            .jsonRpcEnabled()
-            .webSocketEnabled()
-            .build());
+        new BesuNodeConfigurationBuilder().name(name).jsonRpcEnabled().webSocketEnabled().build());
   }
 
   public Node createArchiveNodeThatMustNotBeTheBootnode(final String name) throws IOException {
@@ -175,8 +171,8 @@ public class BesuNodeFactory {
             .build());
   }
 
-  public BesuNode createArchiveNodeWithRpcApis(
-      final String name, final RpcApi... enabledRpcApis) throws IOException {
+  public BesuNode createArchiveNodeWithRpcApis(final String name, final RpcApi... enabledRpcApis)
+      throws IOException {
     final JsonRpcConfiguration jsonRpcConfig = node.createJsonRpcEnabledConfig();
     jsonRpcConfig.setRpcApis(asList(enabledRpcApis));
     final WebSocketConfiguration webSocketConfig = node.createWebSocketEnabledConfig();
@@ -191,8 +187,7 @@ public class BesuNodeFactory {
   }
 
   public BesuNode createNodeWithNoDiscovery(final String name) throws IOException {
-    return create(
-        new BesuNodeConfigurationBuilder().name(name).discoveryEnabled(false).build());
+    return create(new BesuNodeConfigurationBuilder().name(name).discoveryEnabled(false).build());
   }
 
   public BesuNode createCliqueNode(final String name) throws IOException {

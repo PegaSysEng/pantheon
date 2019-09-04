@@ -2201,8 +2201,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void metricsPrometheusJobMustBeUsed() {
-    parseCommand(
-        "--metrics-push-enabled", "--metrics-push-prometheus-job", "besu-command-test");
+    parseCommand("--metrics-push-enabled", "--metrics-push-prometheus-job", "besu-command-test");
 
     verify(mockRunnerBuilder).metricsConfiguration(metricsConfigArgumentCaptor.capture());
     verify(mockRunnerBuilder).build();

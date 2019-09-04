@@ -50,8 +50,8 @@ public class RlpBlockImporter {
   private final ExecutorService importExecutor = Executors.newSingleThreadExecutor();
 
   /**
-   * Imports blocks that are stored as concatenated RLP sections in the given file into Besu's
-   * block storage.
+   * Imports blocks that are stored as concatenated RLP sections in the given file into Besu's block
+   * storage.
    *
    * @param blocks Path to the file containing the blocks
    * @param besuController the BesuController that defines blockchain behavior
