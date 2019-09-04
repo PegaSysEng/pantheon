@@ -553,7 +553,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--pruning-enabled"},
       hidden = true,
       description =
-          "Enable pruning of world state of blocks older than the retention period (default: ${DEFAULT-VALUE})")
+          "Enable pruning of world state of blocks older than the retention period (default: ${DEFAULT-VALUE})",
+      arity = "1")
   private final Boolean isPruningEnabled = true;
 
   @Option(
