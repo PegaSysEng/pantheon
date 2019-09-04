@@ -61,8 +61,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class PantheonEventsImplTest {
 
   private static final KeyPair KEY_PAIR1 = KeyPair.generate();
-  private static final tech.pegasys.pantheon.ethereum.core.Transaction TX1 = createTransaction(1);
-  private static final tech.pegasys.pantheon.ethereum.core.Transaction TX2 = createTransaction(2);
+  private static final org.hyperledger.besu.ethereum.core.Transaction TX1 = createTransaction(1);
+  private static final org.hyperledger.besu.ethereum.core.Transaction TX2 = createTransaction(2);
 
   @Mock private ProtocolSchedule<Void> mockProtocolSchedule;
   @Mock private ProtocolContext<Void> mockProtocolContext;
@@ -76,7 +76,7 @@ public class PantheonEventsImplTest {
   @Mock private ProtocolSpec<Void> mockProtocolSpec;
   @Mock private WorldStateArchive mockWorldStateArchive;
   @Mock private WorldState mockWorldState;
-  private tech.pegasys.pantheon.ethereum.core.BlockHeader fakeBlockHeader;
+  private org.hyperledger.besu.ethereum.core.BlockHeader fakeBlockHeader;
   private TransactionPool transactionPool;
   private BlockBroadcaster blockBroadcaster;
   private PantheonEventsImpl serviceImpl;
@@ -84,7 +84,7 @@ public class PantheonEventsImplTest {
   @Before
   public void setUp() {
     fakeBlockHeader =
-        new tech.pegasys.pantheon.ethereum.core.BlockHeader(
+        new org.hyperledger.besu.ethereum.core.BlockHeader(
             null, null, null, null, null, null, null, null, 1, 1, 1, 1, null, null, 1, null);
 
     when(mockBlockchain.getBlockHeader(any())).thenReturn(Optional.of(fakeBlockHeader));
@@ -192,7 +192,7 @@ public class PantheonEventsImplTest {
     return new Block(new BlockHeaderTestFixture().buildHeader(), body);
   }
 
-  private static tech.pegasys.pantheon.ethereum.core.Transaction createTransaction(
+  private static org.hyperledger.besu.ethereum.core.Transaction createTransaction(
       final int transactionNumber) {
     return new TransactionTestFixture()
         .nonce(transactionNumber)

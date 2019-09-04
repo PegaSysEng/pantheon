@@ -1,4 +1,4 @@
-package tech.pegasys.pantheon.ethereum.vm.generalstate;
+package org.hyperledger.besu.ethereum.vm.generalstate;
 
 import static GeneralStateReferenceTestTools.executeTest;
 import static GeneralStateReferenceTestTools.generateTestParametersForConfig;

@@ -1,4 +1,4 @@
-package tech.pegasys.pantheon.ethereum.vm.blockchain;
+package org.hyperledger.besu.ethereum.vm.blockchain;
 
 import static BlockchainReferenceTestTools.executeTest;
 import static BlockchainReferenceTestTools.generateTestParametersForConfig;
