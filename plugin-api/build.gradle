@@ -69,7 +69,6 @@ publishing {
   publications {
     mavenJava(MavenPublication) {
       groupId 'tech.pegasys.pantheon'
-      artifactId 'plugin-api'
       pom {
         name = 'Pantheon Plugins Library'
         description = 'Core Plugins Libraries for Pantheon'
