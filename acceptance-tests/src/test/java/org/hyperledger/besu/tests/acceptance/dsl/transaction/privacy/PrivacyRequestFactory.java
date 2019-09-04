@@ -13,16 +13,16 @@
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.privacy;
 
 import org.web3j.protocol.Web3jService;
-import org.web3j.protocol.besu.Besu;
+import org.web3j.protocol.pantheon.Pantheon;
 
 public class PrivacyRequestFactory {
-  private final Besu besuClient;
+  private final Pantheon besuClient;
 
   public PrivacyRequestFactory(final Web3jService web3jService) {
-    this.besuClient = Besu.build(web3jService);
+    this.besuClient = Pantheon.build(web3jService);
   }
 
-  public Besu getBesuClient() {
+  public Pantheon getBesuClient() {
     return besuClient;
   }
 }

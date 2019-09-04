@@ -22,12 +22,12 @@ import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.web3j.protocol.core.DefaultBlockParameter;
 import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.besu.Besu;
+import org.web3j.protocol.pantheon.Pantheon;
 
 public class GetAllPrivacyMarkerTransactionHashes implements Transaction<List<String>> {
   @Override
   public List<String> execute(final NodeRequests node) {
-    final Besu besu = node.privacy().getBesuClient();
+    final Pantheon besu = node.privacy().getBesuClient();
     final List<String> toReturn = new ArrayList<>();
     try {
       final long blockchainHeight =

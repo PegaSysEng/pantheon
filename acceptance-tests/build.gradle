@@ -31,8 +31,8 @@ dependencies {
   testImplementation project(':ethereum:permissioning')
   testImplementation project(':ethereum:rlp')
   testImplementation project(':metrics:core')
-  testImplementation project(':pantheon')
-  testImplementation project(path: ':pantheon', configuration: 'testArtifacts')
+  testImplementation project(':besu')
+  testImplementation project(path: ':besu', configuration: 'testArtifacts')
   testImplementation project(':plugins')
   testImplementation project(':services:kvstore')
   testImplementation project(':testutil')
@@ -61,15 +61,15 @@ dependencies {
 test.enabled = false
 
 sourceSets {
-  test { resources {  srcDirs "${rootDir}/pantheon/build/libs" } }
+  test { resources {  srcDirs "${rootDir}/besu/build/libs" } }
 }
 
-processTestResources.dependsOn(':pantheon:testJar')
+processTestResources.dependsOn(':besu:testJar')
 
 task acceptanceTest(type: Test) {
   dependsOn(rootProject.installDist)
-  systemProperty 'acctests.runPantheonAsProcess', 'true'
+  systemProperty 'acctests.runBesuAsProcess', 'true'
   mustRunAfter rootProject.subprojects*.test
-  description = 'Runs Pantheon acceptance tests.'
+  description = 'Runs Besu acceptance tests.'
   group = 'verification'
 }

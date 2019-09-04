@@ -41,3 +41,6 @@ Instructions for how to get started with developing on the Pantheon codebase. Pl
 ## Release Notes
 
 [Release Notes](CHANGELOG.md)
+
+for file in `find . -type f -name 'Pantheon*`; do echo "$file"; done
+for file in `find . -type f -name '*Pantheon*`; do mv -v "$file" "${file/Pantheon/Besu}"; done
