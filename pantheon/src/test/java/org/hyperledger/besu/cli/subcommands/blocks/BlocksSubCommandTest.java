@@ -70,7 +70,6 @@ public class BlocksSubCommandTest extends CommandTestAbstract {
           + "  -V, --version       Print version information and exit."
           + System.lineSeparator();
 
-
   private static final String EXPECTED_BLOCK_EXPORT_USAGE =
       "Usage: besu blocks export [-hV] [--end-block=<LONG>] [--start-block=<LONG>]"
           + System.lineSeparator()
