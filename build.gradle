@@ -26,7 +26,7 @@ plugins {
 }
 
 if (!JavaVersion.current().java11Compatible) {
-  throw new GradleException("Java 11 or later is required to build Pantheon.\n" +
+  throw new GradleException("Java 11 or later is required to build Besu.\n" +
   "  Detected version ${JavaVersion.current()}")
 }
 
@@ -372,7 +372,7 @@ subprojects {
 
   task integrationTest(type: Test, dependsOn: ["compileTestJava"]) {
     group = "verification"
-    description = "Runs the Pantheon integration tests"
+    description = "Runs the Besu integration tests"
 
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
@@ -408,7 +408,7 @@ apply plugin: 'application'
 mainClassName = 'org.hyperledger.besu.Besu'
 applicationDefaultJvmArgs = [
   '-Dvertx.disableFileCPResolving=true',
-  '-Dpantheon.home=PANTHEON_HOME',
+  '-Dbesu.home=BESU_HOME',
   // We shutdown log4j ourselves, as otherwise this shutdown hook runs before our own and whatever
   // happens during shutdown is not logged.
   '-Dlog4j.shutdownHookEnabled=false',
@@ -419,10 +419,10 @@ applicationDefaultJvmArgs = [
 ]
 
 run {
-  args project.hasProperty("pantheon.run.args") ? project.property("pantheon.run.args").toString().split("\\s+") : []
+  args project.hasProperty("besu.run.args") ? project.property("besu.run.args").toString().split("\\s+") : []
   doFirst {
     applicationDefaultJvmArgs = applicationDefaultJvmArgs.collect {
-      it.replace('PANTHEON_HOME', "$buildDir/pantheon")
+      it.replace('BESU_HOME', "$buildDir/besu")
     }
   }
 }
@@ -434,8 +434,8 @@ startScripts {
   }
 
   doLast {
-    unixScript.text = unixScript.text.replace('PANTHEON_HOME', '\$APP_HOME')
-    windowsScript.text = windowsScript.text.replace('PANTHEON_HOME', '%~dp0..')
+    unixScript.text = unixScript.text.replace('BESU_HOME', '\$APP_HOME')
+    windowsScript.text = windowsScript.text.replace('BESU_HOME', '%~dp0..')
 
     // Prevent the error originating from the 8191 chars limit on Windows
     windowsScript.text =
@@ -447,7 +447,7 @@ startScripts {
 }
 
 dependencies {
-  compile project(':pantheon')
+  compile project(':besu')
   errorprone 'com.google.errorprone:error_prone_core'
 }
 
@@ -485,7 +485,7 @@ distZip {
 tasks.register("dockerDistUntar") {
   dependsOn distTar
   dependsOn distZip
-  def dockerBuildDir = "build/docker-pantheon/"
+  def dockerBuildDir = "build/docker-besu/"
   def distTarFile = distTar.outputs.files.singleFile
   def distTarFileName = distTar.outputs.files.singleFile.name.replace(".tar.gz", "")
 
@@ -495,15 +495,15 @@ tasks.register("dockerDistUntar") {
       from tarTree(distTarFile)
       into(dockerBuildDir)
     }
-    file("${dockerBuildDir}/${distTarFileName}").renameTo("${dockerBuildDir}/pantheon")
+    file("${dockerBuildDir}/${distTarFileName}").renameTo("${dockerBuildDir}/besu")
   }
 }
 
 task distDocker(type: Exec) {
   dependsOn dockerDistUntar
   def dockerBuildVersion = project.hasProperty('release.releaseVersion') ? project.property('release.releaseVersion') : "${rootProject.version}"
-  def image = project.hasProperty('release.releaseVersion') ? "pegasyseng/pantheon:" + project.property('release.releaseVersion') : "pegasyseng/pantheon:${project.version}"
-  def dockerBuildDir = "build/docker-pantheon/"
+  def image = project.hasProperty('release.releaseVersion') ? "pegasyseng/besu:" + project.property('release.releaseVersion') : "pegasyseng/besu:${project.version}"
+  def dockerBuildDir = "build/docker-besu/"
   workingDir "${dockerBuildDir}"
 
   doFirst {
