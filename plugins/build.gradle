@@ -68,7 +68,8 @@ check.dependsOn('checkAPIChanges')
 publishing {
   publications {
     mavenJava(MavenPublication) {
-      groupId 'tech.pegasys.pantheon.plugin-api'
+      groupId 'tech.pegasys.pantheon'
+      artifactId 'plugin-api'
       pom {
         name = 'Pantheon Plugins Library'
         description = 'Core Plugins Libraries for Pantheon'
