@@ -28,3 +28,4 @@ out/
 site/
 /kubernetes/reports/
 /kubernetes/pantheon-*.tar.gz
+testutil/src/main/java/tech/pegasys/pantheon/cli/

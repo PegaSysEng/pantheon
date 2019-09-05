@@ -26,7 +26,7 @@ jar {
 }
 
 dependencies {
-  implementation project(':plugins')
+  implementation project(':plugin-api')
   implementation project(':util')
 
   implementation 'com.fasterxml.jackson.core:jackson-databind'

@@ -32,7 +32,7 @@ dependencies {
   implementation project(':ethereum:rlp')
   implementation project(':ethereum:trie')
   implementation project(':metrics:core')
-  implementation project(':plugins')
+  implementation project(':plugin-api')
   implementation project(':services:kvstore')
 
   //TODO hack - otherwise the JAR is not included in the lib (i.e. not flagged as needed)
