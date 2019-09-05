@@ -670,6 +670,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private Collection<EnodeURL> staticNodes;
   private PantheonController<?> pantheonController;
   private StandaloneCommand standaloneCommands;
+  private PantheonConfiguration pluginCommonConfiguration;
   private final Supplier<ObservableMetricsSystem> metricsSystem =
       Suppliers.memoize(() -> PrometheusMetricsSystem.init(metricsConfiguration()));
 
@@ -742,13 +743,14 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     }
   }
 
-  /**
-   * As this is needed by the StorageProvider, it must be created after the configuration parsing
-   * and before the controller is built.
-   */
   private void addConfigurationService() {
-    pantheonPluginContext.addService(
-        PantheonConfiguration.class, new PantheonConfigurationImpl(dataDir()));
+    pluginCommonConfiguration = new PantheonConfigurationImpl(dataDir());
+    pantheonPluginContext.addService(PantheonConfiguration.class, pluginCommonConfiguration);
+  }
+
+  @VisibleForTesting
+  public void setPantheonConfiguration(final PantheonConfiguration pluginCommonConfiguration) {
+    this.pluginCommonConfiguration = pluginCommonConfiguration;
   }
 
   private PantheonCommand handleStandaloneCommand() {
@@ -1241,6 +1243,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private KeyValueStorageProvider keyStorageProvider(final String name) {
     return new KeyValueStorageProviderBuilder()
         .withStorageFactory(storageService.getByName(name))
+        .withCommonConfiguration(pluginCommonConfiguration)
         .build();
   }
 

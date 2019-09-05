@@ -26,25 +26,30 @@ import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPoolConfiguration;
 import tech.pegasys.pantheon.ethereum.mainnet.PrecompiledContract;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBFactoryConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValuePrivacyStorageFactory;
+import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.testutil.TestClock;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.function.Supplier;
+import java.util.Arrays;
 
-import com.google.common.base.Suppliers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class PrivacyTest {
+
+  private static final int MAX_OPEN_FILES = 1024;
+  private static final long CACHE_CAPACITY = 8388608;
+  private static final int MAX_BACKGROUND_COMPACTIONS = 4;
+  private static final int BACKGROUND_THREAD_COUNT = 4;
 
   private static final Integer ADDRESS = 9;
   @Rule public final TemporaryFolder folder = new TemporaryFolder();
@@ -52,23 +57,12 @@ public class PrivacyTest {
   @Test
   public void privacyPrecompiled() throws IOException {
     final Path dataDir = folder.newFolder().toPath();
-
-    final Supplier<RocksDBConfiguration> configurationSupplier =
-        Suppliers.memoize(() -> RocksDBConfiguration.builder().databaseDir(dataDir).build());
-    final KeyValueStorageProvider storageProvider =
-        new KeyValueStorageProviderBuilder()
-            .withStorageFactory(
-                new RocksDBKeyValuePrivacyStorageFactory(
-                    configurationSupplier, Collections.emptyList(), new NoOpMetricsSystem()))
-            .build();
-
     final PrivacyParameters privacyParameters =
         new PrivacyParameters.Builder()
             .setPrivacyAddress(ADDRESS)
             .setEnabled(true)
-            .setStorageProvider(storageProvider)
+            .setStorageProvider(createKeyValueStorageProvider(dataDir))
             .build();
-
     final PantheonController<?> pantheonController =
         new PantheonController.Builder()
             .fromGenesisConfig(GenesisConfigFile.mainnet())
@@ -94,5 +88,20 @@ public class PrivacyTest {
             .get(privacyContractAddress, Account.DEFAULT_VERSION);
 
     assertThat(precompiledContract.getName()).isEqualTo("Privacy");
+  }
+
+  private StorageProvider createKeyValueStorageProvider(final Path dbAhead) throws IOException {
+    return new KeyValueStorageProviderBuilder()
+        .withStorageFactory(
+            new RocksDBKeyValuePrivacyStorageFactory(
+                new RocksDBFactoryConfiguration(
+                    MAX_OPEN_FILES,
+                    MAX_BACKGROUND_COMPACTIONS,
+                    BACKGROUND_THREAD_COUNT,
+                    CACHE_CAPACITY),
+                Arrays.asList(KeyValueSegmentIdentifier.values()),
+                new NoOpMetricsSystem()))
+        .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
+        .build();
   }
 }

@@ -16,19 +16,14 @@ import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.PantheonContext;
 import tech.pegasys.pantheon.plugin.PantheonPlugin;
-import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.plugin.services.StorageService;
-import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.function.Supplier;
 
 import com.google.auto.service.AutoService;
-import com.google.common.base.Suppliers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,19 +53,12 @@ public class RocksDBPlugin implements PantheonPlugin {
             picoCLIOptions -> picoCLIOptions.addPicoCLIOptions(NAME, options),
             () -> LOG.error("Failed to register CLI options due to missing PicoCLIO options."));
 
-    context
-        .getService(StorageService.class)
-        .ifPresentOrElse(
-            this::createAndRegister,
-            () -> LOG.error("Failed to register KeyValueFactory due to missing StorageService."));
-
     LOG.info("Plugin registered.");
   }
 
   @Override
   public void start() {
     LOG.info("Starting plugin.");
-    // TODO should this be called twice?
     LOG.debug("Applied configuration: {}", options.toString());
     context
         .getService(StorageService.class)
@@ -101,26 +89,10 @@ public class RocksDBPlugin implements PantheonPlugin {
     // TODO parse all cmd & create the common config before PantheonController is built
     final List<SegmentIdentifier> segments = service.getAllSegmentIdentifiers();
 
-    final Supplier<PantheonConfiguration> pantheonConfigurationSupplier =
-        Suppliers.memoize(
-            () ->
-                context
-                    .getService(PantheonConfiguration.class)
-                    .orElseThrow(
-                        () ->
-                            new StorageException(
-                                "Failed to start due to missing PantheonConfiguration.")));
-
-    final Supplier<RocksDBConfiguration> configurationSupplier =
-        Suppliers.memoize(
-            () -> {
-              final Path dataDir = pantheonConfigurationSupplier.get().getStoragePath();
-              return options.toDomainObject().databaseDir(dataDir).build();
-            });
-
-    factory = new RocksDBKeyValueStorageFactory(configurationSupplier, segments, metricsSystem);
+    final RocksDBFactoryConfiguration configuration = options.toDomainObject();
+    factory = new RocksDBKeyValueStorageFactory(configuration, segments, metricsSystem);
     privacyFactory =
-        new RocksDBKeyValuePrivacyStorageFactory(configurationSupplier, segments, metricsSystem);
+        new RocksDBKeyValuePrivacyStorageFactory(configuration, segments, metricsSystem);
 
     service.registerKeyValueStorage(factory);
     service.registerKeyValueStorage(privacyFactory);

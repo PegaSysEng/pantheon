@@ -25,8 +25,9 @@ import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBFactoryConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValuePrivacyStorageFactory;
+import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeRunner;
@@ -52,6 +53,10 @@ import org.awaitility.Awaitility;
 public class PrivacyNode implements AutoCloseable {
 
   private static final Logger LOG = LogManager.getLogger();
+  private static final int MAX_OPEN_FILES = 1024;
+  private static final long CACHE_CAPACITY = 8388608;
+  private static final int MAX_BACKGROUND_COMPACTIONS = 4;
+  private static final int BACKGROUND_THREAD_COUNT = 4;
 
   private final OrionTestHarness orion;
   private final PantheonNode pantheon;
@@ -139,21 +144,13 @@ public class PrivacyNode implements AutoCloseable {
 
     try {
       final Path dataDir = Files.createTempDirectory("acctest-privacy");
-      final StorageProvider storage =
-          new KeyValueStorageProviderBuilder()
-              .withStorageFactory(
-                  new RocksDBKeyValuePrivacyStorageFactory(
-                      () -> RocksDBConfiguration.builder().databaseDir(dataDir).build(),
-                      Arrays.asList(KeyValueSegmentIdentifier.values()),
-                      new NoOpMetricsSystem()))
-              .build();
 
       privacyParameters =
           new PrivacyParameters.Builder()
               .setEnabled(true)
               .setEnclaveUrl(orion.clientUrl())
               .setEnclavePublicKeyUsingFile(orion.getConfig().publicKeys().get(0).toFile())
-              .setStorageProvider(storage)
+              .setStorageProvider(createKeyValueStorageProvider(dataDir))
               .setPrivateKeyPath(KeyPairUtil.getDefaultKeyFile(pantheon.homeDirectory()).toPath())
               .build();
     } catch (IOException e) {
@@ -205,5 +202,20 @@ public class PrivacyNode implements AutoCloseable {
 
   public NodeConfiguration getConfiguration() {
     return pantheon.getConfiguration();
+  }
+
+  private StorageProvider createKeyValueStorageProvider(final Path dbAhead) {
+    return new KeyValueStorageProviderBuilder()
+        .withStorageFactory(
+            new RocksDBKeyValuePrivacyStorageFactory(
+                new RocksDBFactoryConfiguration(
+                    MAX_OPEN_FILES,
+                    MAX_BACKGROUND_COMPACTIONS,
+                    BACKGROUND_THREAD_COUNT,
+                    CACHE_CAPACITY),
+                Arrays.asList(KeyValueSegmentIdentifier.values()),
+                new NoOpMetricsSystem()))
+        .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
+        .build();
   }
 }

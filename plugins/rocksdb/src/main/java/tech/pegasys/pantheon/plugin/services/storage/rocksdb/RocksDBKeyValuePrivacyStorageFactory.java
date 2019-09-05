@@ -15,40 +15,23 @@ package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.function.Supplier;
-
-import com.google.common.base.Suppliers;
 
 @Deprecated
 public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorageFactory {
 
-  private static final String PRIVATE_DATABASE_PATH = "private";
+  // TODO this needs to be used as the subpath
+  //  private static final String PRIVATE_DATABASE_PATH = "private";
 
   public RocksDBKeyValuePrivacyStorageFactory(
-      final Supplier<RocksDBConfiguration> configurationSupplier,
+      final RocksDBFactoryConfiguration configuration,
       final List<SegmentIdentifier> segments,
       final ObservableMetricsSystem metricsSystem) {
-    super(getPrivacyConfiguration(configurationSupplier), segments, metricsSystem);
+    super(configuration, segments, metricsSystem);
   }
 
   @Override
   public String getName() {
     return "rocksdb-privacy";
-  }
-
-  private static Supplier<RocksDBConfiguration> getPrivacyConfiguration(
-      final Supplier<RocksDBConfiguration> configurationSupplier) {
-    return Suppliers.memoize(
-        () -> {
-          final Path privateDbPath =
-              configurationSupplier.get().getDatabaseDir().resolve(PRIVATE_DATABASE_PATH);
-
-          return RocksDBConfiguration.builder()
-              .databaseDir(privateDbPath)
-              .label("private_state")
-              .build();
-        });
   }
 }

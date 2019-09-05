@@ -37,6 +37,10 @@ import org.rocksdb.WriteOptions;
 
 public class RocksDBKeyValueStorage implements KeyValueStorage {
 
+  static {
+    RocksDbUtil.loadNativeLibrary();
+  }
+
   private static final Logger LOG = LogManager.getLogger();
 
   private final Options options;

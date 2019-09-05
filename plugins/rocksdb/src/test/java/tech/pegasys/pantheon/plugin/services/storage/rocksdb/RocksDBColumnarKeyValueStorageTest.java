@@ -101,7 +101,7 @@ public class RocksDBColumnarKeyValueStorageTest extends AbstractKeyValueStorageT
 
   private SegmentedKeyValueStorage<ColumnFamilyHandle> createSegmentedStore() throws Exception {
     return new RocksDBColumnarKeyValueStorage(
-        RocksDBConfiguration.builder().databaseDir(folder.newFolder().toPath()).build(),
+        new RocksDBConfigurationBuilder().databaseDir(folder.newFolder().toPath()).build(),
         Arrays.asList(TestSegment.FOO, TestSegment.BAR),
         new NoOpMetricsSystem());
   }

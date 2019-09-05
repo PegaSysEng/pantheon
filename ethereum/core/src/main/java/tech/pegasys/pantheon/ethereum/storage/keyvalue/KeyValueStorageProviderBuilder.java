@@ -19,16 +19,17 @@ import static tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIde
 import static tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier.PRUNING_STATE;
 import static tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier.WORLD_STATE;
 
+import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageFactory;
 import tech.pegasys.pantheon.services.kvstore.LimitedInMemoryKeyValueStorage;
 
 public class KeyValueStorageProviderBuilder {
 
-  private static final long DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE = 5_000L;
+  private static final long DEFAULT_WORLD_STATE_PRE_IMAGE_CACHE_SIZE = 5_000L;
 
-  private long worldStatePreimageCacheSize = DEFAULT_WORLD_STATE_PREIMAGE_CACHE_SIZE;
   private KeyValueStorageFactory storageFactory;
+  private PantheonConfiguration commonConfiguration;
 
   public KeyValueStorageProviderBuilder withStorageFactory(
       final KeyValueStorageFactory storageFactory) {
@@ -36,25 +37,28 @@ public class KeyValueStorageProviderBuilder {
     return this;
   }
 
-  public KeyValueStorageProviderBuilder withWorldStatePreimageCacheSize(
-      final long worldStatePreimageCacheSize) {
-    this.worldStatePreimageCacheSize = worldStatePreimageCacheSize;
+  public KeyValueStorageProviderBuilder withCommonConfiguration(
+      final PantheonConfiguration commonConfiguration) {
+    this.commonConfiguration = commonConfiguration;
     return this;
   }
 
   public KeyValueStorageProvider build() {
     checkNotNull(storageFactory, "Cannot build a storage provider without a storage factory.");
+    checkNotNull(
+        commonConfiguration,
+        "Cannot build a storage provider without the plugin common configuration.");
 
     final KeyValueStorage worldStatePreImageStorage =
-        new LimitedInMemoryKeyValueStorage(worldStatePreimageCacheSize);
+        new LimitedInMemoryKeyValueStorage(DEFAULT_WORLD_STATE_PRE_IMAGE_CACHE_SIZE);
 
     return new KeyValueStorageProvider(
-        storageFactory.create(BLOCKCHAIN),
-        storageFactory.create(WORLD_STATE),
+        storageFactory.create(BLOCKCHAIN, commonConfiguration),
+        storageFactory.create(WORLD_STATE, commonConfiguration),
         worldStatePreImageStorage,
-        storageFactory.create(PRIVATE_TRANSACTIONS),
-        storageFactory.create(PRIVATE_STATE),
-        storageFactory.create(PRUNING_STATE),
+        storageFactory.create(PRIVATE_TRANSACTIONS, commonConfiguration),
+        storageFactory.create(PRIVATE_STATE, commonConfiguration),
+        storageFactory.create(PRUNING_STATE, commonConfiguration),
         storageFactory.isSegmentIsolationSupported());
   }
 }

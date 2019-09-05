@@ -50,6 +50,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageFactory;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.StorageServiceImpl;
@@ -108,6 +109,7 @@ public abstract class CommandTestAbstract {
   @Mock protected JsonBlockImporter<?> jsonBlockImporter;
   @Mock protected RlpBlockImporter rlpBlockImporter;
   @Mock protected StorageServiceImpl storageService;
+  @Mock protected PantheonConfiguration commonPluginConfiguration;
   @Mock protected KeyValueStorageFactory rocksDBStorageFactory;
   @Mock protected KeyValueStorageFactory rocksDBSPrivacyStorageFactory;
 
@@ -248,6 +250,8 @@ public abstract class CommandTestAbstract {
             mockPantheonPluginContext,
             environment,
             storageService);
+
+    pantheonCommand.setPantheonConfiguration(commonPluginConfiguration);
 
     // parse using Ansi.OFF to be able to assert on non formatted output results
     pantheonCommand.parse(

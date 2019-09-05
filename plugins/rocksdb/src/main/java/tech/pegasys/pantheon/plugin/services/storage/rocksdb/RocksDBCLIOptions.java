@@ -70,12 +70,9 @@ public class RocksDBCLIOptions {
     return options;
   }
 
-  public RocksDBConfiguration.Builder toDomainObject() {
-    return RocksDBConfiguration.builder()
-        .maxOpenFiles(maxOpenFiles)
-        .cacheCapacity(cacheCapacity)
-        .maxBackgroundCompactions(maxBackgroundCompactions)
-        .backgroundThreadCount(backgroundThreadCount);
+  public RocksDBFactoryConfiguration toDomainObject() {
+    return new RocksDBFactoryConfiguration(
+        maxOpenFiles, maxBackgroundCompactions, backgroundThreadCount, cacheCapacity);
   }
 
   @Override

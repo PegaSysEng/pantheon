@@ -47,8 +47,9 @@ import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBu
 import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBFactoryConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValueStorageFactory;
+import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
@@ -63,7 +64,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Suppliers;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -83,6 +83,11 @@ import org.junit.rules.TemporaryFolder;
 
 /** Tests for {@link Runner}. */
 public final class RunnerTest {
+
+  private static final int MAX_OPEN_FILES = 1024;
+  private static final long CACHE_CAPACITY = 8388608;
+  private static final int MAX_BACKGROUND_COMPACTIONS = 4;
+  private static final int BACKGROUND_THREAD_COUNT = 4;
 
   @Rule public final TemporaryFolder temp = new TemporaryFolder();
 
@@ -337,10 +342,14 @@ public final class RunnerTest {
     return new KeyValueStorageProviderBuilder()
         .withStorageFactory(
             new RocksDBKeyValueStorageFactory(
-                Suppliers.memoize(
-                    () -> RocksDBConfiguration.builder().databaseDir(dbAhead).build()),
+                new RocksDBFactoryConfiguration(
+                    MAX_OPEN_FILES,
+                    MAX_BACKGROUND_COMPACTIONS,
+                    BACKGROUND_THREAD_COUNT,
+                    CACHE_CAPACITY),
                 Arrays.asList(KeyValueSegmentIdentifier.values()),
                 new NoOpMetricsSystem()))
+        .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
         .build();
   }
 

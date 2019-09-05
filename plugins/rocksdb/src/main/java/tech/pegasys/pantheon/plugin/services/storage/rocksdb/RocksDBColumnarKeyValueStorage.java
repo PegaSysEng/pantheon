@@ -52,6 +52,10 @@ import org.rocksdb.WriteOptions;
 public class RocksDBColumnarKeyValueStorage
     implements SegmentedKeyValueStorage<ColumnFamilyHandle>, Closeable {
 
+  static {
+    RocksDbUtil.loadNativeLibrary();
+  }
+
   private static final Logger LOG = LogManager.getLogger();
   private static final String DEFAULT_COLUMN = "default";
 
