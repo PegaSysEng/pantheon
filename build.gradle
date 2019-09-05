@@ -285,7 +285,7 @@ subprojects {
     publishing {
       publications {
         mavenJava(MavenPublication) {
-          groupId "tech.pegasys.besu.internal"
+          groupId "org.hyperledger.besu.internal"
           version "${project.version}"
           from components.java
           artifact sourcesJar
@@ -407,7 +407,7 @@ subprojects {
 jar { enabled = false }
 
 apply plugin: 'application'
-mainClassName = 'tech.pegasys.besu.Besu'
+mainClassName = 'org.hyperledger.besu.Besu'
 applicationDefaultJvmArgs = [
   '-Dvertx.disableFileCPResolving=true',
   '-Dbesu.home=PANTHEON_HOME',
