@@ -69,7 +69,9 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
   private final Map<Node, PantheonPluginContextImpl> pantheonPluginContextMap = new HashMap<>();
 
   private PantheonPluginContextImpl buildPluginContext(
-      final PantheonNode node, final StorageServiceImpl storageService) {
+      final PantheonNode node,
+      final StorageServiceImpl storageService,
+      final PantheonConfiguration commonPluginConfiguration) {
     final CommandLine commandLine = new CommandLine(CommandSpec.create());
     final PantheonPluginContextImpl pantheonPluginContext = new PantheonPluginContextImpl();
     pantheonPluginContext.addService(StorageService.class, storageService);
@@ -86,8 +88,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     commandLine.parseArgs(node.getConfiguration().getExtraCLIOptions().toArray(new String[0]));
 
-    pantheonPluginContext.addService(
-        PantheonConfiguration.class, new PantheonConfigurationImpl(Files.createTempDir().toPath()));
+    pantheonPluginContext.addService(PantheonConfiguration.class, commonPluginConfiguration);
 
     return pantheonPluginContext;
   }
@@ -99,9 +100,11 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     }
 
     final StorageServiceImpl storageService = new StorageServiceImpl();
+    final PantheonConfiguration commonPluginConfiguration =
+        new PantheonConfigurationImpl(Files.createTempDir().toPath());
     final PantheonPluginContextImpl pantheonPluginContext =
         pantheonPluginContextMap.computeIfAbsent(
-            node, n -> buildPluginContext(node, storageService));
+            node, n -> buildPluginContext(node, storageService, commonPluginConfiguration));
 
     final ObservableMetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
     final List<EnodeURL> bootnodes =
@@ -119,6 +122,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
     final KeyValueStorageProvider storageProvider =
         new KeyValueStorageProviderBuilder()
             .withStorageFactory(storageService.getByName("rocksdb"))
+            .withCommonConfiguration(commonPluginConfiguration)
             .build();
 
     final PantheonController<?> pantheonController;

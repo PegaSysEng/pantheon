@@ -55,18 +55,26 @@ public class RocksDBPlugin implements PantheonPlugin {
             picoCLIOptions -> picoCLIOptions.addPicoCLIOptions(NAME, options),
             () -> LOG.error("Failed to register CLI options due to missing PicoCLIO options."));
 
+    context
+        .getService(StorageService.class)
+        .ifPresentOrElse(
+            this::createAndRegister,
+            () -> LOG.error("Failed to register KeyValueFactory due to missing StorageService."));
+
     LOG.info("Plugin registered.");
   }
 
   @Override
   public void start() {
     LOG.info("Starting plugin.");
-    LOG.debug("Applied configuration: {}", options.toString());
-    context
-        .getService(StorageService.class)
-        .ifPresentOrElse(
-            this::createAndRegister,
-            () -> LOG.error("Failed to register KeyValueFactory due to missing StorageService."));
+    if (factory == null) {
+      LOG.debug("Applied configuration: {}", options.toString());
+      context
+          .getService(StorageService.class)
+          .ifPresentOrElse(
+              this::createAndRegister,
+              () -> LOG.error("Failed to register KeyValueFactory due to missing StorageService."));
+    }
   }
 
   @Override
