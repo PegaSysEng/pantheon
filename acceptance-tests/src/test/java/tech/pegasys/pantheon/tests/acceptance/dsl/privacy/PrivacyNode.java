@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.enclave.types.SendRequestLegacy;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
@@ -41,7 +42,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -144,7 +144,7 @@ public class PrivacyNode implements AutoCloseable {
               .withStorageFactory(
                   new RocksDBKeyValuePrivacyStorageFactory(
                       () -> RocksDBConfiguration.builder().databaseDir(dataDir).build(),
-                      Collections.emptyList(),
+                      Arrays.asList(KeyValueSegmentIdentifier.values()),
                       new NoOpMetricsSystem()))
               .build();
 
