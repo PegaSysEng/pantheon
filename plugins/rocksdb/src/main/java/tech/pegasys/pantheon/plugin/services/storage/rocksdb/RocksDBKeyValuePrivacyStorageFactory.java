@@ -17,14 +17,15 @@ import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
 import java.util.List;
 
+import com.google.common.base.Supplier;
+
 @Deprecated
 public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorageFactory {
 
-  // TODO this needs to be used as the subpath
-  //  private static final String PRIVATE_DATABASE_PATH = "private";
+  // private static final String PRIVATE_DATABASE_PATH = "private";
 
   public RocksDBKeyValuePrivacyStorageFactory(
-      final RocksDBFactoryConfiguration configuration,
+      final Supplier<RocksDBFactoryConfiguration> configuration,
       final List<SegmentIdentifier> segments,
       final ObservableMetricsSystem metricsSystem) {
     super(configuration, segments, metricsSystem);

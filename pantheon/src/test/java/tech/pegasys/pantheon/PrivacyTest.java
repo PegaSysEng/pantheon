@@ -94,11 +94,12 @@ public class PrivacyTest {
     return new KeyValueStorageProviderBuilder()
         .withStorageFactory(
             new RocksDBKeyValuePrivacyStorageFactory(
-                new RocksDBFactoryConfiguration(
-                    MAX_OPEN_FILES,
-                    MAX_BACKGROUND_COMPACTIONS,
-                    BACKGROUND_THREAD_COUNT,
-                    CACHE_CAPACITY),
+                () ->
+                    new RocksDBFactoryConfiguration(
+                        MAX_OPEN_FILES,
+                        MAX_BACKGROUND_COMPACTIONS,
+                        BACKGROUND_THREAD_COUNT,
+                        CACHE_CAPACITY),
                 Arrays.asList(KeyValueSegmentIdentifier.values()),
                 new NoOpMetricsSystem()))
         .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))

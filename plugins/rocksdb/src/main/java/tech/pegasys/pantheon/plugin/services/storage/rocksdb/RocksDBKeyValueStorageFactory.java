@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -42,12 +43,12 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   private SegmentedKeyValueStorage<?> segmentedStorage;
   private KeyValueStorage unsegmentedStorage;
 
-  private final RocksDBFactoryConfiguration configuration;
+  private final Supplier<RocksDBFactoryConfiguration> configuration;
   private final List<SegmentIdentifier> segments;
   private final ObservableMetricsSystem metricsSystem;
 
   public RocksDBKeyValueStorageFactory(
-      final RocksDBFactoryConfiguration configuration,
+      final Supplier<RocksDBFactoryConfiguration> configuration,
       final List<SegmentIdentifier> segments,
       final ObservableMetricsSystem metricsSystem) {
     this.configuration = configuration;
@@ -101,7 +102,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     }
 
     final RocksDBConfiguration rocksDBConfiguration =
-        RocksDBConfigurationBuilder.from(configuration)
+        RocksDBConfigurationBuilder.from(configuration.get())
             .databaseDir(commonConfiguration.getStoragePath())
             .build();
 

@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.auto.service.AutoService;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -89,7 +91,8 @@ public class RocksDBPlugin implements PantheonPlugin {
     // TODO parse all cmd & create the common config before PantheonController is built
     final List<SegmentIdentifier> segments = service.getAllSegmentIdentifiers();
 
-    final RocksDBFactoryConfiguration configuration = options.toDomainObject();
+    final Supplier<RocksDBFactoryConfiguration> configuration =
+        Suppliers.memoize(options::toDomainObject);
     factory = new RocksDBKeyValueStorageFactory(configuration, segments, metricsSystem);
     privacyFactory =
         new RocksDBKeyValuePrivacyStorageFactory(configuration, segments, metricsSystem);
