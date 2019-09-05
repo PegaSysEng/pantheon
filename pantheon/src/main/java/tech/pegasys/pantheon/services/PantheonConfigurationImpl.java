@@ -14,7 +14,9 @@ package tech.pegasys.pantheon.services;
 
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 
+import java.net.URI;
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class PantheonConfigurationImpl implements PantheonConfiguration {
 
@@ -27,5 +29,10 @@ public class PantheonConfigurationImpl implements PantheonConfiguration {
   @Override
   public Path getStoragePath() {
     return storagePath;
+  }
+
+  @Override
+  public Optional<URI> getEnclaveUrl() {
+    return Optional.empty();
   }
 }

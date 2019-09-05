@@ -135,7 +135,6 @@ public class PrivacyNode implements AutoCloseable {
               .setEnabled(true)
               .setEnclaveUrl(orion.clientUrl())
               .setEnclavePublicKeyUsingFile(orion.getConfig().publicKeys().get(0).toFile())
-              .setDataDir(Files.createTempDirectory("acctest-privacy"))
               .setPrivateKeyPath(KeyPairUtil.getDefaultKeyFile(pantheon.homeDirectory()).toPath())
               .build();
     } catch (IOException e) {
