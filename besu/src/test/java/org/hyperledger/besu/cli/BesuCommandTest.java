@@ -749,7 +749,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
     final String configFile = this.getClass().getResource("/partial_config.toml").getFile();
     final String expectedCoinbase = "0x0000000000000000000000000000000000000004";
-    setEnvironemntVariable("BESU_MINER_COINBASE", expectedCoinbase);
+    setEnvironemntVariable("PANTHEON_MINER_COINBASE", expectedCoinbase);
     parseCommand("--config-file", configFile);
 
     verify(mockControllerBuilder)
@@ -767,7 +767,7 @@ public class BesuCommandTest extends CommandTestAbstract {
 
     final String configFile = this.getClass().getResource("/partial_config.toml").getFile();
     final String expectedCoinbase = "0x0000000000000000000000000000000000000006";
-    setEnvironemntVariable("BESU_MINER_COINBASE", "0x0000000000000000000000000000000000000004");
+    setEnvironemntVariable("PANTHEON_MINER_COINBASE", "0x0000000000000000000000000000000000000004");
     parseCommand("--config-file", configFile, "--miner-coinbase", expectedCoinbase);
 
     verify(mockControllerBuilder)
