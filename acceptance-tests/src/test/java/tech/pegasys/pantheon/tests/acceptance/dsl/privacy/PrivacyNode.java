@@ -21,6 +21,11 @@ import tech.pegasys.pantheon.enclave.types.SendRequest;
 import tech.pegasys.pantheon.enclave.types.SendRequestLegacy;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
+import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
+import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValuePrivacyStorageFactory;
 import tech.pegasys.pantheon.tests.acceptance.dsl.condition.Condition;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.node.PantheonNodeRunner;
@@ -36,6 +41,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +50,7 @@ import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 
 public class PrivacyNode implements AutoCloseable {
+
   private static final Logger LOG = LogManager.getLogger();
 
   private final OrionTestHarness orion;
@@ -129,12 +136,24 @@ public class PrivacyNode implements AutoCloseable {
     orion.start();
 
     final PrivacyParameters privacyParameters;
+
     try {
+      final Path dataDir = Files.createTempDirectory("acctest-privacy");
+      final StorageProvider storage =
+          new KeyValueStorageProviderBuilder()
+              .withStorageFactory(
+                  new RocksDBKeyValuePrivacyStorageFactory(
+                      () -> RocksDBConfiguration.builder().databaseDir(dataDir).build(),
+                      Collections.emptyList(),
+                      new NoOpMetricsSystem()))
+              .build();
+
       privacyParameters =
           new PrivacyParameters.Builder()
               .setEnabled(true)
               .setEnclaveUrl(orion.clientUrl())
               .setEnclavePublicKeyUsingFile(orion.getConfig().publicKeys().get(0).toFile())
+              .setStorageProvider(storage)
               .setPrivateKeyPath(KeyPairUtil.getDefaultKeyFile(pantheon.homeDirectory()).toPath())
               .build();
     } catch (IOException e) {
