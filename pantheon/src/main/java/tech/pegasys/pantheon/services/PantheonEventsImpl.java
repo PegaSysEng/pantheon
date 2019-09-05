@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.services;
 
-import tech.pegasys.pantheon.ethereum.core.Block;
-import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
@@ -29,39 +27,33 @@ public class PantheonEventsImpl implements PantheonEvents {
   }
 
   @Override
-  public Object addNewBlockPropagatedListener(final NewBlockPropagatedListener listener) {
+  public Object addBlockPropagatedListener(final BlockPropagatedListener listener) {
     return blockBroadcaster.subscribePropagateNewBlocks(
-        block -> dispatchNewBlockPropagatedMessage(block, listener));
+        block -> listener.newBlockPropagated(block.getHeader()));
   }
 
   @Override
-  public void removeNewBlockPropagatedListener(final Object listenerIdentifier) {
+  public void removeBlockPropagatedListener(final Object listenerIdentifier) {
     if (listenerIdentifier instanceof Long) {
       blockBroadcaster.unsubscribePropagateNewBlocks((Long) listenerIdentifier);
     }
   }
 
-  private void dispatchNewBlockPropagatedMessage(
-      final Block block, final NewBlockPropagatedListener listener) {
-    listener.newBlockPropagated(block.getHeader());
+  @Override
+  public Object addTransactionAddedListener(final TransactionAddedListener listener) {
+    return transactionPool.subscribePendingTransactions(listener::transactionAdded);
   }
 
   @Override
-  public Object addNewTransactionAddedListener(final NewTransactionAddedListener listener) {
-    return transactionPool.subscribePendingTransactions(
-        transaction -> dispatchTransactionAddedMessage(transaction, listener));
-  }
-
-  @Override
-  public void removeNewTransactionAddedListener(final Object listenerIdentifier) {
+  public void removeTransactionAddedListener(final Object listenerIdentifier) {
     if (listenerIdentifier instanceof Long) {
       transactionPool.unsubscribePendingTransactions((Long) listenerIdentifier);
     }
   }
 
   @Override
-  public Object addNewTransactionDroppedListener(
-      final TransactionDroppedListener newTransactionDroppedListener) {
+  public Object addTransactionDroppedListener(
+      final TransactionDroppedListener transactionDroppedListener) {
     throw new UnsupportedOperationException();
   }
 
@@ -70,8 +62,20 @@ public class PantheonEventsImpl implements PantheonEvents {
     throw new UnsupportedOperationException();
   }
 
-  private void dispatchTransactionAddedMessage(
-      final Transaction transaction, final NewTransactionAddedListener listener) {
-    listener.newTransactionAdded(transaction);
+  @Override
+  public Object addLogsListener(final LogsListener logsListener) {
+    return null;
   }
+
+  @Override
+  public void removeLogsListener(final Object listenerIdentifier) {}
+
+  @Override
+  public Object addSynchronizerStatusListener(
+      final SynchronizerStatusListener synchronizerStatusListener) {
+    return null;
+  }
+
+  @Override
+  public void removeSynchronizerStatusListener(final Object listenerIdentifier) {}
 }

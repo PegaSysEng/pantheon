@@ -119,7 +119,7 @@ public class PantheonEventsImplTest {
   @Test
   public void newBlockEventFiresAfterSubscribe() {
     final AtomicReference<BlockHeader> result = new AtomicReference<>();
-    serviceImpl.addNewBlockPropagatedListener(result::set);
+    serviceImpl.addBlockPropagatedListener(result::set);
 
     assertThat(result.get()).isNull();
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
@@ -130,12 +130,12 @@ public class PantheonEventsImplTest {
   @Test
   public void newBlockEventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<BlockHeader> result = new AtomicReference<>();
-    final Object id = serviceImpl.addNewBlockPropagatedListener(result::set);
+    final Object id = serviceImpl.addBlockPropagatedListener(result::set);
 
     assertThat(result.get()).isNull();
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
 
-    serviceImpl.removeNewBlockPropagatedListener(id);
+    serviceImpl.removeBlockPropagatedListener(id);
     result.set(null);
 
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
@@ -149,15 +149,15 @@ public class PantheonEventsImplTest {
 
   @Test
   public void newBlockEventUselessUnsubscribesCompletes() {
-    serviceImpl.removeNewBlockPropagatedListener("doesNotExist");
-    serviceImpl.removeNewBlockPropagatedListener(5);
-    serviceImpl.removeNewBlockPropagatedListener(5L);
+    serviceImpl.removeBlockPropagatedListener("doesNotExist");
+    serviceImpl.removeBlockPropagatedListener(5);
+    serviceImpl.removeBlockPropagatedListener(5L);
   }
 
   @Test
   public void newTransactionEventFiresAfterSubscribe() {
     final AtomicReference<Transaction> result = new AtomicReference<>();
-    serviceImpl.addNewTransactionAddedListener(result::set);
+    serviceImpl.addTransactionAddedListener(result::set);
 
     assertThat(result.get()).isNull();
     transactionPool.addLocalTransaction(TX1);
@@ -168,12 +168,12 @@ public class PantheonEventsImplTest {
   @Test
   public void newTransactionEventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<Transaction> result = new AtomicReference<>();
-    final Object id = serviceImpl.addNewTransactionAddedListener(result::set);
+    final Object id = serviceImpl.addTransactionAddedListener(result::set);
 
     assertThat(result.get()).isNull();
     transactionPool.addLocalTransaction(TX1);
 
-    serviceImpl.removeNewTransactionAddedListener(id);
+    serviceImpl.removeTransactionAddedListener(id);
     result.set(null);
 
     transactionPool.addLocalTransaction(TX2);
@@ -182,9 +182,9 @@ public class PantheonEventsImplTest {
 
   @Test
   public void newTransactionEventUselessUnsubscribesCompletes() {
-    serviceImpl.removeNewTransactionAddedListener("doesNotExist");
-    serviceImpl.removeNewTransactionAddedListener(5);
-    serviceImpl.removeNewTransactionAddedListener(5L);
+    serviceImpl.removeTransactionAddedListener("doesNotExist");
+    serviceImpl.removeTransactionAddedListener(5);
+    serviceImpl.removeTransactionAddedListener(5L);
   }
 
   private Block generateBlock() {
