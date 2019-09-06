@@ -35,7 +35,7 @@ dependencies {
   implementation project(':plugin-api')
   implementation project(':services:kvstore')
 
-  //TODO hack - otherwise the JAR is not included in the lib (i.e. not flagged as needed)
+  // Runtime dependency gets the Plugin included in the distribution
   runtime project(":plugins:rocksdb")
 
   implementation 'com.fasterxml.jackson.core:jackson-databind'
@@ -77,11 +77,11 @@ dependencies {
   jmhImplementation project(':ethereum:trie')
   jmhImplementation project(':metrics:core')
   jmhImplementation project(':services:kvstore')
+  jmhImplementation project(':plugin-api')
   jmhImplementation project(':plugins:rocksdb')
   jmhImplementation project(':util')
 
   jmhImplementation 'com.google.guava:guava'
-  jmhImplementation 'tech.pegasys.pantheon:plugin-api'
 }
 
 configurations { testArtifacts }
