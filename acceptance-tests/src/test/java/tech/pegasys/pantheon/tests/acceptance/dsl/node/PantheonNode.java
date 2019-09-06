@@ -247,7 +247,7 @@ public class PantheonNode implements NodeConfiguration, RunnableNode, AutoClosea
   }
 
   public Optional<Integer> getJsonRpcSocketPort() {
-    if (isWebSocketsRpcEnabled()) {
+    if (isJsonRpcEnabled()) {
       return Optional.of(Integer.valueOf(portsProperties.getProperty("json-rpc")));
     } else {
       return Optional.empty();

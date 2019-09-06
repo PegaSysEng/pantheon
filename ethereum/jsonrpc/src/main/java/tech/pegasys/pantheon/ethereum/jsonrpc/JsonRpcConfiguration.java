@@ -17,7 +17,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 
 import com.google.common.base.MoreObjects;
 
@@ -33,6 +35,7 @@ public class JsonRpcConfiguration {
   private List<String> hostsWhitelist = Arrays.asList("localhost", "127.0.0.1");
   private boolean authenticationEnabled = false;
   private String authenticationCredentialsFile;
+  private Map<String, Function<List<String>, ?>> pluginEndpoints = Collections.emptyMap();
 
   public static JsonRpcConfiguration createDefault() {
     final JsonRpcConfiguration config = new JsonRpcConfiguration();
@@ -98,6 +101,14 @@ public class JsonRpcConfiguration {
 
   public void setHostsWhitelist(final List<String> hostsWhitelist) {
     this.hostsWhitelist = hostsWhitelist;
+  }
+
+  public Map<String, Function<List<String>, ?>> getPluginEndpoints() {
+    return pluginEndpoints;
+  }
+
+  public void setPluginEndpoints(final Map<String, Function<List<String>, ?>> pluginEndpoints) {
+    this.pluginEndpoints = pluginEndpoints;
   }
 
   @Override

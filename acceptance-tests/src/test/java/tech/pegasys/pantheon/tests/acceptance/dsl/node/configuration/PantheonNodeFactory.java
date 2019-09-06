@@ -165,14 +165,23 @@ public class PantheonNodeFactory {
   }
 
   public PantheonNode createPluginsNode(
-      final String name, final List<String> plugins, final List<String> extraCLIOptions)
+      final String name,
+      final List<String> plugins,
+      final List<String> extraCLIOptions,
+      final RpcApi... enabledRpcApis)
       throws IOException {
-    return create(
+    final PantheonNodeConfigurationBuilder pantheonNodeConfigurationBuilder =
         new PantheonNodeConfigurationBuilder()
             .name(name)
             .plugins(plugins)
-            .extraCLIOptions(extraCLIOptions)
-            .build());
+            .extraCLIOptions(extraCLIOptions);
+    if (enabledRpcApis.length > 0) {
+      final JsonRpcConfiguration jsonRpcConfig = node.createJsonRpcEnabledConfig();
+      jsonRpcConfig.setRpcApis(asList(enabledRpcApis));
+      pantheonNodeConfigurationBuilder.jsonRpcConfiguration(jsonRpcConfig);
+    }
+
+    return create(pantheonNodeConfigurationBuilder.build());
   }
 
   public PantheonNode createArchiveNodeWithRpcApis(

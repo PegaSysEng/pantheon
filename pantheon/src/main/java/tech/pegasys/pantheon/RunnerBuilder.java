@@ -37,6 +37,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterIdGenerator;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.filter.FilterRepository;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.JsonRpcMethod;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.PluginJsonRpcMethod;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.WebSocketRequestHandler;
@@ -92,6 +93,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -105,7 +107,7 @@ public class RunnerBuilder {
   private PantheonController<?> pantheonController;
 
   private NetworkingConfiguration networkingConfiguration = NetworkingConfiguration.create();
-  private Collection<BytesValue> bannedNodeIds = new ArrayList<>();
+  private final Collection<BytesValue> bannedNodeIds = new ArrayList<>();
   private boolean p2pEnabled = true;
   private boolean discovery;
   private String p2pAdvertisedHost;
@@ -304,8 +306,8 @@ public class RunnerBuilder {
 
     final Optional<UpnpNatManager> natManager = buildNatManager(natMethod);
 
-    NetworkBuilder inactiveNetwork = (caps) -> new NoopP2PNetwork();
-    NetworkBuilder activeNetwork =
+    final NetworkBuilder inactiveNetwork = (caps) -> new NoopP2PNetwork();
+    final NetworkBuilder activeNetwork =
         (caps) ->
             DefaultP2PNetwork.builder()
                 .vertx(vertx)
@@ -375,7 +377,8 @@ public class RunnerBuilder {
               privacyParameters,
               jsonRpcConfiguration,
               webSocketConfiguration,
-              metricsConfiguration);
+              metricsConfiguration,
+              jsonRpcConfiguration.getPluginEndpoints());
       jsonRpcHttpService =
           Optional.of(
               new JsonRpcHttpService(
@@ -433,7 +436,8 @@ public class RunnerBuilder {
               privacyParameters,
               jsonRpcConfiguration,
               webSocketConfiguration,
-              metricsConfiguration);
+              metricsConfiguration,
+              Collections.emptyMap());
 
       final SubscriptionManager subscriptionManager =
           createSubscriptionManager(vertx, transactionPool);
@@ -510,7 +514,7 @@ public class RunnerBuilder {
       final TransactionSimulator transactionSimulator) {
 
     if (permissioningConfiguration.isPresent()) {
-      Optional<AccountPermissioningController> accountPermissioningController =
+      final Optional<AccountPermissioningController> accountPermissioningController =
           AccountPermissioningControllerFactory.create(
               permissioningConfiguration.get(), transactionSimulator, metricsSystem);
 
@@ -563,7 +567,8 @@ public class RunnerBuilder {
       final PrivacyParameters privacyParameters,
       final JsonRpcConfiguration jsonRpcConfiguration,
       final WebSocketConfiguration webSocketConfiguration,
-      final MetricsConfiguration metricsConfiguration) {
+      final MetricsConfiguration metricsConfiguration,
+      final Map<String, Function<List<String>, ?>> pluginMethods) {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
@@ -588,6 +593,8 @@ public class RunnerBuilder {
                 webSocketConfiguration,
                 metricsConfiguration);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
+    pluginMethods.forEach(
+        (name, function) -> methods.put(name, new PluginJsonRpcMethod(name, function)));
     return methods;
   }
 

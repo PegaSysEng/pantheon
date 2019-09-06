@@ -92,10 +92,12 @@ import tech.pegasys.pantheon.nat.NatMethod;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
+import tech.pegasys.pantheon.plugin.services.RpcEndpointService;
 import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
+import tech.pegasys.pantheon.services.RPCEndpointServiceImpl;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 import tech.pegasys.pantheon.util.PermissioningConfigurationValidator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -171,6 +173,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private final RunnerBuilder runnerBuilder;
   private final PantheonController.Builder controllerBuilderFactory;
   private final PantheonPluginContextImpl pantheonPluginContext;
+  private final RPCEndpointServiceImpl rpcEndpointService;
   private final Map<String, String> environment;
 
   protected KeyLoader getKeyLoader() {
@@ -679,6 +682,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     this.controllerBuilderFactory = controllerBuilderFactory;
     this.pantheonPluginContext = pantheonPluginContext;
     this.environment = environment;
+    this.rpcEndpointService = new RPCEndpointServiceImpl();
   }
 
   private StandaloneCommand standaloneCommands;
@@ -774,6 +778,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private PantheonCommand preparePlugins() {
     pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
     pantheonPluginContext.addService(MetricsSystem.class, getMetricsSystem());
+    pantheonPluginContext.addService(RpcEndpointService.class, rpcEndpointService);
     pantheonPluginContext.registerPlugins(pluginsDir());
     return this;
   }
@@ -1002,6 +1007,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     jsonRpcConfiguration.setHostsWhitelist(hostsWhitelist);
     jsonRpcConfiguration.setAuthenticationEnabled(isRpcHttpAuthenticationEnabled);
     jsonRpcConfiguration.setAuthenticationCredentialsFile(rpcHttpAuthenticationCredentialsFile());
+    jsonRpcConfiguration.setPluginEndpoints(rpcEndpointService.getRpcMethods());
     return jsonRpcConfiguration;
   }
 

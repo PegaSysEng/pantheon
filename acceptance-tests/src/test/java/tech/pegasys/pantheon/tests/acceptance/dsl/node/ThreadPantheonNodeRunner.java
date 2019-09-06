@@ -30,9 +30,11 @@ import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
+import tech.pegasys.pantheon.plugin.services.RpcEndpointService;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
 import tech.pegasys.pantheon.services.PicoCLIOptionsImpl;
+import tech.pegasys.pantheon.services.RPCEndpointServiceImpl;
 import tech.pegasys.pantheon.services.kvstore.RocksDbConfiguration;
 
 import java.io.File;
@@ -72,6 +74,9 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
       pluginsDirFile.deleteOnExit();
     }
     System.setProperty("pantheon.plugins.dir", pluginsPath.toString());
+    final RPCEndpointServiceImpl rpcEndpointService = new RPCEndpointServiceImpl();
+    node.jsonRpcConfiguration().setPluginEndpoints(rpcEndpointService.getRpcMethods());
+    pantheonPluginContext.addService(RpcEndpointService.class, rpcEndpointService);
     pantheonPluginContext.registerPlugins(pluginsPath);
     return pantheonPluginContext;
   }
