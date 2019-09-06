@@ -19,6 +19,7 @@ import static java.util.Collections.singletonList;
 import static tech.pegasys.pantheon.cli.DefaultCommandValues.getDefaultPantheonDataPath;
 import static tech.pegasys.pantheon.cli.config.NetworkName.MAINNET;
 import static tech.pegasys.pantheon.cli.util.CommandLineUtils.checkOptionDependencies;
+import static tech.pegasys.pantheon.controller.PantheonController.DATABASE_PATH;
 import static tech.pegasys.pantheon.ethereum.graphql.GraphQLConfiguration.DEFAULT_GRAPHQL_HTTP_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration.DEFAULT_JSON_RPC_PORT;
 import static tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis.DEFAULT_JSON_RPC_APIS;
@@ -744,7 +745,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private void addConfigurationService() {
-    pluginCommonConfiguration = new PantheonConfigurationImpl(dataDir());
+    pluginCommonConfiguration = new PantheonConfigurationImpl(dataDir().resolve(DATABASE_PATH));
     pantheonPluginContext.addService(PantheonConfiguration.class, pluginCommonConfiguration);
   }
 
