@@ -51,8 +51,6 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.RecursiveDeleteOption;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -63,7 +61,6 @@ import org.openjdk.jmh.annotations.TearDown;
 @State(Scope.Thread)
 public class WorldStateDownloaderBenchmark {
 
-  private static final Logger LOG = LogManager.getLogger();
   private static final int MAX_OPEN_FILES = 1024;
   private static final long CACHE_CAPACITY = 8388608;
   private static final int MAX_BACKGROUND_COMPACTIONS = 4;
