@@ -27,55 +27,52 @@ public class PantheonEventsImpl implements PantheonEvents {
   }
 
   @Override
-  public Object addBlockPropagatedListener(final BlockPropagatedListener listener) {
+  public long addBlockPropagatedListener(final BlockPropagatedListener listener) {
     return blockBroadcaster.subscribePropagateNewBlocks(
         block -> listener.newBlockPropagated(block.getHeader()));
   }
 
   @Override
-  public void removeBlockPropagatedListener(final Object listenerIdentifier) {
-    if (listenerIdentifier instanceof Long) {
-      blockBroadcaster.unsubscribePropagateNewBlocks((Long) listenerIdentifier);
-    }
+  public void removeBlockPropagatedListener(final long listenerIdentifier) {
+    blockBroadcaster.unsubscribePropagateNewBlocks(listenerIdentifier);
   }
 
   @Override
-  public Object addTransactionAddedListener(final TransactionAddedListener listener) {
-    return transactionPool.subscribePendingTransactions(listener::transactionAdded);
+  public long addTransactionAddedListener(final TransactionAddedListener listener) {
+    return transactionPool.subscribePendingTransactions(listener::onTransactionAdded);
   }
 
   @Override
-  public void removeTransactionAddedListener(final Object listenerIdentifier) {
-    if (listenerIdentifier instanceof Long) {
-      transactionPool.unsubscribePendingTransactions((Long) listenerIdentifier);
-    }
+  public void removeTransactionAddedListener(final long listenerIdentifier) {
+    transactionPool.unsubscribePendingTransactions(listenerIdentifier);
   }
 
   @Override
-  public Object addTransactionDroppedListener(
+  public long addTransactionDroppedListener(
       final TransactionDroppedListener transactionDroppedListener) {
-    throw new UnsupportedOperationException();
+    return transactionPool.subscribeDroppedTransactions(
+        transactionDroppedListener::onTransactionDropped);
   }
 
   @Override
-  public void removeTransactionDroppedListener(final Object listenerIdentifier) {
-    throw new UnsupportedOperationException();
+  public void removeTransactionDroppedListener(final long listenerIdentifier) {
+    transactionPool.unsubscribeDroppedTransactions(listenerIdentifier);
   }
 
   @Override
-  public Object addLogsListener(final LogsListener logsListener) {
+  public long addLogWithMetadataListener(final LogWithMetadataListener logWithMetaDataListener) {
     return null;
   }
 
   @Override
-  public void removeLogsListener(final Object listenerIdentifier) {}
+  public void removeLogWithMetadataListener(final long listenerIdentifier) {}
 
   @Override
-  public Object addSynchronizerStatusListener(
+  public long addSynchronizerStatusListener(
       final SynchronizerStatusListener synchronizerStatusListener) {
     return null;
   }
 
   @Override
-  public void removeSynchronizerStatusListener(final Object listenerIdentifier) {}
+  public void removeSynchronizerStatusListener(final long listenerIdentifier) {}
 }

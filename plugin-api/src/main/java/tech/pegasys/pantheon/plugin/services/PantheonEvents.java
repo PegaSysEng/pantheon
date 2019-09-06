@@ -44,14 +44,14 @@ public interface PantheonEvents {
    * @param blockPropagatedListener The listener that will accept a BlockHeader as the event.
    * @return an object to be used as an identifier when de-registering the event.
    */
-  Object addBlockPropagatedListener(BlockPropagatedListener blockPropagatedListener);
+  long addBlockPropagatedListener(BlockPropagatedListener blockPropagatedListener);
 
   /**
    * Remove the blockAdded listener from pantheon notifications.
    *
    * @param listenerIdentifier The instance that was returned from addBlockAddedListener;
    */
-  void removeBlockPropagatedListener(Object listenerIdentifier);
+  void removeBlockPropagatedListener(long listenerIdentifier);
 
   /**
    * Add a listener watching new transactions added to the node.
@@ -60,14 +60,14 @@ public interface PantheonEvents {
    *     event.
    * @return an object to be used as an identifier when de-registering the event.
    */
-  Object addTransactionAddedListener(TransactionAddedListener transactionAddedListener);
+  long addTransactionAddedListener(TransactionAddedListener transactionAddedListener);
 
   /**
    * Remove the blockAdded listener from pantheon notifications.
    *
    * @param listenerIdentifier The instance that was returned from addTransactionAddedListener;
    */
-  void removeTransactionAddedListener(Object listenerIdentifier);
+  void removeTransactionAddedListener(long listenerIdentifier);
 
   /**
    * Add a listener watching dropped transactions.
@@ -76,29 +76,30 @@ public interface PantheonEvents {
    *     event.
    * @return an object to be used as an identifier when de-registering the event.
    */
-  Object addTransactionDroppedListener(TransactionDroppedListener transactionDroppedListener);
+  long addTransactionDroppedListener(TransactionDroppedListener transactionDroppedListener);
 
   /**
    * Remove the transactionDropped listener from pantheon notifications.
    *
    * @param listenerIdentifier The instance that was returned from addTransactionDroppedListener;
    */
-  void removeTransactionDroppedListener(Object listenerIdentifier);
+  void removeTransactionDroppedListener(long listenerIdentifier);
 
   /**
-   * Add a listener watching logs included in new blocks.
+   * Add a listener watching logs (plus metadata about them) included in new blocks.
    *
-   * @param logsListener The listener that will accept the Logs object as the event.
+   * @param logWithMetadataListener The listener that will accept the LogWithMetadata object as the
+   *     event.
    * @return an object to be used as an identifier when de-registering the event.
    */
-  Object addLogsListener(LogsListener logsListener);
+  long addLogWithMetadataListener(LogWithMetadataListener logWithMetadataListener);
 
   /**
    * Remove the logs listener from pantheon notifications.
    *
    * @param listenerIdentifier The instance that was returned from addTransactionDroppedListener;
    */
-  void removeLogsListener(Object listenerIdentifier);
+  void removeLogWithMetadataListener(long listenerIdentifier);
 
   /**
    * Add a listener watching the synchronizer status.
@@ -107,14 +108,14 @@ public interface PantheonEvents {
    *     event.
    * @return an object to be used as an identifier when de-registering the event.
    */
-  Object addSynchronizerStatusListener(SynchronizerStatusListener synchronizerStatusListener);
+  long addSynchronizerStatusListener(SynchronizerStatusListener synchronizerStatusListener);
 
   /**
    * Remove the logs listener from pantheon notifications.
    *
    * @param listenerIdentifier The instance that was returned from addTransactionDroppedListener;
    */
-  void removeSynchronizerStatusListener(Object listenerIdentifier);
+  void removeSynchronizerStatusListener(long listenerIdentifier);
 
   /** The listener interface for receiving new block propagated events. */
   interface BlockPropagatedListener {
@@ -139,7 +140,7 @@ public interface PantheonEvents {
      *
      * @param transaction the new transaction.
      */
-    void transactionAdded(Transaction transaction);
+    void onTransactionAdded(Transaction transaction);
   }
 
   /** The listener interface for receiving transaction dropped events. */
@@ -150,18 +151,18 @@ public interface PantheonEvents {
      *
      * @param transaction the dropped transaction.
      */
-    void transactionDropped(Transaction transaction);
+    void onTransactionDropped(Transaction transaction);
   }
 
   /** The listener interface for receiving logs from new blocks. */
-  interface LogsListener {
+  interface LogWithMetadataListener {
 
     /**
      * Invoked when a new block is added.
      *
      * @param logs the new logs from the block added event
      */
-    void logsAdded(List<LogWithMetadata> logs);
+    void onLogWithMetadatasAdded(List<LogWithMetadata> logs);
   }
 
   /** The listener interface for receiving sync status events. */
@@ -172,6 +173,6 @@ public interface PantheonEvents {
      *
      * @param syncStatus the sync status
      */
-    void synchronizerStatusChanged(SyncStatus syncStatus);
+    void onSynchronizerStatusChanged(SyncStatus syncStatus);
   }
 }
