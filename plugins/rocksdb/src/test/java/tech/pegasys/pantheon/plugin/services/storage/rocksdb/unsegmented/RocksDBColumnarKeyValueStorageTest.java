@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
+package tech.pegasys.pantheon.plugin.services.storage.rocksdb.unsegmented;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -19,6 +19,8 @@ import tech.pegasys.pantheon.kvstore.AbstractKeyValueStorageTest;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfigurationBuilder;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Transaction;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;

@@ -18,6 +18,8 @@ import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageFactory;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.unsegmented.RocksDBKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
 import tech.pegasys.pantheon.services.util.DatabaseMetadata;

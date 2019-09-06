@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
+package tech.pegasys.pantheon.plugin.services.storage.rocksdb.segmented;
 
 import static java.util.Objects.requireNonNullElse;
 
@@ -18,6 +18,9 @@ import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBMetrics;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDbUtil;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageTransactionTransitionValidatorDecorator;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
