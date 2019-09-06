@@ -39,7 +39,7 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
   }
 
   @Override
-  protected Path getStoragePath(final PantheonConfiguration commonConfiguration) {
-    return super.getStoragePath(commonConfiguration).resolve(PRIVATE_DATABASE_PATH);
+  protected Path storagePath(final PantheonConfiguration commonConfiguration) {
+    return super.storagePath(commonConfiguration).resolve(PRIVATE_DATABASE_PATH);
   }
 }
