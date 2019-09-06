@@ -13,8 +13,10 @@
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import com.google.common.base.Supplier;
@@ -22,7 +24,7 @@ import com.google.common.base.Supplier;
 @Deprecated
 public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorageFactory {
 
-  // private static final String PRIVATE_DATABASE_PATH = "private";
+  private static final String PRIVATE_DATABASE_PATH = "private";
 
   public RocksDBKeyValuePrivacyStorageFactory(
       final Supplier<RocksDBFactoryConfiguration> configuration,
@@ -34,5 +36,10 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
   @Override
   public String getName() {
     return "rocksdb-privacy";
+  }
+
+  @Override
+  protected Path getStoragePath(final PantheonConfiguration commonConfiguration) {
+    return super.getStoragePath(commonConfiguration).resolve(PRIVATE_DATABASE_PATH);
   }
 }
