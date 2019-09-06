@@ -17,6 +17,11 @@ import picocli.CommandLine;
 
 public class RocksDBCLIOptions {
 
+  public static final int DEFAULT_MAX_OPEN_FILES = 1024;
+  public static final long DEFAULT_CACHE_CAPACITY = 8388608;
+  public static final int DEFAULT_MAX_BACKGROUND_COMPACTIONS = 4;
+  public static final int DEFAULT_BACKGROUND_THREAD_COUNT = 4;
+
   private static final String MAX_OPEN_FILES_FLAG = "--Xrocksdb-max-open-files";
   private static final String CACHE_CAPACITY_FLAG = "--Xrocksdb-cache-capacity";
   private static final String MAX_BACKGROUND_COMPACTIONS_FLAG =

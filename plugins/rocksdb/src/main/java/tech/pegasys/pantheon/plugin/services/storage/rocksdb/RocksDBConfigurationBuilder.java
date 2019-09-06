@@ -12,18 +12,17 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_BACKGROUND_THREAD_COUNT;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_CACHE_CAPACITY;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_MAX_BACKGROUND_COMPACTIONS;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_MAX_OPEN_FILES;
+
 import java.nio.file.Path;
 
 public class RocksDBConfigurationBuilder {
 
-  private static final int DEFAULT_MAX_OPEN_FILES = 1024;
-  private static final long DEFAULT_CACHE_CAPACITY = 8388608;
-  private static final int DEFAULT_MAX_BACKGROUND_COMPACTIONS = 4;
-  private static final int DEFAULT_BACKGROUND_THREAD_COUNT = 4;
-
   private Path databaseDir;
   private String label = "blockchain";
-
   private int maxOpenFiles = DEFAULT_MAX_OPEN_FILES;
   private long cacheCapacity = DEFAULT_CACHE_CAPACITY;
   private int maxBackgroundCompactions = DEFAULT_MAX_BACKGROUND_COMPACTIONS;

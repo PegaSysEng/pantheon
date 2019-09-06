@@ -13,6 +13,10 @@
 package tech.pegasys.pantheon.ethereum.eth.sync.worldstate;
 
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_BACKGROUND_THREAD_COUNT;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_CACHE_CAPACITY;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_MAX_BACKGROUND_COMPACTIONS;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_MAX_OPEN_FILES;
 
 import tech.pegasys.pantheon.ethereum.core.BlockDataGenerator;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
@@ -60,11 +64,6 @@ import org.openjdk.jmh.annotations.TearDown;
 
 @State(Scope.Thread)
 public class WorldStateDownloaderBenchmark {
-
-  private static final int MAX_OPEN_FILES = 1024;
-  private static final long CACHE_CAPACITY = 8388608;
-  private static final int MAX_BACKGROUND_COMPACTIONS = 4;
-  private static final int BACKGROUND_THREAD_COUNT = 4;
 
   private final BlockDataGenerator dataGen = new BlockDataGenerator();
   private Path tempDir;
@@ -163,10 +162,10 @@ public class WorldStateDownloaderBenchmark {
             new RocksDBKeyValueStorageFactory(
                 () ->
                     new RocksDBFactoryConfiguration(
-                        MAX_OPEN_FILES,
-                        MAX_BACKGROUND_COMPACTIONS,
-                        BACKGROUND_THREAD_COUNT,
-                        CACHE_CAPACITY),
+                        DEFAULT_MAX_OPEN_FILES,
+                        DEFAULT_MAX_BACKGROUND_COMPACTIONS,
+                        DEFAULT_BACKGROUND_THREAD_COUNT,
+                        DEFAULT_CACHE_CAPACITY),
                 Arrays.asList(KeyValueSegmentIdentifier.values()),
                 new NoOpMetricsSystem()))
         .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
