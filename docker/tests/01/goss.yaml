@@ -1,7 +1,7 @@
 ---
 # runtime docker tests
 file:
-  /opt/besu/bin/pantheon:
+  /opt/besu/bin/besu:
     exists: true
     mode: "0755"
     owner: root

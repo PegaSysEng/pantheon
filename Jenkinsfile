@@ -184,20 +184,8 @@ try {
                         stage(stage_name + 'Calculate variables') {
                             def gradleProperties = readProperties file: 'gradle.properties'
                             version = gradleProperties.version
-                            def imageRepos = 'pegasyseng'
-                            image = "${imageRepos}/pantheon:${version}"
-                        }
-
-                        stage(stage_name + "Test image labels") {
-                            shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
-                            sh "docker image inspect \
-    --format='{{index .Config.Labels \"org.label-schema.vcs-ref\"}}' \
-    ${image} \
-    | grep ${shortCommit}"
-                            sh "docker image inspect \
-    --format='{{index .Config.Labels \"org.label-schema.version\"}}' \
-    ${image} \
-    | grep ${version}"
+                            def imageRepos = 'hyperledger'
+                            image = "${imageRepos}/besu:${version}"
                         }
 
                         try {
