@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.plugin.services;
 
 import tech.pegasys.pantheon.plugin.Unstable;
 import tech.pegasys.pantheon.plugin.data.BlockHeader;
-import tech.pegasys.pantheon.plugin.data.Log;
+import tech.pegasys.pantheon.plugin.data.LogWithMetadata;
 import tech.pegasys.pantheon.plugin.data.SyncStatus;
 import tech.pegasys.pantheon.plugin.data.Transaction;
 
@@ -161,7 +161,7 @@ public interface PantheonEvents {
      *
      * @param logs the new logs from the block added event
      */
-    void logsAdded(List<Log> logs);
+    void logsAdded(List<LogWithMetadata> logs);
   }
 
   /** The listener interface for receiving sync status events. */

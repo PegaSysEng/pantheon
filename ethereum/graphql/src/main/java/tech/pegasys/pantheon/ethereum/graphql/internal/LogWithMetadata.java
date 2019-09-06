@@ -21,7 +21,7 @@ import java.util.List;
 
 import com.google.common.base.MoreObjects;
 
-public class LogWithMetadata {
+public class LogWithMetadata implements tech.pegasys.pantheon.plugin.data.LogWithMetadata {
 
   private final int logIndex;
   private final long blockNumber;
@@ -54,40 +54,47 @@ public class LogWithMetadata {
     this.removed = removed;
   }
 
-  // The index of this log within the entire ordered list of logs associated with the block this log
-  // belongs to.
+  @Override
   public int getLogIndex() {
     return logIndex;
   }
 
+  @Override
   public long getBlockNumber() {
     return blockNumber;
   }
 
+  @Override
   public Hash getBlockHash() {
     return blockHash;
   }
 
+  @Override
   public Hash getTransactionHash() {
     return transactionHash;
   }
 
+  @Override
   public int getTransactionIndex() {
     return transactionIndex;
   }
 
-  public Address getAddress() {
+  @Override
+  public Address getLogger() {
     return address;
   }
 
+  @Override
   public BytesValue getData() {
     return data;
   }
 
+  @Override
   public List<LogTopic> getTopics() {
     return topics;
   }
 
+  @Override
   public boolean isRemoved() {
     return removed;
   }
