@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.services;
 
+import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
@@ -19,11 +20,15 @@ import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 public class PantheonEventsImpl implements PantheonEvents {
   private final BlockBroadcaster blockBroadcaster;
   private final TransactionPool transactionPool;
+  private final Synchronizer synchronizer;
 
   public PantheonEventsImpl(
-      final BlockBroadcaster blockBroadcaster, final TransactionPool transactionPool) {
+      final BlockBroadcaster blockBroadcaster,
+      final TransactionPool transactionPool,
+      final Synchronizer synchronizer) {
     this.blockBroadcaster = blockBroadcaster;
     this.transactionPool = transactionPool;
+    this.synchronizer = synchronizer;
   }
 
   @Override
@@ -61,7 +66,7 @@ public class PantheonEventsImpl implements PantheonEvents {
 
   @Override
   public long addLogWithMetadataListener(final LogWithMetadataListener logWithMetaDataListener) {
-    return null;
+    return 0;
   }
 
   @Override
@@ -70,9 +75,11 @@ public class PantheonEventsImpl implements PantheonEvents {
   @Override
   public long addSynchronizerStatusListener(
       final SynchronizerStatusListener synchronizerStatusListener) {
-    return null;
+    return synchronizer.observeSyncStatus(synchronizerStatusListener);
   }
 
   @Override
-  public void removeSynchronizerStatusListener(final long listenerIdentifier) {}
+  public void removeSynchronizerStatusListener(final long listenerIdentifier) {
+    synchronizer.removeObserver(listenerIdentifier);
+  }
 }

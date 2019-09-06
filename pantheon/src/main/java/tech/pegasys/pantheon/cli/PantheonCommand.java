@@ -823,7 +823,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
         PantheonEvents.class,
         new PantheonEventsImpl(
             (pantheonController.getProtocolManager().getBlockBroadcaster()),
-            pantheonController.getTransactionPool()));
+            pantheonController.getTransactionPool(),
+            pantheonController.getSynchronizer()));
     pantheonPluginContext.startPlugins();
     return this;
   }

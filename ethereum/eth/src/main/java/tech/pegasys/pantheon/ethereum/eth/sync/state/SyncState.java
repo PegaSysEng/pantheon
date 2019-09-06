@@ -16,10 +16,10 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.chain.ChainHead;
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
 import tech.pegasys.pantheon.ethereum.core.SyncStatus;
-import tech.pegasys.pantheon.ethereum.core.Synchronizer.SyncStatusListener;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
+import tech.pegasys.pantheon.plugin.services.PantheonEvents.SynchronizerStatusListener;
 import tech.pegasys.pantheon.util.Subscribers;
 
 import java.util.Optional;
@@ -32,7 +32,7 @@ public class SyncState {
   private final long startingBlock;
   private boolean lastInSync = true;
   private final Subscribers<InSyncListener> inSyncListeners = Subscribers.create();
-  private final Subscribers<SyncStatusListener> syncStatusListeners = Subscribers.create();
+  private final Subscribers<SynchronizerStatusListener> syncStatusListeners = Subscribers.create();
   private Optional<SyncTarget> syncTarget = Optional.empty();
   private long chainHeightListenerId;
 
@@ -51,14 +51,14 @@ public class SyncState {
 
   private void publishSyncStatus() {
     final SyncStatus syncStatus = syncStatus();
-    syncStatusListeners.forEach(c -> c.onSyncStatus(syncStatus));
+    syncStatusListeners.forEach(c -> c.onSynchronizerStatusChanged(syncStatus));
   }
 
   public void addInSyncListener(final InSyncListener observer) {
     inSyncListeners.subscribe(observer);
   }
 
-  public void addSyncStatusListener(final SyncStatusListener observer) {
+  public void addSyncStatusListener(final SynchronizerStatusListener observer) {
     syncStatusListeners.subscribe(observer);
   }
 

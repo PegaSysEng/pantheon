@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.ethereum.eth.sync;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
-import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.manager.EthContext;
 import tech.pegasys.pantheon.ethereum.eth.sync.fastsync.FastDownloaderFactory;
@@ -29,7 +28,9 @@ import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.worldstate.Pruner;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
+import tech.pegasys.pantheon.plugin.data.SyncStatus;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
+import tech.pegasys.pantheon.plugin.services.PantheonEvents.SynchronizerStatusListener;
 import tech.pegasys.pantheon.util.ExceptionUtils;
 import tech.pegasys.pantheon.util.Subscribers;
 
@@ -48,7 +49,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   private final Optional<Pruner> maybePruner;
   private final SyncState syncState;
   private final AtomicBoolean running = new AtomicBoolean(false);
-  private final Subscribers<SyncStatusListener> syncStatusListeners = Subscribers.create();
+  private final Subscribers<SynchronizerStatusListener> syncStatusListeners = Subscribers.create();
   private final BlockPropagationManager<C> blockPropagationManager;
   private final Optional<FastSyncDownloader<C>> fastSyncDownloader;
   private final FullSyncDownloader<C> fullSyncDownloader;
@@ -183,7 +184,7 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   }
 
   @Override
-  public long observeSyncStatus(final SyncStatusListener listener) {
+  public long observeSyncStatus(final SynchronizerStatusListener listener) {
     checkNotNull(listener);
     return syncStatusListeners.subscribe(listener);
   }
@@ -194,6 +195,6 @@ public class DefaultSynchronizer<C> implements Synchronizer {
   }
 
   private void syncStatusCallback(final SyncStatus status) {
-    syncStatusListeners.forEach(c -> c.onSyncStatus(status));
+    syncStatusListeners.forEach(c -> c.onSynchronizerStatusChanged(status));
   }
 }

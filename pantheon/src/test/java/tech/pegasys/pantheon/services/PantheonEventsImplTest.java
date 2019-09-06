@@ -113,7 +113,7 @@ public class PantheonEventsImplTest {
             Wei.ZERO,
             TransactionPoolConfiguration.builder().build());
 
-    serviceImpl = new PantheonEventsImpl(blockBroadcaster, transactionPool);
+    serviceImpl = new PantheonEventsImpl(blockBroadcaster, transactionPool, synchronizer);
   }
 
   @Test
