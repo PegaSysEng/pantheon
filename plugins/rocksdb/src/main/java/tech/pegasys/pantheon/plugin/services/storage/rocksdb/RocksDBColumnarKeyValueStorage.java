@@ -71,7 +71,6 @@ public class RocksDBColumnarKeyValueStorage
       final List<SegmentIdentifier> segments,
       final ObservableMetricsSystem metricsSystem)
       throws StorageException {
-    RocksDbUtil.loadNativeLibrary();
 
     try {
       final List<ColumnFamilyDescriptor> columnDescriptors =

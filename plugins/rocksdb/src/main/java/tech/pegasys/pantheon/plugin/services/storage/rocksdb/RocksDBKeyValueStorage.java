@@ -51,7 +51,6 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
 
   public RocksDBKeyValueStorage(
       final RocksDBConfiguration configuration, final ObservableMetricsSystem metricsSystem) {
-    RocksDbUtil.loadNativeLibrary();
 
     try {
       final Statistics stats = new Statistics();
