@@ -27,14 +27,15 @@ import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer;
 import tech.pegasys.pantheon.ethereum.eth.manager.RespondingEthPeer.Responder;
 import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.ethereum.storage.StorageProvider;
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProvider;
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
 import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateStorage;
 import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBFactoryConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBKeyValueStorageFactory;
+import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.services.tasks.CachingTaskCollection;
 import tech.pegasys.pantheon.services.tasks.FlatFileTaskCollection;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
@@ -43,13 +44,15 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import com.google.common.io.Files;
 import com.google.common.io.MoreFiles;
 import com.google.common.io.RecursiveDeleteOption;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -59,6 +62,12 @@ import org.openjdk.jmh.annotations.TearDown;
 
 @State(Scope.Thread)
 public class WorldStateDownloaderBenchmark {
+
+  private static final Logger LOG = LogManager.getLogger();
+  private static final int MAX_OPEN_FILES = 1024;
+  private static final long CACHE_CAPACITY = 8388608;
+  private static final int MAX_BACKGROUND_COMPACTIONS = 4;
+  private static final int BACKGROUND_THREAD_COUNT = 4;
 
   private final BlockDataGenerator dataGen = new BlockDataGenerator();
   private Path tempDir;
@@ -73,7 +82,7 @@ public class WorldStateDownloaderBenchmark {
   private EthProtocolManager ethProtocolManager;
 
   @Setup(Level.Invocation)
-  public void setUpUnchangedState() throws Exception {
+  public void setUpUnchangedState() {
     final SynchronizerConfiguration syncConfig =
         new SynchronizerConfiguration.Builder().worldStateHashCountPerRequest(200).build();
     final Hash stateRoot = createExistingWorldState();
@@ -92,17 +101,8 @@ public class WorldStateDownloaderBenchmark {
 
     final EthContext ethContext = ethProtocolManager.ethContext();
 
-    final KeyValueStorageProvider storageProvider =
-        new KeyValueStorageProviderBuilder()
-            .withStorageFactory(
-                new RocksDBKeyValueStorageFactory(
-                    () ->
-                        RocksDBConfiguration.builder()
-                            .databaseDir(tempDir.resolve("database"))
-                            .build(),
-                    Collections.emptyList(),
-                    metricsSystem))
-            .build();
+    final StorageProvider storageProvider =
+        createKeyValueStorageProvider(tempDir.resolve("database"));
     worldStateStorage = storageProvider.createWorldStateStorage();
 
     pendingRequests =
@@ -158,5 +158,21 @@ public class WorldStateDownloaderBenchmark {
       throw new IllegalStateException("World state download did not complete.");
     }
     return rootData;
+  }
+
+  private StorageProvider createKeyValueStorageProvider(final Path dbAhead) {
+    return new KeyValueStorageProviderBuilder()
+        .withStorageFactory(
+            new RocksDBKeyValueStorageFactory(
+                () ->
+                    new RocksDBFactoryConfiguration(
+                        MAX_OPEN_FILES,
+                        MAX_BACKGROUND_COMPACTIONS,
+                        BACKGROUND_THREAD_COUNT,
+                        CACHE_CAPACITY),
+                Arrays.asList(KeyValueSegmentIdentifier.values()),
+                new NoOpMetricsSystem()))
+        .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
+        .build();
   }
 }
