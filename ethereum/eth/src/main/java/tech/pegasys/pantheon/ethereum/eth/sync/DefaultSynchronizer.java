@@ -177,10 +177,11 @@ public class DefaultSynchronizer<C> implements Synchronizer {
     if (!running.get()) {
       return Optional.empty();
     }
-    if (syncState.syncStatus().getCurrentBlock() == syncState.syncStatus().getHighestBlock()) {
+    final SyncStatus syncStatus = syncState.syncStatus();
+    if (syncStatus.inSync()) {
       return Optional.empty();
     }
-    return Optional.of(syncState.syncStatus());
+    return Optional.of(syncStatus);
   }
 
   @Override

@@ -141,10 +141,10 @@ public class SyncState {
   }
 
   private synchronized void checkInSync() {
-    final boolean currentSyncStatus = isInSync();
-    if (lastInSync != currentSyncStatus) {
-      lastInSync = currentSyncStatus;
-      inSyncListeners.forEach(c -> c.onSyncStatusChanged(currentSyncStatus));
+    final boolean currentInSync = isInSync();
+    if (lastInSync != currentInSync) {
+      lastInSync = currentInSync;
+      inSyncListeners.forEach(c -> c.onSyncStatusChanged(currentInSync));
     }
   }
 
