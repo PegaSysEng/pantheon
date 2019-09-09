@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
 
 import java.nio.file.Path;
 import java.util.List;

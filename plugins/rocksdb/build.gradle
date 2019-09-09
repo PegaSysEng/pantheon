@@ -31,9 +31,9 @@ dependencies {
 
   implementation project(':metrics:core')
   implementation project(':metrics:rocksdb')
-  implementation project(':services:util')
   implementation project(':services:kvstore')
 
+  implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'com.google.auto.service:auto-service'
   implementation 'com.google.guava:guava'
   implementation 'info.picocli:picocli'

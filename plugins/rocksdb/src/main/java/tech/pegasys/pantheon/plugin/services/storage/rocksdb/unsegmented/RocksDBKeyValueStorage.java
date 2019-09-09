@@ -17,9 +17,9 @@ import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageTransaction;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBMetrics;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDbUtil;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBConfiguration;
 import tech.pegasys.pantheon.services.kvstore.KeyValueStorageTransactionTransitionValidatorDecorator;
 
 import java.util.Optional;

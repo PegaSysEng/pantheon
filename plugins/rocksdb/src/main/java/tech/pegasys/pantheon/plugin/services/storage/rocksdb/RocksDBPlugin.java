@@ -19,6 +19,8 @@ import tech.pegasys.pantheon.plugin.PantheonPlugin;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.plugin.services.StorageService;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBCLIOptions;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
 
 import java.io.IOException;
 import java.util.List;

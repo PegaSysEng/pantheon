@@ -28,8 +28,8 @@ import tech.pegasys.pantheon.plugin.services.metrics.Counter;
 import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
 import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfiguration;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfigurationBuilder;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBConfiguration;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBConfigurationBuilder;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.unsegmented.RocksDBKeyValueStorage;
 
 import java.util.function.LongSupplier;

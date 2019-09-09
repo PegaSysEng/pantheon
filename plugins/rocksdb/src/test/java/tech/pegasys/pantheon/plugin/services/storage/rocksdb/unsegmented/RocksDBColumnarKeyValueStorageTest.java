@@ -19,7 +19,7 @@ import tech.pegasys.pantheon.kvstore.AbstractKeyValueStorageTest;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfigurationBuilder;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBConfigurationBuilder;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage.Transaction;

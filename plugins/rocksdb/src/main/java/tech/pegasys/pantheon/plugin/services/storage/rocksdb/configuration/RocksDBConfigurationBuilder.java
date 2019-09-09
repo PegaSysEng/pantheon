@@ -10,12 +10,12 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
+package tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration;
 
-import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_BACKGROUND_THREAD_COUNT;
-import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_CACHE_CAPACITY;
-import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_MAX_BACKGROUND_COMPACTIONS;
-import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBCLIOptions.DEFAULT_MAX_OPEN_FILES;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBCLIOptions.DEFAULT_BACKGROUND_THREAD_COUNT;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBCLIOptions.DEFAULT_CACHE_CAPACITY;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBCLIOptions.DEFAULT_MAX_BACKGROUND_COMPACTIONS;
+import static tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBCLIOptions.DEFAULT_MAX_OPEN_FILES;
 
 import java.nio.file.Path;
 

@@ -22,7 +22,8 @@ import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
-import tech.pegasys.pantheon.services.util.DatabaseMetadata;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.DatabaseMetadata;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
 
 import java.nio.charset.Charset;
 import java.nio.file.Files;

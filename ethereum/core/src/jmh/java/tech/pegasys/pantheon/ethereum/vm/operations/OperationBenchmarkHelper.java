@@ -23,7 +23,7 @@ import tech.pegasys.pantheon.ethereum.core.MessageFrameTestFixture;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
-import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBConfigurationBuilder;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBConfigurationBuilder;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.unsegmented.RocksDBKeyValueStorage;
 import tech.pegasys.pantheon.util.uint.UInt256;
 

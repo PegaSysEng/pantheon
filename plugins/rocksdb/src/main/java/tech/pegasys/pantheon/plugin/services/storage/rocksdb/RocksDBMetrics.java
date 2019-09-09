@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.metrics.rocksdb.RocksDBStats;
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.metrics.Counter;
 import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBConfiguration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
