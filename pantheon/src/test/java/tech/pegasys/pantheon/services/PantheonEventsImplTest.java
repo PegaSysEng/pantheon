@@ -130,7 +130,7 @@ public class PantheonEventsImplTest {
   @Test
   public void newBlockEventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<BlockHeader> result = new AtomicReference<>();
-    final Object id = serviceImpl.addBlockPropagatedListener(result::set);
+    final long id = serviceImpl.addBlockPropagatedListener(result::set);
 
     assertThat(result.get()).isNull();
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
@@ -168,7 +168,7 @@ public class PantheonEventsImplTest {
   @Test
   public void newTransactionEventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<Transaction> result = new AtomicReference<>();
-    final Object id = serviceImpl.addTransactionAddedListener(result::set);
+    final long id = serviceImpl.addTransactionAddedListener(result::set);
 
     assertThat(result.get()).isNull();
     transactionPool.addLocalTransaction(TX1);

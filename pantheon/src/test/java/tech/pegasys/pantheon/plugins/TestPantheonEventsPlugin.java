@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.auto.service.AutoService;
@@ -34,7 +35,7 @@ public class TestPantheonEventsPlugin implements PantheonPlugin {
 
   private PantheonContext context;
 
-  private Optional<Object> subscriptionId;
+  private Optional<Long> subscriptionId;
   private final AtomicInteger blockCounter = new AtomicInteger();
   private File callbackDir;
 
