@@ -31,7 +31,6 @@ dependencies {
 
   implementation project(':metrics:core')
   implementation project(':metrics:rocksdb')
-  implementation project(':services:util')
 
   implementation 'com.google.guava:guava'
   implementation 'io.prometheus:simpleclient'
