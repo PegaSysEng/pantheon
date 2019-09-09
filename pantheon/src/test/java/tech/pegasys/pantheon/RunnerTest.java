@@ -53,7 +53,6 @@ import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.nio.file.Path;
@@ -338,7 +337,7 @@ public final class RunnerTest {
     }
   }
 
-  private StorageProvider createKeyValueStorageProvider(final Path dbAhead) throws IOException {
+  private StorageProvider createKeyValueStorageProvider(final Path dbAhead) {
     return new KeyValueStorageProviderBuilder()
         .withStorageFactory(
             new RocksDBKeyValueStorageFactory(
@@ -348,9 +347,9 @@ public final class RunnerTest {
                         MAX_BACKGROUND_COMPACTIONS,
                         BACKGROUND_THREAD_COUNT,
                         CACHE_CAPACITY),
-                Arrays.asList(KeyValueSegmentIdentifier.values()),
-                new NoOpMetricsSystem()))
+                Arrays.asList(KeyValueSegmentIdentifier.values())))
         .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
+        .withMetricsSystem(new NoOpMetricsSystem())
         .build();
   }
 

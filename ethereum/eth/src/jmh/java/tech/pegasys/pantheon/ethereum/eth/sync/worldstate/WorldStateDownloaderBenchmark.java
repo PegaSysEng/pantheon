@@ -166,9 +166,9 @@ public class WorldStateDownloaderBenchmark {
                         DEFAULT_MAX_BACKGROUND_COMPACTIONS,
                         DEFAULT_BACKGROUND_THREAD_COUNT,
                         DEFAULT_CACHE_CAPACITY),
-                Arrays.asList(KeyValueSegmentIdentifier.values()),
-                new NoOpMetricsSystem()))
+                Arrays.asList(KeyValueSegmentIdentifier.values())))
         .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
+        .withMetricsSystem(new NoOpMetricsSystem())
         .build();
   }
 }

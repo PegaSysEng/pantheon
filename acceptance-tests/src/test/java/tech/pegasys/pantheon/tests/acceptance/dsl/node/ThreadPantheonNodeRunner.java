@@ -123,6 +123,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         new KeyValueStorageProviderBuilder()
             .withStorageFactory(storageService.getByName("rocksdb"))
             .withCommonConfiguration(commonPluginConfiguration)
+            .withMetricsSystem(noOpMetricsSystem)
             .build();
 
     final PantheonController<?> pantheonController;

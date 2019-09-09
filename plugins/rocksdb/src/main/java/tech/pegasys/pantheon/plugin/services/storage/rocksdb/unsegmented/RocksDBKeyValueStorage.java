@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb.unsegmented;
 
-import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
@@ -53,7 +53,7 @@ public class RocksDBKeyValueStorage implements KeyValueStorage {
   private final RocksDBMetrics rocksDBMetrics;
 
   public RocksDBKeyValueStorage(
-      final RocksDBConfiguration configuration, final ObservableMetricsSystem metricsSystem) {
+      final RocksDBConfiguration configuration, final MetricsSystem metricsSystem) {
 
     try {
       final Statistics stats = new Statistics();

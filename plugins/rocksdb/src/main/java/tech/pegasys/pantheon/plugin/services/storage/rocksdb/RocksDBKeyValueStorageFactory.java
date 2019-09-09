@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
@@ -50,15 +50,12 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   private final Supplier<RocksDBFactoryConfiguration> configuration;
   private final List<SegmentIdentifier> segments;
-  private final ObservableMetricsSystem metricsSystem;
 
   public RocksDBKeyValueStorageFactory(
       final Supplier<RocksDBFactoryConfiguration> configuration,
-      final List<SegmentIdentifier> segments,
-      final ObservableMetricsSystem metricsSystem) {
+      final List<SegmentIdentifier> segments) {
     this.configuration = configuration;
     this.segments = segments;
-    this.metricsSystem = metricsSystem;
   }
 
   @Override
@@ -68,11 +65,13 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   @Override
   public KeyValueStorage create(
-      final SegmentIdentifier segment, final PantheonConfiguration commonConfiguration)
+      final SegmentIdentifier segment,
+      final PantheonConfiguration commonConfiguration,
+      final MetricsSystem metricsSystem)
       throws StorageException {
 
     if (requiresInit()) {
-      init(commonConfiguration);
+      init(commonConfiguration, metricsSystem);
     }
 
     return isSegmentIsolationSupported
@@ -102,7 +101,8 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     return segmentedStorage == null && unsegmentedStorage == null;
   }
 
-  private void init(final PantheonConfiguration commonConfiguration) {
+  private void init(
+      final PantheonConfiguration commonConfiguration, final MetricsSystem metricsSystem) {
     try {
       this.isSegmentIsolationSupported = databaseVersion(commonConfiguration) == DEFAULT_VERSION;
     } catch (final IOException e) {

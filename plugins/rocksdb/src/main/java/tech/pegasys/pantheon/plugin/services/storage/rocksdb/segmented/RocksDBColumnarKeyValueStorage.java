@@ -14,7 +14,7 @@ package tech.pegasys.pantheon.plugin.services.storage.rocksdb.segmented;
 
 import static java.util.Objects.requireNonNullElse;
 
-import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
+import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
@@ -72,7 +72,7 @@ public class RocksDBColumnarKeyValueStorage
   public RocksDBColumnarKeyValueStorage(
       final RocksDBConfiguration configuration,
       final List<SegmentIdentifier> segments,
-      final ObservableMetricsSystem metricsSystem)
+      final MetricsSystem metricsSystem)
       throws StorageException {
 
     try {

@@ -90,7 +90,7 @@ public class PrivacyTest {
     assertThat(precompiledContract.getName()).isEqualTo("Privacy");
   }
 
-  private StorageProvider createKeyValueStorageProvider(final Path dbAhead) throws IOException {
+  private StorageProvider createKeyValueStorageProvider(final Path dbAhead) {
     return new KeyValueStorageProviderBuilder()
         .withStorageFactory(
             new RocksDBKeyValuePrivacyStorageFactory(
@@ -100,9 +100,9 @@ public class PrivacyTest {
                         MAX_BACKGROUND_COMPACTIONS,
                         BACKGROUND_THREAD_COUNT,
                         CACHE_CAPACITY),
-                Arrays.asList(KeyValueSegmentIdentifier.values()),
-                new NoOpMetricsSystem()))
+                Arrays.asList(KeyValueSegmentIdentifier.values())))
         .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
+        .withMetricsSystem(new NoOpMetricsSystem())
         .build();
   }
 }

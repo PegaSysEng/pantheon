@@ -12,8 +12,6 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.PantheonContext;
 import tech.pegasys.pantheon.plugin.PantheonPlugin;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
@@ -97,17 +95,12 @@ public class RocksDBPlugin implements PantheonPlugin {
   }
 
   private void createAndRegister(final StorageService service) {
-    // TODO get the metrics system from a service (code will arrive soon on master - MT)
-    final ObservableMetricsSystem metricsSystem = new NoOpMetricsSystem();
-
-    // TODO parse all cmd & create the common config before PantheonController is built
     final List<SegmentIdentifier> segments = service.getAllSegmentIdentifiers();
 
     final Supplier<RocksDBFactoryConfiguration> configuration =
         Suppliers.memoize(options::toDomainObject);
-    factory = new RocksDBKeyValueStorageFactory(configuration, segments, metricsSystem);
-    privacyFactory =
-        new RocksDBKeyValuePrivacyStorageFactory(configuration, segments, metricsSystem);
+    factory = new RocksDBKeyValueStorageFactory(configuration, segments);
+    privacyFactory = new RocksDBKeyValuePrivacyStorageFactory(configuration, segments);
 
     service.registerKeyValueStorage(factory);
     service.registerKeyValueStorage(privacyFactory);

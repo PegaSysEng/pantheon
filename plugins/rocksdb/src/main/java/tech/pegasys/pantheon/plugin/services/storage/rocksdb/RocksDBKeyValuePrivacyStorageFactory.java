@@ -12,7 +12,6 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
@@ -29,9 +28,8 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
 
   public RocksDBKeyValuePrivacyStorageFactory(
       final Supplier<RocksDBFactoryConfiguration> configuration,
-      final List<SegmentIdentifier> segments,
-      final ObservableMetricsSystem metricsSystem) {
-    super(configuration, segments, metricsSystem);
+      final List<SegmentIdentifier> segments) {
+    super(configuration, segments);
   }
 
   @Override
