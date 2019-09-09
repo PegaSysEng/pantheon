@@ -29,6 +29,7 @@ if (shouldPublish()) {
 def docker_image_dind = 'docker:18.06.0-ce-dind'
 def docker_image = 'docker:18.06.0-ce'
 def build_image = 'pegasyseng/pantheon-build:0.0.7-jdk11'
+def python_image = 'python:3'
 
 def abortPreviousBuilds() {
     Run previousBuild = currentBuild.rawBuild.getPreviousBuildInProgress()
@@ -54,7 +55,21 @@ if (!shouldPublish()) {
 
 try {
     timeout(time: 1, unit: 'HOURS') {
-        parallel UnitTests: {
+        parallel DCOCheck: {
+            def stage_name = "DCO tests node: "
+            node {
+                checkout scm
+                docker.image(python_image).withRun('/bin/bash').inside() {
+                    stage(stage_name + 'Prepare') {
+                        pip install lftools
+                    }
+                    
+                    stage(stage_name + 'Check') {
+                        lftools dco check
+                    }
+                }
+            }
+        }, UnitTests: {
             def stage_name = "Unit tests node: "
             node {
                 checkout scm
