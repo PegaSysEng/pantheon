@@ -49,7 +49,7 @@ public class SyncState {
         });
   }
 
-  private void publishSyncStatus() {
+  public void publishSyncStatus() {
     final SyncStatus syncStatus = syncStatus();
     syncStatusListeners.forEach(c -> c.onSynchronizerStatusChanged(syncStatus));
   }
@@ -58,8 +58,12 @@ public class SyncState {
     inSyncListeners.subscribe(observer);
   }
 
-  public void addSyncStatusListener(final SynchronizerStatusListener observer) {
-    syncStatusListeners.subscribe(observer);
+  public long addSyncStatusListener(final SynchronizerStatusListener observer) {
+    return syncStatusListeners.subscribe(observer);
+  }
+
+  public void removeSyncStatusListener(final long listenerId) {
+    syncStatusListeners.unsubscribe(listenerId);
   }
 
   public SyncStatus syncStatus() {

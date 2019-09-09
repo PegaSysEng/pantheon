@@ -42,6 +42,7 @@ import tech.pegasys.pantheon.ethereum.mainnet.ValidationResult;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.data.BlockHeader;
+import tech.pegasys.pantheon.plugin.data.SyncStatus;
 import tech.pegasys.pantheon.plugin.data.Transaction;
 import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -66,7 +67,7 @@ public class PantheonEventsImplTest {
 
   @Mock private ProtocolSchedule<Void> mockProtocolSchedule;
   @Mock private ProtocolContext<Void> mockProtocolContext;
-  @Mock private SyncState mockSyncState;
+  private SyncState syncState;
   @Mock private EthPeers mockEthPeers;
   @Mock private EthContext mockEthContext;
   @Mock private EthMessages mockEthMessages;
@@ -109,11 +110,31 @@ public class PantheonEventsImplTest {
             mockEthContext,
             TestClock.fixed(),
             new NoOpMetricsSystem(),
-            mockSyncState,
+            syncState,
             Wei.ZERO,
             TransactionPoolConfiguration.builder().build());
+    syncState = new SyncState(mockBlockchain, mockEthPeers);
 
-    serviceImpl = new PantheonEventsImpl(blockBroadcaster, transactionPool, synchronizer);
+    serviceImpl = new PantheonEventsImpl(blockBroadcaster, transactionPool, syncState);
+  }
+
+  @Test
+  public void newSyncStatusEventFiresAfterSubscribe() {
+    final AtomicReference<SyncStatus> result = new AtomicReference<>();
+    serviceImpl.addSynchronizerStatusListener(result::set);
+
+    assertThat(result.get()).isNull();
+    syncState.publishSyncStatus();
+    assertThat(result.get()).isNotNull();
+  }
+
+  @Test
+  public void newSyncStatusEventDoesNotFireAfterUnsubscribe() {
+    final AtomicReference<SyncStatus> result = new AtomicReference<>();
+    final long id = serviceImpl.addSynchronizerStatusListener(result::set);
+    serviceImpl.removeSynchronizerStatusListener(id);
+    syncState.publishSyncStatus();
+    assertThat(result.get()).isNull();
   }
 
   @Test
