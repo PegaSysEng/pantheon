@@ -57,6 +57,7 @@ import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.concurrent.Executors;
@@ -86,6 +87,7 @@ public abstract class PantheonControllerBuilder<C> {
   private final List<Runnable> shutdownActions = new ArrayList<>();
   private boolean isPruningEnabled;
   private PruningConfiguration pruningConfiguration;
+  Map<String, String> genesisConfigOverrides;
 
   public PantheonControllerBuilder<C> storageProvider(final StorageProvider storageProvider) {
     this.storageProvider = storageProvider;
@@ -172,6 +174,12 @@ public abstract class PantheonControllerBuilder<C> {
     return this;
   }
 
+  public PantheonControllerBuilder<C> genesisConfigOverrides(
+      final Map<String, String> genesisConfigOverrides) {
+    this.genesisConfigOverrides = genesisConfigOverrides;
+    return this;
+  }
+
   public PantheonController<C> build() {
     checkNotNull(genesisConfig, "Missing genesis config");
     checkNotNull(syncConfig, "Missing sync config");
@@ -254,7 +262,8 @@ public abstract class PantheonControllerBuilder<C> {
             clock,
             metricsSystem);
 
-    final OptionalLong daoBlock = genesisConfig.getConfigOptions().getDaoForkBlock();
+    final OptionalLong daoBlock =
+        genesisConfig.getConfigOptions(genesisConfigOverrides).getDaoForkBlock();
     if (daoBlock.isPresent()) {
       // Setup dao validator
       final EthContext ethContext = ethProtocolManager.ethContext();
@@ -293,7 +302,7 @@ public abstract class PantheonControllerBuilder<C> {
         protocolSchedule,
         protocolContext,
         ethProtocolManager,
-        genesisConfig.getConfigOptions(),
+        genesisConfig.getConfigOptions(genesisConfigOverrides),
         subProtocolConfiguration,
         synchronizer,
         additionalJsonRpcMethodFactory,

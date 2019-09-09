@@ -122,6 +122,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -662,6 +663,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       arity = "1")
   private String keyValueStorageName = KEY_VALUE_STORAGE_NAME;
 
+  @Option(
+      names = {"--override-genesis-config"},
+      paramLabel = "NAME=VALUE",
+      description = "Overrides configuration values in the genesis file.  Use with care.",
+      arity = "*",
+      hidden = true,
+      split = ",")
+  private final Map<String, String> genesisConfigOverrides =
+      new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
   private EthNetworkConfig ethNetworkConfig;
   private JsonRpcConfiguration jsonRpcConfiguration;
   private GraphQLConfiguration graphQLConfiguration;
@@ -990,7 +1001,8 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           .isRevertReasonEnabled(isRevertReasonEnabled)
           .storageProvider(keyStorageProvider(keyValueStorageName))
           .isPruningEnabled(isPruningEnabled)
-          .pruningConfiguration(buildPruningConfiguration());
+          .pruningConfiguration(buildPruningConfiguration())
+          .genesisConfigOverrides(genesisConfigOverrides);
     } catch (final IOException e) {
       throw new ExecutionException(this.commandLine, "Invalid path", e);
     }
@@ -1400,7 +1412,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
           final GenesisConfigFile genesisConfigFile = GenesisConfigFile.fromConfig(genesisConfig());
           builder.setNetworkId(
               genesisConfigFile
-                  .getConfigOptions()
+                  .getConfigOptions(genesisConfigOverrides)
                   .getChainId()
                   .orElse(EthNetworkConfig.getNetworkConfig(MAINNET).getNetworkId()));
         } catch (final DecodeException e) {
