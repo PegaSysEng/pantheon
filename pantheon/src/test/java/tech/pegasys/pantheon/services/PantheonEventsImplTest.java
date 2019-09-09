@@ -149,7 +149,6 @@ public class PantheonEventsImplTest {
 
   @Test
   public void newBlockEventUselessUnsubscribesCompletes() {
-    serviceImpl.removeBlockPropagatedListener("doesNotExist");
     serviceImpl.removeBlockPropagatedListener(5);
     serviceImpl.removeBlockPropagatedListener(5L);
   }
@@ -182,7 +181,6 @@ public class PantheonEventsImplTest {
 
   @Test
   public void newTransactionEventUselessUnsubscribesCompletes() {
-    serviceImpl.removeTransactionAddedListener("doesNotExist");
     serviceImpl.removeTransactionAddedListener(5);
     serviceImpl.removeTransactionAddedListener(5L);
   }
