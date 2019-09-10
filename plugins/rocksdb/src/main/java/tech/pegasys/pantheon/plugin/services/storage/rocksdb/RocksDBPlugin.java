@@ -79,12 +79,18 @@ public class RocksDBPlugin implements PantheonPlugin {
 
   @Override
   public void stop() {
+    LOG.info("Stopping plugin.");
+
     try {
       if (factory != null) {
         factory.close();
         factory = null;
       }
+    } catch (final IOException e) {
+      LOG.error("Failed to stop plugin: {}", e.getMessage(), e);
+    }
 
+    try {
       if (privacyFactory != null) {
         privacyFactory.close();
         privacyFactory = null;
