@@ -112,7 +112,7 @@ public class PantheonEventsImplTest {
             new NoOpMetricsSystem(),
             syncState,
             Wei.ZERO,
-            TransactionPoolConfiguration.builder().build());
+            TransactionPoolConfiguration.builder().txPoolMaxSize(1).build());
     syncState = new SyncState(mockBlockchain, mockEthPeers);
 
     serviceImpl = new PantheonEventsImpl(blockBroadcaster, transactionPool, syncState);
@@ -201,9 +201,39 @@ public class PantheonEventsImplTest {
   }
 
   @Test
-  public void newTransactionEventUselessUnsubscribesCompletes() {
+  public void transactionAddedEventUselessUnsubscribesCompletes() {
     serviceImpl.removeTransactionAddedListener(5);
     serviceImpl.removeTransactionAddedListener(5L);
+  }
+
+  @Test
+  public void transactionDroppedEventFiresAfterSubscribe() {
+    final AtomicReference<Transaction> result = new AtomicReference<>();
+    serviceImpl.addTransactionDroppedListener(result::set);
+
+    assertThat(result.get()).isNull();
+    // The max pool size is configured to 1 so adding two transactions should trigger a drop
+    transactionPool.addLocalTransaction(TX1);
+    transactionPool.addLocalTransaction(TX2);
+
+    assertThat(result.get()).isNotNull();
+  }
+
+  @Test
+  public void transactionDroppedEventDoesNotFireAfterUnsubscribe() {
+    final AtomicReference<Transaction> result = new AtomicReference<>();
+    final long id = serviceImpl.addTransactionDroppedListener(result::set);
+
+    assertThat(result.get()).isNull();
+    transactionPool.addLocalTransaction(TX1);
+    transactionPool.addLocalTransaction(TX2);
+
+    assertThat(result.get()).isNotNull();
+    serviceImpl.removeTransactionAddedListener(id);
+    result.set(null);
+
+    transactionPool.addLocalTransaction(TX2);
+    assertThat(result.get()).isNull();
   }
 
   private Block generateBlock() {
