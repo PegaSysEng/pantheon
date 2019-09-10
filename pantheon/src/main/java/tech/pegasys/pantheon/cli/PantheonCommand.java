@@ -659,7 +659,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
   @Option(
       names = {"--key-value-storage"},
-      description = "Identity for the key-value storage to be used,",
+      description = "Identity for the key-value storage to be used.",
       arity = "1")
   private String keyValueStorageName = KEY_VALUE_STORAGE_NAME;
 
