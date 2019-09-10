@@ -29,7 +29,7 @@ if (shouldPublish()) {
 def docker_image_dind = 'docker:18.06.0-ce-dind'
 def docker_image = 'docker:18.06.0-ce'
 def build_image = 'pegasyseng/pantheon-build:0.0.7-jdk11'
-def python_image = 'edjojob/lftools:latest'
+def python_image = 'edjojob/lftools'
 
 def abortPreviousBuilds() {
     Run previousBuild = currentBuild.rawBuild.getPreviousBuildInProgress()
