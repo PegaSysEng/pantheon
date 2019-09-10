@@ -24,7 +24,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.Subscriptio
 import tech.pegasys.pantheon.ethereum.jsonrpc.websocket.subscription.request.SubscriptionType;
 
 import java.util.List;
-import java.util.Optional;
 
 public class LogsSubscriptionService implements BlockAddedObserver {
 
