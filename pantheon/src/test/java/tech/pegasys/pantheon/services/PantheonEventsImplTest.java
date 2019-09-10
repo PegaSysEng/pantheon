@@ -119,7 +119,7 @@ public class PantheonEventsImplTest {
   }
 
   @Test
-  public void newSyncStatusEventFiresAfterSubscribe() {
+  public void syncStatusEventFiresAfterSubscribe() {
     final AtomicReference<SyncStatus> result = new AtomicReference<>();
     serviceImpl.addSyncStatusListener(result::set);
 
@@ -129,7 +129,7 @@ public class PantheonEventsImplTest {
   }
 
   @Test
-  public void newSyncStatusEventDoesNotFireAfterUnsubscribe() {
+  public void syncStatusEventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<SyncStatus> result = new AtomicReference<>();
     final long id = serviceImpl.addSyncStatusListener(result::set);
     syncState.publishSyncStatus();
@@ -179,7 +179,7 @@ public class PantheonEventsImplTest {
   }
 
   @Test
-  public void newTransactionEventFiresAfterSubscribe() {
+  public void transactionAddedEventFiresAfterSubscribe() {
     final AtomicReference<Transaction> result = new AtomicReference<>();
     serviceImpl.addTransactionAddedListener(result::set);
 
