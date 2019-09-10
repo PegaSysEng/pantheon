@@ -24,6 +24,8 @@ import tech.pegasys.pantheon.util.Subscribers;
 
 import java.util.Optional;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class SyncState {
   private static final long SYNC_TOLERANCE = 5;
   private final Blockchain blockchain;
@@ -49,6 +51,7 @@ public class SyncState {
         });
   }
 
+  @VisibleForTesting
   public void publishSyncStatus() {
     final SyncStatus syncStatus = syncStatus();
     syncStatusListeners.forEach(c -> c.onSyncStatusChanged(syncStatus));
