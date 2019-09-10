@@ -46,7 +46,9 @@ public class LogsSubscriptionService implements BlockAddedObserver {
     }
 
     event.getAddedTransactions().stream()
-        .flatMap(tx -> blockchainQueries.transactionReceiptByTransactionHash(tx.hash()).stream())
+        .map(tx -> blockchainQueries.transactionReceiptByTransactionHash(tx.hash()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .forEachOrdered(
             receiptWithMetadata -> {
               final List<Log> logs = receiptWithMetadata.getReceipt().getLogs();
@@ -54,7 +56,9 @@ public class LogsSubscriptionService implements BlockAddedObserver {
             });
 
     event.getRemovedTransactions().stream()
-        .flatMap(tx -> blockchainQueries.transactionReceiptByTransactionHash(tx.hash()).stream())
+        .map(tx -> blockchainQueries.transactionReceiptByTransactionHash(tx.hash()))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
         .forEachOrdered(
             receiptWithMetadata -> {
               final List<Log> logs = receiptWithMetadata.getReceipt().getLogs();
