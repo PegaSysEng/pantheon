@@ -54,6 +54,8 @@ public class LogWithMetadata {
     this.removed = removed;
   }
 
+  // The index of this log within the entire ordered list of logs associated with the block this log
+  // belongs to.
   public int getLogIndex() {
     return logIndex;
   }
@@ -74,7 +76,7 @@ public class LogWithMetadata {
     return transactionIndex;
   }
 
-  public Address getLogger() {
+  public Address getAddress() {
     return address;
   }
 
