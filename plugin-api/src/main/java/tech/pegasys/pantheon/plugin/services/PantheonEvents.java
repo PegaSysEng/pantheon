@@ -85,8 +85,7 @@ public interface PantheonEvents {
   /**
    * Add a listener watching the synchronizer status.
    *
-   * @param syncStatusListener The listener that will accept the SyncStatus object as the
-   *     event.
+   * @param syncStatusListener The listener that will accept the SyncStatus object as the event.
    * @return an object to be used as an identifier when de-registering the event.
    */
   long addSyncStatusListener(SyncStatusListener syncStatusListener);

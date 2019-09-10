@@ -65,8 +65,7 @@ public class PantheonEventsImpl implements PantheonEvents {
   }
 
   @Override
-  public long addSyncStatusListener(
-      final SyncStatusListener syncStatusListener) {
+  public long addSyncStatusListener(final SyncStatusListener syncStatusListener) {
     return syncState.addSyncStatusListener(syncStatusListener);
   }
 
