@@ -132,6 +132,9 @@ public class PantheonEventsImplTest {
   public void newSyncStatusEventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<SyncStatus> result = new AtomicReference<>();
     final long id = serviceImpl.addSyncStatusListener(result::set);
+    syncState.publishSyncStatus();
+    assertThat(result.get()).isNotNull();
+    result.set(null);
     serviceImpl.removeSyncStatusListener(id);
     syncState.publishSyncStatus();
     assertThat(result.get()).isNull();
@@ -156,6 +159,7 @@ public class PantheonEventsImplTest {
     assertThat(result.get()).isNull();
     blockBroadcaster.propagate(generateBlock(), UInt256.of(1));
 
+    assertThat(result.get()).isNotNull();
     serviceImpl.removeBlockPropagatedListener(id);
     result.set(null);
 
@@ -186,12 +190,13 @@ public class PantheonEventsImplTest {
   }
 
   @Test
-  public void newTransactionEventDoesNotFireAfterUnsubscribe() {
+  public void transactionAddedEventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<Transaction> result = new AtomicReference<>();
     final long id = serviceImpl.addTransactionAddedListener(result::set);
 
     assertThat(result.get()).isNull();
     transactionPool.addLocalTransaction(TX1);
+    assertThat(result.get()).isNotNull();
 
     serviceImpl.removeTransactionAddedListener(id);
     result.set(null);
