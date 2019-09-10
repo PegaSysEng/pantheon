@@ -30,7 +30,7 @@ public interface Synchronizer {
    */
   Optional<SyncStatus> getSyncStatus();
 
-  long observeSyncStatus(final PantheonEvents.SynchronizerStatusListener listener);
+  long observeSyncStatus(final PantheonEvents.SyncStatusListener listener);
 
   boolean removeObserver(long observerId);
 }

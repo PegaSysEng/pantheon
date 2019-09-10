@@ -65,21 +65,13 @@ public class PantheonEventsImpl implements PantheonEvents {
   }
 
   @Override
-  public long addLogWithMetadataListener(final LogWithMetadataListener logWithMetaDataListener) {
-    return 0;
+  public long addSyncStatusListener(
+      final SyncStatusListener syncStatusListener) {
+    return syncState.addSyncStatusListener(syncStatusListener);
   }
 
   @Override
-  public void removeLogWithMetadataListener(final long listenerIdentifier) {}
-
-  @Override
-  public long addSynchronizerStatusListener(
-      final SynchronizerStatusListener synchronizerStatusListener) {
-    return syncState.addSyncStatusListener(synchronizerStatusListener);
-  }
-
-  @Override
-  public void removeSynchronizerStatusListener(final long listenerIdentifier) {
+  public void removeSyncStatusListener(final long listenerIdentifier) {
     syncState.removeSyncStatusListener(listenerIdentifier);
   }
 }

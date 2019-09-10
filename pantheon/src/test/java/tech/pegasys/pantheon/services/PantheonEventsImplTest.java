@@ -121,7 +121,7 @@ public class PantheonEventsImplTest {
   @Test
   public void newSyncStatusEventFiresAfterSubscribe() {
     final AtomicReference<SyncStatus> result = new AtomicReference<>();
-    serviceImpl.addSynchronizerStatusListener(result::set);
+    serviceImpl.addSyncStatusListener(result::set);
 
     assertThat(result.get()).isNull();
     syncState.publishSyncStatus();
@@ -131,8 +131,8 @@ public class PantheonEventsImplTest {
   @Test
   public void newSyncStatusEventDoesNotFireAfterUnsubscribe() {
     final AtomicReference<SyncStatus> result = new AtomicReference<>();
-    final long id = serviceImpl.addSynchronizerStatusListener(result::set);
-    serviceImpl.removeSynchronizerStatusListener(id);
+    final long id = serviceImpl.addSyncStatusListener(result::set);
+    serviceImpl.removeSyncStatusListener(id);
     syncState.publishSyncStatus();
     assertThat(result.get()).isNull();
   }

@@ -14,11 +14,8 @@ package tech.pegasys.pantheon.plugin.services;
 
 import tech.pegasys.pantheon.plugin.Unstable;
 import tech.pegasys.pantheon.plugin.data.BlockHeader;
-import tech.pegasys.pantheon.plugin.data.LogWithMetadata;
 import tech.pegasys.pantheon.plugin.data.SyncStatus;
 import tech.pegasys.pantheon.plugin.data.Transaction;
-
-import java.util.List;
 
 /**
  * This service allows plugins to attach to various events during the normal operation of Pantheon.
@@ -86,37 +83,20 @@ public interface PantheonEvents {
   void removeTransactionDroppedListener(long listenerIdentifier);
 
   /**
-   * Add a listener watching logs (plus metadata about them) included in new blocks.
-   *
-   * @param logWithMetadataListener The listener that will accept the LogWithMetadata object as the
-   *     event.
-   * @return an object to be used as an identifier when de-registering the event.
-   */
-  long addLogWithMetadataListener(
-      List<String> address, List<String> topics, LogWithMetadataListener logWithMetadataListener);
-
-  /**
-   * Remove the logs listener from pantheon notifications.
-   *
-   * @param listenerIdentifier The instance that was returned from addTransactionDroppedListener;
-   */
-  void removeLogWithMetadataListener(long listenerIdentifier);
-
-  /**
    * Add a listener watching the synchronizer status.
    *
-   * @param synchronizerStatusListener The listener that will accept the SyncStatus object as the
+   * @param syncStatusListener The listener that will accept the SyncStatus object as the
    *     event.
    * @return an object to be used as an identifier when de-registering the event.
    */
-  long addSynchronizerStatusListener(SynchronizerStatusListener synchronizerStatusListener);
+  long addSyncStatusListener(SyncStatusListener syncStatusListener);
 
   /**
    * Remove the logs listener from pantheon notifications.
    *
    * @param listenerIdentifier The instance that was returned from addTransactionDroppedListener;
    */
-  void removeSynchronizerStatusListener(long listenerIdentifier);
+  void removeSyncStatusListener(long listenerIdentifier);
 
   /** The listener interface for receiving new block propagated events. */
   interface BlockPropagatedListener {
@@ -155,25 +135,14 @@ public interface PantheonEvents {
     void onTransactionDropped(Transaction transaction);
   }
 
-  /** The listener interface for receiving logs from new blocks. */
-  interface LogWithMetadataListener {
-
-    /**
-     * Invoked when a new block is added.
-     *
-     * @param logs the new logs from the block added event
-     */
-    void onLogWithMetadatasAdded(List<LogWithMetadata> logs);
-  }
-
   /** The listener interface for receiving sync status events. */
-  interface SynchronizerStatusListener {
+  interface SyncStatusListener {
 
     /**
      * Invoked when the synchronizer status changes
      *
      * @param syncStatus the sync status
      */
-    void onSynchronizerStatusChanged(SyncStatus syncStatus);
+    void onSyncStatusChanged(SyncStatus syncStatus);
   }
 }
