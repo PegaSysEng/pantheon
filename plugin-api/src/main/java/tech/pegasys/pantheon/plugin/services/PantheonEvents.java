@@ -18,6 +18,7 @@ import tech.pegasys.pantheon.plugin.data.LogWithMetadata;
 import tech.pegasys.pantheon.plugin.data.SyncStatus;
 import tech.pegasys.pantheon.plugin.data.Transaction;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -92,7 +93,7 @@ public interface PantheonEvents {
    *     event.
    * @return an object to be used as an identifier when de-registering the event.
    */
-  long addLogWithMetadataListener(LogWithMetadataListener logWithMetadataListener);
+  long addLogWithMetadataListener(List<String> address, List<String> topics, LogWithMetadataListener logWithMetadataListener);
 
   /**
    * Remove the logs listener from pantheon notifications.
