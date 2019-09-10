@@ -59,7 +59,7 @@ try {
             def stage_name = "DCO tests node: "
             node {
                 checkout scm
-                docker.image(python_image).withRun('/bin/bash').inside() {
+                docker.image(python_image).withRun('/bin/bash') {
                     stage(stage_name + 'Prepare') {
                         pip install lftools
                     }
