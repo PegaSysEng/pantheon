@@ -226,7 +226,7 @@ try {
         }, BintrayPublish: {
             def stage_name = "Bintray publish node: "
             node {
-                if (shouldPublish()) {
+
                     checkout scm
 
                     docker.image(docker_image_dind).withRun('--privileged') { d ->
@@ -247,7 +247,7 @@ try {
                             }
                         }
                     }
-                }
+
             }
         }
     }
