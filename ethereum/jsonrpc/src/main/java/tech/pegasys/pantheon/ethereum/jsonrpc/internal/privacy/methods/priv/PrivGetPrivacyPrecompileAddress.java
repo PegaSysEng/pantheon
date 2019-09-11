@@ -39,7 +39,7 @@ public class PrivGetPrivacyPrecompileAddress implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-
+    request.assertMaxLength(1);
     if (privacyEnabled) {
       return new JsonRpcSuccessResponse(
           request.getId(), Address.privacyPrecompiled(privacyAddress).toString());

@@ -47,9 +47,7 @@ public class EeaGetTransactionCount implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    if (request.getParamLength() != 3) {
-      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
-    }
+    request.assertMaxLength(3);
 
     final Address address = parameters.required(request.getParams(), 0, Address.class);
     final String privateFrom = parameters.required(request.getParams(), 1, String.class);

@@ -14,6 +14,7 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -167,5 +168,22 @@ public class PrivGetPrivateTransactionTest {
     final PrivateTransactionResult result = (PrivateTransactionResult) response.getResult();
 
     assertThat(result).isEqualToComparingFieldByField(privateTransactionGroupResult);
+  }
+
+  @Test
+  public void tooManyParamsThrowsException() {
+    when(blockchain.transactionByHash(any(Hash.class)))
+        .thenReturn(Optional.of(returnedTransaction));
+    when(returnedTransaction.getTransaction()).thenReturn(justTransaction);
+    when(justTransaction.getPayload()).thenReturn(BytesValues.fromBase64(""));
+
+    final PrivGetPrivateTransaction privGetPrivateTransaction =
+        new PrivGetPrivateTransaction(blockchain, enclave, parameters, privacyParameters);
+
+    final Object[] params = new Object[] {enclaveKey, "tooManyParams"};
+    final JsonRpcRequest tooManyParamsReq =
+        new JsonRpcRequest("1", "priv_getPrivateTransaction", params);
+    assertThatExceptionOfType(RuntimeException.class)
+        .isThrownBy(() -> privGetPrivateTransaction.response(tooManyParamsReq));
   }
 }

@@ -73,6 +73,7 @@ public class EeaGetTransactionReceipt implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
+    request.assertMaxLength(1);
     LOG.trace("Executing {}", RpcMethod.EEA_GET_TRANSACTION_RECEIPT.getMethodName());
     final Hash transactionHash = parameters.required(request.getParams(), 0, Hash.class);
     final Optional<TransactionLocation> maybeLocation =

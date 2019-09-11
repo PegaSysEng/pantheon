@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.catchThrowableOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -245,5 +246,21 @@ public class PrivCreatePrivacyGroupTest {
     final JsonRpcError result = response.getError();
 
     assertThat(result).isEqualTo(JsonRpcError.CREATE_PRIVACY_GROUP_ERROR);
+  }
+
+  @Test
+  public void tooManyParamsThrowsException() {
+
+    final PrivCreatePrivacyGroup privCreatePrivacyGroup =
+        new PrivCreatePrivacyGroup(enclave, privacyParameters, parameters);
+
+    final CreatePrivacyGroupParameter param =
+        new CreatePrivacyGroupParameter(ADDRESSES, NAME, DESCRIPTION);
+    final Object[] params = new Object[] {param, "tooManyParams"};
+
+    final JsonRpcRequest tooManyParamsReq =
+        new JsonRpcRequest("1", "priv_createPrivacyGroup", params);
+    assertThatExceptionOfType(RuntimeException.class)
+        .isThrownBy(() -> privCreatePrivacyGroup.response(tooManyParamsReq));
   }
 }

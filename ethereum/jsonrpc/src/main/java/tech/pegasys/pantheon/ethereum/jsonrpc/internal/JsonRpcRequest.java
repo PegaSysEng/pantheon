@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.exception.InvalidJsonRpcRequestException;
 
 import java.util.Arrays;
@@ -67,6 +68,15 @@ public class JsonRpcRequest {
   @JsonGetter("params")
   public Object[] getParams() {
     return params;
+  }
+
+  @JsonIgnore
+  public void assertMaxLength(final int expectedLength) {
+    final int length = getParamLength();
+    if (length > expectedLength) {
+      throw new InvalidJsonRpcParameters(
+          "Too many parameters, expected " + expectedLength + ", got " + length + " .");
+    }
   }
 
   @JsonIgnore

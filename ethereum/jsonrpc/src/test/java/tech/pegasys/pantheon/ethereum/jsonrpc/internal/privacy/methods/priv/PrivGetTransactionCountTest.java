@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,5 +54,22 @@ public class PrivGetTransactionCountTest {
         (JsonRpcSuccessResponse) privGetTransactionCount.response(request);
 
     assertEquals(String.format("0x%X", NONCE), response.getResult());
+  }
+
+  @Test
+  public void tooManyParamsThrowsException() {
+    final PrivateTransactionHandler privateTransactionHandler =
+        mock(PrivateTransactionHandler.class);
+    when(privateTransactionHandler.getSenderNonce(senderAddress, privacyGroupId)).thenReturn(NONCE);
+
+    final PrivGetTransactionCount privGetTransactionCount =
+        new PrivGetTransactionCount(parameters, privateTransactionHandler);
+
+    final Object[] params = new Object[] {senderAddress, privacyGroupId, "tooManyParams"};
+    final JsonRpcRequest tooManyParamsReq =
+        new JsonRpcRequest("1", "priv_getTransactionCount", params);
+
+    assertThatExceptionOfType(RuntimeException.class)
+        .isThrownBy(() -> privGetTransactionCount.response(tooManyParamsReq));
   }
 }

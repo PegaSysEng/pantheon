@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.privacy.eea;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -90,5 +91,20 @@ public class EeaGetTransactionCountTest {
     final JsonRpcErrorResponse errorResponse = (JsonRpcErrorResponse) response;
     assertThat(errorResponse.getError())
         .isEqualTo(JsonRpcError.GET_PRIVATE_TRANSACTION_NONCE_ERROR);
+  }
+
+  @Test
+  public void tooManyParamsThrowsAnException() {
+    final long reportedNonce = 8L;
+    final EeaGetTransactionCount method =
+        new EeaGetTransactionCount(new JsonRpcParameter(), nonceProvider);
+
+    when(nonceProvider.determineNonce(privateFrom, privateFor, address)).thenReturn(reportedNonce);
+
+    final Object[] jsonBody = new Object[] {address.toString(), privateFrom, privateFor, "tooMany"};
+    final JsonRpcRequest tooManyParamsReq =
+        new JsonRpcRequest("2.0", "eea_getTransactionCount", jsonBody);
+    assertThatExceptionOfType(RuntimeException.class)
+        .isThrownBy(() -> method.response(tooManyParamsReq));
   }
 }

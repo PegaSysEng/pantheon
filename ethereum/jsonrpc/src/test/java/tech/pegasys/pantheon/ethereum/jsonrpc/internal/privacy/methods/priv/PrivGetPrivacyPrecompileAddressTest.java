@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -65,5 +66,22 @@ public class PrivGetPrivacyPrecompileAddressTest {
 
     assertEquals(JsonRpcResponseType.ERROR, response.getType());
     assertEquals(JsonRpcError.PRIVACY_NOT_ENABLED, ((JsonRpcErrorResponse) response).getError());
+  }
+
+  @Test
+  public void tooManyParamsThrowsException() {
+    when(privacyParameters.getPrivacyAddress()).thenReturn(rawPrivacyAddress);
+    when(privacyParameters.isEnabled()).thenReturn(true);
+
+    final PrivGetPrivacyPrecompileAddress privGetPrivacyPrecompileAddress =
+        new PrivGetPrivacyPrecompileAddress(privacyParameters);
+
+    final Object[] params = new Object[] {new Object[0], "tooManyParams"};
+
+    final JsonRpcRequest tooManyParamsReq =
+        new JsonRpcRequest("1", "priv_getPrivacyPrecompileAddress", params);
+
+    assertThatExceptionOfType(RuntimeException.class)
+        .isThrownBy(() -> privGetPrivacyPrecompileAddress.response(tooManyParamsReq));
   }
 }

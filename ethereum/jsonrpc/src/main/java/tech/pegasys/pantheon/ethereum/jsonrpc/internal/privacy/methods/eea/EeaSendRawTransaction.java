@@ -60,9 +60,7 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    if (request.getParamLength() != 1) {
-      return new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
-    }
+    request.assertMaxLength(1);
     final String rawPrivateTransaction = parameters.required(request.getParams(), 0, String.class);
 
     final PrivateTransaction privateTransaction;

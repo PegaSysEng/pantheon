@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.eea;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
@@ -125,24 +126,14 @@ public class EeaSendRawTransactionTest {
     final JsonRpcRequest request =
         new JsonRpcRequest("2.0", "eea_sendRawTransaction", new String[] {});
 
-    final JsonRpcResponse expectedResponse =
-        new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
-
-    final JsonRpcResponse actualResponse = method.response(request);
-
-    assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+    assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> method.response(request));
   }
 
   @Test
   public void requestHasNullObjectParameter() {
     final JsonRpcRequest request = new JsonRpcRequest("2.0", "eea_sendRawTransaction", null);
 
-    final JsonRpcResponse expectedResponse =
-        new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
-
-    final JsonRpcResponse actualResponse = method.response(request);
-
-    assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+    assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> method.response(request));
   }
 
   @Test
@@ -150,12 +141,7 @@ public class EeaSendRawTransactionTest {
     final JsonRpcRequest request =
         new JsonRpcRequest("2.0", "eea_sendRawTransaction", new String[] {null});
 
-    final JsonRpcResponse expectedResponse =
-        new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);
-
-    final JsonRpcResponse actualResponse = method.response(request);
-
-    assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
+    assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> method.response(request));
   }
 
   @Test
@@ -385,5 +371,17 @@ public class EeaSendRawTransactionTest {
   @Test
   public void getMethodReturnsExpectedName() {
     assertThat(method.getName()).matches("eea_sendRawTransaction");
+  }
+
+  @Test
+  public void tooManyParamsThrowsException() {
+
+    final Object[] params = new Object[] {VALID_PRIVATE_TRANSACTION_RLP, "tooManyParams"};
+
+    final JsonRpcRequest tooManyParamsReq =
+        new JsonRpcRequest("2.0", "eea_sendRawTransaction", params);
+
+    assertThatExceptionOfType(RuntimeException.class)
+        .isThrownBy(() -> method.response(tooManyParamsReq));
   }
 }
