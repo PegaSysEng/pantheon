@@ -54,7 +54,7 @@ public class RocksDBPlugin implements PantheonPlugin {
 
     if (cmdlineOptions.isEmpty()) {
       throw new IllegalStateException(
-          "Expecting a PicoCLIO options to register CLI options with, but found none.");
+          "Expecting a PicoCLIO options to register CLI options with, but none found.");
     }
 
     cmdlineOptions.get().addPicoCLIOptions(NAME, options);
