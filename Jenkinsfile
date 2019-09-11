@@ -240,9 +240,10 @@ try {
                                     credentialsId: 'pegasys-bintray',
                                     usernameVariable: 'BINTRAY_USER',
                                     passwordVariable: 'BINTRAY_KEY'
+
                                 )
                                 ]) {
-                                    sh './gradlew --no-daemon --parallel --debug bintrayUpload'
+                                    sh './gradlew --no-daemon --parallel bintrayUpload'
                                 }
                             }
                         }

@@ -74,7 +74,7 @@ def bintrayKey = project.hasProperty('bintrayApiKey') ? project.property('bintra
 def bintrayPackage = bintray.pkg {
   repo = 'besu-repo'
   name = 'besu'
-  userOrg = 'hyperledger'
+  userOrg = 'hyperledger-org'
   licenses = ['Apache-2.0']
   websiteUrl = 'https://github.com/hyperledger/besu'
   issueTrackerUrl = 'https://github.com/hyperledger/besu/issues'
@@ -124,7 +124,7 @@ allprojects {
       jcenter()
       mavenCentral()
       mavenLocal()
-      maven { url "https://hyperledger-org.bintray.com/besu-repo" }
+      maven { url "https://consensys.bintray.com/pegasys-repo" }
     }
   }
 
@@ -143,7 +143,7 @@ allprojects {
       }
       removeUnusedImports()
       googleJavaFormat('1.7')
-      importOrder 'tech.pegasys', 'java', ''
+      importOrder 'org.hyperledger', 'java', ''
       trimTrailingWhitespace()
       endWithNewline()
       licenseHeaderFile "${rootDir}/gradle/spotless.java.license"
