@@ -1257,7 +1257,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     return new KeyValueStorageProviderBuilder()
         .withStorageFactory(storageService.getByName(name))
         .withCommonConfiguration(pluginCommonConfiguration)
-        .withMetricsSystem(metricsSystem.get())
+        .withMetricsSystem(getMetricsSystem())
         .build();
   }
 
