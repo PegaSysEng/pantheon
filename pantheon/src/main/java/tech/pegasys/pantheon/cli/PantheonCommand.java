@@ -761,7 +761,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   @VisibleForTesting
-  public void setPantheonConfiguration(final PantheonConfiguration pluginCommonConfiguration) {
+  void setPantheonConfiguration(final PantheonConfiguration pluginCommonConfiguration) {
     this.pluginCommonConfiguration = pluginCommonConfiguration;
   }
 
