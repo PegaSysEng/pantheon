@@ -242,7 +242,7 @@ try {
                                     passwordVariable: 'BINTRAY_KEY'
                                 )
                                 ]) {
-                                    sh './gradlew --no-daemon --parallel bintrayUpload'
+                                    sh './gradlew --no-daemon --parallel --debug bintrayUpload'
                                 }
                             }
                         }
