@@ -204,7 +204,7 @@ public class PrivacyNode implements AutoCloseable {
     return pantheon.getConfiguration();
   }
 
-  private StorageProvider createKeyValueStorageProvider(final Path dbAhead) {
+  private StorageProvider createKeyValueStorageProvider(final Path dbLocation) {
     return new KeyValueStorageProviderBuilder()
         .withStorageFactory(
             new RocksDBKeyValuePrivacyStorageFactory(
@@ -215,7 +215,7 @@ public class PrivacyNode implements AutoCloseable {
                         BACKGROUND_THREAD_COUNT,
                         CACHE_CAPACITY),
                 Arrays.asList(KeyValueSegmentIdentifier.values())))
-        .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
+        .withCommonConfiguration(new PantheonConfigurationImpl(dbLocation))
         .withMetricsSystem(new NoOpMetricsSystem())
         .build();
   }
