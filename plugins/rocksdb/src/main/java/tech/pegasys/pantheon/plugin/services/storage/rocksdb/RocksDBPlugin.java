@@ -22,6 +22,7 @@ import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.Rocks
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.auto.service.AutoService;
 import com.google.common.base.Supplier;
@@ -49,12 +50,14 @@ public class RocksDBPlugin implements PantheonPlugin {
     LOG.info("Registering plugin");
     this.context = context;
 
-    context
-        .getService(PicoCLIOptions.class)
-        .ifPresentOrElse(
-            picoCLIOptions -> picoCLIOptions.addPicoCLIOptions(NAME, options),
-            () -> LOG.error("Failed to register CLI options due to missing PicoCLIO options."));
+    final Optional<PicoCLIOptions> cmdlineOptions = context.getService(PicoCLIOptions.class);
 
+    if (cmdlineOptions.isEmpty()) {
+      throw new IllegalStateException(
+          "Expecting a PicoCLIO options to register CLI options with, but found none.");
+    }
+
+    cmdlineOptions.get().addPicoCLIOptions(NAME, options);
     createFactoriesAndRegisterWithStorageService();
 
     LOG.info("Plugin registered.");
