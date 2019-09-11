@@ -31,6 +31,7 @@ import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueStorageProviderBu
 import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
+import tech.pegasys.pantheon.metrics.prometheus.PrometheusMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.plugin.services.StorageService;
@@ -106,7 +107,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         pantheonPluginContextMap.computeIfAbsent(
             node, n -> buildPluginContext(node, storageService, commonPluginConfiguration));
 
-    final ObservableMetricsSystem noOpMetricsSystem = new NoOpMetricsSystem();
+    final ObservableMetricsSystem metricsSystem =
+        PrometheusMetricsSystem.init(node.getMetricsConfiguration());
     final List<EnodeURL> bootnodes =
         node.getConfiguration().getBootnodes().stream()
             .map(EnodeURL::fromURI)
@@ -123,7 +125,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
         new KeyValueStorageProviderBuilder()
             .withStorageFactory(storageService.getByName("rocksdb"))
             .withCommonConfiguration(commonPluginConfiguration)
-            .withMetricsSystem(noOpMetricsSystem)
+            .withMetricsSystem(metricsSystem)
             .build();
 
     final PantheonController<?> pantheonController;
@@ -135,7 +137,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
               .miningParameters(node.getMiningParameters())
               .privacyParameters(node.getPrivacyParameters())
               .nodePrivateKeyFile(KeyPairUtil.getDefaultKeyFile(node.homeDirectory()))
-              .metricsSystem(noOpMetricsSystem)
+              .metricsSystem(metricsSystem)
               .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
               .ethProtocolConfiguration(EthProtocolConfiguration.defaultConfig())
               .clock(Clock.systemUTC())
@@ -174,8 +176,8 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
             .jsonRpcConfiguration(node.jsonRpcConfiguration())
             .webSocketConfiguration(node.webSocketConfiguration())
             .dataDir(node.homeDirectory())
-            .metricsSystem(noOpMetricsSystem)
-            .metricsConfiguration(node.metricsConfiguration())
+            .metricsSystem(metricsSystem)
+            .metricsConfiguration(node.getMetricsConfiguration())
             .p2pEnabled(node.isP2pEnabled())
             .graphQLConfiguration(GraphQLConfiguration.createDefault())
             .staticNodes(
