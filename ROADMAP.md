@@ -39,16 +39,21 @@ Support key-value storage in relational databases to solidify a robust Disaster 
 ## Next (v1.4)
 The key areas for next are:
 * Privacy group modification 
-* IBFT 2.x 
+* Enhancing key management capabilities 
+* Migration tools  
 * Ethereum 1.x 
 
 ### Privacy Group Modification 
 
 Add the ability to add and remove privacy group members. 
 
-### IBFT 2.x 
+### Enhancing Key Management
 
-Continuous improvements on our IBFT2.0 consensus mechanism to enable a stable Enterprise Ethereum client, ensuring a high degree of safety and liveness.
+Enhancing key management capabilities by supporting secure storage of keys. 
+
+### Migration Tools
+
+Adding tools to enable migration across consensus algorithms. 
 
 ### Ethereum 1.x
 
