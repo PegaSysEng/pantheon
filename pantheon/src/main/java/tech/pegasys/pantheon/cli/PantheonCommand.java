@@ -661,7 +661,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       names = {"--key-value-storage"},
       description = "Identity for the key-value storage to be used.",
       arity = "1")
-  private String keyValueStorageName = KEY_VALUE_STORAGE_NAME;
+  private String keyValueStorageName = DEFAULT_KEY_VALUE_STORAGE_NAME;
 
   @Option(
       names = {"--override-genesis-config"},
