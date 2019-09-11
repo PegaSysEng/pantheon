@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.privacy.condition;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyNode;
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.transaction.PrivacyTransactions;
@@ -29,6 +30,10 @@ public class ExpectNoPrivateTransactionReceipt implements PrivateCondition {
 
   @Override
   public void verify(final PrivacyNode node) {
-    assertThat(node.execute(transactions.getPrivateTransactionReceipt(transactionHash))).isNull();
+    final Throwable t =
+        catchThrowable(
+            () -> node.execute(transactions.getPrivateTransactionReceipt(transactionHash)));
+
+    assertThat(t).hasMessageContaining("TransactionException");
   }
 }
