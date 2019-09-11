@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
 import tech.pegasys.pantheon.consensus.common.VoteType;
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcError;
@@ -24,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcError
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcResponseType;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.ethereum.core.Address;
 
 import java.util.Optional;
 

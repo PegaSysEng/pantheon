@@ -15,7 +15,6 @@ package tech.pegasys.pantheon.consensus.clique.jsonrpc.methods;
 import static tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface.NO_VOTE_SUBJECT;
 
 import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
@@ -24,6 +23,7 @@ import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcError
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import tech.pegasys.pantheon.ethereum.core.Address;
 
 public class Propose implements JsonRpcMethod {
   private final VoteProposer proposer;
