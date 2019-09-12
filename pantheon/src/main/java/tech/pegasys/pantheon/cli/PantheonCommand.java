@@ -96,6 +96,7 @@ import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.plugin.services.StorageService;
 import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBPlugin;
 import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
@@ -830,6 +831,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private PantheonCommand preparePlugins() {
     pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
     pantheonPluginContext.addService(StorageService.class, storageService);
+
+    // register built-in plugins
+    new RocksDBPlugin().register(pantheonPluginContext);
+
     pantheonPluginContext.registerPlugins(pluginsDir());
     return this;
   }

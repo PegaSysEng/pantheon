@@ -30,7 +30,6 @@ import com.google.common.base.Suppliers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@AutoService(PantheonPlugin.class)
 public class RocksDBPlugin implements PantheonPlugin {
 
   private static final Logger LOG = LogManager.getLogger();
