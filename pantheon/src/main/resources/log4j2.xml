@@ -2,15 +2,23 @@
 <Configuration status="INFO">
   <Properties>
     <Property name="root.log.level">INFO</Property>
+    <Property name="patternLayout.tty">%style{%d{yyyy-MM-dd HH:mm:ss.SSSZZZ}}{dim} %style{|}{dim} %highlight{%-5level}{INFO=cyan, ERROR=bright red, WARN=bright yellow, FATAL=bright red} %style{|}{dim} %style{%t}{cyan} %style{|}{dim} %style{%c{1}}{cyan} %style{|}{dim} %highlight{%m}{INFO=Normal, ERROR=bright red, WARN=bright yellow, FATAL=bright red}%n</Property>
   </Properties>
 
   <Appenders>
-    <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSSZZZ} | %t | %-5level | %c{1} | %msg%n" />    </Console>
+    <Console name="ConsoleStdOut" target="SYSTEM_OUT">
+      <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="ACCEPT" />
+      <PatternLayout pattern="${sys:patternLayout.tty}" />
+    </Console>
+    <Console name="ConsoleStdErr" target="SYSTEM_ERR">
+      <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY" />
+      <PatternLayout pattern="${sys:patternLayout.tty}" />
+    </Console>
   </Appenders>
   <Loggers>
     <Root level="${sys:root.log.level}">
-      <AppenderRef ref="Console" />
+      <AppenderRef ref="ConsoleStdOut" />
+      <AppenderRef ref="ConsoleStdErr" />
     </Root>
   </Loggers>
 </Configuration>
