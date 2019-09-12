@@ -14,9 +14,6 @@ package tech.pegasys.pantheon.ethereum.jsonrpc.internal.queries;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
@@ -73,7 +70,7 @@ public class BlockchainQueriesTest {
 
     final Optional<TransactionWithMetadata> transactionWithMetadata =
         queries.transactionByBlockHashAndIndex(gen.hash(), 1);
-    assertFalse(transactionWithMetadata.isPresent());
+    assertThat(transactionWithMetadata).isEmpty();
   }
 
   @Test
@@ -83,7 +80,7 @@ public class BlockchainQueriesTest {
 
     final Optional<BlockWithMetadata<TransactionWithMetadata, Hash>> result =
         queries.blockByHash(gen.hash());
-    assertFalse(result.isPresent());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -105,7 +102,7 @@ public class BlockchainQueriesTest {
 
     final Optional<BlockWithMetadata<TransactionWithMetadata, Hash>> result =
         queries.blockByNumber(10L);
-    assertFalse(result.isPresent());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -138,7 +135,7 @@ public class BlockchainQueriesTest {
 
     final Optional<BlockWithMetadata<Hash, Hash>> result =
         queries.blockByHashWithTxHashes(gen.hash());
-    assertFalse(result.isPresent());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -159,7 +156,7 @@ public class BlockchainQueriesTest {
     final BlockchainQueries queries = data.blockchainQueries;
 
     final Optional<BlockWithMetadata<Hash, Hash>> result = queries.blockByNumberWithTxHashes(10L);
-    assertFalse(result.isPresent());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -179,7 +176,7 @@ public class BlockchainQueriesTest {
     final BlockchainQueries queries = data.blockchainQueries;
 
     long result = queries.headBlockNumber();
-    assertEquals(2L, result);
+    assertThat(result).isEqualTo(2L);
 
     // Increment and test
     final Block lastBlock = data.blockData.get(2).block;
@@ -188,7 +185,7 @@ public class BlockchainQueriesTest {
 
     // Check that number has incremented
     result = queries.headBlockNumber();
-    assertEquals(3L, result);
+    assertThat(result).isEqualTo(3L);
   }
 
   @Test
@@ -206,8 +203,8 @@ public class BlockchainQueriesTest {
             storageKeys.forEach(
                 storageKey -> {
                   final Account actualAccount0 = worldState0.get(address);
-                  final UInt256 result = queries.storageAt(address, storageKey, 2L).get();
-                  assertEquals(actualAccount0.getStorageValue(storageKey), result);
+                  final Optional<UInt256> result = queries.storageAt(address, storageKey, 2L);
+                  assertThat(result).contains(actualAccount0.getStorageValue(storageKey));
                 }));
 
     final Hash latestStateRoot1 = data.blockData.get(1).block.getHeader().getStateRoot();
@@ -217,8 +214,8 @@ public class BlockchainQueriesTest {
             storageKeys.forEach(
                 storageKey -> {
                   final Account actualAccount1 = worldState1.get(address);
-                  final UInt256 result = queries.storageAt(address, storageKey, 1L).get();
-                  assertEquals(actualAccount1.getStorageValue(storageKey), result);
+                  final Optional<UInt256> result = queries.storageAt(address, storageKey, 1L);
+                  assertThat(result).contains(actualAccount1.getStorageValue(storageKey));
                 }));
   }
 
@@ -233,14 +230,14 @@ public class BlockchainQueriesTest {
       final long curBlockNumber = i;
       final Hash stateRoot = data.blockData.get(i).block.getHeader().getStateRoot();
       final WorldState worldState = data.worldStateArchive.get(stateRoot).get();
-      assertTrue(addresses.size() > 0);
+      assertThat(addresses).isNotEmpty();
 
       addresses.forEach(
           address -> {
             final Account actualAccount = worldState.get(address);
-            final Wei result = queries.accountBalance(address, curBlockNumber).get();
+            final Optional<Wei> result = queries.accountBalance(address, curBlockNumber);
 
-            assertEquals(actualAccount.getBalance(), result);
+            assertThat(result).contains(actualAccount.getBalance());
           });
     }
   }
@@ -250,11 +247,11 @@ public class BlockchainQueriesTest {
     final List<Address> addresses = Arrays.asList(gen.address(), gen.address(), gen.address());
     final BlockchainWithData data = setupBlockchain(3, addresses);
     final BlockchainQueries queries = data.blockchainQueries;
-    assertTrue(addresses.size() > 0);
+    assertThat(addresses).isNotEmpty();
 
     // Get random non-existent account
     final Wei result = queries.accountBalance(gen.address(), 1L).get();
-    assertEquals(Wei.ZERO, result);
+    assertThat(result).isEqualByComparingTo(Wei.ZERO);
   }
 
   @Test
@@ -265,7 +262,7 @@ public class BlockchainQueriesTest {
     final Block targetBlock = data.blockData.get(1).block;
 
     final Optional<Integer> result = queries.getOmmerCount(targetBlock.getHash());
-    assertEquals(targetBlock.getBody().getOmmers().size(), (int) result.get());
+    assertThat(result).contains(targetBlock.getBody().getOmmers().size());
   }
 
   @Test
@@ -274,7 +271,7 @@ public class BlockchainQueriesTest {
     final BlockchainQueries queries = data.blockchainQueries;
 
     final Optional<Integer> result = queries.getOmmerCount(gen.hash());
-    assertFalse(result.isPresent());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -285,7 +282,7 @@ public class BlockchainQueriesTest {
     final Block targetBlock = data.blockData.get(1).block;
 
     final Optional<Integer> result = queries.getOmmerCount(targetBlock.getHeader().getNumber());
-    assertEquals(targetBlock.getBody().getOmmers().size(), (int) result.get());
+    assertThat(result).contains(targetBlock.getBody().getOmmers().size());
   }
 
   @Test
@@ -295,7 +292,7 @@ public class BlockchainQueriesTest {
 
     final long invalidNumber = data.blockchain.getChainHeadBlockNumber() + 10;
     final Optional<Integer> result = queries.getOmmerCount(invalidNumber);
-    assertFalse(result.isPresent());
+    assertThat(result).isEmpty();
   }
 
   @Test
@@ -305,7 +302,7 @@ public class BlockchainQueriesTest {
 
     final Block targetBlock = data.blockData.get(data.blockData.size() - 1).block;
     final Optional<Integer> result = queries.getOmmerCount();
-    assertEquals(targetBlock.getBody().getOmmers().size(), (int) result.get());
+    assertThat(result).contains(targetBlock.getBody().getOmmers().size());
   }
 
   @Test
@@ -483,36 +480,36 @@ public class BlockchainQueriesTest {
 
   private void assertBlockMatchesResult(
       final Block targetBlock, final BlockWithMetadata<TransactionWithMetadata, Hash> result) {
-    assertEquals(targetBlock.getHeader(), result.getHeader());
+    assertThat(result.getHeader()).isEqualTo(targetBlock.getHeader());
     final List<Hash> expectedOmmers =
         targetBlock.getBody().getOmmers().stream()
             .map(BlockHeader::getHash)
             .collect(Collectors.toList());
-    assertEquals(expectedOmmers, result.getOmmers());
+    assertThat(result.getOmmers()).isEqualTo(expectedOmmers);
 
     for (int i = 0; i < result.getTransactions().size(); i++) {
       final TransactionWithMetadata txResult = result.getTransactions().get(i);
       final Transaction targetTx = targetBlock.getBody().getTransactions().get(i);
-      assertEquals(targetTx, txResult.getTransaction());
-      assertEquals(i, txResult.getTransactionIndex());
-      assertEquals(targetBlock.getHash(), txResult.getBlockHash());
-      assertEquals(targetBlock.getHeader().getNumber(), txResult.getBlockNumber());
+      assertThat(txResult.getTransaction()).isEqualTo(targetTx);
+      assertThat(txResult.getTransactionIndex()).isEqualTo(i);
+      assertThat(txResult.getBlockHash()).isEqualByComparingTo(targetBlock.getHash());
+      assertThat(txResult.getBlockNumber()).isEqualTo(targetBlock.getHeader().getNumber());
     }
   }
 
   private void assertBlockMatchesResultWithTxHashes(
       final Block targetBlock, final BlockWithMetadata<Hash, Hash> result) {
-    assertEquals(targetBlock.getHeader(), result.getHeader());
+    assertThat(result.getHeader()).isEqualTo(targetBlock.getHeader());
     final List<Hash> expectedOmmers =
         targetBlock.getBody().getOmmers().stream()
             .map(BlockHeader::getHash)
             .collect(Collectors.toList());
-    assertEquals(expectedOmmers, result.getOmmers());
+    assertThat(result.getOmmers()).isEqualTo(expectedOmmers);
 
     for (int i = 0; i < result.getTransactions().size(); i++) {
       final Hash txResult = result.getTransactions().get(i);
       final Transaction actualTx = targetBlock.getBody().getTransactions().get(i);
-      assertEquals(actualTx.hash(), txResult);
+      assertThat(txResult).isEqualByComparingTo(actualTx.hash());
     }
   }
 

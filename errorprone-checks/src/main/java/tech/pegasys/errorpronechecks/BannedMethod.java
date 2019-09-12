@@ -15,7 +15,6 @@ package tech.pegasys.errorpronechecks;
 import static com.google.errorprone.BugPattern.SeverityLevel.WARNING;
 import static com.google.errorprone.bugpatterns.BugChecker.MethodInvocationTreeMatcher;
 import static com.google.errorprone.matchers.Description.NO_MATCH;
-import static com.google.errorprone.matchers.Matchers.assertEqualsInvocation;
 import static com.google.errorprone.matchers.method.MethodMatchers.staticMethod;
 
 import java.util.Map;
