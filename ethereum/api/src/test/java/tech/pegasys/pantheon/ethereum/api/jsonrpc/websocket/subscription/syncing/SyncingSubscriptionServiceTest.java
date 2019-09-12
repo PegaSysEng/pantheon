@@ -18,11 +18,11 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.core.SyncStatus;
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.results.SyncingResult;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.websocket.subscription.SubscriptionManager;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.websocket.subscription.request.SubscriptionType;
+import tech.pegasys.pantheon.ethereum.core.SyncStatus;
+import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents.SyncStatusListener;
 
 import java.util.Collections;

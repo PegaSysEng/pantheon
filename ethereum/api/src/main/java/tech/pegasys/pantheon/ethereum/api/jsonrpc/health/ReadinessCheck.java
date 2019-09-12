@@ -12,10 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.api.jsonrpc.health;
 
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.health.HealthService.HealthCheck;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.health.HealthService.ParamSource;
-import tech.pegasys.pantheon.ethereum.core.SyncStatus;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.p2p.network.P2PNetwork;
 import tech.pegasys.pantheon.plugin.data.SyncStatus;

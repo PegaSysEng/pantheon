@@ -17,11 +17,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.results.SyncingResult;
+import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.plugin.data.SyncStatus;
 
 import java.util.Optional;

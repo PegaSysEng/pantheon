@@ -12,11 +12,11 @@
  */
 package tech.pegasys.pantheon.ethereum.api.jsonrpc.websocket.subscription.syncing;
 
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.results.SyncingResult;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.websocket.subscription.Subscription;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.websocket.subscription.SubscriptionManager;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.websocket.subscription.request.SubscriptionType;
+import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.plugin.data.SyncStatus;
 
 public class SyncingSubscriptionService {
