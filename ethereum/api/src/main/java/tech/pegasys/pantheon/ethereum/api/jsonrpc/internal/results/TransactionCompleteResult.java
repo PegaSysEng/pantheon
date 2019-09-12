@@ -54,7 +54,7 @@ public class TransactionCompleteResult implements TransactionResult {
 
   public TransactionCompleteResult(final TransactionWithMetadata tx) {
     final Transaction transaction = tx.getTransaction();
-    this.blockHash = tx.getBlockHash().toString();
+    this.blockHash = tx.getBlockHash().get().toString();
     this.blockNumber = Quantity.create(tx.getBlockNumber().get());
     this.from = transaction.getSender().toString();
     this.gas = Quantity.create(transaction.getGasLimit());
