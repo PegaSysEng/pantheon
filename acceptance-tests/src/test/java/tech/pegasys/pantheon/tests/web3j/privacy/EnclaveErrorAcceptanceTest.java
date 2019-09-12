@@ -20,11 +20,13 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyAcceptanceTestB
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyNode;
 import tech.pegasys.pantheon.tests.web3j.generated.EventEmitter;
 
+import java.math.BigInteger;
 import java.util.Base64;
 
 import net.consensys.cava.crypto.sodium.Box;
 import org.junit.Before;
 import org.junit.Test;
+import org.web3j.protocol.eea.response.PrivateTransactionReceipt;
 
 public class EnclaveErrorAcceptanceTest extends PrivacyAcceptanceTestBase {
 
@@ -76,5 +78,79 @@ public class EnclaveErrorAcceptanceTest extends PrivacyAcceptanceTestBase {
                         wrongPublicKey)));
 
     assertThat(throwable).hasMessageContaining(JsonRpcError.NODE_MISSING_PEER_URL.getMessage());
+  }
+
+  @Test
+  public void whenEnclaveIsDisconnectedGetReceiptReturnsInternalError() {
+    final EventEmitter eventEmitter =
+        alice.execute(
+            privateContractTransactions.createSmartContract(
+                EventEmitter.class,
+                alice.getTransactionSigningKey(),
+                IBFT2_CHAIN_ID,
+                alice.getEnclaveKey(),
+                bob.getEnclaveKey()));
+
+    privateContractVerifier
+        .validPrivateContractDeployed(
+            eventEmitter.getContractAddress(), alice.getAddress().toString())
+        .verify(eventEmitter);
+
+    final String transactionHash =
+        alice.execute(
+            privateContractTransactions.callSmartContract(
+                eventEmitter.getContractAddress(),
+                eventEmitter.store(BigInteger.ONE).encodeFunctionCall(),
+                alice.getTransactionSigningKey(),
+                IBFT2_CHAIN_ID,
+                alice.getEnclaveKey(),
+                bob.getEnclaveKey()));
+
+    final PrivateTransactionReceipt receiptBeforeEnclaveLosesConnection =
+        alice.execute(privacyTransactions.getPrivateTransactionReceipt(transactionHash));
+
+    alice.verify(
+        privateTransactionVerifier.validPrivateTransactionReceipt(
+            transactionHash, receiptBeforeEnclaveLosesConnection));
+
+    alice.getOrion().stop();
+
+    alice.verify(
+        privateTransactionVerifier.internalErrorPrivateTransactionReceipt(transactionHash));
+  }
+
+  @Test
+  public void transactionFailsIfPartyIsOffline() {
+    // Contract address is generated from sender address and transaction nonce
+    final String contractAddress = "0xebf56429e6500e84442467292183d4d621359838";
+
+    final EventEmitter eventEmitter =
+        alice.execute(
+            privateContractTransactions.createSmartContract(
+                EventEmitter.class,
+                alice.getTransactionSigningKey(),
+                IBFT2_CHAIN_ID,
+                alice.getEnclaveKey(),
+                bob.getEnclaveKey()));
+
+    privateContractVerifier
+        .validPrivateContractDeployed(contractAddress, alice.getAddress().toString())
+        .verify(eventEmitter);
+
+    bob.getOrion().stop();
+
+    final Throwable throwable =
+        catchThrowable(
+            () ->
+                alice.execute(
+                    privateContractTransactions.callSmartContract(
+                        eventEmitter.getContractAddress(),
+                        eventEmitter.store(BigInteger.ONE).encodeFunctionCall(),
+                        alice.getTransactionSigningKey(),
+                        IBFT2_CHAIN_ID,
+                        alice.getEnclaveKey(),
+                        bob.getEnclaveKey())));
+
+    assertThat(throwable).hasMessageContaining("NodePushingToPeer");
   }
 }

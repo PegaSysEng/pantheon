@@ -868,8 +868,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     pantheonPluginContext.addService(
         PantheonEvents.class,
         new PantheonEventsImpl(
-            (pantheonController.getProtocolManager().getBlockBroadcaster()),
-            pantheonController.getTransactionPool()));
+            pantheonController.getProtocolManager().getBlockBroadcaster(),
+            pantheonController.getTransactionPool(),
+            pantheonController.getSyncState()));
+    pantheonPluginContext.addService(MetricsSystem.class, getMetricsSystem());
     pantheonPluginContext.startPlugins();
     return this;
   }
