@@ -995,7 +995,7 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
     try {
       addConfigurationService();
       return controllerBuilderFactory
-          .fromEthNetworkConfig(updateNetworkConfig(getNetwork()))
+          .fromEthNetworkConfig(updateNetworkConfig(getNetwork()), genesisConfigOverrides)
           .synchronizerConfiguration(buildSyncConfig())
           .ethProtocolConfiguration(ethProtocolOptions.toDomainObject())
           .dataDirectory(dataDir())
