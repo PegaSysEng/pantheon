@@ -49,9 +49,20 @@ public class StorageServiceImpl implements StorageService {
     PRIVATE_STATE,
     PRUNING_STATE;
 
+    private final byte[] id;
+
+    Segment(final byte... id) {
+      this.id = id;
+    }
+
     @Override
     public String getName() {
       return name();
+    }
+
+    @Override
+    public byte[] getId() {
+      return id;
     }
   }
 
