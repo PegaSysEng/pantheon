@@ -148,7 +148,7 @@ public class PrivacyPrecompiledContractIntegrationTest {
 
   @Test
   public void testUpCheck() throws IOException {
-    assertTrue(enclave.upCheck());
+    assertThat(enclave.upCheck()).isTrue();
   }
 
   @Test
