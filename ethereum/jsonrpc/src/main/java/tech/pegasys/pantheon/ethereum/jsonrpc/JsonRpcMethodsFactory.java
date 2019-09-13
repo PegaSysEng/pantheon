@@ -97,7 +97,6 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.Per
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.methods.permissioning.PermRemoveNodesFromWhitelist;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.parameters.JsonRpcParameter;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.eea.EeaGetTransactionCount;
-import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.eea.EeaGetTransactionReceipt;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.eea.EeaPrivateNonceProvider;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.eea.EeaSendRawTransaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv.PrivCreatePrivacyGroup;
@@ -106,6 +105,7 @@ import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv.Priv
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv.PrivGetPrivacyPrecompileAddress;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv.PrivGetPrivateTransaction;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv.PrivGetTransactionCount;
+import tech.pegasys.pantheon.ethereum.jsonrpc.internal.privacy.methods.priv.PrivGetTransactionReceipt;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockReplay;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.BlockTracer;
 import tech.pegasys.pantheon.ethereum.jsonrpc.internal.processor.TransactionTracer;
@@ -363,7 +363,7 @@ public class JsonRpcMethodsFactory {
       if (eea) {
         addMethods(
             enabledMethods,
-            new EeaGetTransactionReceipt(blockchainQueries, enclave, parameter, privacyParameters),
+            new PrivGetTransactionReceipt(blockchainQueries, enclave, parameter, privacyParameters),
             new EeaSendRawTransaction(privateTransactionHandler, transactionPool, parameter),
             new EeaGetTransactionCount(
                 parameter, new EeaPrivateNonceProvider(enclave, privateTransactionHandler)));

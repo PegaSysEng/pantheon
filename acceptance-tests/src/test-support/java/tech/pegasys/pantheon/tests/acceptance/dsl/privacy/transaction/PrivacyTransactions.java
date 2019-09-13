@@ -13,15 +13,15 @@
 package tech.pegasys.pantheon.tests.acceptance.dsl.privacy.transaction;
 
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.PrivacyNode;
-import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.condition.EeaGetTransactionReceiptTransaction;
+import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.condition.PrivGetTransactionReceiptTransaction;
 
 import java.util.List;
 
 public class PrivacyTransactions {
 
-  public EeaGetTransactionReceiptTransaction getPrivateTransactionReceipt(
+  public PrivGetTransactionReceiptTransaction getPrivateTransactionReceipt(
       final String transactionHash) {
-    return new EeaGetTransactionReceiptTransaction(transactionHash);
+    return new PrivGetTransactionReceiptTransaction(transactionHash);
   }
 
   public CreatePrivacyGroupTransaction createPrivacyGroup(
