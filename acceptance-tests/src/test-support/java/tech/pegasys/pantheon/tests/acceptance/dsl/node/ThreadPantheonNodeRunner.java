@@ -34,6 +34,7 @@ import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.plugin.services.StorageService;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBPlugin;
 import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
@@ -90,6 +91,9 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     pantheonPluginContext.addService(PantheonConfiguration.class, commonPluginConfiguration);
 
+    // register built-in plugins
+    new RocksDBPlugin().register(pantheonPluginContext);
+
     return pantheonPluginContext;
   }
 
@@ -122,7 +126,7 @@ public class ThreadPantheonNodeRunner implements PantheonNodeRunner {
 
     final KeyValueStorageProvider storageProvider =
         new KeyValueStorageProviderBuilder()
-            .withStorageFactory(storageService.getByName("rocksdb"))
+            .withStorageFactory(storageService.getByName("rocksdb").get())
             .withCommonConfiguration(commonPluginConfiguration)
             .withMetricsSystem(metricsSystem)
             .build();

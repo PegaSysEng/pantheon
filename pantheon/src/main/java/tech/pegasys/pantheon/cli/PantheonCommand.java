@@ -95,7 +95,9 @@ import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
 import tech.pegasys.pantheon.plugin.services.StorageService;
+import tech.pegasys.pantheon.plugin.services.exception.StorageException;
 import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
+import tech.pegasys.pantheon.plugin.services.storage.rocksdb.RocksDBPlugin;
 import tech.pegasys.pantheon.services.PantheonConfigurationImpl;
 import tech.pegasys.pantheon.services.PantheonEventsImpl;
 import tech.pegasys.pantheon.services.PantheonPluginContextImpl;
@@ -747,7 +749,6 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   public void run() {
     try {
       prepareLogging();
-      addConfigurationService();
       logger.info("Starting Pantheon version: {}", PantheonInfo.version());
       checkOptions().configure().controller().startPlugins().startSynchronization();
     } catch (final Exception e) {
@@ -756,8 +757,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   }
 
   private void addConfigurationService() {
-    pluginCommonConfiguration = new PantheonConfigurationImpl(dataDir().resolve(DATABASE_PATH));
-    pantheonPluginContext.addService(PantheonConfiguration.class, pluginCommonConfiguration);
+    if (pluginCommonConfiguration == null) {
+      pluginCommonConfiguration = new PantheonConfigurationImpl(dataDir().resolve(DATABASE_PATH));
+      pantheonPluginContext.addService(PantheonConfiguration.class, pluginCommonConfiguration);
+    }
   }
 
   @VisibleForTesting
@@ -830,6 +833,10 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
   private PantheonCommand preparePlugins() {
     pantheonPluginContext.addService(PicoCLIOptions.class, new PicoCLIOptionsImpl(commandLine));
     pantheonPluginContext.addService(StorageService.class, storageService);
+
+    // register built-in plugins
+    new RocksDBPlugin().register(pantheonPluginContext);
+
     pantheonPluginContext.registerPlugins(pluginsDir());
     return this;
   }
@@ -987,8 +994,9 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   public PantheonControllerBuilder<?> getControllerBuilder() {
     try {
+      addConfigurationService();
       return controllerBuilderFactory
-          .fromEthNetworkConfig(updateNetworkConfig(getNetwork()))
+          .fromEthNetworkConfig(updateNetworkConfig(getNetwork()), genesisConfigOverrides)
           .synchronizerConfiguration(buildSyncConfig())
           .ethProtocolConfiguration(ethProtocolOptions.toDomainObject())
           .dataDirectory(dataDir())
@@ -1256,7 +1264,11 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
 
   private KeyValueStorageProvider keyStorageProvider(final String name) {
     return new KeyValueStorageProviderBuilder()
-        .withStorageFactory(storageService.getByName(name))
+        .withStorageFactory(
+            storageService
+                .getByName(name)
+                .orElseThrow(
+                    () -> new StorageException("No KeyValueStorageFactory found for key: " + name)))
         .withCommonConfiguration(pluginCommonConfiguration)
         .withMetricsSystem(getMetricsSystem())
         .build();
