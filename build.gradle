@@ -300,7 +300,6 @@ subprojects {
 
   task testSupportJar(type: Jar) {
     baseName = "${project.name}-support-test"
-    classifier = 'test-support'
     from sourceSets.testSupport.output
   }
 
@@ -310,43 +309,56 @@ subprojects {
     return result
   }
 
+  def pomData = {
+    name = "Pantheon - ${project.name}"
+    url = 'http://github.com/PegaSysEng/pantheon'
+    licenses {
+      license {
+        name = 'The Apache License, Version 2.0'
+        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+      }
+    }
+    scm {
+      connection = 'scm:git:git://github.com/PegaSysEng/pantheon.git'
+      developerConnection = 'scm:git:ssh://github.com/PegaSysEng/pantheon.git'
+      url = 'https://github.com/PegaSysEng/pantheon'
+    }
+  }
+
+  def versionMappingData = {
+    usage('java-api') { fromResolutionOf('runtimeClasspath') }
+    usage('java-runtime') { fromResolutionResult() }
+  }
+
+  def projectPublications = []
+
   if(sourceSetIsPopulated("main") || sourceSetIsPopulated("testSupport")) {
     apply plugin: 'com.jfrog.bintray'
     apply plugin: 'maven-publish'
 
     publishing {
       publications {
-        mavenJava(MavenPublication) {
-          groupId "tech.pegasys.pantheon.internal"
-          version "${project.version}"
-          if(sourceSetIsPopulated("main")) {
+        if(sourceSetIsPopulated("main")) {
+          mavenJava(MavenPublication) {
+            groupId "tech.pegasys.pantheon.internal"
+            version "${project.version}"
             from components.java
             artifact sourcesJar
             artifact javadocJar
+            versionMapping versionMappingData
+            pom pomData
           }
-
-          if(sourceSetIsPopulated("testSupport")) {
+          projectPublications.add("mavenJava")
+        }
+        if(sourceSetIsPopulated("testSupport")) {
+          testSupport(MavenPublication) {
+            groupId "tech.pegasys.pantheon.internal.testsupport"
+            version "${project.version}"
             artifact testSupportJar
+            versionMapping versionMappingData
+            pom pomData
           }
-          versionMapping {
-            usage('java-api') { fromResolutionOf('runtimeClasspath') }
-            usage('java-runtime') { fromResolutionResult() }
-          }
-          pom {
-            name = "Pantheon - ${project.name}"
-            url = 'http://github.com/PegaSysEng/pantheon'
-            licenses {
-              license {
-                name = 'The Apache License, Version 2.0'
-                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-              }
-            }
-            scm {
-              connection = 'scm:git:git://github.com/PegaSysEng/pantheon.git'
-              developerConnection = 'scm:git:ssh://github.com/PegaSysEng/pantheon.git'
-              url = 'https://github.com/PegaSysEng/pantheon'
-            }
-          }
+          projectPublications.add("testSupport")
         }
       }
     }
@@ -355,7 +367,7 @@ subprojects {
       user = bintrayUser
       key = bintrayKey
 
-      publications = ['mavenJava']
+      publications = projectPublications
       override = version.endsWith('SNAPSHOT')
 
       publish = true
