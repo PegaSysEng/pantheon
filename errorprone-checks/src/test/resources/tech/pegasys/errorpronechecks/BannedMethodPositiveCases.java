@@ -27,4 +27,14 @@ public class BannedMethodPositiveCases {
     // java.util.Objects methods instead.
     Objects.hashCode("1", "1");
   }
+
+  public void usesJUnitAssertions() throws Exception {
+    org.junit.Assert.assertEquals(1, 1);
+    org.junit.Assert.assertNotEquals(1, 2);
+    org.junit.Assert.assertTrue(true);
+    org.junit.Assert.assertFalse(false);
+    org.junit.Assert.assertNull(null);
+    org.junit.Assert.assertNotNull("foo");
+    org.junit.Assert.assertArrayEquals(new int[] {1}, new int[] {1});
+  }
 }
