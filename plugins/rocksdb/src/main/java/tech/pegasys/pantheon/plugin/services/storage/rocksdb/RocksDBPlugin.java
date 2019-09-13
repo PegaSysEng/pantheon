@@ -12,13 +12,6 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import tech.pegasys.pantheon.plugin.PantheonContext;
 import tech.pegasys.pantheon.plugin.PantheonPlugin;
 import tech.pegasys.pantheon.plugin.services.PicoCLIOptions;
@@ -26,6 +19,15 @@ import tech.pegasys.pantheon.plugin.services.StorageService;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBCLIOptions;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RocksDBPlugin implements PantheonPlugin {
 
