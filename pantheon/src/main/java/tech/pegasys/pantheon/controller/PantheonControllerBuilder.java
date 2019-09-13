@@ -83,6 +83,7 @@ public abstract class PantheonControllerBuilder<C> {
   protected Clock clock;
   protected KeyPair nodeKeys;
   protected boolean isRevertReasonEnabled;
+  protected GasLimitCalculator gasLimitCalculator;
   private StorageProvider storageProvider;
   private final List<Runnable> shutdownActions = new ArrayList<>();
   private boolean isPruningEnabled;
@@ -180,6 +181,11 @@ public abstract class PantheonControllerBuilder<C> {
     return this;
   }
 
+  public PantheonControllerBuilder<C> targetGasLimit(final Long targetGasLimit) {
+    this.gasLimitCalculator = new GasLimitCalculator(targetGasLimit);
+    return this;
+  }
+
   public PantheonController<C> build() {
     checkNotNull(genesisConfig, "Missing genesis config");
     checkNotNull(syncConfig, "Missing sync config");
@@ -193,6 +199,7 @@ public abstract class PantheonControllerBuilder<C> {
     checkNotNull(transactionPoolConfiguration, "Missing transaction pool configuration");
     checkNotNull(nodeKeys, "Missing node keys");
     checkNotNull(storageProvider, "Must supply a storage provider");
+    checkNotNull(gasLimitCalculator, "Missing gas limit calculator");
 
     prepForBuild();
 

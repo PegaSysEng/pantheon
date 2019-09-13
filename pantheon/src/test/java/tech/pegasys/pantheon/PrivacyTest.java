@@ -15,6 +15,7 @@ package tech.pegasys.pantheon;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
+import tech.pegasys.pantheon.controller.GasLimitCalculator;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Account;
@@ -77,6 +78,7 @@ public class PrivacyTest {
             .clock(TestClock.fixed())
             .privacyParameters(privacyParameters)
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
+            .targetGasLimit(GasLimitCalculator.DEFAULT)
             .build();
 
     final Address privacyContractAddress = Address.privacyPrecompiled(ADDRESS);

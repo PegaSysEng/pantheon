@@ -16,6 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import tech.pegasys.pantheon.config.GenesisConfigFile;
+import tech.pegasys.pantheon.controller.GasLimitCalculator;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.InMemoryStorageProvider;
@@ -66,6 +67,7 @@ public final class RlpBlockImporterTest {
             .dataDirectory(dataDir)
             .clock(TestClock.fixed())
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
+            .targetGasLimit(GasLimitCalculator.DEFAULT)
             .build();
     final RlpBlockImporter.ImportResult result =
         rlpBlockImporter.importBlockchain(source, targetController);
@@ -105,6 +107,7 @@ public final class RlpBlockImporterTest {
             .dataDirectory(dataDir)
             .clock(TestClock.fixed())
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
+            .targetGasLimit(GasLimitCalculator.DEFAULT)
             .build();
     final RlpBlockImporter.ImportResult result =
         rlpBlockImporter.importBlockchain(source, controller);

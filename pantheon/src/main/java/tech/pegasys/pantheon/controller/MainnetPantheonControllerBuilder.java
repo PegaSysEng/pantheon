@@ -56,7 +56,8 @@ public class MainnetPantheonControllerBuilder extends PantheonControllerBuilder<
             new DefaultBlockScheduler(
                 MainnetBlockHeaderValidator.MINIMUM_SECONDS_SINCE_PARENT,
                 MainnetBlockHeaderValidator.TIMESTAMP_TOLERANCE_S,
-                clock));
+                clock),
+            gasLimitCalculator);
 
     final EthHashMiningCoordinator miningCoordinator =
         new EthHashMiningCoordinator(protocolContext.getBlockchain(), executor, syncState);

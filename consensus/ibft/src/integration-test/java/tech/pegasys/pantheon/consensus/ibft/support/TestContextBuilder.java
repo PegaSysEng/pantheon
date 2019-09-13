@@ -81,6 +81,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
@@ -290,7 +291,7 @@ public class TestContextBuilder {
 
     final IbftBlockCreatorFactory blockCreatorFactory =
         new IbftBlockCreatorFactory(
-            (gasLimit) -> gasLimit,
+            Function.identity(),
             pendingTransactions, // changed from IbftPantheonController
             protocolContext,
             protocolSchedule,

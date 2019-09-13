@@ -51,6 +51,7 @@ import tech.pegasys.pantheon.testutil.TestClock;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.List;
+import java.util.function.Function;
 
 import com.google.common.collect.Lists;
 import org.junit.Before;
@@ -121,7 +122,7 @@ public class CliqueBlockCreatorTest {
                 metricsSystem),
             protocolContext,
             protocolSchedule,
-            gasLimit -> gasLimit,
+            Function.identity(),
             proposerKeyPair,
             Wei.ZERO,
             blockchain.getChainHeadHeader(),
@@ -152,7 +153,7 @@ public class CliqueBlockCreatorTest {
                 metricsSystem),
             protocolContext,
             protocolSchedule,
-            gasLimit -> gasLimit,
+            Function.identity(),
             proposerKeyPair,
             Wei.ZERO,
             blockchain.getChainHeadHeader(),
@@ -182,7 +183,7 @@ public class CliqueBlockCreatorTest {
                 metricsSystem),
             protocolContext,
             protocolSchedule,
-            gasLimit -> gasLimit,
+            Function.identity(),
             proposerKeyPair,
             Wei.ZERO,
             blockchain.getChainHeadHeader(),
@@ -215,7 +216,7 @@ public class CliqueBlockCreatorTest {
                 metricsSystem),
             protocolContext,
             protocolSchedule,
-            gasLimit -> gasLimit,
+            Function.identity(),
             proposerKeyPair,
             Wei.ZERO,
             blockchain.getChainHeadHeader(),

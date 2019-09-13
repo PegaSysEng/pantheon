@@ -94,7 +94,8 @@ public class CliquePantheonControllerBuilder extends PantheonControllerBuilder<C
                 protocolContext.getConsensusState().getVoteTallyCache(),
                 localAddress,
                 secondsBetweenBlocks),
-            epochManager);
+            epochManager,
+            gasLimitCalculator);
     final CliqueMiningCoordinator miningCoordinator =
         new CliqueMiningCoordinator(
             protocolContext.getBlockchain(),

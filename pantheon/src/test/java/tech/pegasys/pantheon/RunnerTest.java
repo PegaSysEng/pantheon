@@ -20,6 +20,7 @@ import static tech.pegasys.pantheon.controller.KeyPairUtil.loadKeyPair;
 
 import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
 import tech.pegasys.pantheon.config.GenesisConfigFile;
+import tech.pegasys.pantheon.controller.GasLimitCalculator;
 import tech.pegasys.pantheon.controller.MainnetPantheonControllerBuilder;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
@@ -143,6 +144,7 @@ public final class RunnerTest {
             .clock(TestClock.fixed())
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
             .storageProvider(createKeyValueStorageProvider(dbAhead))
+            .targetGasLimit(GasLimitCalculator.DEFAULT)
             .build()) {
       setupState(blockCount, controller.getProtocolSchedule(), controller.getProtocolContext());
     }
@@ -162,6 +164,7 @@ public final class RunnerTest {
             .clock(TestClock.fixed())
             .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
             .storageProvider(createKeyValueStorageProvider(dbAhead))
+            .targetGasLimit(GasLimitCalculator.DEFAULT)
             .build();
     final String listenHost = InetAddress.getLoopbackAddress().getHostAddress();
     final JsonRpcConfiguration aheadJsonRpcConfiguration = jsonRpcConfiguration();
@@ -220,6 +223,7 @@ public final class RunnerTest {
               .privacyParameters(PrivacyParameters.DEFAULT)
               .clock(TestClock.fixed())
               .transactionPoolConfiguration(TransactionPoolConfiguration.builder().build())
+              .targetGasLimit(GasLimitCalculator.DEFAULT)
               .build();
       final EnodeURL enode = runnerAhead.getLocalEnode().get();
       final EthNetworkConfig behindEthNetworkConfiguration =
