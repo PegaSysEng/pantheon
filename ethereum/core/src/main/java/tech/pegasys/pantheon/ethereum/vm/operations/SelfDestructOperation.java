@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
+import tech.pegasys.pantheon.ethereum.core.ReadOnlyMutableAccount;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.vm.AbstractOperation;
 import tech.pegasys.pantheon.ethereum.vm.EVM;
@@ -68,7 +69,10 @@ public class SelfDestructOperation extends AbstractOperation {
       final MessageFrame frame,
       final EnumSet<ExceptionalHaltReason> previousReasons,
       final EVM evm) {
+
     return frame.isStatic()
+            || frame.getWorldState().getMutable(frame.getRecipientAddress())
+                instanceof ReadOnlyMutableAccount
         ? Optional.of(ExceptionalHaltReason.ILLEGAL_STATE_CHANGE)
         : Optional.empty();
   }

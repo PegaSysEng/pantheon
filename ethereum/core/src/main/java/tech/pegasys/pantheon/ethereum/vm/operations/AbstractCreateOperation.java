@@ -15,6 +15,7 @@ package tech.pegasys.pantheon.ethereum.vm.operations;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
+import tech.pegasys.pantheon.ethereum.core.ReadOnlyMutableAccount;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.vm.AbstractOperation;
 import tech.pegasys.pantheon.ethereum.vm.Code;
@@ -89,6 +90,11 @@ public abstract class AbstractCreateOperation extends AbstractOperation {
   private void spawnChildMessage(final MessageFrame frame) {
     final Address address = frame.getRecipientAddress();
     final MutableAccount account = frame.getWorldState().getMutable(address);
+    if (account instanceof ReadOnlyMutableAccount) {
+      frame.setState(MessageFrame.State.EXCEPTIONAL_HALT);
+      return;
+    }
+
     account.incrementNonce();
 
     final Wei value = Wei.wrap(frame.getStackItem(0));

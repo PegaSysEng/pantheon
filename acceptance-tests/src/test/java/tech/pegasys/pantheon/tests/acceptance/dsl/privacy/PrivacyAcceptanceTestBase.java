@@ -19,6 +19,7 @@ import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.condition.PrivateContr
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.condition.PrivateTransactionVerifier;
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.contract.PrivateContractTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.privacy.transaction.PrivacyTransactions;
+import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.contract.ContractTransactions;
 import tech.pegasys.pantheon.tests.acceptance.dsl.transaction.net.NetTransactions;
 
 import org.junit.After;
@@ -28,6 +29,7 @@ import org.junit.rules.TemporaryFolder;
 public class PrivacyAcceptanceTestBase {
   @ClassRule public static final TemporaryFolder privacy = new TemporaryFolder();
 
+  protected final NetConditions net;
   protected final PrivacyTransactions privacyTransactions;
   protected final PrivateContractVerifier privateContractVerifier;
   protected final PrivateTransactionVerifier privateTransactionVerifier;
@@ -35,8 +37,7 @@ public class PrivacyAcceptanceTestBase {
   protected final PrivateContractTransactions privateContractTransactions;
   protected final PrivacyCluster privacyCluster;
   protected final PrivacyAccountResolver privacyAccountResolver;
-
-  protected final NetConditions net;
+  protected final ContractTransactions contractTransactions;
 
   public PrivacyAcceptanceTestBase() {
     net = new NetConditions(new NetTransactions());
@@ -47,6 +48,7 @@ public class PrivacyAcceptanceTestBase {
     privateContractTransactions = new PrivateContractTransactions();
     privacyCluster = new PrivacyCluster(net);
     privacyAccountResolver = new PrivacyAccountResolver();
+    contractTransactions = new ContractTransactions();
   }
 
   @After

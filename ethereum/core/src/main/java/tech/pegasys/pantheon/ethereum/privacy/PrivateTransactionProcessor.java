@@ -32,6 +32,7 @@ import tech.pegasys.pantheon.ethereum.vm.Code;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
 import tech.pegasys.pantheon.ethereum.vm.OperationTracer;
+import tech.pegasys.pantheon.ethereum.worldstate.DefaultMutablePrivateWorldStateUpdater;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.util.ArrayDeque;
@@ -210,6 +211,10 @@ public class PrivateTransactionProcessor {
 
     final MessageFrame initialFrame;
     final Deque<MessageFrame> messageFrameStack = new ArrayDeque<>();
+
+    final WorldUpdater mutablePrivateWorldStateUpdater =
+        new DefaultMutablePrivateWorldStateUpdater(publicWorldState, privateWorldState.updater());
+
     if (transaction.isContractCreation()) {
       final Address privateContractAddress =
           Address.privateContractAddress(senderAddress, previousNonce, privacyGroupId);
@@ -226,7 +231,7 @@ public class PrivateTransactionProcessor {
               .type(MessageFrame.Type.CONTRACT_CREATION)
               .messageFrameStack(messageFrameStack)
               .blockchain(blockchain)
-              .worldState(privateWorldState.updater())
+              .worldState(mutablePrivateWorldStateUpdater)
               .address(privateContractAddress)
               .originator(senderAddress)
               .contract(privateContractAddress)
@@ -255,7 +260,7 @@ public class PrivateTransactionProcessor {
               .type(MessageFrame.Type.MESSAGE_CALL)
               .messageFrameStack(messageFrameStack)
               .blockchain(blockchain)
-              .worldState(privateWorldState.updater())
+              .worldState(mutablePrivateWorldStateUpdater)
               .address(to)
               .originator(senderAddress)
               .contract(to)

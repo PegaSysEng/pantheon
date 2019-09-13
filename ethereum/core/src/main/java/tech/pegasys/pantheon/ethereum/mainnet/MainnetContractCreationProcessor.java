@@ -16,6 +16,7 @@ import tech.pegasys.pantheon.ethereum.core.Account;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Gas;
 import tech.pegasys.pantheon.ethereum.core.MutableAccount;
+import tech.pegasys.pantheon.ethereum.core.ReadOnlyMutableAccount;
 import tech.pegasys.pantheon.ethereum.vm.EVM;
 import tech.pegasys.pantheon.ethereum.vm.GasCalculator;
 import tech.pegasys.pantheon.ethereum.vm.MessageFrame;
@@ -112,6 +113,9 @@ public class MainnetContractCreationProcessor extends AbstractMessageProcessor {
       LOG.trace(
           "Contract creation error: account as already been created for address {}",
           frame.getContractAddress());
+      frame.setState(MessageFrame.State.EXCEPTIONAL_HALT);
+    } else if (contract instanceof ReadOnlyMutableAccount) {
+      LOG.trace("Public contracts cannot be created from private calls");
       frame.setState(MessageFrame.State.EXCEPTIONAL_HALT);
     } else {
       contract.incrementBalance(frame.getValue());
