@@ -44,5 +44,5 @@ public interface StorageService {
    * @return an optional containing the instance of the registered factory, or empty if the factory
    *     hasn't been registered.
    */
-  Optional<KeyValueStorageFactory> getByName(final String name);
+  Optional<KeyValueStorageFactory> getByName(String name);
 }
