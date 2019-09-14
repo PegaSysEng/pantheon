@@ -24,9 +24,9 @@ import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.Rocks
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.unsegmented.RocksDBKeyValueStorage;
-import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,21 +37,21 @@ import com.google.common.base.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
+public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory, Closeable {
 
   private static final Logger LOG = LogManager.getLogger();
   private final int DEFAULT_VERSION;
   private static final Set<Integer> SUPPORTED_VERSION = Set.of(0, 1);
   private static final String NAME = "rocksdb";
 
-  private boolean isSegmentIsolationSupported;
-  private SegmentedKeyValueStorage<?> segmentedStorage;
-  private KeyValueStorage unsegmentedStorage;
+  private Boolean isSegmentIsolationSupported;
 
   private final Supplier<RocksDBFactoryConfiguration> configuration;
   private final List<SegmentIdentifier> segments;
 
-  public RocksDBKeyValueStorageFactory(
+  private KeyValueStorage createdStorage;
+
+  RocksDBKeyValueStorageFactory(
       final Supplier<RocksDBFactoryConfiguration> configuration,
       final List<SegmentIdentifier> segments,
       final int DEFAULT_VERSION) {
@@ -82,41 +82,9 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
       final MetricsSystem metricsSystem)
       throws StorageException {
 
-    if (requiresInit()) {
-      init(commonConfiguration, metricsSystem);
-    }
-
-    return isSegmentIsolationSupported
-        ? new SegmentedKeyValueStorageAdapter<>(segment, segmentedStorage)
-        : unsegmentedStorage;
-  }
-
-  @Override
-  public boolean isSegmentIsolationSupported() {
-    return isSegmentIsolationSupported;
-  }
-
-  public void close() throws IOException {
-    if (segmentedStorage != null) {
-      segmentedStorage.close();
-    }
-    if (unsegmentedStorage != null) {
-      unsegmentedStorage.close();
-    }
-  }
-
-  protected Path storagePath(final PantheonConfiguration commonConfiguration) {
-    return commonConfiguration.getStoragePath();
-  }
-
-  private boolean requiresInit() {
-    return segmentedStorage == null && unsegmentedStorage == null;
-  }
-
-  private void init(
-      final PantheonConfiguration commonConfiguration, final MetricsSystem metricsSystem) {
+    final int databaseVersion;
     try {
-      this.isSegmentIsolationSupported = databaseVersion(commonConfiguration) == DEFAULT_VERSION;
+      databaseVersion = readDatabaseVersion(commonConfiguration);
     } catch (final IOException e) {
       LOG.error("Failed to retrieve the RocksDB database meta version: {}", e.getMessage());
       throw new StorageException(e.getMessage(), e);
@@ -127,17 +95,41 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
             .databaseDir(storagePath(commonConfiguration))
             .build();
 
-    if (isSegmentIsolationSupported) {
-      this.unsegmentedStorage = null;
-      this.segmentedStorage =
-          new RocksDBColumnarKeyValueStorage(rocksDBConfiguration, segments, metricsSystem);
-    } else {
-      this.unsegmentedStorage = new RocksDBKeyValueStorage(rocksDBConfiguration, metricsSystem);
-      this.segmentedStorage = null;
+    switch (databaseVersion) {
+      case 0:
+        {
+          isSegmentIsolationSupported = false;
+          createdStorage = new RocksDBKeyValueStorage(rocksDBConfiguration, metricsSystem);
+          break;
+        }
+      case 1:
+        {
+          isSegmentIsolationSupported = true;
+          createdStorage =
+              new SegmentedKeyValueStorageAdapter<>(
+                  segment,
+                  new RocksDBColumnarKeyValueStorage(
+                      rocksDBConfiguration, segments, metricsSystem));
+          break;
+        }
+      default:
+        {
+          throw new IllegalStateException(
+              String.format(
+                  "Developer error: A supported database version (%d) was detected, but there was no associated creation logic.",
+                  databaseVersion));
+        }
     }
+
+    return createdStorage;
   }
 
-  private int databaseVersion(final PantheonConfiguration commonConfiguration) throws IOException {
+  protected Path storagePath(final PantheonConfiguration commonConfiguration) {
+    return commonConfiguration.getStoragePath();
+  }
+
+  private int readDatabaseVersion(final PantheonConfiguration commonConfiguration)
+      throws IOException {
     final Path databaseDir = storagePath(commonConfiguration);
     final boolean databaseExists = databaseDir.resolve("IDENTITY").toFile().exists();
     final int databaseVersion;
@@ -159,5 +151,15 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     }
 
     return databaseVersion;
+  }
+
+  @Override
+  public void close() throws IOException {
+    createdStorage.close();
+  }
+
+  @Override
+  public boolean isSegmentIsolationSupported() {
+    return isSegmentIsolationSupported;
   }
 }
