@@ -46,11 +46,10 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   private static final String NAME = "rocksdb";
 
   private Boolean isSegmentIsolationSupported;
+  private KeyValueStorage createdStorage;
 
   private final Supplier<RocksDBFactoryConfiguration> configuration;
   private final List<SegmentIdentifier> segments;
-
-  private KeyValueStorage createdStorage;
 
   RocksDBKeyValueStorageFactory(
       final Supplier<RocksDBFactoryConfiguration> configuration,
@@ -119,7 +118,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
         {
           throw new IllegalStateException(
               String.format(
-                  "Developer error: A supported database version (%d) was detected. Remove the support or implement the creation logic.",
+                  "Developer error: A supported database version (%d) was detected but there is no associated creation logic.",
                   databaseVersion));
         }
     }
