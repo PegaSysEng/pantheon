@@ -92,7 +92,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory, Cl
 
     final RocksDBConfiguration rocksDBConfiguration =
         RocksDBConfigurationBuilder.from(configuration.get())
-            .databaseDir(storagePath(commonConfiguration))
+            .databaseDir(commonConfiguration.getStoragePath())
             .build();
 
     switch (databaseVersion) {
@@ -124,13 +124,9 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory, Cl
     return createdStorage;
   }
 
-  protected Path storagePath(final PantheonConfiguration commonConfiguration) {
-    return commonConfiguration.getStoragePath();
-  }
-
   private int readDatabaseVersion(final PantheonConfiguration commonConfiguration)
       throws IOException {
-    final Path databaseDir = storagePath(commonConfiguration);
+    final Path databaseDir = commonConfiguration.getStoragePath();
     final boolean databaseExists = databaseDir.resolve("IDENTITY").toFile().exists();
     final int databaseVersion;
     if (databaseExists) {
