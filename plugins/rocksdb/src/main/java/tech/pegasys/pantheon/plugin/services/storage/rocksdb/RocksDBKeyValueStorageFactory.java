@@ -40,7 +40,7 @@ import org.apache.logging.log4j.Logger;
 public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   private static final Logger LOG = LogManager.getLogger();
-  private static final int DEFAULT_VERSION = 1;
+  private final int DEFAULT_VERSION;
   private static final Set<Integer> SUPPORTED_VERSION = Set.of(0, 1);
   private static final String NAME = "rocksdb";
 
@@ -53,9 +53,21 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   public RocksDBKeyValueStorageFactory(
       final Supplier<RocksDBFactoryConfiguration> configuration,
-      final List<SegmentIdentifier> segments) {
+      final List<SegmentIdentifier> segments,
+      final int DEFAULT_VERSION) {
     this.configuration = configuration;
     this.segments = segments;
+    this.DEFAULT_VERSION = DEFAULT_VERSION;
+  }
+
+  public RocksDBKeyValueStorageFactory(
+      final Supplier<RocksDBFactoryConfiguration> configuration,
+      final List<SegmentIdentifier> segments) {
+    this(
+        configuration,
+        segments,
+        /** Source of truth for the default database version. */
+        1);
   }
 
   @Override

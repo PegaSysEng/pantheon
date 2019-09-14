@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
 import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
@@ -27,6 +28,7 @@ import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.Rocks
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Rule;
@@ -46,7 +48,7 @@ public class RocksDBKeyValueStorageFactoryTest {
   @Mock private PantheonConfiguration commonConfiguration;
   @Rule public final TemporaryFolder temporaryFolder = new TemporaryFolder();
   private final ObservableMetricsSystem metricsSystem = new NoOpMetricsSystem();
-  private final List<SegmentIdentifier> segments = List.of();
+  private final List<SegmentIdentifier> segments = List.of(KeyValueSegmentIdentifier.values());
   @Mock private SegmentIdentifier segment;
 
   @Test
@@ -94,6 +96,22 @@ public class RocksDBKeyValueStorageFactoryTest {
     assertThat(DatabaseMetadata.fromDirectory(tempDatabaseDir).getVersion())
         .isEqualTo(DEFAULT_VERSION);
     assertThat(storageFactory.isSegmentIsolationSupported()).isTrue();
+  }
+
+  @Test
+  public void shouldDetectCorrectVersionInCaseOfRollback() throws Exception {
+    final Path tempDatabaseDir = temporaryFolder.newFolder().toPath().resolve("db");
+    Files.createDirectories(tempDatabaseDir);
+    when(commonConfiguration.getStoragePath()).thenReturn(tempDatabaseDir);
+    final RocksDBKeyValueStorageFactory storageFactory =
+        new RocksDBKeyValueStorageFactory(() -> rocksDbConfiguration, segments, 1);
+
+    storageFactory.create(segments.get(0), commonConfiguration, metricsSystem);
+    storageFactory.close();
+
+    final RocksDBKeyValueStorageFactory rolledbackStorageFactory =
+        new RocksDBKeyValueStorageFactory(() -> rocksDbConfiguration, segments, 0);
+    rolledbackStorageFactory.create(segments.get(0), commonConfiguration, metricsSystem);
   }
 
   @Test
