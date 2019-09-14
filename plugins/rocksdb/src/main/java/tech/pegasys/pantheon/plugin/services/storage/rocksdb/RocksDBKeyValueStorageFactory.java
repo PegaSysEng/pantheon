@@ -12,6 +12,8 @@
  */
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import tech.pegasys.pantheon.plugin.services.MetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
 import tech.pegasys.pantheon.plugin.services.exception.StorageException;
@@ -159,6 +161,8 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory, Cl
 
   @Override
   public boolean isSegmentIsolationSupported() {
-    return isSegmentIsolationSupported;
+    return checkNotNull(
+        isSegmentIsolationSupported,
+        "Whether segment isolation is supported will be determined during creation. Call a creation method first");
   }
 }
