@@ -28,7 +28,6 @@ import tech.pegasys.pantheon.plugin.services.storage.rocksdb.segmented.RocksDBCo
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.unsegmented.RocksDBKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,7 +38,7 @@ import com.google.common.base.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory, Closeable {
+public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   private static final Logger LOG = LogManager.getLogger();
   private final int DEFAULT_VERSION;
