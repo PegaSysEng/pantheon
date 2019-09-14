@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
 import tech.pegasys.pantheon.metrics.ObservableMetricsSystem;
 import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
 import tech.pegasys.pantheon.plugin.services.PantheonConfiguration;
@@ -48,7 +47,7 @@ public class RocksDBKeyValueStorageFactoryTest {
   @Mock private PantheonConfiguration commonConfiguration;
   @Rule public final TemporaryFolder temporaryFolder = new TemporaryFolder();
   private final ObservableMetricsSystem metricsSystem = new NoOpMetricsSystem();
-  private final List<SegmentIdentifier> segments = List.of(KeyValueSegmentIdentifier.values());
+  private final List<SegmentIdentifier> segments = List.of();
   @Mock private SegmentIdentifier segment;
 
   @Test
@@ -106,12 +105,12 @@ public class RocksDBKeyValueStorageFactoryTest {
     final RocksDBKeyValueStorageFactory storageFactory =
         new RocksDBKeyValueStorageFactory(() -> rocksDbConfiguration, segments, 1);
 
-    storageFactory.create(segments.get(0), commonConfiguration, metricsSystem);
+    storageFactory.create(segment, commonConfiguration, metricsSystem);
     storageFactory.close();
 
     final RocksDBKeyValueStorageFactory rolledbackStorageFactory =
         new RocksDBKeyValueStorageFactory(() -> rocksDbConfiguration, segments, 0);
-    rolledbackStorageFactory.create(segments.get(0), commonConfiguration, metricsSystem);
+    rolledbackStorageFactory.create(segment, commonConfiguration, metricsSystem);
   }
 
   @Test
