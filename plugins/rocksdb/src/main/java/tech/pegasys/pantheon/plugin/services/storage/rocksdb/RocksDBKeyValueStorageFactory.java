@@ -43,7 +43,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   private static final Logger LOG = LogManager.getLogger();
   private final int DEFAULT_VERSION;
-  private static final Set<Integer> SUPPORTED_VERSION = Set.of(0, 1);
+  private static final Set<Integer> SUPPORTED_VERSIONS = Set.of(0, 1);
   private static final String NAME = "rocksdb";
 
   private Integer databaseVersion;
@@ -155,7 +155,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
       new DatabaseMetadata(databaseVersion).writeToDirectory(databaseDir);
     }
 
-    if (!SUPPORTED_VERSION.contains(databaseVersion)) {
+    if (!SUPPORTED_VERSIONS.contains(databaseVersion)) {
       final String message = "Unsupported RocksDB Metadata version of: " + databaseVersion;
       LOG.error(message);
       throw new StorageException(message);
