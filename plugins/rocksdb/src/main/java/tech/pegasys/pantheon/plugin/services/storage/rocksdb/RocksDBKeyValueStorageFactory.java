@@ -82,6 +82,10 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
       final MetricsSystem metricsSystem)
       throws StorageException {
 
+    if (createdStorage != null) {
+      return createdStorage;
+    }
+
     final int databaseVersion;
     try {
       databaseVersion = readDatabaseVersion(commonConfiguration);
