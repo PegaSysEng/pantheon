@@ -116,7 +116,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory, Cl
         {
           throw new IllegalStateException(
               String.format(
-                  "Developer error: A supported database version (%d) was detected, but there was no associated creation logic.",
+                  "Developer error: A supported database version (%d) was detected. Remove the support or implement the creation logic.",
                   databaseVersion));
         }
     }
