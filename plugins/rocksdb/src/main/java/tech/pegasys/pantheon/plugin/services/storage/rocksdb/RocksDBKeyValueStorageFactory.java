@@ -50,6 +50,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   private Boolean isSegmentIsolationSupported;
   private SegmentedKeyValueStorage<?> segmentedStorage;
   private KeyValueStorage unsegmentedStorage;
+  private RocksDBConfiguration rocksDBConfiguration;
 
   private final Supplier<RocksDBFactoryConfiguration> configuration;
   private final List<SegmentIdentifier> segments;
@@ -89,11 +90,6 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
       init(commonConfiguration);
     }
 
-    final RocksDBConfiguration rocksDBConfiguration =
-        RocksDBConfigurationBuilder.from(configuration.get())
-            .databaseDir(commonConfiguration.getStoragePath())
-            .build();
-
     // It's probably a good idea for the creation logic to be entirely dependent on the database
     // version. Introducing intermediate booleans that represent database properties and dispatching
     // creation logic based on them is error prone.
@@ -127,12 +123,16 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   private void init(final PantheonConfiguration commonConfiguration) {
     try {
-      this.databaseVersion = readDatabaseVersion(commonConfiguration);
+      databaseVersion = readDatabaseVersion(commonConfiguration);
     } catch (final IOException e) {
       LOG.error("Failed to retrieve the RocksDB database meta version: {}", e.getMessage());
       throw new StorageException(e.getMessage(), e);
     }
-    this.isSegmentIsolationSupported = this.databaseVersion >= 1;
+    isSegmentIsolationSupported = databaseVersion >= 1;
+    rocksDBConfiguration =
+        RocksDBConfigurationBuilder.from(configuration.get())
+            .databaseDir(commonConfiguration.getStoragePath())
+            .build();
   }
 
   private boolean requiresInit() {
