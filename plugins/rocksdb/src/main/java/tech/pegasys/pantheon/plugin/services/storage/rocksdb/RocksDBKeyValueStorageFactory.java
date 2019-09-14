@@ -95,6 +95,9 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory, Cl
             .databaseDir(commonConfiguration.getStoragePath())
             .build();
 
+    // It's probably a good idea for the creation logic to be entirely dependent on the database
+    // version. Introducing intermediate booleans that represent database properties and dispatching
+    // creation logic based on them is error prone.
     switch (databaseVersion) {
       case 0:
         {
