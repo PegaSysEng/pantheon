@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon.plugin.services.storage.rocksdb;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +29,6 @@ import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.Rocks
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Rule;
@@ -127,6 +127,17 @@ public class RocksDBKeyValueStorageFactoryTest {
                 new RocksDBKeyValueStorageFactory(() -> rocksDbConfiguration, segments)
                     .create(segment, commonConfiguration, metricsSystem))
         .isInstanceOf(StorageException.class);
+  }
+
+  @Test
+  public void shouldSetSegmentationFieldDuringCreation() throws Exception {
+    final Path tempDatabaseDir = temporaryFolder.newFolder().toPath().resolve("db");
+    Files.createDirectories(tempDatabaseDir);
+    when(commonConfiguration.getStoragePath()).thenReturn(tempDatabaseDir);
+    final RocksDBKeyValueStorageFactory storageFactory =
+        new RocksDBKeyValueStorageFactory(() -> rocksDbConfiguration, segments);
+    storageFactory.create(segment, commonConfiguration, metricsSystem);
+    assertThatCode(storageFactory::isSegmentIsolationSupported).doesNotThrowAnyException();
   }
 
   @Test
