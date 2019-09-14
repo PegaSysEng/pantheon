@@ -90,6 +90,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
       LOG.error("Failed to retrieve the RocksDB database meta version: {}", e.getMessage());
       throw new StorageException(e.getMessage(), e);
     }
+    isSegmentIsolationSupported = databaseVersion >= 1;
 
     final RocksDBConfiguration rocksDBConfiguration =
         RocksDBConfigurationBuilder.from(configuration.get())
@@ -102,13 +103,11 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     switch (databaseVersion) {
       case 0:
         {
-          isSegmentIsolationSupported = false;
           createdStorage = new RocksDBKeyValueStorage(rocksDBConfiguration, metricsSystem);
           break;
         }
       case 1:
         {
-          isSegmentIsolationSupported = true;
           createdStorage =
               new SegmentedKeyValueStorageAdapter<>(
                   segment,
