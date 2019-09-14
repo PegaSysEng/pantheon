@@ -153,7 +153,9 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   @Override
   public void close() throws IOException {
-    createdStorage.close();
+    if (createdStorage != null) {
+      createdStorage.close();
+    }
   }
 
   @Override
