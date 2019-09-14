@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.Rocks
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage;
 import tech.pegasys.pantheon.plugin.services.storage.rocksdb.unsegmented.RocksDBKeyValueStorage;
+import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorage;
 import tech.pegasys.pantheon.services.kvstore.SegmentedKeyValueStorageAdapter;
 
 import java.io.IOException;
@@ -45,8 +46,10 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   private static final Set<Integer> SUPPORTED_VERSION = Set.of(0, 1);
   private static final String NAME = "rocksdb";
 
+  private Integer databaseVersion;
   private Boolean isSegmentIsolationSupported;
-  private KeyValueStorage createdStorage;
+  private SegmentedKeyValueStorage<?> segmentedStorage;
+  private KeyValueStorage unsegmentedStorage;
 
   private final Supplier<RocksDBFactoryConfiguration> configuration;
   private final List<SegmentIdentifier> segments;
@@ -82,18 +85,9 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
       final MetricsSystem metricsSystem)
       throws StorageException {
 
-    if (createdStorage != null) {
-      return createdStorage;
+    if (requiresInit()) {
+      init(commonConfiguration);
     }
-
-    final int databaseVersion;
-    try {
-      databaseVersion = readDatabaseVersion(commonConfiguration);
-    } catch (final IOException e) {
-      LOG.error("Failed to retrieve the RocksDB database meta version: {}", e.getMessage());
-      throw new StorageException(e.getMessage(), e);
-    }
-    isSegmentIsolationSupported = databaseVersion >= 1;
 
     final RocksDBConfiguration rocksDBConfiguration =
         RocksDBConfigurationBuilder.from(configuration.get())
@@ -106,17 +100,20 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     switch (databaseVersion) {
       case 0:
         {
-          createdStorage = new RocksDBKeyValueStorage(rocksDBConfiguration, metricsSystem);
-          break;
+          segmentedStorage = null;
+          if (unsegmentedStorage == null) {
+            unsegmentedStorage = new RocksDBKeyValueStorage(rocksDBConfiguration, metricsSystem);
+          }
+          return unsegmentedStorage;
         }
       case 1:
         {
-          createdStorage =
-              new SegmentedKeyValueStorageAdapter<>(
-                  segment,
-                  new RocksDBColumnarKeyValueStorage(
-                      rocksDBConfiguration, segments, metricsSystem));
-          break;
+          unsegmentedStorage = null;
+          if (segmentedStorage == null) {
+            segmentedStorage =
+                new RocksDBColumnarKeyValueStorage(rocksDBConfiguration, segments, metricsSystem);
+          }
+          return new SegmentedKeyValueStorageAdapter<>(segment, segmentedStorage);
         }
       default:
         {
@@ -126,8 +123,20 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
                   databaseVersion));
         }
     }
+  }
 
-    return createdStorage;
+  private void init(final PantheonConfiguration commonConfiguration) {
+    try {
+      this.databaseVersion = readDatabaseVersion(commonConfiguration);
+    } catch (final IOException e) {
+      LOG.error("Failed to retrieve the RocksDB database meta version: {}", e.getMessage());
+      throw new StorageException(e.getMessage(), e);
+    }
+    this.isSegmentIsolationSupported = this.databaseVersion >= 1;
+  }
+
+  private boolean requiresInit() {
+    return segmentedStorage == null && unsegmentedStorage == null;
   }
 
   private int readDatabaseVersion(final PantheonConfiguration commonConfiguration)
@@ -157,8 +166,11 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
 
   @Override
   public void close() throws IOException {
-    if (createdStorage != null) {
-      createdStorage.close();
+    if (unsegmentedStorage != null) {
+      unsegmentedStorage.close();
+    }
+    if (segmentedStorage != null) {
+      segmentedStorage.close();
     }
   }
 
