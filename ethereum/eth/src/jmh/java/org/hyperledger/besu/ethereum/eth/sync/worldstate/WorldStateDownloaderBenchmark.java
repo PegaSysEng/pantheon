@@ -39,7 +39,7 @@ import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBKeyValueStorageFactory;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
-import org.hyperledger.besu.services.PantheonConfigurationImpl;
+import org.hyperledger.besu.services.BesuConfigurationImpl;
 import org.hyperledger.besu.services.tasks.CachingTaskCollection;
 import org.hyperledger.besu.services.tasks.FlatFileTaskCollection;
 import org.hyperledger.besu.util.bytes.BytesValue;
@@ -167,7 +167,7 @@ public class WorldStateDownloaderBenchmark {
                         DEFAULT_BACKGROUND_THREAD_COUNT,
                         DEFAULT_CACHE_CAPACITY),
                 Arrays.asList(KeyValueSegmentIdentifier.values())))
-        .withCommonConfiguration(new PantheonConfigurationImpl(dbAhead))
+        .withCommonConfiguration(new BesuConfigurationImpl(dbAhead))
         .withMetricsSystem(new NoOpMetricsSystem())
         .build();
   }

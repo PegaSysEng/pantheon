@@ -12,22 +12,22 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuNodeConfiguration;
 import org.hyperledger.orion.testutil.OrionKeyConfiguration;
 
 public class PrivacyNodeConfiguration {
 
-  private final PantheonNodeConfiguration pantheonConfig;
+  private final BesuNodeConfiguration besuConfig;
   private final OrionKeyConfiguration orionConfig;
 
   PrivacyNodeConfiguration(
-      final PantheonNodeConfiguration pantheonConfig, final OrionKeyConfiguration orionConfig) {
-    this.pantheonConfig = pantheonConfig;
+      final BesuNodeConfiguration besuConfig, final OrionKeyConfiguration orionConfig) {
+    this.besuConfig = besuConfig;
     this.orionConfig = orionConfig;
   }
 
-  public PantheonNodeConfiguration getPantheonConfig() {
-    return pantheonConfig;
+  public BesuNodeConfiguration getBesuConfig() {
+    return besuConfig;
   }
 
   public OrionKeyConfiguration getOrionKeyConfig() {

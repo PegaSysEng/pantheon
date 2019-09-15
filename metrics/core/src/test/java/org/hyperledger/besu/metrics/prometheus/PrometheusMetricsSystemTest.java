@@ -17,15 +17,15 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.DEFAULT_METRIC_CATEGORIES;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.NETWORK;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.PEERS;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.RPC;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.DEFAULT_METRIC_CATEGORIES;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.NETWORK;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.PEERS;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.RPC;
 import static org.hyperledger.besu.metrics.StandardMetricCategory.JVM;
 
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.metrics.Observation;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
@@ -190,7 +190,7 @@ public class PrometheusMetricsSystemTest {
   public void shouldOnlyObserveEnabledMetrics() {
     final MetricsConfiguration metricsConfiguration =
         MetricsConfiguration.builder()
-            .metricCategories(ImmutableSet.of(PantheonMetricCategory.RPC))
+            .metricCategories(ImmutableSet.of(BesuMetricCategory.RPC))
             .enabled(true)
             .build();
     final ObservableMetricsSystem localMetricSystem =

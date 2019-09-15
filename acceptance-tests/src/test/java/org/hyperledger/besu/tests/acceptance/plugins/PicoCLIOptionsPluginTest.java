@@ -15,7 +15,7 @@ package org.hyperledger.besu.tests.acceptance.plugins;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class PicoCLIOptionsPluginTest extends AcceptanceTestBase {
-  private PantheonNode node;
+  private BesuNode node;
 
   // context: https://en.wikipedia.org/wiki/The_Magic_Words_are_Squeamish_Ossifrage
   private static final String MAGIC_WORDS = "Squemish Ossifrage";
@@ -39,7 +39,7 @@ public class PicoCLIOptionsPluginTest extends AcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     node =
-        pantheon.createPluginsNode(
+        besu.createPluginsNode(
             "node1",
             Collections.singletonList("testPlugins"),
             Collections.singletonList("--Xtest-option=" + MAGIC_WORDS));
@@ -68,7 +68,7 @@ public class PicoCLIOptionsPluginTest extends AcceptanceTestBase {
   }
 
   @Test
-  @Ignore("No way to do a graceful shutdown of Pantheon at the moment.")
+  @Ignore("No way to do a graceful shutdown of Besu at the moment.")
   public void shouldStop() {
     cluster.stopNode(node);
     waitForFile(node.homeDirectory().resolve("plugins/pluginLifecycle.stopped"));

@@ -24,7 +24,7 @@ public interface RunnableNode extends Node {
 
   void close();
 
-  void start(PantheonNodeRunner runner);
+  void start(BesuNodeRunner runner);
 
   NodeConfiguration getConfiguration();
 

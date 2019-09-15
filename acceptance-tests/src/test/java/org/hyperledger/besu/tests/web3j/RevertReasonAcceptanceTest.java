@@ -16,7 +16,7 @@ import static org.hyperledger.besu.tests.web3j.generated.RevertReason.FUNC_REVER
 import static org.hyperledger.besu.tests.web3j.generated.RevertReason.FUNC_REVERTWITHREVERTREASON;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.web3j.generated.RevertReason;
 
 import org.junit.Before;
@@ -25,11 +25,11 @@ import org.web3j.protocol.core.methods.response.EthSendTransaction;
 
 public class RevertReasonAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode minerNode;
+  private BesuNode minerNode;
 
   @Before
   public void setUp() throws Exception {
-    minerNode = pantheon.createMinerNodeWithRevertReasonEnabled("miner-node-withRevertReason");
+    minerNode = besu.createMinerNodeWithRevertReasonEnabled("miner-node-withRevertReason");
     cluster.start(minerNode);
   }
 

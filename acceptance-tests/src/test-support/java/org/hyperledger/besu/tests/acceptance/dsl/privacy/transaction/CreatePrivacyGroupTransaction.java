@@ -41,9 +41,9 @@ public class CreatePrivacyGroupTransaction implements Transaction<String> {
 
   @Override
   public String execute(final NodeRequests node) {
-    final Pantheon pantheon = node.privacy().getPantheonClient();
+    final Pantheon besu = node.privacy().getBesuClient();
     try {
-      return pantheon
+      return besu
           .privCreatePrivacyGroup(addresses, name, description)
           .send()
           .getPrivacyGroupId()

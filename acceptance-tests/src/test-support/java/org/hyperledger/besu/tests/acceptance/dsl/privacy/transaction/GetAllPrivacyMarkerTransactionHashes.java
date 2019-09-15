@@ -28,13 +28,13 @@ import org.web3j.protocol.pantheon.Pantheon;
 public class GetAllPrivacyMarkerTransactionHashes implements Transaction<List<String>> {
   @Override
   public List<String> execute(final NodeRequests node) {
-    final Pantheon pantheon = node.privacy().getPantheonClient();
+    final Pantheon besu = node.privacy().getBesuClient();
     final List<String> toReturn = new ArrayList<>();
     try {
       final long blockchainHeight =
-          pantheon.ethBlockNumber().send().getBlockNumber().longValueExact();
+          besu.ethBlockNumber().send().getBlockNumber().longValueExact();
       for (int i = 0; i <= blockchainHeight; i++) {
-        pantheon
+        besu
             .ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(i)), true)
             .send()
             .getBlock()

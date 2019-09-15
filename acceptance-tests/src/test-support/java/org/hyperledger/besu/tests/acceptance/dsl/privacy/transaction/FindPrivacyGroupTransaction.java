@@ -33,9 +33,9 @@ public class FindPrivacyGroupTransaction implements Transaction<List<PrivacyGrou
 
   @Override
   public List<PrivacyGroup> execute(final NodeRequests node) {
-    final Pantheon pantheon = node.privacy().getPantheonClient();
+    final Pantheon besu = node.privacy().getBesuClient();
     try {
-      return pantheon.privFindPrivacyGroup(nodes).send().getGroups();
+      return besu.privFindPrivacyGroup(nodes).send().getGroups();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

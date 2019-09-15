@@ -31,13 +31,13 @@ public class PrivacyGroupAcceptanceTest extends PrivacyAcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     alice =
-        privacyPantheon.createPrivateTransactionEnabledMinerNode(
+        privacyBesu.createPrivateTransactionEnabledMinerNode(
             "node1", privacyAccountResolver.resolve(0));
     bob =
-        privacyPantheon.createPrivateTransactionEnabledNode(
+        privacyBesu.createPrivateTransactionEnabledNode(
             "node2", privacyAccountResolver.resolve(1));
     charlie =
-        privacyPantheon.createPrivateTransactionEnabledNode(
+        privacyBesu.createPrivateTransactionEnabledNode(
             "node3", privacyAccountResolver.resolve(2));
     privacyCluster.start(alice, bob, charlie);
   }

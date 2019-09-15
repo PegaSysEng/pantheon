@@ -40,7 +40,7 @@ public class EthSignerAcceptanceTest extends PrivacyAcceptanceTestBase {
   @Before
   public void setUp() throws Exception {
     minerNode =
-        privacyPantheon.createPrivateTransactionEnabledMinerNode(
+        privacyBesu.createPrivateTransactionEnabledMinerNode(
             "miner-node", privacyAccountResolver.resolve(0));
     privacyCluster.start(minerNode);
 
@@ -48,7 +48,7 @@ public class EthSignerAcceptanceTest extends PrivacyAcceptanceTestBase {
         EthSignerTestHarnessFactory.create(
             privacy.newFolder().toPath(),
             "ethSignerKey--fe3b557e8fb62b89f4916b721be55ceb828dbd73.json",
-            minerNode.getPantheon().getJsonRpcSocketPort().orElseThrow(),
+            minerNode.getBesu().getJsonRpcSocketPort().orElseThrow(),
             2018);
 
     ethSignerClient = new EthSignerClient(ethSigner.getHttpListeningUrl());

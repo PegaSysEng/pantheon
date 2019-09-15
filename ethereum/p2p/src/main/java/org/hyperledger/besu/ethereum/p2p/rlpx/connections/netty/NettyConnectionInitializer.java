@@ -24,7 +24,7 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.ConnectCallback;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.ConnectionInitializer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEventDispatcher;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.util.Subscribers;
 
@@ -80,13 +80,13 @@ public class NettyConnectionInitializer implements ConnectionInitializer {
     this.metricsSystem = metricsSystem;
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.NETWORK,
+        BesuMetricCategory.NETWORK,
         "netty_workers_pending_tasks",
         "The number of pending tasks in the Netty workers event loop",
         pendingTaskCounter(workers));
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.NETWORK,
+        BesuMetricCategory.NETWORK,
         "netty_boss_pending_tasks",
         "The number of pending tasks in the Netty boss event loop",
         pendingTaskCounter(boss));

@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.plugin.services.storage.rocksdb;
 
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.prometheus.PrometheusMetricsSystem;
 import org.hyperledger.besu.metrics.rocksdb.RocksDBStats;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
@@ -57,7 +57,7 @@ public class RocksDBMetrics {
     final OperationTimer readLatency =
         metricsSystem
             .createLabelledTimer(
-                PantheonMetricCategory.KVSTORE_ROCKSDB,
+                BesuMetricCategory.KVSTORE_ROCKSDB,
                 "read_latency_seconds",
                 "Latency for read from RocksDB.",
                 "database")
@@ -65,7 +65,7 @@ public class RocksDBMetrics {
     final OperationTimer removeLatency =
         metricsSystem
             .createLabelledTimer(
-                PantheonMetricCategory.KVSTORE_ROCKSDB,
+                BesuMetricCategory.KVSTORE_ROCKSDB,
                 "remove_latency_seconds",
                 "Latency of remove requests from RocksDB.",
                 "database")
@@ -73,7 +73,7 @@ public class RocksDBMetrics {
     final OperationTimer writeLatency =
         metricsSystem
             .createLabelledTimer(
-                PantheonMetricCategory.KVSTORE_ROCKSDB,
+                BesuMetricCategory.KVSTORE_ROCKSDB,
                 "write_latency_seconds",
                 "Latency for write to RocksDB.",
                 "database")
@@ -81,7 +81,7 @@ public class RocksDBMetrics {
     final OperationTimer commitLatency =
         metricsSystem
             .createLabelledTimer(
-                PantheonMetricCategory.KVSTORE_ROCKSDB,
+                BesuMetricCategory.KVSTORE_ROCKSDB,
                 "commit_latency_seconds",
                 "Latency for commits to RocksDB.",
                 "database")
@@ -92,7 +92,7 @@ public class RocksDBMetrics {
     }
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.KVSTORE_ROCKSDB,
+        BesuMetricCategory.KVSTORE_ROCKSDB,
         "rocks_db_table_readers_memory_bytes",
         "Estimated memory used for RocksDB index and filter blocks in bytes",
         () -> {
@@ -105,7 +105,7 @@ public class RocksDBMetrics {
         });
 
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.KVSTORE_ROCKSDB,
+        BesuMetricCategory.KVSTORE_ROCKSDB,
         "rocks_db_files_size_bytes",
         "Estimated database size in bytes",
         () -> {
@@ -120,7 +120,7 @@ public class RocksDBMetrics {
     final Counter rollbackCount =
         metricsSystem
             .createLabelledCounter(
-                PantheonMetricCategory.KVSTORE_ROCKSDB,
+                BesuMetricCategory.KVSTORE_ROCKSDB,
                 "rollback_count",
                 "Number of RocksDB transactions rolled back.",
                 "database")

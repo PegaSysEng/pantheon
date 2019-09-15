@@ -15,7 +15,7 @@ package org.hyperledger.besu.tests.web3j;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.web3j.generated.EventEmitter;
 import org.hyperledger.besu.tests.web3j.generated.EventEmitter.StoredEventResponse;
 
@@ -34,11 +34,11 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
  */
 public class EventEmitterAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode node;
+  private BesuNode node;
 
   @Before
   public void setUp() throws Exception {
-    node = pantheon.createMinerNode("node1");
+    node = besu.createMinerNode("node1");
     cluster.start(node);
   }
 

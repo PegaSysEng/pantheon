@@ -24,7 +24,7 @@ public class Web3Sha3AcceptanceTest extends AcceptanceTestBase {
 
   @Before
   public void setUp() throws Exception {
-    node = pantheon.createArchiveNode("node1");
+    node = besu.createArchiveNode("node1");
     cluster.start(node);
   }
 

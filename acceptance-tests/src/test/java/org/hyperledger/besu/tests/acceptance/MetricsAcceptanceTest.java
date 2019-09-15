@@ -15,8 +15,8 @@ package org.hyperledger.besu.tests.acceptance;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeConfigurationBuilder;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuNodeConfigurationBuilder;
 
 import java.io.IOException;
 
@@ -29,14 +29,14 @@ import org.junit.Test;
 
 public class MetricsAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode metricsNode;
+  private BesuNode metricsNode;
   private OkHttpClient client;
 
   @Before
   public void setUp() throws Exception {
     metricsNode =
-        pantheon.create(
-            new PantheonNodeConfigurationBuilder().name("metrics-node").metricsEnabled().build());
+        besu.create(
+            new BesuNodeConfigurationBuilder().name("metrics-node").metricsEnabled().build());
     cluster.start(metricsNode);
     client = new OkHttpClient();
   }
@@ -49,6 +49,6 @@ public class MetricsAcceptanceTest extends AcceptanceTestBase {
         client.newCall(new Request.Builder().url(metricsNode.metricsHttpUrl().get()).build());
     final Response response = metricsRequest.execute();
 
-    assertThat(response.body().string()).contains("# TYPE pantheon_peers_connected_total counter");
+    assertThat(response.body().string()).contains("# TYPE besu_peers_connected_total counter");
   }
 }

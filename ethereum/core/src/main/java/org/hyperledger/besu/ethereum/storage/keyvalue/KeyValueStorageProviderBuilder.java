@@ -20,7 +20,7 @@ import static org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueSegmentIden
 import static org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueSegmentIdentifier.WORLD_STATE;
 
 import org.hyperledger.besu.plugin.services.MetricsSystem;
-import org.hyperledger.besu.plugin.services.PantheonConfiguration;
+import org.hyperledger.besu.plugin.services.BesuConfiguration;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorage;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorageFactory;
 import org.hyperledger.besu.services.kvstore.LimitedInMemoryKeyValueStorage;
@@ -30,7 +30,7 @@ public class KeyValueStorageProviderBuilder {
   private static final long DEFAULT_WORLD_STATE_PRE_IMAGE_CACHE_SIZE = 5_000L;
 
   private KeyValueStorageFactory storageFactory;
-  private PantheonConfiguration commonConfiguration;
+  private BesuConfiguration commonConfiguration;
   private MetricsSystem metricsSystem;
 
   public KeyValueStorageProviderBuilder withStorageFactory(
@@ -40,7 +40,7 @@ public class KeyValueStorageProviderBuilder {
   }
 
   public KeyValueStorageProviderBuilder withCommonConfiguration(
-      final PantheonConfiguration commonConfiguration) {
+      final BesuConfiguration commonConfiguration) {
     this.commonConfiguration = commonConfiguration;
     return this;
   }

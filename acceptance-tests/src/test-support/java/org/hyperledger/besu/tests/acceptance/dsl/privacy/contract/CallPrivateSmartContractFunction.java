@@ -55,11 +55,11 @@ public class CallPrivateSmartContractFunction implements Transaction<String> {
 
   @Override
   public String execute(final NodeRequests node) {
-    final Pantheon pantheon = node.privacy().getPantheonClient();
+    final Pantheon besu = node.privacy().getBesuClient();
 
     final PrivateTransactionManager privateTransactionManager =
         new LegacyPrivateTransactionManager(
-            pantheon, GAS_PROVIDER, senderCredentials, chainId, privateFrom, privateFor);
+            besu, GAS_PROVIDER, senderCredentials, chainId, privateFrom, privateFor);
 
     try {
       return privateTransactionManager

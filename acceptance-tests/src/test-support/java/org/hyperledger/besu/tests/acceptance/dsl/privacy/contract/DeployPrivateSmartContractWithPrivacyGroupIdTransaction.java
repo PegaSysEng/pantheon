@@ -59,7 +59,7 @@ public class DeployPrivateSmartContractWithPrivacyGroupIdTransaction<T extends C
   public T execute(final NodeRequests node) {
     final PrivateTransactionManager privateTransactionManager =
         new PantheonPrivateTransactionManager(
-            node.privacy().getPantheonClient(),
+            node.privacy().getBesuClient(),
             GAS_PROVIDER,
             senderCredentials,
             chainId,
@@ -73,7 +73,7 @@ public class DeployPrivateSmartContractWithPrivacyGroupIdTransaction<T extends C
       final Object invoked =
           method.invoke(
               METHOD_IS_STATIC,
-              node.privacy().getPantheonClient(),
+              node.privacy().getBesuClient(),
               privateTransactionManager,
               GAS_PROVIDER);
 

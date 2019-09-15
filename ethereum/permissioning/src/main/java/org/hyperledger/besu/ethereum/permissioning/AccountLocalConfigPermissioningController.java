@@ -16,7 +16,7 @@ import org.hyperledger.besu.ethereum.permissioning.account.TransactionPermission
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.util.bytes.BytesValue;
@@ -62,17 +62,17 @@ public class AccountLocalConfigPermissioningController implements TransactionPer
     readAccountsFromConfig(configuration);
     this.checkCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "account_local_check_count",
             "Number of times the account local permissioning provider has been checked");
     this.checkCounterPermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "account_local_check_count_permitted",
             "Number of times the account local permissioning provider has been checked and returned permitted");
     this.checkCounterUnpermitted =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "account_local_check_count_unpermitted",
             "Number of times the account local permissioning provider has been checked and returned unpermitted");
   }

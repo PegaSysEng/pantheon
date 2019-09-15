@@ -59,7 +59,7 @@ public class DeployPrivateSmartContractTransaction<T extends Contract> implement
   public T execute(final NodeRequests node) {
     final PrivateTransactionManager privateTransactionManager =
         new LegacyPrivateTransactionManager(
-            node.privacy().getPantheonClient(),
+            node.privacy().getBesuClient(),
             GAS_PROVIDER,
             senderCredentials,
             chainId,
@@ -73,7 +73,7 @@ public class DeployPrivateSmartContractTransaction<T extends Contract> implement
       final Object invoked =
           method.invoke(
               METHOD_IS_STATIC,
-              node.privacy().getPantheonClient(),
+              node.privacy().getBesuClient(),
               privateTransactionManager,
               GAS_PROVIDER);
 

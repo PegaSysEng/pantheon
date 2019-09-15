@@ -31,7 +31,7 @@ public class P2pDisabledAcceptanceTest extends AcceptanceTestBase {
         new ClusterConfigurationBuilder().awaitPeerDiscovery(false).build();
 
     p2pDisabledCluster = new Cluster(clusterConfiguration, net);
-    node = pantheon.createNodeWithP2pDisabled("node1");
+    node = besu.createNodeWithP2pDisabled("node1");
     p2pDisabledCluster.start(node);
   }
 

@@ -16,10 +16,10 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeConfigurationBuilder;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeFactory;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuNodeConfigurationBuilder;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuNodeFactory;
 import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcConfiguration;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApis;
@@ -153,7 +153,7 @@ public class PermissionedNodeBuilder {
     return this;
   }
 
-  public PantheonNode build() {
+  public BesuNode build() {
     if (name == null) {
       name = "perm_node_" + UUID.randomUUID().toString().substring(0, 8);
     }
@@ -171,7 +171,7 @@ public class PermissionedNodeBuilder {
     final PermissioningConfiguration permissioningConfiguration =
         new PermissioningConfiguration(localPermConfig, smartContractPermConfig);
 
-    final PantheonNodeConfigurationBuilder builder = new PantheonNodeConfigurationBuilder();
+    final BesuNodeConfigurationBuilder builder = new BesuNodeConfigurationBuilder();
     builder
         .name(name)
         .jsonRpcConfiguration(jsonRpcConfigWithPermApiEnabled())
@@ -192,9 +192,9 @@ public class PermissionedNodeBuilder {
     }
 
     try {
-      return new PantheonNodeFactory().create(builder.build());
+      return new BesuNodeFactory().create(builder.build());
     } catch (IOException e) {
-      throw new RuntimeException("Error creating PantheonNode", e);
+      throw new RuntimeException("Error creating BesuNode", e);
     }
   }
 

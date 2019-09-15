@@ -13,7 +13,7 @@
 package org.hyperledger.besu.tests.acceptance.jsonrpc;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.Cluster;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.ClusterConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.cluster.ClusterConfigurationBuilder;
@@ -27,7 +27,7 @@ import org.junit.Test;
 public class HttpServiceLoginAcceptanceTest extends AcceptanceTestBase {
 
   private Cluster authenticatedCluster;
-  private PantheonNode node;
+  private BesuNode node;
 
   @Before
   public void setUp() throws IOException, URISyntaxException {
@@ -35,7 +35,7 @@ public class HttpServiceLoginAcceptanceTest extends AcceptanceTestBase {
         new ClusterConfigurationBuilder().awaitPeerDiscovery(false).build();
 
     authenticatedCluster = new Cluster(clusterConfiguration, net);
-    node = pantheon.createArchiveNodeWithAuthentication("node1");
+    node = besu.createArchiveNodeWithAuthentication("node1");
     authenticatedCluster.start(node);
     node.verify(login.awaitResponse("user", "badpassword"));
   }

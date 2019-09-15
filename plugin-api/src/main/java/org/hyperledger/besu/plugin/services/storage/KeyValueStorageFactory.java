@@ -14,7 +14,7 @@ package org.hyperledger.besu.plugin.services.storage;
 
 import org.hyperledger.besu.plugin.Unstable;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
-import org.hyperledger.besu.plugin.services.PantheonConfiguration;
+import org.hyperledger.besu.plugin.services.BesuConfiguration;
 import org.hyperledger.besu.plugin.services.exception.StorageException;
 
 /** Factory for creating key-value storage instances. */
@@ -46,7 +46,7 @@ public interface KeyValueStorageFactory {
    * @exception StorageException problem encountered when creating storage for the segment.
    */
   KeyValueStorage create(
-      SegmentIdentifier segment, PantheonConfiguration configuration, MetricsSystem metricsSystem)
+      SegmentIdentifier segment, BesuConfiguration configuration, MetricsSystem metricsSystem)
       throws StorageException;
 
   /**

@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.eth.manager;
 
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer.DisconnectCallback;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.util.Subscribers;
 
@@ -52,7 +52,7 @@ public class EthPeers {
     this.protocolName = protocolName;
     this.clock = clock;
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.PEERS,
+        BesuMetricCategory.PEERS,
         "pending_peer_requests_current",
         "Number of peer requests currently pending because peers are busy",
         pendingRequests::size);

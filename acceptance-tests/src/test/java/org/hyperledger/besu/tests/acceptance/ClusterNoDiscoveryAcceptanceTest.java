@@ -32,8 +32,8 @@ public class ClusterNoDiscoveryAcceptanceTest extends AcceptanceTestBase {
     final ClusterConfiguration clusterConfiguration =
         new ClusterConfigurationBuilder().awaitPeerDiscovery(false).build();
     noDiscoveryCluster = new Cluster(clusterConfiguration, net);
-    noDiscoveryNode = pantheon.createNodeWithNoDiscovery("noDiscovery");
-    fullNode = pantheon.createArchiveNode("node2");
+    noDiscoveryNode = besu.createNodeWithNoDiscovery("noDiscovery");
+    fullNode = besu.createArchiveNode("node2");
     noDiscoveryCluster.start(noDiscoveryNode, fullNode);
   }
 

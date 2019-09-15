@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.plugin.services.storage.rocksdb;
 
-import org.hyperledger.besu.plugin.PantheonContext;
-import org.hyperledger.besu.plugin.PantheonPlugin;
+import org.hyperledger.besu.plugin.BesuContext;
+import org.hyperledger.besu.plugin.BesuPlugin;
 import org.hyperledger.besu.plugin.services.PicoCLIOptions;
 import org.hyperledger.besu.plugin.services.StorageService;
 import org.hyperledger.besu.plugin.services.storage.SegmentIdentifier;
@@ -29,13 +29,13 @@ import com.google.common.base.Suppliers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RocksDBPlugin implements PantheonPlugin {
+public class RocksDBPlugin implements BesuPlugin {
 
   private static final Logger LOG = LogManager.getLogger();
   private static final String NAME = "rocksdb";
 
   private final RocksDBCLIOptions options;
-  private PantheonContext context;
+  private BesuContext context;
   private RocksDBKeyValueStorageFactory factory;
   private RocksDBKeyValuePrivacyStorageFactory privacyFactory;
 
@@ -44,7 +44,7 @@ public class RocksDBPlugin implements PantheonPlugin {
   }
 
   @Override
-  public void register(final PantheonContext context) {
+  public void register(final BesuContext context) {
     LOG.info("Registering plugin");
     this.context = context;
 

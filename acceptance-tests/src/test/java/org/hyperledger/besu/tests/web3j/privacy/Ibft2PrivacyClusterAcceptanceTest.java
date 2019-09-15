@@ -33,10 +33,10 @@ public class Ibft2PrivacyClusterAcceptanceTest extends PrivacyAcceptanceTestBase
   @Before
   public void setUp() throws Exception {
     alice =
-        privacyPantheon.createIbft2NodePrivacyEnabled("node1", privacyAccountResolver.resolve(0));
-    bob = privacyPantheon.createIbft2NodePrivacyEnabled("node2", privacyAccountResolver.resolve(1));
+        privacyBesu.createIbft2NodePrivacyEnabled("node1", privacyAccountResolver.resolve(0));
+    bob = privacyBesu.createIbft2NodePrivacyEnabled("node2", privacyAccountResolver.resolve(1));
     charlie =
-        privacyPantheon.createIbft2NodePrivacyEnabled("node3", privacyAccountResolver.resolve(2));
+        privacyBesu.createIbft2NodePrivacyEnabled("node3", privacyAccountResolver.resolve(2));
     privacyCluster.start(alice, bob, charlie);
   }
 

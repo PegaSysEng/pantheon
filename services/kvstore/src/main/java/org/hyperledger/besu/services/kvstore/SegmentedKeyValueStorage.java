@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
- * Service provided by pantheon to facilitate persistent data storage.
+ * Service provided by besu to facilitate persistent data storage.
  *
  * @param <S> the segment identifier type
  */

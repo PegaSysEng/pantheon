@@ -31,7 +31,7 @@ public class PrivacyAcceptanceTestBase {
   protected final PrivacyTransactions privacyTransactions;
   protected final PrivateContractVerifier privateContractVerifier;
   protected final PrivateTransactionVerifier privateTransactionVerifier;
-  protected final PrivacyNodeFactory privacyPantheon;
+  protected final PrivacyNodeFactory privacyBesu;
   protected final PrivateContractTransactions privateContractTransactions;
   protected final PrivacyCluster privacyCluster;
   protected final PrivacyAccountResolver privacyAccountResolver;
@@ -43,7 +43,7 @@ public class PrivacyAcceptanceTestBase {
     privacyTransactions = new PrivacyTransactions();
     privateContractVerifier = new PrivateContractVerifier();
     privateTransactionVerifier = new PrivateTransactionVerifier(privacyTransactions);
-    privacyPantheon = new PrivacyNodeFactory();
+    privacyBesu = new PrivacyNodeFactory();
     privateContractTransactions = new PrivateContractTransactions();
     privacyCluster = new PrivacyCluster(net);
     privacyAccountResolver = new PrivacyAccountResolver();

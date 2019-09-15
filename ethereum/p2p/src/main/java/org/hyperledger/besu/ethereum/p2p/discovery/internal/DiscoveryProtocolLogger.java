@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.p2p.discovery.internal;
 
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
@@ -30,13 +30,13 @@ public class DiscoveryProtocolLogger {
   public DiscoveryProtocolLogger(final MetricsSystem metricsSystem) {
     outgoingMessageCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.NETWORK,
+            BesuMetricCategory.NETWORK,
             "discovery_messages_outbound",
             "Total number of P2P discovery messages sent",
             "name");
     incomingMessageCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.NETWORK,
+            BesuMetricCategory.NETWORK,
             "discovery_messages_inbound",
             "Total number of P2P discovery messages received",
             "name");

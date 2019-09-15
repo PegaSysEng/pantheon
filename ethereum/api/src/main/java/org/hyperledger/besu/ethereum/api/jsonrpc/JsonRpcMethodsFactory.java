@@ -73,8 +73,8 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.NetServices;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.NetVersion;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.RpcModules;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.TraceReplayBlockTransactions;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.TxPoolPantheonStatistics;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.TxPoolPantheonTransactions;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.TxPoolBesuStatistics;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.TxPoolBesuTransactions;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.Web3ClientVersion;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.Web3Sha3;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.miner.MinerSetCoinbase;
@@ -310,8 +310,8 @@ public class JsonRpcMethodsFactory {
     if (rpcApis.contains(RpcApis.TX_POOL)) {
       addMethods(
           enabledMethods,
-          new TxPoolPantheonTransactions(transactionPool.getPendingTransactions()),
-          new TxPoolPantheonStatistics(transactionPool.getPendingTransactions()));
+          new TxPoolBesuTransactions(transactionPool.getPendingTransactions()),
+          new TxPoolBesuStatistics(transactionPool.getPendingTransactions()));
     }
     if (rpcApis.contains(RpcApis.PERM)) {
       addMethods(

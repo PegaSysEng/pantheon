@@ -13,7 +13,7 @@
 package org.hyperledger.besu.tests.acceptance.clique;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 
 import java.io.IOException;
 
@@ -24,12 +24,12 @@ public class CliqueDiscardRpcAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldDiscardVotes() throws IOException {
     final String[] validators = {"validator1", "validator3"};
-    final PantheonNode validator1 =
-        pantheon.createCliqueNodeWithValidators("validator1", validators);
-    final PantheonNode validator2 =
-        pantheon.createCliqueNodeWithValidators("validator2", validators);
-    final PantheonNode validator3 =
-        pantheon.createCliqueNodeWithValidators("validator3", validators);
+    final BesuNode validator1 =
+        besu.createCliqueNodeWithValidators("validator1", validators);
+    final BesuNode validator2 =
+        besu.createCliqueNodeWithValidators("validator2", validators);
+    final BesuNode validator3 =
+        besu.createCliqueNodeWithValidators("validator3", validators);
     cluster.start(validator1, validator2, validator3);
 
     validator1.execute(cliqueTransactions.createAddProposal(validator2));

@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
-import org.hyperledger.besu.plugin.services.PantheonConfiguration;
+import org.hyperledger.besu.plugin.services.BesuConfiguration;
 import org.hyperledger.besu.plugin.services.exception.StorageException;
 import org.hyperledger.besu.plugin.services.storage.SegmentIdentifier;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.DatabaseMetadata;
@@ -43,7 +43,7 @@ public class RocksDBKeyValueStorageFactoryTest {
   private static final int DEFAULT_VERSION = 1;
 
   @Mock private RocksDBFactoryConfiguration rocksDbConfiguration;
-  @Mock private PantheonConfiguration commonConfiguration;
+  @Mock private BesuConfiguration commonConfiguration;
   @Rule public final TemporaryFolder temporaryFolder = new TemporaryFolder();
   private final ObservableMetricsSystem metricsSystem = new NoOpMetricsSystem();
   private final List<SegmentIdentifier> segments = List.of();

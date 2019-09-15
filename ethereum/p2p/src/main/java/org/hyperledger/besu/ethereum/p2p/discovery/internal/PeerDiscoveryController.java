@@ -27,7 +27,7 @@ import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.peers.PeerId;
 import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
@@ -171,21 +171,21 @@ public class PeerDiscoveryController {
     this.peerPermissions = new PeerDiscoveryPermissions(localPeer, peerPermissions);
 
     metricsSystem.createIntegerGauge(
-        PantheonMetricCategory.NETWORK,
+        BesuMetricCategory.NETWORK,
         "discovery_inflight_interactions_current",
         "Current number of inflight discovery interactions",
         inflightInteractions::size);
 
     interactionCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.NETWORK,
+            BesuMetricCategory.NETWORK,
             "discovery_interaction_count",
             "Total number of discovery interactions initiated",
             "type");
 
     interactionRetryCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.NETWORK,
+            BesuMetricCategory.NETWORK,
             "discovery_interaction_retry_count",
             "Total number of interaction retries performed",
             "type");

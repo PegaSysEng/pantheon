@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.core;
 
 import org.hyperledger.besu.plugin.data.SyncStatus;
-import org.hyperledger.besu.plugin.services.PantheonEvents;
+import org.hyperledger.besu.plugin.services.BesuEvents;
 
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ public interface Synchronizer {
    */
   Optional<SyncStatus> getSyncStatus();
 
-  long observeSyncStatus(final PantheonEvents.SyncStatusListener listener);
+  long observeSyncStatus(final BesuEvents.SyncStatusListener listener);
 
   boolean removeObserver(long observerId);
 }

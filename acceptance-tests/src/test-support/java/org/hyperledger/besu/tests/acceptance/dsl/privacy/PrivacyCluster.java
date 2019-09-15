@@ -14,7 +14,7 @@ package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
 import static java.util.Collections.emptyList;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNodeRunner;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNodeRunner;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.net.NetConditions;
 
@@ -30,7 +30,7 @@ import org.apache.logging.log4j.Logger;
 public class PrivacyCluster {
   private static final Logger LOG = LogManager.getLogger();
   private final NetConditions net;
-  private final PantheonNodeRunner pantheonNodeRunner;
+  private final BesuNodeRunner besuNodeRunner;
 
   private List<PrivacyNode> nodes = emptyList();
   private List<RunnableNode> runnableNodes = emptyList();
@@ -38,7 +38,7 @@ public class PrivacyCluster {
 
   public PrivacyCluster(final NetConditions net) {
     this.net = net;
-    this.pantheonNodeRunner = PantheonNodeRunner.instance();
+    this.besuNodeRunner = BesuNodeRunner.instance();
   }
 
   public void start(final PrivacyNode... nodes) {
@@ -50,7 +50,7 @@ public class PrivacyCluster {
       throw new IllegalArgumentException("Can't start a cluster with no nodes");
     }
     this.nodes = nodes;
-    this.runnableNodes = nodes.stream().map(n -> n.getPantheon()).collect(Collectors.toList());
+    this.runnableNodes = nodes.stream().map(n -> n.getBesu()).collect(Collectors.toList());
 
     final Optional<PrivacyNode> bootNode = selectAndStartBootnode(nodes);
 
@@ -79,13 +79,13 @@ public class PrivacyCluster {
 
   public void stop() {
     for (final PrivacyNode node : nodes) {
-      pantheonNodeRunner.stopNode(node.getPantheon());
+      besuNodeRunner.stopNode(node.getBesu());
     }
   }
 
   public void stopNode(final PrivacyNode node) {
     node.getOrion().stop();
-    pantheonNodeRunner.stopNode(node.getPantheon());
+    besuNodeRunner.stopNode(node.getBesu());
   }
 
   public void close() {
@@ -93,7 +93,7 @@ public class PrivacyCluster {
     for (final PrivacyNode node : nodes) {
       node.close();
     }
-    pantheonNodeRunner.shutdown();
+    besuNodeRunner.shutdown();
   }
 
   private Optional<PrivacyNode> selectAndStartBootnode(final List<PrivacyNode> nodes) {
@@ -136,6 +136,6 @@ public class PrivacyCluster {
         node.getName(),
         node.getNodeId().substring(0, 4),
         node.getNodeId().substring(124));
-    node.start(pantheonNodeRunner);
+    node.start(besuNodeRunner);
   }
 }

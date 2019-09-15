@@ -27,7 +27,7 @@ import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.services.pipeline.Pipeline;
 import org.hyperledger.besu.services.pipeline.PipelineBuilder;
@@ -95,7 +95,7 @@ public class FullSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
             checkpointRangeSource,
             downloaderParallelism,
             metricsSystem.createLabelledCounter(
-                PantheonMetricCategory.SYNCHRONIZER,
+                BesuMetricCategory.SYNCHRONIZER,
                 "chain_download_pipeline_processed_total",
                 "Number of entries process by each chain download pipeline stage",
                 "step",

@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.metrics.rocksdb;
 
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.KVSTORE_ROCKSDB_STATS;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.KVSTORE_ROCKSDB_STATS;
 
 import org.hyperledger.besu.metrics.prometheus.PrometheusMetricsSystem;
 

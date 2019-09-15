@@ -13,7 +13,7 @@
 package org.hyperledger.besu.tests.web3j;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.tests.web3j.generated.SimpleStorage;
 
 import org.junit.Before;
@@ -21,11 +21,11 @@ import org.junit.Test;
 
 public class DeploySmartContractAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode minerNode;
+  private BesuNode minerNode;
 
   @Before
   public void setUp() throws Exception {
-    minerNode = pantheon.createMinerNode("miner-node");
+    minerNode = besu.createMinerNode("miner-node");
     cluster.start(minerNode);
   }
 

@@ -24,7 +24,7 @@ import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.task.WaitForPeersTask;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.util.ExceptionUtils;
@@ -65,11 +65,11 @@ public class FastSyncActions<C> {
 
     pivotBlockSelectionCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.SYNCHRONIZER,
+            BesuMetricCategory.SYNCHRONIZER,
             "fast_sync_pivot_block_selected_count",
             "Number of times a fast sync pivot block has been selected");
     metricsSystem.createLongGauge(
-        PantheonMetricCategory.SYNCHRONIZER,
+        BesuMetricCategory.SYNCHRONIZER,
         "fast_sync_pivot_block_current",
         "The current fast sync pivot block",
         pivotBlockGauge::get);

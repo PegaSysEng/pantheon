@@ -15,20 +15,20 @@ package org.hyperledger.besu.tests.web3j;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class DeployTransactionAcceptanceTest extends AcceptanceTestBase {
 
-  private PantheonNode minerNode;
+  private BesuNode minerNode;
   private Account recipient;
 
   @Before
   public void setUp() throws Exception {
     recipient = accounts.createAccount("recipient");
-    minerNode = pantheon.createMinerNode("node");
+    minerNode = besu.createMinerNode("node");
     cluster.start(minerNode);
   }
 

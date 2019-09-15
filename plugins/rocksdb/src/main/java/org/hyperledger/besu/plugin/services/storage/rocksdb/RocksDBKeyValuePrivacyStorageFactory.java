@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.plugin.services.storage.rocksdb;
 
-import org.hyperledger.besu.plugin.services.PantheonConfiguration;
+import org.hyperledger.besu.plugin.services.BesuConfiguration;
 import org.hyperledger.besu.plugin.services.storage.SegmentIdentifier;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
 
@@ -38,7 +38,7 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
   }
 
   @Override
-  protected Path storagePath(final PantheonConfiguration commonConfiguration) {
+  protected Path storagePath(final BesuConfiguration commonConfiguration) {
     return super.storagePath(commonConfiguration).resolve(PRIVATE_DATABASE_PATH);
   }
 }

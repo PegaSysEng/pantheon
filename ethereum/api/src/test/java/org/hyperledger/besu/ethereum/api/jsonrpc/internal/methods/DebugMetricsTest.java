@@ -16,8 +16,8 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.PEERS;
-import static org.hyperledger.besu.metrics.PantheonMetricCategory.RPC;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.PEERS;
+import static org.hyperledger.besu.metrics.BesuMetricCategory.RPC;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;

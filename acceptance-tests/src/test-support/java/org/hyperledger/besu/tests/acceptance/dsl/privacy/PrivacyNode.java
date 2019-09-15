@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNodeRunner;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNodeRunner;
 import org.hyperledger.orion.testutil.OrionTestHarness;
 import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
 import org.hyperledger.besu.controller.KeyPairUtil;
@@ -29,10 +29,10 @@ import org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueStorageProviderBui
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBKeyValuePrivacyStorageFactory;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
-import org.hyperledger.besu.services.PantheonConfigurationImpl;
+import org.hyperledger.besu.services.BesuConfigurationImpl;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.PantheonNodeConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuNodeConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyNodeConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.condition.PrivateCondition;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
@@ -59,32 +59,32 @@ public class PrivacyNode implements AutoCloseable {
   private static final int BACKGROUND_THREAD_COUNT = 4;
 
   private final OrionTestHarness orion;
-  private final PantheonNode pantheon;
+  private final BesuNode besu;
 
   public PrivacyNode(final PrivacyNodeConfiguration privacyConfiguration) throws IOException {
     final Path orionDir = Files.createTempDirectory("acctest-orion");
     this.orion = OrionTestHarnessFactory.create(orionDir, privacyConfiguration.getOrionKeyConfig());
 
-    final PantheonNodeConfiguration pantheonConfig = privacyConfiguration.getPantheonConfig();
+    final BesuNodeConfiguration besuConfig = privacyConfiguration.getBesuConfig();
 
-    this.pantheon =
-        new PantheonNode(
-            pantheonConfig.getName(),
-            pantheonConfig.getMiningParameters(),
-            pantheonConfig.getJsonRpcConfiguration(),
-            pantheonConfig.getWebSocketConfiguration(),
-            pantheonConfig.getMetricsConfiguration(),
-            pantheonConfig.getPermissioningConfiguration(),
-            pantheonConfig.getKeyFilePath(),
-            pantheonConfig.isDevMode(),
-            pantheonConfig.getGenesisConfigProvider(),
-            pantheonConfig.isP2pEnabled(),
-            pantheonConfig.getNetworkingConfiguration(),
-            pantheonConfig.isDiscoveryEnabled(),
-            pantheonConfig.isBootnodeEligible(),
-            pantheonConfig.isRevertReasonEnabled(),
-            pantheonConfig.getPlugins(),
-            pantheonConfig.getExtraCLIOptions(),
+    this.besu =
+        new BesuNode(
+            besuConfig.getName(),
+            besuConfig.getMiningParameters(),
+            besuConfig.getJsonRpcConfiguration(),
+            besuConfig.getWebSocketConfiguration(),
+            besuConfig.getMetricsConfiguration(),
+            besuConfig.getPermissioningConfiguration(),
+            besuConfig.getKeyFilePath(),
+            besuConfig.isDevMode(),
+            besuConfig.getGenesisConfigProvider(),
+            besuConfig.isP2pEnabled(),
+            besuConfig.getNetworkingConfiguration(),
+            besuConfig.isDiscoveryEnabled(),
+            besuConfig.isBootnodeEligible(),
+            besuConfig.isRevertReasonEnabled(),
+            besuConfig.getPlugins(),
+            besuConfig.getExtraCLIOptions(),
             new ArrayList<>());
   }
 
@@ -92,9 +92,9 @@ public class PrivacyNode implements AutoCloseable {
     LOG.info(
         String.format(
             "Testing Enclave connectivity between %s (%s) and %s (%s)",
-            pantheon.getName(),
+            besu.getName(),
             orion.nodeUrl(),
-            Arrays.toString(otherNodes.stream().map(node -> node.pantheon.getName()).toArray()),
+            Arrays.toString(otherNodes.stream().map(node -> node.besu.getName()).toArray()),
             Arrays.toString(otherNodes.stream().map(node -> node.orion.nodeUrl()).toArray())));
     Enclave enclaveClient = new Enclave(orion.clientUrl());
     SendRequest sendRequest1 =
@@ -122,22 +122,22 @@ public class PrivacyNode implements AutoCloseable {
     return orion;
   }
 
-  public PantheonNode getPantheon() {
-    return pantheon;
+  public BesuNode getBesu() {
+    return besu;
   }
 
   public void stop() {
-    pantheon.stop();
+    besu.stop();
     orion.stop();
   }
 
   @Override
   public void close() {
-    pantheon.close();
+    besu.close();
     orion.close();
   }
 
-  public void start(final PantheonNodeRunner runner) {
+  public void start(final BesuNodeRunner runner) {
     orion.start();
 
     final PrivacyParameters privacyParameters;
@@ -151,37 +151,37 @@ public class PrivacyNode implements AutoCloseable {
               .setEnclaveUrl(orion.clientUrl())
               .setEnclavePublicKeyUsingFile(orion.getConfig().publicKeys().get(0).toFile())
               .setStorageProvider(createKeyValueStorageProvider(dataDir))
-              .setPrivateKeyPath(KeyPairUtil.getDefaultKeyFile(pantheon.homeDirectory()).toPath())
+              .setPrivateKeyPath(KeyPairUtil.getDefaultKeyFile(besu.homeDirectory()).toPath())
               .build();
     } catch (IOException e) {
       throw new RuntimeException();
     }
-    pantheon.setPrivacyParameters(privacyParameters);
-    pantheon.start(runner);
+    besu.setPrivacyParameters(privacyParameters);
+    besu.start(runner);
   }
 
   public void awaitPeerDiscovery(final Condition condition) {
-    pantheon.awaitPeerDiscovery(condition);
+    besu.awaitPeerDiscovery(condition);
   }
 
   public String getName() {
-    return pantheon.getName();
+    return besu.getName();
   }
 
   public Address getAddress() {
-    return pantheon.getAddress();
+    return besu.getAddress();
   }
 
   public URI enodeUrl() {
-    return pantheon.enodeUrl();
+    return besu.enodeUrl();
   }
 
   public String getNodeId() {
-    return pantheon.getNodeId();
+    return besu.getNodeId();
   }
 
   public <T> T execute(final Transaction<T> transaction) {
-    return pantheon.execute(transaction);
+    return besu.execute(transaction);
   }
 
   public void verify(final PrivateCondition expected) {
@@ -193,7 +193,7 @@ public class PrivacyNode implements AutoCloseable {
   }
 
   public String getTransactionSigningKey() {
-    return pantheon.keyPair().getPrivateKey().toString();
+    return besu.keyPair().getPrivateKey().toString();
   }
 
   public void addOtherEnclaveNode(final URI otherNode) {
@@ -201,7 +201,7 @@ public class PrivacyNode implements AutoCloseable {
   }
 
   public NodeConfiguration getConfiguration() {
-    return pantheon.getConfiguration();
+    return besu.getConfiguration();
   }
 
   private StorageProvider createKeyValueStorageProvider(final Path dbLocation) {
@@ -215,7 +215,7 @@ public class PrivacyNode implements AutoCloseable {
                         BACKGROUND_THREAD_COUNT,
                         CACHE_CAPACITY),
                 Arrays.asList(KeyValueSegmentIdentifier.values())))
-        .withCommonConfiguration(new PantheonConfigurationImpl(dbLocation))
+        .withCommonConfiguration(new BesuConfigurationImpl(dbLocation))
         .withMetricsSystem(new NoOpMetricsSystem())
         .build();
   }

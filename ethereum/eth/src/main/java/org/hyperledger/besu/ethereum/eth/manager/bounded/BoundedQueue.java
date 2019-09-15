@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager.bounded;
 
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 
@@ -28,7 +28,7 @@ public class BoundedQueue extends LinkedBlockingDeque<Runnable> {
     this.metricsSystem = metricsSystem;
     this.totalEvictedTaskCounter =
         this.metricsSystem.createCounter(
-            PantheonMetricCategory.EXECUTORS,
+            BesuMetricCategory.EXECUTORS,
             metricName + "_dropped_tasks_total",
             "Total number of tasks rejected by this working queue.");
   }

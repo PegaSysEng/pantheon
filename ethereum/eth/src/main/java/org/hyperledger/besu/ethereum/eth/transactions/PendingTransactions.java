@@ -18,7 +18,7 @@ import org.hyperledger.besu.ethereum.core.AccountTransactionOrder;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
@@ -85,7 +85,7 @@ public class PendingTransactions {
     this.clock = clock;
     final LabelledMetric<Counter> transactionAddedCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.TRANSACTION_POOL,
+            BesuMetricCategory.TRANSACTION_POOL,
             "transactions_added_total",
             "Count of transactions added to the transaction pool",
             "source");
@@ -94,7 +94,7 @@ public class PendingTransactions {
 
     transactionRemovedCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.TRANSACTION_POOL,
+            BesuMetricCategory.TRANSACTION_POOL,
             "transactions_removed_total",
             "Count of transactions removed from the transaction pool",
             "source",

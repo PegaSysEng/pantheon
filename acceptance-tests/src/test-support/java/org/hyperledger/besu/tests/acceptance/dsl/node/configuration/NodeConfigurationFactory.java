@@ -34,10 +34,10 @@ public class NodeConfigurationFactory {
 
   public Optional<String> createGenesisConfigForValidators(
       final Collection<String> validators,
-      final Collection<? extends RunnableNode> pantheonNodes,
+      final Collection<? extends RunnableNode> besuNodes,
       final GenesisConfigurationProvider genesisConfigProvider) {
     final List<RunnableNode> nodes =
-        pantheonNodes.stream().filter(n -> validators.contains(n.getName())).collect(toList());
+        besuNodes.stream().filter(n -> validators.contains(n.getName())).collect(toList());
     return genesisConfigProvider.create(nodes);
   }
 

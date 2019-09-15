@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
 import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
@@ -57,10 +57,10 @@ public class RocksDBMetricsTest {
     // Prepare mocks
     when(labelledMetricOperationTimerMock.labels(any())).thenReturn(operationTimerMock);
     when(metricsSystemMock.createLabelledTimer(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
         .thenReturn(labelledMetricOperationTimerMock);
     when(metricsSystemMock.createLabelledCounter(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB), anyString(), anyString(), any()))
         .thenReturn(labelledMetricCounterMock);
     // Prepare argument captors
     final ArgumentCaptor<String> labelledTimersMetricsNameArgs =
@@ -76,7 +76,7 @@ public class RocksDBMetricsTest {
 
     verify(metricsSystemMock, times(4))
         .createLabelledTimer(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB),
             labelledTimersMetricsNameArgs.capture(),
             labelledTimersHelpArgs.capture(),
             any());
@@ -95,7 +95,7 @@ public class RocksDBMetricsTest {
 
     verify(metricsSystemMock, times(2))
         .createLongGauge(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB),
             longGaugesMetricsNameArgs.capture(),
             longGaugesHelpArgs.capture(),
             any(LongSupplier.class));
@@ -108,7 +108,7 @@ public class RocksDBMetricsTest {
 
     verify(metricsSystemMock)
         .createLabelledCounter(
-            eq(PantheonMetricCategory.KVSTORE_ROCKSDB),
+            eq(BesuMetricCategory.KVSTORE_ROCKSDB),
             labelledCountersMetricsNameArgs.capture(),
             labelledCountersHelpArgs.capture(),
             any());

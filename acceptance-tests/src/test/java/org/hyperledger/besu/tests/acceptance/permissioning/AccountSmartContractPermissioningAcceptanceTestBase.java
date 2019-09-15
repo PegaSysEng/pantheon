@@ -69,7 +69,7 @@ class AccountSmartContractPermissioningAcceptanceTestBase extends AcceptanceTest
 
   protected Node node(final String name) {
     try {
-      return pantheon.createCustomGenesisNode(name, GENESIS_FILE, false);
+      return besu.createCustomGenesisNode(name, GENESIS_FILE, false);
     } catch (IOException e) {
       throw new RuntimeException("Error creating node", e);
     }

@@ -22,7 +22,7 @@ import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncTarget;
 import org.hyperledger.besu.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
@@ -66,7 +66,7 @@ public class PipelineChainDownloader<C> implements ChainDownloader {
 
     final LabelledMetric<Counter> labelledCounter =
         metricsSystem.createLabelledCounter(
-            PantheonMetricCategory.SYNCHRONIZER,
+            BesuMetricCategory.SYNCHRONIZER,
             "chain_download_pipeline_restarts",
             "Number of times the chain download pipeline has been restarted",
             "reason");

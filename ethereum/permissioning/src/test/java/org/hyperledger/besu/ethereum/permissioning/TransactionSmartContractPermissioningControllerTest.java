@@ -32,7 +32,7 @@ import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.util.bytes.BytesValue;
@@ -72,19 +72,19 @@ public class TransactionSmartContractPermissioningControllerTest {
     final Address contractAddress = Address.fromHexString(contractAddressString);
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "transaction_smart_contract_check_count",
             "Number of times the transaction smart contract permissioning provider has been checked"))
         .thenReturn(checkCounter);
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "transaction_smart_contract_check_count_permitted",
             "Number of times the transaction smart contract permissioning provider has been checked and returned permitted"))
         .thenReturn(checkPermittedCounter);
 
     when(metricsSystem.createCounter(
-            PantheonMetricCategory.PERMISSIONING,
+            BesuMetricCategory.PERMISSIONING,
             "transaction_smart_contract_check_count_unpermitted",
             "Number of times the transaction smart contract permissioning provider has been checked and returned unpermitted"))
         .thenReturn(checkUnpermittedCounter);

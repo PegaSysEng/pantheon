@@ -30,7 +30,7 @@ public enum JsonRpcError {
   // eth_sendTransaction specific error message
   ETH_SEND_TX_NOT_AVAILABLE(
       -32604,
-      "The method eth_sendTransaction is not supported. Use eth_sendRawTransaction to send a signed transaction to Pantheon."),
+      "The method eth_sendTransaction is not supported. Use eth_sendRawTransaction to send a signed transaction to Besu."),
 
   // P2P related errors
   P2P_DISABLED(-32000, "P2P has been disabled. This functionality is not available"),

@@ -18,7 +18,7 @@ import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.trie.MerklePatriciaTrie;
 import org.hyperledger.besu.ethereum.trie.StoredMerklePatriciaTrie;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorage;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorageTransaction;
@@ -75,23 +75,23 @@ public class MarkSweepPruner {
 
     markedNodesCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PRUNER,
+            BesuMetricCategory.PRUNER,
             "marked_nodes_total",
             "Total number of nodes marked as in use");
     markOperationCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PRUNER,
+            BesuMetricCategory.PRUNER,
             "mark_operations_total",
             "Total number of mark operations performed");
 
     sweptNodesCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PRUNER,
+            BesuMetricCategory.PRUNER,
             "swept_nodes_total",
             "Total number of unused nodes removed");
     sweepOperationCounter =
         metricsSystem.createCounter(
-            PantheonMetricCategory.PRUNER,
+            BesuMetricCategory.PRUNER,
             "sweep_operations_total",
             "Total number of sweep operations performed");
   }

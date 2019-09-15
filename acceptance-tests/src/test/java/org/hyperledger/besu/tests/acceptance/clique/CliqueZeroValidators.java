@@ -13,7 +13,7 @@
 package org.hyperledger.besu.tests.acceptance.clique;
 
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
-import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 
 import java.io.IOException;
 
@@ -24,8 +24,8 @@ public class CliqueZeroValidators extends AcceptanceTestBase {
   @Test
   public void zeroValidatorsFormValidCluster() throws IOException {
     final String[] signers = {};
-    final PantheonNode node1 = pantheon.createCliqueNodeWithValidators("node1", signers);
-    final PantheonNode node2 = pantheon.createCliqueNodeWithValidators("node2", signers);
+    final BesuNode node1 = besu.createCliqueNodeWithValidators("node1", signers);
+    final BesuNode node2 = besu.createCliqueNodeWithValidators("node2", signers);
 
     cluster.start(node1, node2);
 

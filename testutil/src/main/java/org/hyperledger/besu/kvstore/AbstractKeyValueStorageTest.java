@@ -384,7 +384,7 @@ public abstract class AbstractKeyValueStorageTest {
   }
 
   /*
-   * Used to mimic the wrapping with BytesValue performed in Pantheon
+   * Used to mimic the wrapping with BytesValue performed in Besu
    */
   protected byte[] bytesFromHexString(final String hex) {
     return BytesValue.fromHexString(hex).getArrayUnsafe();

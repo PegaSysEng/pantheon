@@ -29,7 +29,7 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcNoResp
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponseType;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcUnauthorizedResponse;
-import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.nat.upnp.UpnpNatManager;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
@@ -137,7 +137,7 @@ public class JsonRpcHttpService {
     this.dataDir = dataDir;
     requestTimer =
         metricsSystem.createLabelledTimer(
-            PantheonMetricCategory.RPC,
+            BesuMetricCategory.RPC,
             "request_time",
             "Time taken to process a JSON-RPC request",
             "methodName");

@@ -63,10 +63,10 @@ check.dependsOn('checkAPIChanges')
 publishing {
   publications {
     mavenJava(MavenPublication) {
-      groupId 'tech.pegasys.pantheon'
+      groupId 'tech.pegasys.besu'
       pom {
-        name = 'Pantheon Plugins Library'
-        description = 'Core Plugins Libraries for Pantheon'
+        name = 'Besu Plugins Library'
+        description = 'Core Plugins Libraries for Besu'
       }
     }
   }

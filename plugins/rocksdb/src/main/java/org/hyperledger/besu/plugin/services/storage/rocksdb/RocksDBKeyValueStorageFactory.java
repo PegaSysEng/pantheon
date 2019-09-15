@@ -14,7 +14,7 @@ package org.hyperledger.besu.plugin.services.storage.rocksdb;
 
 import org.hyperledger.besu.plugin.services.storage.rocksdb.segmented.RocksDBColumnarKeyValueStorage;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
-import org.hyperledger.besu.plugin.services.PantheonConfiguration;
+import org.hyperledger.besu.plugin.services.BesuConfiguration;
 import org.hyperledger.besu.plugin.services.exception.StorageException;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorage;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorageFactory;
@@ -66,7 +66,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   @Override
   public KeyValueStorage create(
       final SegmentIdentifier segment,
-      final PantheonConfiguration commonConfiguration,
+      final BesuConfiguration commonConfiguration,
       final MetricsSystem metricsSystem)
       throws StorageException {
 
@@ -93,7 +93,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     }
   }
 
-  protected Path storagePath(final PantheonConfiguration commonConfiguration) {
+  protected Path storagePath(final BesuConfiguration commonConfiguration) {
     return commonConfiguration.getStoragePath();
   }
 
@@ -102,7 +102,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   }
 
   private void init(
-      final PantheonConfiguration commonConfiguration, final MetricsSystem metricsSystem) {
+      final BesuConfiguration commonConfiguration, final MetricsSystem metricsSystem) {
     try {
       this.isSegmentIsolationSupported = databaseVersion(commonConfiguration) == DEFAULT_VERSION;
     } catch (final IOException e) {
@@ -125,7 +125,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
     }
   }
 
-  private int databaseVersion(final PantheonConfiguration commonConfiguration) throws IOException {
+  private int databaseVersion(final BesuConfiguration commonConfiguration) throws IOException {
     final Path databaseDir = storagePath(commonConfiguration);
     final boolean databaseExists = databaseDir.resolve("IDENTITY").toFile().exists();
     final int databaseVersion;
