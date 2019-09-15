@@ -24,10 +24,10 @@ import org.hyperledger.besu.ethereum.core.TransactionReceipt;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.core.WorldState;
 import org.hyperledger.besu.ethereum.core.WorldUpdater;
-import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.ethereum.mainnet.contractvalidation.MaxCodeSizeRule;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionProcessor;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionValidator;
+import org.hyperledger.besu.ethereum.vm.MessageFrame;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -313,7 +313,7 @@ public abstract class MainnetProtocolSpecs {
   }
 
   private static TransactionReceipt frontierTransactionReceiptFactory(
-          final TransactionProcessor.Result result, final WorldState worldState, final long gasUsed) {
+      final TransactionProcessor.Result result, final WorldState worldState, final long gasUsed) {
     return new TransactionReceipt(
         worldState.rootHash(),
         gasUsed,

@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.permissioning;
 
-import org.hyperledger.besu.ethereum.permissioning.account.TransactionPermissioningProvider;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Transaction;
+import org.hyperledger.besu.ethereum.permissioning.account.TransactionPermissioningProvider;
 import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;

@@ -38,8 +38,8 @@ public class GetReceiptsFromPeerTaskTest
   }
 
   @Override
-  protected EthTask<AbstractPeerTask.PeerTaskResult<Map<BlockHeader, List<TransactionReceipt>>>> createTask(
-      final Map<BlockHeader, List<TransactionReceipt>> requestedData) {
+  protected EthTask<AbstractPeerTask.PeerTaskResult<Map<BlockHeader, List<TransactionReceipt>>>>
+      createTask(final Map<BlockHeader, List<TransactionReceipt>> requestedData) {
     return GetReceiptsFromPeerTask.forHeaders(ethContext, requestedData.keySet(), metricsSystem);
   }
 

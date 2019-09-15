@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -24,12 +25,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
 import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;
 
 import java.time.Duration;
@@ -46,7 +46,8 @@ public class CheckpointRangeSourceTest {
   private static final Duration RETRY_DELAY_DURATION = Duration.ofSeconds(2);
   private final EthPeer peer = mock(EthPeer.class);
   private final CheckpointHeaderFetcher checkpointFetcher = mock(CheckpointHeaderFetcher.class);
-  private final CheckpointRangeSource.SyncTargetChecker syncTargetChecker = mock(CheckpointRangeSource.SyncTargetChecker.class);
+  private final CheckpointRangeSource.SyncTargetChecker syncTargetChecker =
+      mock(CheckpointRangeSource.SyncTargetChecker.class);
   private final EthScheduler ethScheduler = mock(EthScheduler.class);
 
   private final BlockHeader commonAncestor = header(10);

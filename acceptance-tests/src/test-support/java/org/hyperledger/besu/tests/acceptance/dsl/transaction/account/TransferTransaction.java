@@ -14,11 +14,11 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.account;
 
 import static org.web3j.utils.Numeric.toHexString;
 
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.blockchain.Amount;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import org.hyperledger.besu.ethereum.core.Hash;
 
 import java.io.IOException;
 import java.math.BigInteger;

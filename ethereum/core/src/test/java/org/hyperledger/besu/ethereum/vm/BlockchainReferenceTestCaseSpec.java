@@ -12,7 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.vm;
 
-import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static org.hyperledger.besu.ethereum.vm.WorldStateMock.insertAccount;
 
 import org.hyperledger.besu.ethereum.ProtocolContext;
@@ -30,9 +29,9 @@ import org.hyperledger.besu.ethereum.core.ParsedExtraData;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.WorldUpdater;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderFunctions;
-import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
+import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
 
@@ -62,7 +61,8 @@ public class BlockchainReferenceTestCaseSpec {
 
   private static WorldStateArchive buildWorldStateArchive(
       final Map<String, WorldStateMock.AccountMock> accounts) {
-    final WorldStateArchive worldStateArchive = InMemoryStorageProvider.createInMemoryWorldStateArchive();
+    final WorldStateArchive worldStateArchive =
+        InMemoryStorageProvider.createInMemoryWorldStateArchive();
 
     final MutableWorldState worldState = worldStateArchive.getMutable();
     final WorldUpdater updater = worldState.updater();

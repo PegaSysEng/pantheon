@@ -53,7 +53,11 @@ final class NettyPeerConnection extends AbstractPeerConnection {
         outboundMessagesCounter);
 
     this.ctx = ctx;
-    ctx.channel().closeFuture().addListener(f -> terminateConnection(DisconnectMessage.DisconnectReason.TCP_SUBSYSTEM_ERROR, false));
+    ctx.channel()
+        .closeFuture()
+        .addListener(
+            f ->
+                terminateConnection(DisconnectMessage.DisconnectReason.TCP_SUBSYSTEM_ERROR, false));
   }
 
   @Override

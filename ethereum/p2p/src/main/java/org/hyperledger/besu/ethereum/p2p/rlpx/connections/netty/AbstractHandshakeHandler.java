@@ -127,7 +127,8 @@ abstract class AbstractHandshakeHandler extends SimpleChannelInboundHandler<Byte
     }
   }
 
-  private void disconnect(final ChannelHandlerContext ctx, final DisconnectMessage.DisconnectReason reason) {
+  private void disconnect(
+      final ChannelHandlerContext ctx, final DisconnectMessage.DisconnectReason reason) {
     ctx.writeAndFlush(new OutboundMessage(null, DisconnectMessage.create(reason)))
         .addListener(
             ff -> {

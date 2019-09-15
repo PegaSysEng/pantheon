@@ -152,7 +152,9 @@ public class DefaultBlockchainTest {
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
     final BlockDataGenerator.BlockOptions options =
-        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+        new BlockDataGenerator.BlockOptions()
+            .setBlockNumber(1L)
+            .setParentHash(genesisBlock.getHash());
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
     blockchain.appendBlock(newBlock, receipts);
@@ -170,7 +172,8 @@ public class DefaultBlockchainTest {
     final Block genesisBlock = gen.genesisBlock();
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
-    final BlockDataGenerator.BlockOptions options = new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(Hash.ZERO);
+    final BlockDataGenerator.BlockOptions options =
+        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(Hash.ZERO);
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
     blockchain.appendBlock(newBlock, receipts);
@@ -185,7 +188,9 @@ public class DefaultBlockchainTest {
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
     final BlockDataGenerator.BlockOptions options =
-        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+        new BlockDataGenerator.BlockOptions()
+            .setBlockNumber(1L)
+            .setParentHash(genesisBlock.getHash());
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
     receipts.add(gen.receipt());
@@ -705,7 +710,9 @@ public class DefaultBlockchainTest {
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
     final BlockDataGenerator.BlockOptions options =
-        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+        new BlockDataGenerator.BlockOptions()
+            .setBlockNumber(1L)
+            .setParentHash(genesisBlock.getHash());
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
 
@@ -726,7 +733,9 @@ public class DefaultBlockchainTest {
     final DefaultBlockchain blockchain = createMutableBlockchain(kvStore, genesisBlock);
 
     final BlockDataGenerator.BlockOptions options =
-        new BlockDataGenerator.BlockOptions().setBlockNumber(1L).setParentHash(genesisBlock.getHash());
+        new BlockDataGenerator.BlockOptions()
+            .setBlockNumber(1L)
+            .setParentHash(genesisBlock.getHash());
     final Block newBlock = gen.block(options);
     final List<TransactionReceipt> receipts = gen.receipts(newBlock);
 

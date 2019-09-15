@@ -41,7 +41,8 @@ public class IbftValidatorsValidationRuleTest {
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
 
-    final BlockHeader header = HeaderValidationTestHelpers.createProposedBlockHeader(validators, emptyList(), false);
+    final BlockHeader header =
+        HeaderValidationTestHelpers.createProposedBlockHeader(validators, emptyList(), false);
 
     assertThat(validatorsValidationRule.validate(header, null, context)).isTrue();
   }
@@ -57,7 +58,8 @@ public class IbftValidatorsValidationRuleTest {
         new ProtocolContext<>(null, null, setupContextWithValidators(validators));
 
     final BlockHeader header =
-        HeaderValidationTestHelpers.createProposedBlockHeader(Lists.reverse(validators), emptyList(), false);
+        HeaderValidationTestHelpers.createProposedBlockHeader(
+            Lists.reverse(validators), emptyList(), false);
 
     assertThat(validatorsValidationRule.validate(header, null, context)).isFalse();
   }
@@ -75,7 +77,9 @@ public class IbftValidatorsValidationRuleTest {
     final ProtocolContext<IbftContext> context =
         new ProtocolContext<>(null, null, setupContextWithValidators(storedValidators));
 
-    final BlockHeader header = HeaderValidationTestHelpers.createProposedBlockHeader(reportedValidators, emptyList(), false);
+    final BlockHeader header =
+        HeaderValidationTestHelpers.createProposedBlockHeader(
+            reportedValidators, emptyList(), false);
 
     assertThat(validatorsValidationRule.validate(header, null, context)).isFalse();
   }

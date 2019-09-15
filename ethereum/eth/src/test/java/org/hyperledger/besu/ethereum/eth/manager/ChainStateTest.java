@@ -239,7 +239,8 @@ public class ChainStateTest {
     final BlockHeader bestBlockHeader =
         new BlockHeaderTestFixture().number(blockNumber).buildHeader();
     chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
-    final ChainState.EstimatedHeightListener listener = mock(ChainState.EstimatedHeightListener.class);
+    final ChainState.EstimatedHeightListener listener =
+        mock(ChainState.EstimatedHeightListener.class);
     chainState.addEstimatedHeightListener(listener);
     chainState.update(bestBlockHeader.getHash(), blockNumber);
     verify(listener).onEstimatedHeightChanged(blockNumber);
@@ -251,7 +252,8 @@ public class ChainStateTest {
     final BlockHeader bestBlockHeader =
         new BlockHeaderTestFixture().number(blockNumber).buildHeader();
     chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
-    final ChainState.EstimatedHeightListener listener = mock(ChainState.EstimatedHeightListener.class);
+    final ChainState.EstimatedHeightListener listener =
+        mock(ChainState.EstimatedHeightListener.class);
     chainState.addEstimatedHeightListener(listener);
     chainState.update(bestBlockHeader);
     verify(listener).onEstimatedHeightChanged(blockNumber);
@@ -263,7 +265,8 @@ public class ChainStateTest {
     final BlockHeader bestBlockHeader =
         new BlockHeaderTestFixture().number(blockNumber).buildHeader();
     chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
-    final ChainState.EstimatedHeightListener listener = mock(ChainState.EstimatedHeightListener.class);
+    final ChainState.EstimatedHeightListener listener =
+        mock(ChainState.EstimatedHeightListener.class);
     chainState.addEstimatedHeightListener(listener);
     chainState.updateForAnnouncedBlock(bestBlockHeader, INITIAL_TOTAL_DIFFICULTY);
     verify(listener).onEstimatedHeightChanged(blockNumber - 1);
@@ -275,7 +278,8 @@ public class ChainStateTest {
     final BlockHeader bestBlockHeader =
         new BlockHeaderTestFixture().number(blockNumber).buildHeader();
     chainState.statusReceived(bestBlockHeader.getHash(), INITIAL_TOTAL_DIFFICULTY);
-    final ChainState.EstimatedHeightListener listener = mock(ChainState.EstimatedHeightListener.class);
+    final ChainState.EstimatedHeightListener listener =
+        mock(ChainState.EstimatedHeightListener.class);
     chainState.addEstimatedHeightListener(listener);
     chainState.update(bestBlockHeader);
     verify(listener).onEstimatedHeightChanged(blockNumber);

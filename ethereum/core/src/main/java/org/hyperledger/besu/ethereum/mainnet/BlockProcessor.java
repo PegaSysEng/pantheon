@@ -53,7 +53,7 @@ public interface BlockProcessor {
    * @return the block processing result
    */
   default Result processBlock(
-          final Blockchain blockchain, final MutableWorldState worldState, final Block block) {
+      final Blockchain blockchain, final MutableWorldState worldState, final Block block) {
     return processBlock(
         blockchain,
         worldState,

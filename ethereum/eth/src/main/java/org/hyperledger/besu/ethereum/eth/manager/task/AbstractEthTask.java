@@ -138,7 +138,7 @@ public abstract class AbstractEthTask<T> implements EthTask<T> {
    * @return The completableFuture that was executed
    */
   protected final <S> CompletableFuture<S> executeWorkerSubTask(
-          final EthScheduler scheduler, final Supplier<CompletableFuture<S>> subTask) {
+      final EthScheduler scheduler, final Supplier<CompletableFuture<S>> subTask) {
     return executeSubTask(() -> scheduler.scheduleSyncWorkerTask(subTask));
   }
 

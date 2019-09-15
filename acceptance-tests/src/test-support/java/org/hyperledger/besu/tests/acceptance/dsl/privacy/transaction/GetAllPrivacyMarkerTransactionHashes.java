@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.privacy.transaction;
 
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import org.hyperledger.besu.ethereum.core.Address;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -31,11 +31,9 @@ public class GetAllPrivacyMarkerTransactionHashes implements Transaction<List<St
     final Pantheon besu = node.privacy().getBesuClient();
     final List<String> toReturn = new ArrayList<>();
     try {
-      final long blockchainHeight =
-          besu.ethBlockNumber().send().getBlockNumber().longValueExact();
+      final long blockchainHeight = besu.ethBlockNumber().send().getBlockNumber().longValueExact();
       for (int i = 0; i <= blockchainHeight; i++) {
-        besu
-            .ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(i)), true)
+        besu.ethGetBlockByNumber(DefaultBlockParameter.valueOf(BigInteger.valueOf(i)), true)
             .send()
             .getBlock()
             .getTransactions()

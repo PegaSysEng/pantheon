@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
 
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
-import org.hyperledger.besu.ethereum.vm.ReferenceTestProtocolSchedules;
 import org.hyperledger.besu.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.vm.ReferenceTestProtocolSchedules;
 import org.hyperledger.besu.testutil.JsonTestParameters;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

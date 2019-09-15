@@ -92,12 +92,11 @@ public class PrometheusMetricsSystem implements ObservableMetricsSystem {
   }
 
   @Override
-  public LabelledMetric<org.hyperledger.besu.plugin.services.metrics.Counter>
-      createLabelledCounter(
-          final MetricCategory category,
-          final String name,
-          final String help,
-          final String... labelNames) {
+  public LabelledMetric<org.hyperledger.besu.plugin.services.metrics.Counter> createLabelledCounter(
+      final MetricCategory category,
+      final String name,
+      final String help,
+      final String... labelNames) {
     final String metricName = convertToPrometheusName(category, name);
     return cachedCounters.computeIfAbsent(
         metricName,

@@ -14,10 +14,6 @@ package org.hyperledger.besu.tests.acceptance.dsl.ethsigner.testutil;
 
 import static net.consensys.cava.io.file.Files.copyResource;
 
-import tech.pegasys.ethsigner.core.EthSigner;
-import tech.pegasys.ethsigner.core.signing.ConfigurationChainId;
-import tech.pegasys.ethsigner.signer.filebased.CredentialTransactionSigner;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,6 +31,9 @@ import org.apache.logging.log4j.Logger;
 import org.awaitility.Awaitility;
 import org.web3j.crypto.CipherException;
 import org.web3j.crypto.WalletUtils;
+import tech.pegasys.ethsigner.core.EthSigner;
+import tech.pegasys.ethsigner.core.signing.ConfigurationChainId;
+import tech.pegasys.ethsigner.signer.filebased.CredentialTransactionSigner;
 
 public class EthSignerTestHarnessFactory {
 

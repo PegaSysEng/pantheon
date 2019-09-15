@@ -26,17 +26,16 @@ import org.hyperledger.besu.RunnerBuilder;
 import org.hyperledger.besu.chainexport.RlpBlockExporter;
 import org.hyperledger.besu.chainimport.JsonBlockImporter;
 import org.hyperledger.besu.chainimport.RlpBlockImporter;
-import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand;
-import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand;
-import org.hyperledger.besu.controller.BesuController;
-import org.hyperledger.besu.controller.BesuControllerBuilder;
-import org.hyperledger.besu.services.StorageServiceImpl;
 import org.hyperledger.besu.cli.config.EthNetworkConfig;
 import org.hyperledger.besu.cli.options.EthProtocolOptions;
 import org.hyperledger.besu.cli.options.MetricsCLIOptions;
 import org.hyperledger.besu.cli.options.NetworkingOptions;
 import org.hyperledger.besu.cli.options.SynchronizerOptions;
 import org.hyperledger.besu.cli.options.TransactionPoolOptions;
+import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand;
+import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand;
+import org.hyperledger.besu.controller.BesuController;
+import org.hyperledger.besu.controller.BesuControllerBuilder;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.graphql.GraphQLConfiguration;
@@ -54,6 +53,7 @@ import org.hyperledger.besu.plugin.services.BesuConfiguration;
 import org.hyperledger.besu.plugin.services.PicoCLIOptions;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorageFactory;
 import org.hyperledger.besu.services.BesuPluginContextImpl;
+import org.hyperledger.besu.services.StorageServiceImpl;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.io.ByteArrayOutputStream;
@@ -228,7 +228,8 @@ public abstract class CommandTestAbstract {
     return parseCommand(System.in, args);
   }
 
-  protected TestBesuCommand parseCommand(final PublicKeySubCommand.KeyLoader keyLoader, final String... args) {
+  protected TestBesuCommand parseCommand(
+      final PublicKeySubCommand.KeyLoader keyLoader, final String... args) {
     return parseCommand(keyLoader, System.in, args);
   }
 
@@ -237,13 +238,12 @@ public abstract class CommandTestAbstract {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> JsonBlockImporter<T> jsonBlockImporterFactory(
-      final BesuController<T> controller) {
+  private <T> JsonBlockImporter<T> jsonBlockImporterFactory(final BesuController<T> controller) {
     return (JsonBlockImporter<T>) jsonBlockImporter;
   }
 
   private TestBesuCommand parseCommand(
-          final PublicKeySubCommand.KeyLoader keyLoader, final InputStream in, final String... args) {
+      final PublicKeySubCommand.KeyLoader keyLoader, final InputStream in, final String... args) {
     // turn off ansi usage globally in picocli
     System.setProperty("picocli.ansi", "false");
 

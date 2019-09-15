@@ -13,7 +13,6 @@
 package org.hyperledger.besu.tests.acceptance.dsl.condition.miner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
@@ -32,6 +31,7 @@ public class MiningStatusCondition implements Condition {
 
   @Override
   public void verify(final Node node) {
-    WaitUtils.waitFor(10, () -> assertThat(node.execute(transaction)).isEqualTo(expectedMiningStatus));
+    WaitUtils.waitFor(
+        10, () -> assertThat(node.execute(transaction)).isEqualTo(expectedMiningStatus));
   }
 }

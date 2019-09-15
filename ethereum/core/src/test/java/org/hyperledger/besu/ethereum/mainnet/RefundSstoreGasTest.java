@@ -12,18 +12,17 @@
  */
 package org.hyperledger.besu.ethereum.mainnet;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.hyperledger.besu.util.uint.UInt256.ONE;
 import static org.hyperledger.besu.util.uint.UInt256.ZERO;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.util.uint.UInt256;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -143,7 +142,8 @@ public class RefundSstoreGasTest {
 
   @Test
   public void shouldRefundCorrectGas() {
-    Assertions.assertThat(gasCalculator.calculateStorageRefundAmount(account, UInt256.ZERO, newValue))
+    Assertions.assertThat(
+            gasCalculator.calculateStorageRefundAmount(account, UInt256.ZERO, newValue))
         .isEqualTo(expectedGasRefund);
   }
 }

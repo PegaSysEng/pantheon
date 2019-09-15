@@ -153,17 +153,20 @@ public class EthPeer {
         () -> connection.sendForProtocol(protocolName, messageData));
   }
 
-  public RequestManager.ResponseStream getBodies(final List<Hash> blockHashes) throws PeerNotConnected {
+  public RequestManager.ResponseStream getBodies(final List<Hash> blockHashes)
+      throws PeerNotConnected {
     final GetBlockBodiesMessage message = GetBlockBodiesMessage.create(blockHashes);
     return sendRequest(bodiesRequestManager, message);
   }
 
-  public RequestManager.ResponseStream getReceipts(final List<Hash> blockHashes) throws PeerNotConnected {
+  public RequestManager.ResponseStream getReceipts(final List<Hash> blockHashes)
+      throws PeerNotConnected {
     final GetReceiptsMessage message = GetReceiptsMessage.create(blockHashes);
     return sendRequest(receiptsRequestManager, message);
   }
 
-  public RequestManager.ResponseStream getNodeData(final Iterable<Hash> nodeHashes) throws PeerNotConnected {
+  public RequestManager.ResponseStream getNodeData(final Iterable<Hash> nodeHashes)
+      throws PeerNotConnected {
     final GetNodeDataMessage message = GetNodeDataMessage.create(nodeHashes);
     return sendRequest(nodeDataRequestManager, message);
   }

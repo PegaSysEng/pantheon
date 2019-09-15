@@ -48,7 +48,7 @@ public class MessageValidatorFactory {
   }
 
   private SignedDataValidator createSignedDataValidator(
-          final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
+      final ConsensusRoundIdentifier roundIdentifier, final BlockHeader parentHeader) {
 
     return new SignedDataValidator(
         getValidatorsAfterBlock(parentHeader),

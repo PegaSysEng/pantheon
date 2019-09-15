@@ -14,10 +14,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,7 +33,8 @@ public class Ibft2GetValidatorsAtHash implements Transaction<List<Address>> {
   @Override
   public List<Address> execute(final NodeRequests node) {
     try {
-      final Ibft2RequestFactory.SignersBlockResponse result = node.ibft().signersAtHash(hash).send();
+      final Ibft2RequestFactory.SignersBlockResponse result =
+          node.ibft().signersAtHash(hash).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

@@ -23,8 +23,7 @@ public class NetworkingOptionsTest
 
   @Test
   public void checkMaintainedConnectionsFrequencyFlag_isSet() {
-    final TestBesuCommand cmd =
-        parseCommand("--Xp2p-check-maintained-connections-frequency", "2");
+    final TestBesuCommand cmd = parseCommand("--Xp2p-check-maintained-connections-frequency", "2");
 
     final NetworkingOptions options = cmd.getNetworkingOptions();
     final NetworkingConfiguration networkingConfig = options.toDomainObject();

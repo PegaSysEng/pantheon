@@ -15,7 +15,6 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
@@ -23,6 +22,7 @@ import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +48,8 @@ public class NetListeningTest {
     final JsonRpcRequest request = netListeningRequest();
     final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null, true);
 
-    Assertions.assertThat(method.response(request)).isEqualToComparingFieldByField(expectedResponse);
+    Assertions.assertThat(method.response(request))
+        .isEqualToComparingFieldByField(expectedResponse);
   }
 
   @Test
@@ -58,7 +59,8 @@ public class NetListeningTest {
     final JsonRpcRequest request = netListeningRequest();
     final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null, false);
 
-    Assertions.assertThat(method.response(request)).isEqualToComparingFieldByField(expectedResponse);
+    Assertions.assertThat(method.response(request))
+        .isEqualToComparingFieldByField(expectedResponse);
   }
 
   @Test

@@ -18,7 +18,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
@@ -29,6 +28,7 @@ import org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningC
 import java.util.List;
 import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -101,7 +101,8 @@ public class PermGetNodesWhitelistTest {
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.NODE_WHITELIST_NOT_ENABLED);
 
-    Assertions.assertThat(method.response(request)).isEqualToComparingFieldByField(expectedResponse);
+    Assertions.assertThat(method.response(request))
+        .isEqualToComparingFieldByField(expectedResponse);
   }
 
   private JsonRpcRequest buildRequest() {

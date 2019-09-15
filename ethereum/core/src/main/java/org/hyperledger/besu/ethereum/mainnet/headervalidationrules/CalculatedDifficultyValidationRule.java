@@ -32,7 +32,7 @@ public class CalculatedDifficultyValidationRule<C> implements AttachedBlockHeade
 
   @Override
   public boolean validate(
-          final BlockHeader header, final BlockHeader parent, final ProtocolContext<C> context) {
+      final BlockHeader header, final BlockHeader parent, final ProtocolContext<C> context) {
     final BigInteger actualDifficulty =
         new BigInteger(1, header.getDifficulty().getBytes().extractArray());
     final BigInteger expectedDifficulty =

@@ -19,14 +19,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.processor.BlockReplay;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.DebugStorageRangeAtResult;
-import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
-import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.AccountStorageEntry;
@@ -129,9 +129,15 @@ public class DebugStorageRangeAtTest {
     entries.sort(Comparator.comparing(AccountStorageEntry::getKeyHash));
     assertThat(result.getStorage())
         .containsExactly(
-            entry(entries.get(0).getKeyHash().toString(), new DebugStorageRangeAtResult.StorageEntry(entries.get(0), false)),
-            entry(entries.get(1).getKeyHash().toString(), new DebugStorageRangeAtResult.StorageEntry(entries.get(1), false)),
-            entry(entries.get(2).getKeyHash().toString(), new DebugStorageRangeAtResult.StorageEntry(entries.get(2), false)));
+            entry(
+                entries.get(0).getKeyHash().toString(),
+                new DebugStorageRangeAtResult.StorageEntry(entries.get(0), false)),
+            entry(
+                entries.get(1).getKeyHash().toString(),
+                new DebugStorageRangeAtResult.StorageEntry(entries.get(1), false)),
+            entry(
+                entries.get(2).getKeyHash().toString(),
+                new DebugStorageRangeAtResult.StorageEntry(entries.get(2), false)));
   }
 
   private Object callAction(final InvocationOnMock invocation) {

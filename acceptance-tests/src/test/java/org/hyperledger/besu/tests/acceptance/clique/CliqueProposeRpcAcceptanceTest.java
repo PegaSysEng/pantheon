@@ -26,12 +26,9 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldAddValidators() throws IOException {
     final String[] initialValidators = {"miner1", "miner2"};
-    final BesuNode minerNode1 =
-        besu.createCliqueNodeWithValidators("miner1", initialValidators);
-    final BesuNode minerNode2 =
-        besu.createCliqueNodeWithValidators("miner2", initialValidators);
-    final BesuNode minerNode3 =
-        besu.createCliqueNodeWithValidators("miner3", initialValidators);
+    final BesuNode minerNode1 = besu.createCliqueNodeWithValidators("miner1", initialValidators);
+    final BesuNode minerNode2 = besu.createCliqueNodeWithValidators("miner2", initialValidators);
+    final BesuNode minerNode3 = besu.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
@@ -43,12 +40,9 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldRemoveValidators() throws IOException {
     final String[] initialValidators = {"miner1", "miner2", "miner3"};
-    final BesuNode minerNode1 =
-        besu.createCliqueNodeWithValidators("miner1", initialValidators);
-    final BesuNode minerNode2 =
-        besu.createCliqueNodeWithValidators("miner2", initialValidators);
-    final BesuNode minerNode3 =
-        besu.createCliqueNodeWithValidators("miner3", initialValidators);
+    final BesuNode minerNode1 = besu.createCliqueNodeWithValidators("miner1", initialValidators);
+    final BesuNode minerNode2 = besu.createCliqueNodeWithValidators("miner2", initialValidators);
+    final BesuNode minerNode3 = besu.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2, minerNode3));
@@ -62,12 +56,9 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldNotAddValidatorWhenInsufficientVotes() throws IOException {
     final String[] initialValidators = {"miner1", "miner2"};
-    final BesuNode minerNode1 =
-        besu.createCliqueNodeWithValidators("miner1", initialValidators);
-    final BesuNode minerNode2 =
-        besu.createCliqueNodeWithValidators("miner2", initialValidators);
-    final BesuNode minerNode3 =
-        besu.createCliqueNodeWithValidators("miner3", initialValidators);
+    final BesuNode minerNode1 = besu.createCliqueNodeWithValidators("miner1", initialValidators);
+    final BesuNode minerNode2 = besu.createCliqueNodeWithValidators("miner2", initialValidators);
+    final BesuNode minerNode3 = besu.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.validatorsEqual(minerNode1, minerNode2));
@@ -92,12 +83,9 @@ public class CliqueProposeRpcAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldIncludeVoteInBlockHeader() throws IOException {
     final String[] initialValidators = {"miner1", "miner2"};
-    final BesuNode minerNode1 =
-        besu.createCliqueNodeWithValidators("miner1", initialValidators);
-    final BesuNode minerNode2 =
-        besu.createCliqueNodeWithValidators("miner2", initialValidators);
-    final BesuNode minerNode3 =
-        besu.createCliqueNodeWithValidators("miner3", initialValidators);
+    final BesuNode minerNode1 = besu.createCliqueNodeWithValidators("miner1", initialValidators);
+    final BesuNode minerNode2 = besu.createCliqueNodeWithValidators("miner2", initialValidators);
+    final BesuNode minerNode3 = besu.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     minerNode1.execute(cliqueTransactions.createAddProposal(minerNode3));

@@ -22,5 +22,5 @@ import java.util.Optional;
 public interface ExceptionalHaltPredicate {
 
   Optional<ExceptionalHaltReason> exceptionalHaltCondition(
-          MessageFrame frame, EnumSet<ExceptionalHaltReason> previousReasons, EVM evm);
+      MessageFrame frame, EnumSet<ExceptionalHaltReason> previousReasons, EVM evm);
 }

@@ -15,7 +15,6 @@ package org.hyperledger.besu.ethereum.p2p.peers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
 import org.hyperledger.besu.util.bytes.BytesValue;
@@ -23,6 +22,7 @@ import org.hyperledger.besu.util.bytes.BytesValue;
 import java.util.Arrays;
 import java.util.List;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class DefaultLocalNodeTest {
@@ -59,7 +59,8 @@ public class DefaultLocalNodeTest {
     validateReadyNode(localNode);
 
     // Verify we can't set the enode a second time
-    assertThatThrownBy(() -> localNode.setEnode(enode)).isInstanceOf(MutableLocalNode.NodeAlreadySetException.class);
+    assertThatThrownBy(() -> localNode.setEnode(enode))
+        .isInstanceOf(MutableLocalNode.NodeAlreadySetException.class);
   }
 
   private MutableLocalNode createLocalNode() {

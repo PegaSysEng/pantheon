@@ -55,8 +55,7 @@ class AccountTrieNodeDataRequest extends TrieNodeDataRequest {
     // Add storage, if appropriate
     if (!accountValue.getStorageRoot().equals(MerklePatriciaTrie.EMPTY_TRIE_NODE_HASH)) {
       // If storage is non-empty queue download
-      final NodeDataRequest storageNode =
-          createStorageDataRequest(accountValue.getStorageRoot());
+      final NodeDataRequest storageNode = createStorageDataRequest(accountValue.getStorageRoot());
       builder.add(storageNode);
     }
     return builder.build();

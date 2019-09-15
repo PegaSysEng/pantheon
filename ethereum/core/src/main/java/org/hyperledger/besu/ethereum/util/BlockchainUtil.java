@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.util;
 
-import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.util.Collections;
 import java.util.Comparator;

@@ -29,13 +29,13 @@ import org.hyperledger.besu.ethereum.privacy.PrivateStateStorage;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionProcessor;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionStorage;
+import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
+import org.hyperledger.besu.ethereum.rlp.RLP;
+import org.hyperledger.besu.ethereum.trie.MerklePatriciaTrie;
 import org.hyperledger.besu.ethereum.vm.DebugOperationTracer;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
-import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
-import org.hyperledger.besu.ethereum.rlp.RLP;
-import org.hyperledger.besu.ethereum.trie.MerklePatriciaTrie;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
@@ -55,7 +55,7 @@ public class PrivacyPrecompiledContract extends AbstractPrecompiledContract {
   private static final Logger LOG = LogManager.getLogger();
 
   public PrivacyPrecompiledContract(
-          final GasCalculator gasCalculator, final PrivacyParameters privacyParameters) {
+      final GasCalculator gasCalculator, final PrivacyParameters privacyParameters) {
     this(
         gasCalculator,
         privacyParameters.getEnclavePublicKey(),

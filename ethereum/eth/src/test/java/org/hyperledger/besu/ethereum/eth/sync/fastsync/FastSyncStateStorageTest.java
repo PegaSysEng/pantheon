@@ -65,7 +65,8 @@ public class FastSyncStateStorageTest {
 
   @Test
   public void shouldReturnEmptyWhenLoadingHeaderAndFileDoesNotExist() {
-    assertThat(storage.loadState(new MainnetBlockHeaderFunctions())).isEqualTo(FastSyncState.EMPTY_SYNC_STATE);
+    assertThat(storage.loadState(new MainnetBlockHeaderFunctions()))
+        .isEqualTo(FastSyncState.EMPTY_SYNC_STATE);
   }
 
   @Test
@@ -74,6 +75,7 @@ public class FastSyncStateStorageTest {
     assertThat(storage.loadState(new MainnetBlockHeaderFunctions())).isEqualTo(syncStateWithHeader);
 
     storage.storeState(FastSyncState.EMPTY_SYNC_STATE);
-    assertThat(storage.loadState(new MainnetBlockHeaderFunctions())).isEqualTo(FastSyncState.EMPTY_SYNC_STATE);
+    assertThat(storage.loadState(new MainnetBlockHeaderFunctions()))
+        .isEqualTo(FastSyncState.EMPTY_SYNC_STATE);
   }
 }

@@ -19,7 +19,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
@@ -44,6 +43,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import io.vertx.core.Vertx;
+import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -235,7 +235,8 @@ public class P2PNetworkTest {
       // Check connection is made, and then a disconnect is registered at remote
       Assertions.assertThat(connectFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
           .isEqualTo(localId);
-      Assertions.assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId()).isEqualTo(localId);
+      Assertions.assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
+          .isEqualTo(localId);
       assertThat(reasonFuture.get(5L, TimeUnit.SECONDS))
           .isEqualByComparingTo(DisconnectReason.UNKNOWN);
     }
@@ -258,7 +259,9 @@ public class P2PNetworkTest {
 
       // Deny incoming connection permissions for remotePeer
       when(peerPermissions.isPermitted(
-              eq(localPeer), eq(remotePeer), eq(PeerPermissions.Action.RLPX_ALLOW_NEW_INBOUND_CONNECTION)))
+              eq(localPeer),
+              eq(remotePeer),
+              eq(PeerPermissions.Action.RLPX_ALLOW_NEW_INBOUND_CONNECTION)))
           .thenReturn(false);
 
       // Setup disconnect listener
@@ -277,7 +280,8 @@ public class P2PNetworkTest {
       final BytesValue localId = localEnode.getNodeId();
       Assertions.assertThat(connectFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
           .isEqualTo(localId);
-      Assertions.assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId()).isEqualTo(localId);
+      Assertions.assertThat(peerFuture.get(5L, TimeUnit.SECONDS).getPeerInfo().getNodeId())
+          .isEqualTo(localId);
       assertThat(reasonFuture.get(5L, TimeUnit.SECONDS))
           .isEqualByComparingTo(DisconnectReason.UNKNOWN);
     }

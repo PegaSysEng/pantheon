@@ -16,8 +16,8 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcEnclaveErrorConverter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcErrorConverter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcRequestException;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
@@ -84,7 +84,9 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
     try {
       enclaveKey = privateTransactionHandler.sendToOrion(privateTransaction);
     } catch (final Exception e) {
-      return new JsonRpcErrorResponse(request.getId(), JsonRpcEnclaveErrorConverter.convertEnclaveInvalidReason(e.getMessage()));
+      return new JsonRpcErrorResponse(
+          request.getId(),
+          JsonRpcEnclaveErrorConverter.convertEnclaveInvalidReason(e.getMessage()));
     }
 
     final String privacyGroupId;
@@ -92,7 +94,9 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
       privacyGroupId = privateTransactionHandler.getPrivacyGroup(enclaveKey, privateTransaction);
 
     } catch (final Exception e) {
-      return new JsonRpcErrorResponse(request.getId(), JsonRpcEnclaveErrorConverter.convertEnclaveInvalidReason(e.getMessage()));
+      return new JsonRpcErrorResponse(
+          request.getId(),
+          JsonRpcEnclaveErrorConverter.convertEnclaveInvalidReason(e.getMessage()));
     }
 
     return privateTransactionHandler
@@ -110,11 +114,13 @@ public class EeaSendRawTransaction implements JsonRpcMethod {
                               request.getId(), privacyMarkerTransaction.hash().toString()),
                       errorReason ->
                           new JsonRpcErrorResponse(
-                              request.getId(), JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
+                              request.getId(),
+                              JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
             },
             (errorReason) ->
                 new JsonRpcErrorResponse(
-                    request.getId(), JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
+                    request.getId(),
+                    JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
   }
 
   private PrivateTransaction decodeRawTransaction(final String hash)

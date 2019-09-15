@@ -13,11 +13,15 @@
 package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.LIGHT_SKIP_DETACHED;
 import static org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason.TOO_MANY_PEERS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
+import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
@@ -28,10 +32,6 @@ import org.hyperledger.besu.ethereum.eth.messages.GetBlockHeadersMessage;
 import org.hyperledger.besu.ethereum.eth.sync.ChainDownloader;
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
-import org.hyperledger.besu.ethereum.ProtocolContext;
-import org.hyperledger.besu.ethereum.chain.Blockchain;
-import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
-import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 
@@ -81,7 +81,7 @@ public class FastSyncChainDownloaderTest {
   }
 
   private ChainDownloader downloader(
-          final SynchronizerConfiguration syncConfig, final long pivotBlockNumber) {
+      final SynchronizerConfiguration syncConfig, final long pivotBlockNumber) {
     return FastSyncChainDownloader.create(
         syncConfig,
         protocolSchedule,
@@ -98,7 +98,8 @@ public class FastSyncChainDownloaderTest {
 
     final RespondingEthPeer peer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final SynchronizerConfiguration syncConfig =
         SynchronizerConfiguration.builder()
@@ -123,7 +124,8 @@ public class FastSyncChainDownloaderTest {
 
     final RespondingEthPeer peer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
-    final RespondingEthPeer.Responder responder = RespondingEthPeer.blockchainResponder(otherBlockchain);
+    final RespondingEthPeer.Responder responder =
+        RespondingEthPeer.blockchainResponder(otherBlockchain);
 
     final long pivotBlockNumber = 5;
     final SynchronizerConfiguration syncConfig = SynchronizerConfiguration.builder().build();
@@ -150,7 +152,8 @@ public class FastSyncChainDownloaderTest {
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, otherBlockchain);
     final RespondingEthPeer secondBestPeer =
         EthProtocolManagerTestUtil.createPeer(ethProtocolManager, shorterChain);
-    final RespondingEthPeer.Responder shorterResponder = RespondingEthPeer.blockchainResponder(shorterChain);
+    final RespondingEthPeer.Responder shorterResponder =
+        RespondingEthPeer.blockchainResponder(shorterChain);
     // Doesn't respond to requests for checkpoints unless it's starting from geneis
     // So the import can only make it as far as block 15 (3 checkpoints 5 blocks apart)
     final RespondingEthPeer.Responder shorterLimitedRangeResponder =

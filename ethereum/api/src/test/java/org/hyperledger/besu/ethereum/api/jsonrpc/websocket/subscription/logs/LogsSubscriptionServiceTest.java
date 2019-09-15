@@ -21,13 +21,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.ethereum.api.LogWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.FilterParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.TransactionReceiptWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.LogResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.SubscriptionManager;
-import org.mockito.ArgumentMatchers;
-import org.hyperledger.besu.ethereum.api.LogWithMetadata;
 import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -50,6 +49,7 @@ import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -82,7 +82,8 @@ public class LogsSubscriptionServiceTest {
     logsSubscriptionService.onBlockAdded(createBlockAddedEvent(transaction, null), blockchain);
 
     verify(subscriptionManager)
-        .sendMessage(ArgumentMatchers.eq(subscription.getSubscriptionId()), refEq(expectedLogResult));
+        .sendMessage(
+            ArgumentMatchers.eq(subscription.getSubscriptionId()), refEq(expectedLogResult));
   }
 
   @Test
@@ -96,7 +97,8 @@ public class LogsSubscriptionServiceTest {
     logsSubscriptionService.onBlockAdded(createBlockAddedEvent(null, transaction), blockchain);
 
     verify(subscriptionManager)
-        .sendMessage(ArgumentMatchers.eq(subscription.getSubscriptionId()), refEq(expectedLogResult));
+        .sendMessage(
+            ArgumentMatchers.eq(subscription.getSubscriptionId()), refEq(expectedLogResult));
   }
 
   @Test

@@ -30,7 +30,7 @@ public class ExceptionalHaltManager {
               new InsufficientGasExceptionalHaltPredicate());
 
   public static EnumSet<ExceptionalHaltReason> evaluateAll(
-          final MessageFrame frame, final EVM evm) {
+      final MessageFrame frame, final EVM evm) {
     final EnumSet<ExceptionalHaltReason> answer = EnumSet.noneOf(ExceptionalHaltReason.class);
     for (final ExceptionalHaltPredicate predicate : GLOBAL) {
       predicate.exceptionalHaltCondition(frame, answer, evm).ifPresent(answer::add);

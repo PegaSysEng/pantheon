@@ -12,8 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.p2p.discovery;
 
-import com.google.common.base.MoreObjects;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.PeerDiscoveryController;
+
+import com.google.common.base.MoreObjects;
 
 /** An abstract event emitted from the peer discovery layer. */
 public abstract class PeerDiscoveryEvent {

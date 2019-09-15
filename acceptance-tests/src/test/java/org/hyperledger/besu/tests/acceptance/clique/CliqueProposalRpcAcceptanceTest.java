@@ -24,12 +24,9 @@ public class CliqueProposalRpcAcceptanceTest extends AcceptanceTestBase {
   @Test
   public void shouldReturnProposals() throws IOException {
     final String[] initialValidators = {"miner1", "miner2"};
-    final BesuNode minerNode1 =
-        besu.createCliqueNodeWithValidators("miner1", initialValidators);
-    final BesuNode minerNode2 =
-        besu.createCliqueNodeWithValidators("miner2", initialValidators);
-    final BesuNode minerNode3 =
-        besu.createCliqueNodeWithValidators("miner3", initialValidators);
+    final BesuNode minerNode1 = besu.createCliqueNodeWithValidators("miner1", initialValidators);
+    final BesuNode minerNode2 = besu.createCliqueNodeWithValidators("miner2", initialValidators);
+    final BesuNode minerNode3 = besu.createCliqueNodeWithValidators("miner3", initialValidators);
     cluster.start(minerNode1, minerNode2, minerNode3);
 
     cluster.verify(clique.noProposals());

@@ -17,7 +17,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonCallParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
@@ -35,6 +34,7 @@ import org.hyperledger.besu.ethereum.transaction.TransactionSimulatorResult;
 
 import java.util.Optional;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,7 +76,8 @@ public class EthEstimateGasTest {
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(null, JsonRpcError.INTERNAL_ERROR);
 
-    Assertions.assertThat(method.response(request)).isEqualToComparingFieldByField(expectedResponse);
+    Assertions.assertThat(method.response(request))
+        .isEqualToComparingFieldByField(expectedResponse);
   }
 
   @Test
@@ -86,7 +87,8 @@ public class EthEstimateGasTest {
 
     final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(null, Quantity.create(1L));
 
-    Assertions.assertThat(method.response(request)).isEqualToComparingFieldByField(expectedResponse);
+    Assertions.assertThat(method.response(request))
+        .isEqualToComparingFieldByField(expectedResponse);
   }
 
   private void mockTransientProcessorResultGasEstimate(final long gasEstimate) {

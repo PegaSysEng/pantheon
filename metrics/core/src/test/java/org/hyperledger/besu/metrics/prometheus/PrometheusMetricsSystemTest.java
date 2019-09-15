@@ -23,9 +23,9 @@ import static org.hyperledger.besu.metrics.BesuMetricCategory.PEERS;
 import static org.hyperledger.besu.metrics.BesuMetricCategory.RPC;
 import static org.hyperledger.besu.metrics.StandardMetricCategory.JVM;
 
+import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.metrics.Observation;
-import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;

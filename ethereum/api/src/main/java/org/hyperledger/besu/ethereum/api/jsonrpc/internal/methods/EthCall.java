@@ -64,7 +64,8 @@ public class EthCall extends AbstractBlockParameterMethod {
                                 request.getId(), result.getOutput().toString())),
                         reason ->
                             new JsonRpcErrorResponse(
-                                request.getId(), JsonRpcErrorConverter.convertTransactionInvalidReason(reason))))
+                                request.getId(),
+                                JsonRpcErrorConverter.convertTransactionInvalidReason(reason))))
         .orElse(validRequestBlockNotFound(request));
   }
 

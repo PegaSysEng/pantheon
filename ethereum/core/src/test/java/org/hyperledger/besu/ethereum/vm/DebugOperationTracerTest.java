@@ -18,7 +18,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.Gas;
@@ -37,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -154,7 +154,8 @@ public class DebugOperationTracerTest {
 
   @Test
   public void shouldCaptureFrameWhenExceptionalHaltOccurs() throws Exception {
-    final EnumSet<ExceptionalHaltReason> expectedHaltReasons = EnumSet.of(ExceptionalHaltReason.INSUFFICIENT_GAS);
+    final EnumSet<ExceptionalHaltReason> expectedHaltReasons =
+        EnumSet.of(ExceptionalHaltReason.INSUFFICIENT_GAS);
     final ExceptionalHaltException expectedException =
         new ExceptionalHaltException(expectedHaltReasons);
     doThrow(expectedException).when(executeOperationAction).execute();

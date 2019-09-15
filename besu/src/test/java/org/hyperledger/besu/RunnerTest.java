@@ -16,13 +16,12 @@ import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.cli.config.EthNetworkConfig.DEV_NETWORK_ID;
 import static org.hyperledger.besu.cli.config.NetworkName.DEV;
-import static org.hyperledger.besu.controller.KeyPairUtil.loadKeyPair;
 
-import org.hyperledger.besu.controller.KeyPairUtil;
-import org.hyperledger.besu.controller.MainnetBesuControllerBuilder;
-import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.cli.config.EthNetworkConfig;
 import org.hyperledger.besu.config.GenesisConfigFile;
+import org.hyperledger.besu.controller.BesuController;
+import org.hyperledger.besu.controller.KeyPairUtil;
+import org.hyperledger.besu.controller.MainnetBesuControllerBuilder;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.graphql.GraphQLConfiguration;

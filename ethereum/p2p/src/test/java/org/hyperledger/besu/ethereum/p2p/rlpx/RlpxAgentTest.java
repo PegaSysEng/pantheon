@@ -14,6 +14,10 @@ package org.hyperledger.besu.ethereum.p2p.rlpx;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createMutableLocalNode;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enode;
+import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enodeBuilder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -22,12 +26,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createMutableLocalNode;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enode;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.enodeBuilder;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.p2p.config.RlpxConfiguration;
 import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
@@ -36,6 +35,7 @@ import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.p2p.peers.MutableLocalNode;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.peers.PeerPrivileges;
+import org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper;
 import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissions;
 import org.hyperledger.besu.ethereum.p2p.permissions.PeerPermissionsException;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.MockConnectionInitializer;
@@ -43,7 +43,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.connections.MockPeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnectionEvents;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
-import org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.PingMessage;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
@@ -59,6 +58,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -619,7 +619,9 @@ public class RlpxAgentTest {
     doReturn(false)
         .when(peerPermissions)
         .isPermitted(
-            eq(localNode.getPeer()), eq(peer), eq(PeerPermissions.Action.RLPX_ALLOW_NEW_OUTBOUND_CONNECTION));
+            eq(localNode.getPeer()),
+            eq(peer),
+            eq(PeerPermissions.Action.RLPX_ALLOW_NEW_OUTBOUND_CONNECTION));
     final CompletableFuture<PeerConnection> connection = agent.connect(peer);
 
     assertThat(connection).isDone();
@@ -637,7 +639,9 @@ public class RlpxAgentTest {
     doReturn(false)
         .when(peerPermissions)
         .isPermitted(
-            eq(localNode.getPeer()), eq(peer), eq(PeerPermissions.Action.RLPX_ALLOW_NEW_INBOUND_CONNECTION));
+            eq(localNode.getPeer()),
+            eq(peer),
+            eq(PeerPermissions.Action.RLPX_ALLOW_NEW_INBOUND_CONNECTION));
     connectionInitializer.simulateIncomingConnection(connection);
 
     assertPeerConnectionNotTracked(peer);
@@ -903,7 +907,8 @@ public class RlpxAgentTest {
   }
 
   @Test
-  public void subscribeMessage() throws ExecutionException, InterruptedException, PeerConnection.PeerNotConnected {
+  public void subscribeMessage()
+      throws ExecutionException, InterruptedException, PeerConnection.PeerNotConnected {
     final Peer peer = createPeer();
     final Capability cap = Capability.create("eth", 63);
     startAgent();

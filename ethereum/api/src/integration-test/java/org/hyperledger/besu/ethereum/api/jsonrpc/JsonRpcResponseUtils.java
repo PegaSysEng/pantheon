@@ -12,8 +12,6 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcResponseKey.COINBASE;
 import static org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcResponseKey.DIFFICULTY;
 import static org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcResponseKey.EXTRA_DATA;
@@ -31,14 +29,16 @@ import static org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcResponseKey.STATE
 import static org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcResponseKey.TIMESTAMP;
 import static org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcResponseKey.TOTAL_DIFFICULTY;
 import static org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcResponseKey.TRANSACTION_ROOT;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.BlockResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionCompleteResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionHashResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionResult;
-import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;

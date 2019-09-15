@@ -19,6 +19,8 @@ import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.LIGHT_D
 import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.LIGHT_SKIP_DETACHED;
 import static org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode.SKIP_DETACHED;
 
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.sync.CheckpointHeaderFetcher;
@@ -29,8 +31,6 @@ import org.hyperledger.besu.ethereum.eth.sync.DownloadHeadersStep;
 import org.hyperledger.besu.ethereum.eth.sync.DownloadPipelineFactory;
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncTarget;
-import org.hyperledger.besu.ethereum.ProtocolContext;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
@@ -147,7 +147,7 @@ public class FastSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
   }
 
   private boolean shouldContinueDownloadingFromPeer(
-          final EthPeer peer, final BlockHeader lastCheckpointHeader) {
+      final EthPeer peer, final BlockHeader lastCheckpointHeader) {
     return !peer.isDisconnected()
         && lastCheckpointHeader.getNumber() < pivotBlockHeader.getNumber();
   }

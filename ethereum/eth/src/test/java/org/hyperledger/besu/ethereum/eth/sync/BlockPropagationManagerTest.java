@@ -23,15 +23,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthContext;
-import org.hyperledger.besu.ethereum.eth.manager.EthMessages;
-import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
-import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
-import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
-import org.hyperledger.besu.ethereum.eth.messages.NewBlockHashesMessage;
-import org.hyperledger.besu.ethereum.eth.messages.NewBlockMessage;
-import org.hyperledger.besu.ethereum.eth.sync.state.PendingBlocks;
-import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
@@ -40,9 +31,18 @@ import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import org.hyperledger.besu.ethereum.core.BlockDataGenerator.BlockOptions;
 import org.hyperledger.besu.ethereum.core.BlockImporter;
 import org.hyperledger.besu.ethereum.core.BlockchainSetupUtil;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthMessages;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
+import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
+import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
 import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer.Responder;
+import org.hyperledger.besu.ethereum.eth.messages.NewBlockHashesMessage;
+import org.hyperledger.besu.ethereum.eth.messages.NewBlockMessage;
+import org.hyperledger.besu.ethereum.eth.sync.state.PendingBlocks;
+import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
@@ -124,11 +124,13 @@ public class BlockPropagationManagerTest {
     final NewBlockHashesMessage nextAnnouncement =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(nextBlock.getHash(), nextBlock.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    nextBlock.getHash(), nextBlock.getHeader().getNumber())));
     final NewBlockHashesMessage nextNextAnnouncement =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(nextNextBlock.getHash(), nextNextBlock.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    nextNextBlock.getHash(), nextNextBlock.getHeader().getNumber())));
     final Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
 
     // Broadcast first message
@@ -159,11 +161,13 @@ public class BlockPropagationManagerTest {
     final NewBlockHashesMessage nextAnnouncement =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(nextBlock.getHash(), nextBlock.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    nextBlock.getHash(), nextBlock.getHeader().getNumber())));
     final NewBlockHashesMessage nextNextAnnouncement =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(nextNextBlock.getHash(), nextNextBlock.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    nextNextBlock.getHash(), nextNextBlock.getHeader().getNumber())));
     final Responder responder = RespondingEthPeer.blockchainResponder(fullBlockchain);
 
     // Broadcast second message first
@@ -264,14 +268,16 @@ public class BlockPropagationManagerTest {
     final NewBlockHashesMessage block1Msg =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(block1.getHash(), block1.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    block1.getHash(), block1.getHeader().getNumber())));
     final NewBlockMessage block2Msg =
         NewBlockMessage.create(
             block2, fullBlockchain.getTotalDifficultyByHash(block2.getHash()).get());
     final NewBlockHashesMessage block3Msg =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(block3.getHash(), block3.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    block3.getHash(), block3.getHeader().getNumber())));
     final NewBlockMessage block4Msg =
         NewBlockMessage.create(
             block4, fullBlockchain.getTotalDifficultyByHash(block4.getHash()).get());
@@ -324,7 +330,8 @@ public class BlockPropagationManagerTest {
     final NewBlockHashesMessage newBlockHash =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(nextBlock.getHash(), nextBlock.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    nextBlock.getHash(), nextBlock.getHeader().getNumber())));
     final NewBlockMessage newBlock =
         NewBlockMessage.create(
             nextBlock, fullBlockchain.getTotalDifficultyByHash(nextBlock.getHash()).get());
@@ -374,7 +381,8 @@ public class BlockPropagationManagerTest {
     final NewBlockHashesMessage newBlockHash =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(nextBlock.getHash(), nextBlock.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    nextBlock.getHash(), nextBlock.getHeader().getNumber())));
     final NewBlockMessage newBlock =
         NewBlockMessage.create(
             nextBlock, fullBlockchain.getTotalDifficultyByHash(nextBlock.getHash()).get());
@@ -406,7 +414,8 @@ public class BlockPropagationManagerTest {
     final NewBlockHashesMessage futureAnnouncement =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(futureBlock.getHash(), futureBlock.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    futureBlock.getHash(), futureBlock.getHeader().getNumber())));
 
     // Broadcast
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, futureAnnouncement);
@@ -458,7 +467,8 @@ public class BlockPropagationManagerTest {
     final NewBlockHashesMessage oldAnnouncement =
         NewBlockHashesMessage.create(
             Collections.singletonList(
-                new NewBlockHashesMessage.NewBlockHash(oldBlock.getHash(), oldBlock.getHeader().getNumber())));
+                new NewBlockHashesMessage.NewBlockHash(
+                    oldBlock.getHash(), oldBlock.getHeader().getNumber())));
 
     // Broadcast
     EthProtocolManagerTestUtil.broadcastMessage(ethProtocolManager, peer, oldAnnouncement);

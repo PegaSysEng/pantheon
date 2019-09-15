@@ -22,10 +22,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.eth.manager.exceptions.NoAvailablePeersException;
 import org.hyperledger.besu.ethereum.eth.manager.exceptions.PeerDisconnectedException;
 import org.hyperledger.besu.ethereum.eth.messages.NodeDataMessage;
-import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection.PeerNotConnected;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.util.uint.UInt256;
@@ -43,7 +43,8 @@ public class EthPeersTest {
   private EthProtocolManager ethProtocolManager;
   private EthPeers ethPeers;
   private final PeerRequest peerRequest = mock(PeerRequest.class);
-  private final RequestManager.ResponseStream responseStream = mock(RequestManager.ResponseStream.class);
+  private final RequestManager.ResponseStream responseStream =
+      mock(RequestManager.ResponseStream.class);
 
   @Before
   public void setup() throws Exception {

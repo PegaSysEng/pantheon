@@ -87,7 +87,9 @@ public class EVM {
     // Calculate the cost if, and only if, we are not halting as a result of a stack underflow, as
     // the operation may need all its stack items to calculate gas.
     // This is how existing EVM implementations behave.
-    if (!frame.getExceptionalHaltReasons().contains(ExceptionalHaltReason.INSUFFICIENT_STACK_ITEMS)) {
+    if (!frame
+        .getExceptionalHaltReasons()
+        .contains(ExceptionalHaltReason.INSUFFICIENT_STACK_ITEMS)) {
       try {
         return Optional.ofNullable(frame.getCurrentOperation().cost(frame));
       } catch (final IllegalArgumentException e) {

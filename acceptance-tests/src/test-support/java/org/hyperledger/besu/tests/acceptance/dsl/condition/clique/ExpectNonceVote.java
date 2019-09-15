@@ -13,7 +13,6 @@
 package org.hyperledger.besu.tests.acceptance.dsl.condition.clique;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 import static org.hyperledger.besu.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE.AUTH;
 
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
@@ -39,6 +38,7 @@ public class ExpectNonceVote implements Condition {
 
   @Override
   public void verify(final Node node) {
-    WaitUtils.waitFor(() -> assertThat(node.execute(eth.block()).getNonceRaw()).isEqualTo(expectedNonce));
+    WaitUtils.waitFor(
+        () -> assertThat(node.execute(eth.block()).getNonceRaw()).isEqualTo(expectedNonce));
   }
 }

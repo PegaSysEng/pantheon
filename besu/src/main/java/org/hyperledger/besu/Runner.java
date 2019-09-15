@@ -86,10 +86,7 @@ public class Runner implements AutoCloseable {
       vertx.setPeriodic(
           TimeUnit.MINUTES.toMillis(1),
           time ->
-              besuController
-                  .getTransactionPool()
-                  .getPendingTransactions()
-                  .evictOldTransactions());
+              besuController.getTransactionPool().getPendingTransactions().evictOldTransactions());
       jsonRpc.ifPresent(service -> waitForServiceToStart("jsonRpc", service.start()));
       graphQLHttp.ifPresent(service -> waitForServiceToStart("graphQLHttp", service.start()));
       websocketRpc.ifPresent(service -> waitForServiceToStop("websocketRpc", service.start()));

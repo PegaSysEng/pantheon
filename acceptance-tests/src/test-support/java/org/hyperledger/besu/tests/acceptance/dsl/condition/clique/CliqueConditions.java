@@ -16,14 +16,14 @@ import static java.util.Collections.emptyList;
 import static org.hyperledger.besu.ethereum.core.Hash.fromHexString;
 import static org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions.LATEST;
 
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.config.CliqueConfigOptions;
 import org.hyperledger.besu.config.GenesisConfigFile;
 import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain.ExpectBlockNotCreated;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.clique.ExpectNonceVote.CLIQUE_NONCE_VOTE;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
@@ -51,13 +51,12 @@ public class CliqueConditions {
     return new ExpectValidators(clique, validatorAddresses(validators));
   }
 
-  public Condition validatorsAtBlockEqual(
-      final String blockNumber, final BesuNode... validators) {
+  public Condition validatorsAtBlockEqual(final String blockNumber, final BesuNode... validators) {
     return new ExpectValidatorsAtBlock(clique, blockNumber, validatorAddresses(validators));
   }
 
   public Condition validatorsAtBlockHashFromBlockNumberEqual(
-          final Node node, final long blockNumber, final BesuNode... validators) {
+      final Node node, final long blockNumber, final BesuNode... validators) {
     final DefaultBlockParameter blockParameter =
         DefaultBlockParameter.valueOf(BigInteger.valueOf(blockNumber));
     final String blockHash = node.execute(eth.block(blockParameter)).getHash();

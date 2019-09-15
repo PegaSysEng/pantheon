@@ -19,7 +19,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.config.GenesisConfigFile;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
@@ -38,14 +37,14 @@ import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.core.WorldState;
 import org.hyperledger.besu.ethereum.core.WorldUpdater;
 import org.hyperledger.besu.ethereum.difficulty.fixed.FixedDifficultyProtocolSchedule;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
 import org.hyperledger.besu.ethereum.mainnet.MainnetTransactionProcessor;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidator;
 import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.ethereum.vm.TestBlockchain;
-import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.testutil.TestClock;
@@ -59,6 +58,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class BlockTransactionSelectorTest {
@@ -184,7 +184,9 @@ public class BlockTransactionSelectorTest {
             anyBoolean(),
             any()))
         .thenReturn(
-            MainnetTransactionProcessor.Result.invalid(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW)));
+            MainnetTransactionProcessor.Result.invalid(
+                ValidationResult.invalid(
+                    TransactionValidator.TransactionInvalidReason.NONCE_TOO_LOW)));
 
     // The block should fit 3 transactions only
     final ProcessableBlockHeader blockHeader = createBlockWithGasLimit(5000);
@@ -462,12 +464,15 @@ public class BlockTransactionSelectorTest {
             any()))
         .thenReturn(
             MainnetTransactionProcessor.Result.invalid(
-                ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.EXCEEDS_BLOCK_GAS_LIMIT)));
+                ValidationResult.invalid(
+                    TransactionValidator.TransactionInvalidReason.EXCEEDS_BLOCK_GAS_LIMIT)));
 
     selector.buildTransactionListForBlock();
 
-    Assertions.assertThat(pendingTransactions.getTransactionByHash(validTransaction.hash())).isPresent();
-    Assertions.assertThat(pendingTransactions.getTransactionByHash(invalidTransaction.hash())).isNotPresent();
+    Assertions.assertThat(pendingTransactions.getTransactionByHash(validTransaction.hash()))
+        .isPresent();
+    Assertions.assertThat(pendingTransactions.getTransactionByHash(invalidTransaction.hash()))
+        .isNotPresent();
   }
 
   @Test
@@ -490,7 +495,9 @@ public class BlockTransactionSelectorTest {
             anyBoolean(),
             any()))
         .thenReturn(
-            MainnetTransactionProcessor.Result.invalid(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE)));
+            MainnetTransactionProcessor.Result.invalid(
+                ValidationResult.invalid(
+                    TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE)));
 
     final Address miningBeneficiary = AddressHelpers.ofValue(1);
     final BlockTransactionSelector selector =
@@ -508,7 +515,8 @@ public class BlockTransactionSelectorTest {
     final BlockTransactionSelector.TransactionSelectionResults results =
         selector.buildTransactionListForBlock();
 
-    Assertions.assertThat(pendingTransactions.getTransactionByHash(futureTransaction.hash())).isPresent();
+    Assertions.assertThat(pendingTransactions.getTransactionByHash(futureTransaction.hash()))
+        .isPresent();
     assertThat(results.getTransactions().size()).isEqualTo(0);
   }
 
@@ -527,7 +535,7 @@ public class BlockTransactionSelectorTest {
 
   // This is a duplicate of the MainnetProtocolSpec::frontierTransactionReceiptFactory
   private TransactionReceipt createReceipt(
-          final TransactionProcessor.Result result, final WorldState worldState, final long gasUsed) {
+      final TransactionProcessor.Result result, final WorldState worldState, final long gasUsed) {
     return new TransactionReceipt(
         worldState.rootHash(), gasUsed, Lists.newArrayList(), Optional.empty());
   }

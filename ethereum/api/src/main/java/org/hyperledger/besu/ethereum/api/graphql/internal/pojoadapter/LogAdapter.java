@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.api.graphql.internal.pojoadapter;
 
-import org.hyperledger.besu.ethereum.api.graphql.internal.BlockchainQuery;
 import org.hyperledger.besu.ethereum.api.LogWithMetadata;
 import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.graphql.internal.BlockchainQuery;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.LogTopic;
 import org.hyperledger.besu.util.bytes.Bytes32;

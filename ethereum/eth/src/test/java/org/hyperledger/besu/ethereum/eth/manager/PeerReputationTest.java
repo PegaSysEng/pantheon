@@ -17,6 +17,7 @@ import static org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMes
 import static org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason.USELESS_PEER;
 
 import org.hyperledger.besu.ethereum.eth.messages.EthPV62;
+
 import org.junit.Test;
 
 public class PeerReputationTest {
@@ -72,7 +73,9 @@ public class PeerReputationTest {
     assertThat(reputation.recordUselessResponse(1004)).isEmpty();
 
     // But then the next empty response doesn't come in until after the window expires on the first
-    assertThat(reputation.recordUselessResponse(1001 + PeerReputation.USELESS_RESPONSE_WINDOW_IN_MILLIS + 1))
+    assertThat(
+            reputation.recordUselessResponse(
+                1001 + PeerReputation.USELESS_RESPONSE_WINDOW_IN_MILLIS + 1))
         .isEmpty();
   }
 }

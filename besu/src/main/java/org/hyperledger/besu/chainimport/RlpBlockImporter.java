@@ -16,11 +16,11 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 import org.hyperledger.besu.controller.BesuController;
-import org.hyperledger.besu.ethereum.core.BlockImporter;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockImporter;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.mainnet.BlockHeaderValidator;
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
@@ -52,8 +52,8 @@ public class RlpBlockImporter {
   private final ExecutorService importExecutor = Executors.newSingleThreadExecutor();
 
   /**
-   * Imports blocks that are stored as concatenated RLP sections in the given file into Besu's
-   * block storage.
+   * Imports blocks that are stored as concatenated RLP sections in the given file into Besu's block
+   * storage.
    *
    * @param blocks Path to the file containing the blocks
    * @param besuController the BesuController that defines blockchain behavior
@@ -176,8 +176,7 @@ public class RlpBlockImporter {
       final BlockHeader header,
       final ProtocolSpec<C> protocolSpec) {
     try {
-      final BlockImporter<C> blockImporter =
-          protocolSpec.getBlockImporter();
+      final BlockImporter<C> blockImporter = protocolSpec.getBlockImporter();
       final boolean blockImported =
           blockImporter.importBlock(context, block, HeaderValidationMode.SKIP_DETACHED);
       if (!blockImported) {

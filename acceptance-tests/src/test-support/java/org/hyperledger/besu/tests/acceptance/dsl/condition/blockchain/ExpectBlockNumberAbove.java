@@ -13,7 +13,6 @@
 package org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;

@@ -14,7 +14,6 @@ package org.hyperledger.besu.ethereum.vm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.Block;
@@ -30,6 +29,8 @@ import org.hyperledger.besu.testutil.JsonTestParameters;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import org.assertj.core.api.Assertions;
 
 public class BlockchainReferenceTestTools {
   private static final ReferenceTestProtocolSchedules REFERENCE_TEST_PROTOCOL_SCHEDULES =

@@ -86,7 +86,7 @@ public class WorldStateMock extends DefaultMutableWorldState {
   }
 
   public static void insertAccount(
-          final WorldUpdater updater, final Address address, final AccountMock toCopy) {
+      final WorldUpdater updater, final Address address, final AccountMock toCopy) {
     final MutableAccount account = updater.getOrCreate(address);
     account.setNonce(toCopy.getNonce());
     account.setBalance(toCopy.getBalance());

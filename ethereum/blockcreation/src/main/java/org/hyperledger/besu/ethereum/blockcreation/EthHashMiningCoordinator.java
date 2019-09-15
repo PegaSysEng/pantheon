@@ -16,9 +16,9 @@ import org.hyperledger.besu.ethereum.chain.BlockAddedObserver;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.mainnet.EthHashSolution;
 import org.hyperledger.besu.ethereum.mainnet.EthHashSolverInputs;
-import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 
 import java.util.Optional;
 
@@ -33,7 +33,7 @@ public class EthHashMiningCoordinator extends AbstractMiningCoordinator<Void, Et
   private volatile Optional<Long> cachedHashesPerSecond = Optional.empty();
 
   public EthHashMiningCoordinator(
-          final Blockchain blockchain, final EthHashMinerExecutor executor, final SyncState syncState) {
+      final Blockchain blockchain, final EthHashMinerExecutor executor, final SyncState syncState) {
     super(blockchain, executor, syncState);
     this.executor = executor;
   }

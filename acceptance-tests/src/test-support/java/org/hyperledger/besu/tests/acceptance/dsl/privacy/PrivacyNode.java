@@ -12,10 +12,6 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
-import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNodeRunner;
-import org.hyperledger.orion.testutil.OrionTestHarness;
-import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
 import org.hyperledger.besu.controller.KeyPairUtil;
 import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.enclave.EnclaveException;
@@ -31,11 +27,15 @@ import org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBKeyValuePriva
 import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
 import org.hyperledger.besu.services.BesuConfigurationImpl;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNodeRunner;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.BesuNodeConfiguration;
+import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.NodeConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.privacy.PrivacyNodeConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.privacy.condition.PrivateCondition;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
+import org.hyperledger.orion.testutil.OrionTestHarness;
+import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
 
 import java.io.IOException;
 import java.net.URI;

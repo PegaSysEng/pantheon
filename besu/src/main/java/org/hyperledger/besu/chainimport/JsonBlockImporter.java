@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.chainimport;
 
-import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.chainimport.internal.BlockData;
 import org.hyperledger.besu.chainimport.internal.ChainData;
 import org.hyperledger.besu.config.GenesisConfigOptions;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Block;

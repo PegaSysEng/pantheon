@@ -12,6 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.eth.sync.fullsync;
 
+import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.sync.CheckpointHeaderFetcher;
@@ -23,8 +25,6 @@ import org.hyperledger.besu.ethereum.eth.sync.DownloadPipelineFactory;
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 import org.hyperledger.besu.ethereum.eth.sync.ValidationPolicy;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncTarget;
-import org.hyperledger.besu.ethereum.ProtocolContext;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.metrics.BesuMetricCategory;
@@ -109,7 +109,7 @@ public class FullSyncDownloadPipelineFactory<C> implements DownloadPipelineFacto
   }
 
   private boolean shouldContinueDownloadingFromPeer(
-          final EthPeer peer, final BlockHeader lastCheckpointHeader) {
+      final EthPeer peer, final BlockHeader lastCheckpointHeader) {
     final boolean caughtUpToPeer =
         peer.chainState().getEstimatedHeight() <= lastCheckpointHeader.getNumber();
     return !peer.isDisconnected()

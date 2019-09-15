@@ -24,12 +24,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncTarget;
-import org.hyperledger.besu.ethereum.core.BlockHeader;
-import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.eth.sync.tasks.exceptions.InvalidBlockException;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
@@ -326,7 +326,8 @@ public class PipelineChainDownloaderTest {
 
   @SuppressWarnings("unchecked")
   private void immediatelyCompletePauseAfterError() {
-    when(scheduler.scheduleFutureTask(any(Supplier.class), same(PipelineChainDownloader.PAUSE_AFTER_ERROR_DURATION)))
+    when(scheduler.scheduleFutureTask(
+            any(Supplier.class), same(PipelineChainDownloader.PAUSE_AFTER_ERROR_DURATION)))
         .then(invocation -> ((Supplier<CompletableFuture<?>>) invocation.getArgument(0)).get());
   }
 }

@@ -30,7 +30,7 @@ public class InvalidRLPRefTest {
 
   private static final String[] TEST_CONFIG_FILES = {
     // TODO: upstream these additional tests to the ethereum tests repo
-          "org/hyperledger/besu/ethereum/rlp/invalidRLPTest.json", "RLPTests/invalidRLPTest.json"
+    "org/hyperledger/besu/ethereum/rlp/invalidRLPTest.json", "RLPTests/invalidRLPTest.json"
   };
 
   private final InvalidRLPRefTestCaseSpec spec;

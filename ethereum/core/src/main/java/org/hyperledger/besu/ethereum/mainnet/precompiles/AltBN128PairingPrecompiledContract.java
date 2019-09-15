@@ -45,7 +45,7 @@ public class AltBN128PairingPrecompiledContract extends AbstractPrecompiledContr
   private final Gas baseGasCost;
 
   private AltBN128PairingPrecompiledContract(
-          final GasCalculator gasCalculator, final Gas pairingGasCost, final Gas baseGasCost) {
+      final GasCalculator gasCalculator, final Gas pairingGasCost, final Gas baseGasCost) {
     super("AltBN128Pairing", gasCalculator);
     this.pairingGasCost = pairingGasCost;
     this.baseGasCost = baseGasCost;

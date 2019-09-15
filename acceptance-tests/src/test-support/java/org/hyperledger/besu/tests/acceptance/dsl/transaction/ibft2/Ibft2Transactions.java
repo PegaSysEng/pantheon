@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2;
 
-import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 
 public class Ibft2Transactions {
   public static final String LATEST = "latest";

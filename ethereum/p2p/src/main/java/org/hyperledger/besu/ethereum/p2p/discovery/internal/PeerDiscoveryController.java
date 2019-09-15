@@ -380,7 +380,8 @@ public class PeerDiscoveryController {
   }
 
   private void notifyPeerBonded(final DiscoveryPeer peer, final long now) {
-    final PeerDiscoveryEvent.PeerBondedEvent event = new PeerDiscoveryEvent.PeerBondedEvent(peer, now);
+    final PeerDiscoveryEvent.PeerBondedEvent event =
+        new PeerDiscoveryEvent.PeerBondedEvent(peer, now);
     dispatchPeerBondedEvent(peerBondedObservers, event);
   }
 
@@ -546,7 +547,8 @@ public class PeerDiscoveryController {
 
   // Dispatches an event to a set of observers.
   private void dispatchPeerBondedEvent(
-      final Subscribers<PeerBondedObserver> observers, final PeerDiscoveryEvent.PeerBondedEvent event) {
+      final Subscribers<PeerBondedObserver> observers,
+      final PeerDiscoveryEvent.PeerBondedEvent event) {
     observers.forEach(observer -> observer.onPeerBonded(event));
   }
 

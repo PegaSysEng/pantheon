@@ -66,11 +66,13 @@ public class CliqueDifficultyValidationRuleTest {
 
     blockHeaderBuilder.number(IN_TURN_BLOCK_NUMBER - 1L);
     final BlockHeader parentHeader =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     blockHeaderBuilder.number(IN_TURN_BLOCK_NUMBER).difficulty(REPORTED_DIFFICULTY);
     final BlockHeader newBlock =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     final CliqueDifficultyValidationRule diffValidationRule = new CliqueDifficultyValidationRule();
     assertThat(diffValidationRule.validate(newBlock, parentHeader, cliqueProtocolContext)).isTrue();
@@ -83,11 +85,13 @@ public class CliqueDifficultyValidationRuleTest {
 
     blockHeaderBuilder.number(OUT_OF_TURN_BLOCK_NUMBER - 1L);
     final BlockHeader parentHeader =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     blockHeaderBuilder.number(OUT_OF_TURN_BLOCK_NUMBER).difficulty(REPORTED_DIFFICULTY);
     final BlockHeader newBlock =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     final CliqueDifficultyValidationRule diffValidationRule = new CliqueDifficultyValidationRule();
     assertThat(diffValidationRule.validate(newBlock, parentHeader, cliqueProtocolContext)).isTrue();
@@ -100,11 +104,13 @@ public class CliqueDifficultyValidationRuleTest {
 
     blockHeaderBuilder.number(OUT_OF_TURN_BLOCK_NUMBER - 1L);
     final BlockHeader parentHeader =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     blockHeaderBuilder.number(OUT_OF_TURN_BLOCK_NUMBER).difficulty(REPORTED_DIFFICULTY);
     final BlockHeader newBlock =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     final CliqueDifficultyValidationRule diffValidationRule = new CliqueDifficultyValidationRule();
     assertThat(diffValidationRule.validate(newBlock, parentHeader, cliqueProtocolContext))
@@ -118,11 +124,13 @@ public class CliqueDifficultyValidationRuleTest {
 
     blockHeaderBuilder.number(IN_TURN_BLOCK_NUMBER - 1L);
     final BlockHeader parentHeader =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     blockHeaderBuilder.number(IN_TURN_BLOCK_NUMBER).difficulty(REPORTED_DIFFICULTY);
     final BlockHeader newBlock =
-        TestHelpers.createCliqueSignedBlockHeader(blockHeaderBuilder, proposerKeyPair, validatorList);
+        TestHelpers.createCliqueSignedBlockHeader(
+            blockHeaderBuilder, proposerKeyPair, validatorList);
 
     final CliqueDifficultyValidationRule diffValidationRule = new CliqueDifficultyValidationRule();
     assertThat(diffValidationRule.validate(newBlock, parentHeader, cliqueProtocolContext))

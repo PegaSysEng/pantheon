@@ -15,7 +15,7 @@ pragma solidity >=0.4.0 <0.6.0;
 // compile with:
 // solc RevertReason.sol --bin --abi --optimize --overwrite -o .
 // then create web3j wrappers with:
-// web3j solidity generate -b ./generated/RevertReason.bin -a ./generated/RevertReason.abi -o ../../../../../ -p tech.pegasys.pantheon.tests.web3j.generated
+// web3j solidity generate -b ./generated/RevertReason.bin -a ./generated/RevertReason.abi -o ../../../../../ -p org.hyperledger.besu.tests.web3j.generated
 contract RevertReason {
 
     function revertWithRevertReason() public pure returns (bool) {

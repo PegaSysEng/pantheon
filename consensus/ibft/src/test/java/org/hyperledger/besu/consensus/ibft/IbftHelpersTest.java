@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.consensus.ibft.messagewrappers.Proposal;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.consensus.ibft.payload.PreparedCertificate;
@@ -28,6 +27,7 @@ import org.hyperledger.besu.ethereum.core.Hash;
 import java.util.Optional;
 
 import com.google.common.collect.Lists;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
 public class IbftHelpersTest {

@@ -25,8 +25,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.permissioning.node.NodeWhitelistUpdatedEvent;
 import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.plugin.services.metrics.Counter;
@@ -101,8 +101,11 @@ public class NodeLocalConfigPermissioningControllerTest {
 
   @Test
   public void whenAddNodesWithValidInputShouldReturnSuccess() {
-    NodeLocalConfigPermissioningController.NodesWhitelistResult expected = new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.SUCCESS);
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.addNodes(Lists.newArrayList(enode1));
+    NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.SUCCESS);
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.addNodes(Lists.newArrayList(enode1));
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
     assertThat(controller.getNodesWhitelist()).containsExactly(enode1);
@@ -113,8 +116,10 @@ public class NodeLocalConfigPermissioningControllerTest {
     controller.addNodes(Arrays.asList(enode1));
 
     NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
-        new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.ERROR_EXISTING_ENTRY);
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.addNodes(Lists.newArrayList(enode1, enode2));
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_EXISTING_ENTRY);
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.addNodes(Lists.newArrayList(enode1, enode2));
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
@@ -122,9 +127,11 @@ public class NodeLocalConfigPermissioningControllerTest {
   @Test
   public void whenAddNodesInputHasDuplicatedNodesShouldReturnDuplicatedEntryError() {
     NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
-        new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.ERROR_DUPLICATED_ENTRY);
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_DUPLICATED_ENTRY);
 
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.addNodes(Arrays.asList(enode1, enode1));
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.addNodes(Arrays.asList(enode1, enode1));
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
@@ -132,8 +139,10 @@ public class NodeLocalConfigPermissioningControllerTest {
   @Test
   public void whenAddNodesInputHasEmptyListOfNodesShouldReturnErrorEmptyEntry() {
     NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
-        new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.removeNodes(new ArrayList<>());
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.removeNodes(new ArrayList<>());
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
@@ -141,8 +150,10 @@ public class NodeLocalConfigPermissioningControllerTest {
   @Test
   public void whenAddNodesInputHasNullListOfNodesShouldReturnErrorEmptyEntry() {
     NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
-        new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.removeNodes(null);
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.removeNodes(null);
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
@@ -150,8 +161,10 @@ public class NodeLocalConfigPermissioningControllerTest {
   @Test
   public void whenRemoveNodesInputHasAbsentNodeShouldReturnRemoveErrorAbsentEntry() {
     NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
-        new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.ERROR_ABSENT_ENTRY);
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.removeNodes(Lists.newArrayList(enode1, enode2));
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_ABSENT_ENTRY);
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.removeNodes(Lists.newArrayList(enode1, enode2));
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
@@ -159,8 +172,10 @@ public class NodeLocalConfigPermissioningControllerTest {
   @Test
   public void whenRemoveNodesInputHasDuplicateNodesShouldReturnErrorDuplicatedEntry() {
     NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
-        new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.ERROR_DUPLICATED_ENTRY);
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.removeNodes(Lists.newArrayList(enode1, enode1));
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_DUPLICATED_ENTRY);
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.removeNodes(Lists.newArrayList(enode1, enode1));
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
@@ -168,8 +183,10 @@ public class NodeLocalConfigPermissioningControllerTest {
   @Test
   public void whenRemoveNodesInputHasEmptyListOfNodesShouldReturnErrorEmptyEntry() {
     NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
-        new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.removeNodes(new ArrayList<>());
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.removeNodes(new ArrayList<>());
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
@@ -177,8 +194,10 @@ public class NodeLocalConfigPermissioningControllerTest {
   @Test
   public void whenRemoveNodesInputHasNullListOfNodesShouldReturnErrorEmptyEntry() {
     NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
-        new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.ERROR_EMPTY_ENTRY);
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.removeNodes(null);
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_EMPTY_ENTRY);
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.removeNodes(null);
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
   }
@@ -431,11 +450,13 @@ public class NodeLocalConfigPermissioningControllerTest {
   @Test
   public void whenRemovingBootnodeShouldReturnRemoveBootnodeError() {
     NodeLocalConfigPermissioningController.NodesWhitelistResult expected =
-        new NodeLocalConfigPermissioningController.NodesWhitelistResult(WhitelistOperationResult.ERROR_FIXED_NODE_CANNOT_BE_REMOVED);
+        new NodeLocalConfigPermissioningController.NodesWhitelistResult(
+            WhitelistOperationResult.ERROR_FIXED_NODE_CANNOT_BE_REMOVED);
     bootnodesList.add(EnodeURL.fromString(enode1));
     controller.addNodes(Lists.newArrayList(enode1, enode2));
 
-    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult = controller.removeNodes(Lists.newArrayList(enode1));
+    NodeLocalConfigPermissioningController.NodesWhitelistResult actualResult =
+        controller.removeNodes(Lists.newArrayList(enode1));
 
     assertThat(actualResult).isEqualToComparingOnlyGivenFields(expected, "result");
     assertThat(controller.getNodesWhitelist()).containsExactly(enode1, enode2);

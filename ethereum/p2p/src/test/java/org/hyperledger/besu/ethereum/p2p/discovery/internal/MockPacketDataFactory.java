@@ -27,7 +27,7 @@ import java.util.Optional;
 public class MockPacketDataFactory {
 
   public static Packet mockNeighborsPacket(
-          final DiscoveryPeer from, final DiscoveryPeer... neighbors) {
+      final DiscoveryPeer from, final DiscoveryPeer... neighbors) {
     final Packet packet = mock(Packet.class);
 
     final NeighborsPacketData packetData = NeighborsPacketData.create(Arrays.asList(neighbors));

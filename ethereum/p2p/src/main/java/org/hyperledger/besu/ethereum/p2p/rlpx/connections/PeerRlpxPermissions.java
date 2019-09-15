@@ -36,7 +36,8 @@ public class PeerRlpxPermissions {
   }
 
   public PeerPermissionsException newOutboundConnectionException(final Peer peer) {
-    return new PeerPermissionsException(peer, PeerPermissions.Action.RLPX_ALLOW_NEW_OUTBOUND_CONNECTION);
+    return new PeerPermissionsException(
+        peer, PeerPermissions.Action.RLPX_ALLOW_NEW_OUTBOUND_CONNECTION);
   }
 
   public boolean allowNewInboundConnectionFrom(final Peer peer) {

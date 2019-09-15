@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.consensus.common.jsonrpc;
 
-import org.hyperledger.besu.consensus.common.VoteType;
 import org.hyperledger.besu.consensus.common.VoteProposer;
+import org.hyperledger.besu.consensus.common.VoteType;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;

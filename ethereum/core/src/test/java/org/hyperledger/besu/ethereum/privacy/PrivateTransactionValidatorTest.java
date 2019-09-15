@@ -13,16 +13,14 @@
 package org.hyperledger.besu.ethereum.privacy;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INCORRECT_PRIVATE_NONCE;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.INVALID_SIGNATURE;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.PRIVATE_NONCE_TOO_LOW;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.REPLAY_PROTECTED_SIGNATURES_NOT_SUPPORTED;
 import static org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason.WRONG_CHAIN_ID;
+import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import org.mockito.Mockito;
 import org.hyperledger.besu.ethereum.core.PrivateTransactionTestFixture;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidator.TransactionInvalidReason;
 import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
@@ -32,6 +30,7 @@ import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class PrivateTransactionValidatorTest {
 
@@ -92,7 +91,8 @@ public class PrivateTransactionValidatorTest {
 
   @Test
   public void transactionWithInvalidSignatureShouldReturnInvalidSignature() {
-    PrivateTransaction transactionWithInvalidSignature = Mockito.spy(privateTransactionWithNonce(1L));
+    PrivateTransaction transactionWithInvalidSignature =
+        Mockito.spy(privateTransactionWithNonce(1L));
     when(transactionWithInvalidSignature.getSender()).thenThrow(new IllegalArgumentException());
 
     ValidationResult<TransactionInvalidReason> validationResult =

@@ -12,14 +12,13 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.ethsigner.testutil;
 
-import tech.pegasys.ethsigner.core.Config;
-import tech.pegasys.ethsigner.core.signing.ChainIdProvider;
-
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.time.Duration;
 
 import org.apache.logging.log4j.Level;
+import tech.pegasys.ethsigner.core.Config;
+import tech.pegasys.ethsigner.core.signing.ChainIdProvider;
 
 public class EthSignerConfig implements Config {
   private final Level logLevel;

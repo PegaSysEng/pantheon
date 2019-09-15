@@ -22,5 +22,5 @@ public interface BlockCreator {
   Block createBlock(final long timestamp);
 
   Block createBlock(
-          final List<Transaction> transactions, final List<BlockHeader> ommers, final long timestamp);
+      final List<Transaction> transactions, final List<BlockHeader> ommers, final long timestamp);
 }

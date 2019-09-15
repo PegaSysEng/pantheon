@@ -65,8 +65,8 @@ public class PrivateTransactionValidator {
     return ValidationResult.valid();
   }
 
-  public ValidationResult<TransactionValidator.TransactionInvalidReason> validateTransactionSignature(
-      final PrivateTransaction transaction) {
+  public ValidationResult<TransactionValidator.TransactionInvalidReason>
+      validateTransactionSignature(final PrivateTransaction transaction) {
     if (chainId.isPresent()
         && (transaction.getChainId().isPresent() && !transaction.getChainId().equals(chainId))) {
       return ValidationResult.invalid(
@@ -88,7 +88,8 @@ public class PrivateTransactionValidator {
       transaction.getSender();
     } catch (final IllegalArgumentException e) {
       return ValidationResult.invalid(
-          TransactionValidator.TransactionInvalidReason.INVALID_SIGNATURE, "sender could not be extracted from transaction signature");
+          TransactionValidator.TransactionInvalidReason.INVALID_SIGNATURE,
+          "sender could not be extracted from transaction signature");
     }
 
     return ValidationResult.valid();

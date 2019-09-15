@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.connections;
 
-import static org.mockito.Mockito.mock;
 import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
+import static org.mockito.Mockito.mock;
 
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MockSubProtocol;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.CapabilityMultiplexer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MockSubProtocol;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.PeerInfo;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;

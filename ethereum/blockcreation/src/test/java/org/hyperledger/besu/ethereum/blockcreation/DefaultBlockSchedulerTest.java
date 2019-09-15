@@ -42,7 +42,8 @@ public class DefaultBlockSchedulerTest {
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     final BlockHeader parentBlock = headerBuilder.timestamp(parentTimeStamp).buildHeader();
-    final AbstractBlockScheduler.BlockCreationTimeResult result = scheduler.getNextTimestamp(parentBlock);
+    final AbstractBlockScheduler.BlockCreationTimeResult result =
+        scheduler.getNextTimestamp(parentBlock);
 
     assertThat(result.getTimestampForHeader()).isEqualTo(parentTimeStamp + interBlockSeconds);
     assertThat(result.getMillisecondsUntilValid()).isEqualTo(0);
@@ -58,7 +59,8 @@ public class DefaultBlockSchedulerTest {
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     final BlockHeader parentBlock = headerBuilder.timestamp(parentTimeStamp).buildHeader();
-    final AbstractBlockScheduler.BlockCreationTimeResult result = scheduler.getNextTimestamp(parentBlock);
+    final AbstractBlockScheduler.BlockCreationTimeResult result =
+        scheduler.getNextTimestamp(parentBlock);
 
     assertThat(result.getMillisecondsUntilValid()).isEqualTo(0);
   }
@@ -74,7 +76,8 @@ public class DefaultBlockSchedulerTest {
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     final BlockHeader parentBlock = headerBuilder.timestamp(parentTimeStamp).buildHeader();
-    final AbstractBlockScheduler.BlockCreationTimeResult result = scheduler.getNextTimestamp(parentBlock);
+    final AbstractBlockScheduler.BlockCreationTimeResult result =
+        scheduler.getNextTimestamp(parentBlock);
 
     assertThat(result.getMillisecondsUntilValid()).isEqualTo(interBlockSeconds * 1000);
   }
@@ -91,7 +94,8 @@ public class DefaultBlockSchedulerTest {
 
     final BlockHeaderTestFixture headerBuilder = new BlockHeaderTestFixture();
     final BlockHeader parentBlock = headerBuilder.timestamp(parentTimeStamp).buildHeader();
-    final AbstractBlockScheduler.BlockCreationTimeResult result = scheduler.getNextTimestamp(parentBlock);
+    final AbstractBlockScheduler.BlockCreationTimeResult result =
+        scheduler.getNextTimestamp(parentBlock);
 
     assertThat(result.getTimestampForHeader()).isEqualTo(secondsSinceEpoch);
   }

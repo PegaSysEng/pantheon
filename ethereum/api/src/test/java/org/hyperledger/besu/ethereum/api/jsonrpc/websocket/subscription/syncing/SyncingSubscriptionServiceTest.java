@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.SyncingResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.request.SubscriptionType;
-import org.mockito.ArgumentMatchers;
 import org.hyperledger.besu.ethereum.core.SyncStatus;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.plugin.services.BesuEvents.SyncStatusListener;
@@ -34,6 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -73,7 +73,8 @@ public class SyncingSubscriptionServiceTest {
     syncStatusListener.onSyncStatusChanged(syncStatus);
 
     verify(subscriptionManager)
-        .sendMessage(ArgumentMatchers.eq(subscription.getSubscriptionId()), eq(expectedSyncingResult));
+        .sendMessage(
+            ArgumentMatchers.eq(subscription.getSubscriptionId()), eq(expectedSyncingResult));
   }
 
   @Test
@@ -95,6 +96,8 @@ public class SyncingSubscriptionServiceTest {
     syncStatusListener.onSyncStatusChanged(syncStatus);
 
     verify(subscriptionManager)
-        .sendMessage(ArgumentMatchers.eq(subscription.getSubscriptionId()), any(NotSynchronisingResult.class));
+        .sendMessage(
+            ArgumentMatchers.eq(subscription.getSubscriptionId()),
+            any(NotSynchronisingResult.class));
   }
 }

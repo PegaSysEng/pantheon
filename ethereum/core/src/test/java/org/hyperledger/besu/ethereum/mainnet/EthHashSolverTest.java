@@ -118,7 +118,8 @@ public class EthHashSolverTest {
             Lists.newArrayList(expectedFirstOutput.getNonce(), 0L, expectedSecondOutput.getNonce()),
             new EthHasher.Light());
 
-    EthHashSolution soln = solver.solveFor(EthHashSolver.EthHashSolverJob.createFromInputs(firstInputs));
+    EthHashSolution soln =
+        solver.solveFor(EthHashSolver.EthHashSolverJob.createFromInputs(firstInputs));
     assertThat(soln.getMixHash()).isEqualTo(expectedFirstOutput.getMixHash());
 
     soln = solver.solveFor(EthHashSolver.EthHashSolverJob.createFromInputs(secondInputs));

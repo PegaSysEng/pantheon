@@ -24,7 +24,7 @@ public class StackUnderflowExceptionalHaltPredicate implements ExceptionalHaltPr
 
   @Override
   public Optional<ExceptionalHaltReason> exceptionalHaltCondition(
-          final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
+      final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
     final Operation op = frame.getCurrentOperation();
     final boolean condition = frame.stackSize() < op.getStackItemsConsumed();
 

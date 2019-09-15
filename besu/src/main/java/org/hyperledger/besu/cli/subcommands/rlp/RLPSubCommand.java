@@ -15,8 +15,8 @@ package org.hyperledger.besu.cli.subcommands.rlp;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-import org.hyperledger.besu.cli.DefaultCommandValues;
 import org.hyperledger.besu.cli.BesuCommand;
+import org.hyperledger.besu.cli.DefaultCommandValues;
 import org.hyperledger.besu.cli.subcommands.rlp.RLPSubCommand.EncodeSubCommand;
 import org.hyperledger.besu.util.bytes.BytesValue;
 

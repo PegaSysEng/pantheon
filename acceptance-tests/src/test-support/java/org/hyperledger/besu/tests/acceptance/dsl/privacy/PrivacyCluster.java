@@ -14,9 +14,9 @@ package org.hyperledger.besu.tests.acceptance.dsl.privacy;
 
 import static java.util.Collections.emptyList;
 
+import org.hyperledger.besu.tests.acceptance.dsl.condition.net.NetConditions;
 import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNodeRunner;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-import org.hyperledger.besu.tests.acceptance.dsl.condition.net.NetConditions;
 
 import java.util.Arrays;
 import java.util.Collections;

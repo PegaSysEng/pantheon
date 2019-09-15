@@ -38,8 +38,7 @@ public class EnclaveErrorAcceptanceTest extends PrivacyAcceptanceTestBase {
 
   @Before
   public void setUp() throws Exception {
-    alice =
-        privacyBesu.createIbft2NodePrivacyEnabled("node1", privacyAccountResolver.resolve(0));
+    alice = privacyBesu.createIbft2NodePrivacyEnabled("node1", privacyAccountResolver.resolve(0));
     bob = privacyBesu.createIbft2NodePrivacyEnabled("node2", privacyAccountResolver.resolve(1));
     privacyCluster.start(alice, bob);
 

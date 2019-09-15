@@ -131,7 +131,7 @@ public class SignedDataValidator {
   }
 
   private boolean isMessageForCurrentRoundFromValidatorAndProposalAvailable(
-          final SignedData<? extends Payload> msg, final String msgType) {
+      final SignedData<? extends Payload> msg, final String msgType) {
 
     if (!msg.getPayload().getRoundIdentifier().equals(roundIdentifier)) {
       LOG.info("Invalid {} message, does not match current round.", msgType);

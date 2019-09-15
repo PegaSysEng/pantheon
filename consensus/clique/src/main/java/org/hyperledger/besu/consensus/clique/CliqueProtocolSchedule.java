@@ -70,8 +70,12 @@ public class CliqueProtocolSchedule {
       final ProtocolSpecBuilder<Void> specBuilder) {
     return specBuilder
         .changeConsensusContextType(
-            difficultyCalculator -> BlockHeaderValidationRulesetFactory.cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
-            difficultyCalculator -> BlockHeaderValidationRulesetFactory.cliqueBlockHeaderValidator(secondsBetweenBlocks, epochManager),
+            difficultyCalculator ->
+                BlockHeaderValidationRulesetFactory.cliqueBlockHeaderValidator(
+                    secondsBetweenBlocks, epochManager),
+            difficultyCalculator ->
+                BlockHeaderValidationRulesetFactory.cliqueBlockHeaderValidator(
+                    secondsBetweenBlocks, epochManager),
             MainnetBlockBodyValidator::new,
             MainnetBlockValidator::new,
             MainnetBlockImporter::new,

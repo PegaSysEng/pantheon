@@ -31,7 +31,8 @@ public class CliquePropose implements Transaction<Boolean> {
   @Override
   public Boolean execute(final NodeRequests node) {
     try {
-      final CliqueRequestFactory.ProposeResponse result = node.clique().cliquePropose(address, auth).send();
+      final CliqueRequestFactory.ProposeResponse result =
+          node.clique().cliquePropose(address, auth).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

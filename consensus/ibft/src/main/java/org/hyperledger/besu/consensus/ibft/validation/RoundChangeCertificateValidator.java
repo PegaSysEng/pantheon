@@ -50,7 +50,7 @@ public class RoundChangeCertificateValidator {
   }
 
   public boolean validateRoundChangeMessagesAndEnsureTargetRoundMatchesRoot(
-          final ConsensusRoundIdentifier expectedRound, final RoundChangeCertificate roundChangeCert) {
+      final ConsensusRoundIdentifier expectedRound, final RoundChangeCertificate roundChangeCert) {
 
     final Collection<SignedData<RoundChangePayload>> roundChangeMsgs =
         roundChangeCert.getRoundChangePayloads();
@@ -74,7 +74,10 @@ public class RoundChangeCertificateValidator {
 
     final RoundChangePayloadValidator roundChangeValidator =
         new RoundChangePayloadValidator(
-            messageValidatorFactory, validators, IbftHelpers.prepareMessageCountForQuorum(quorum), chainHeight);
+            messageValidatorFactory,
+            validators,
+            IbftHelpers.prepareMessageCountForQuorum(quorum),
+            chainHeight);
 
     if (!roundChangeCert.getRoundChangePayloads().stream()
         .allMatch(roundChangeValidator::validateRoundChange)) {

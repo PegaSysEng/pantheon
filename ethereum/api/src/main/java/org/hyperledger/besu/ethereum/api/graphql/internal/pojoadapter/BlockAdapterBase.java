@@ -12,12 +12,12 @@
  */
 package org.hyperledger.besu.ethereum.api.graphql.internal.pojoadapter;
 
-import org.hyperledger.besu.ethereum.api.graphql.GraphQLDataFetcherContext;
-import org.hyperledger.besu.ethereum.api.graphql.internal.BlockchainQuery;
 import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
 import org.hyperledger.besu.ethereum.api.LogWithMetadata;
 import org.hyperledger.besu.ethereum.api.LogsQuery;
 import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.graphql.GraphQLDataFetcherContext;
+import org.hyperledger.besu.ethereum.api.graphql.internal.BlockchainQuery;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;

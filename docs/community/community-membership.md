@@ -10,7 +10,7 @@ this project.
 | Role | Responsibilities | Defined by |
 | -----| ---------------- | ---------- |
 | Everyone | none | anybody with a belly button
-| Member | everyone who contributes - code or otherwise | Pantheon GitHub org member
+| Member | everyone who contributes - code or otherwise | Besu GitHub org member
 | Approver | approve accepting contributions | write permissions on master
 | Project Manager | management of the project | PegaSys
 | Project Sponsor | contribute developer resources | PegaSys
@@ -47,9 +47,9 @@ issues and PRs assigned to them.
     - Authoring or reviewing PRs on GitHub
     - Filing or commenting on issues on GitHub
     - Contributing to community discussions (e.g. meetings, Slack, email discussion forums, Stack Overflow)
-- Subscribed to [pantheon-dev@pegasys.tech]
-- Joined [Pantheon Gitter]
-- Browsed [Pantheon Wiki]
+- Subscribed to [besu-dev@pegasys.tech]
+- Joined [Besu Gitter]
+- Browsed [Besu Wiki]
 - Have read the [contributor guide]
 - Signed ICLA, as described in [CLA.md]
 
@@ -170,6 +170,6 @@ This document is adapted from the following sources:
 [contributor guide]: /CONTRIBUTING.md
 [New contributors]: /CONTRIBUTING.md
 [two-factor authentication]: https://help.github.com/articles/about-two-factor-authentication
-[pantheon-dev@pegasys.tech]: mailto:pantheon-dev@pegasys.tech
-[Pantheon Gitter]: https://gitter.im/PegaSysEng/pantheon
-[Pantheon Documentation]: https://pantheon.readthedocs.io/
+[besu-dev@pegasys.tech]: mailto:besu-dev@pegasys.tech
+[Besu Gitter]: https://gitter.im/PegaSysEng/besu
+[Besu Documentation]: https://besu.readthedocs.io/

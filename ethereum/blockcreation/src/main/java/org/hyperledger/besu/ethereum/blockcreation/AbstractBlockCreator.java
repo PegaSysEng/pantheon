@@ -27,6 +27,7 @@ import org.hyperledger.besu.ethereum.core.SealableBlockHeader;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.ethereum.core.WorldUpdater;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.mainnet.BodyValidation;
 import org.hyperledger.besu.ethereum.mainnet.DifficultyCalculator;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockProcessor;
@@ -34,7 +35,6 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
 import org.hyperledger.besu.ethereum.mainnet.ScheduleBasedBlockHeaderFunctions;
 import org.hyperledger.besu.ethereum.mainnet.TransactionProcessor;
-import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
 
@@ -119,7 +119,7 @@ public abstract class AbstractBlockCreator<C> implements AsyncBlockCreator {
 
   @Override
   public Block createBlock(
-          final List<Transaction> transactions, final List<BlockHeader> ommers, final long timestamp) {
+      final List<Transaction> transactions, final List<BlockHeader> ommers, final long timestamp) {
     return createBlock(Optional.of(transactions), Optional.of(ommers), timestamp);
   }
 

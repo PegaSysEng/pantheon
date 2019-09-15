@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.logs;
 
+import org.hyperledger.besu.ethereum.api.LogsQuery;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.FilterParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.Subscription;
-import org.hyperledger.besu.ethereum.api.LogsQuery;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.request.SubscriptionType;
 
 public class LogsSubscription extends Subscription {

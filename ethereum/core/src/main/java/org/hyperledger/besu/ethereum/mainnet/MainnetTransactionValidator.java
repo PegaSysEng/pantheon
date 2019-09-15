@@ -147,7 +147,8 @@ public class MainnetTransactionValidator implements TransactionValidator {
       transaction.getSender();
     } catch (final IllegalArgumentException e) {
       return ValidationResult.invalid(
-          TransactionInvalidReason.INVALID_SIGNATURE, "sender could not be extracted from transaction signature");
+          TransactionInvalidReason.INVALID_SIGNATURE,
+          "sender could not be extracted from transaction signature");
     }
 
     return ValidationResult.valid();

@@ -74,7 +74,7 @@ public abstract class MainnetDifficultyCalculators {
           calculateByzantiumDifficulty(time, parent, CONSTANTINOPLE_FAKE_BLOCK_OFFSET);
 
   private static BigInteger calculateByzantiumDifficulty(
-          final long time, final BlockHeader parent, final long fakeBlockOffset) {
+      final long time, final BlockHeader parent, final long fakeBlockOffset) {
     final BigInteger parentDifficulty = difficulty(parent.getDifficulty());
     final boolean hasOmmers = !parent.getOmmersHash().equals(Hash.EMPTY_LIST_HASH);
     final BigInteger difficulty =

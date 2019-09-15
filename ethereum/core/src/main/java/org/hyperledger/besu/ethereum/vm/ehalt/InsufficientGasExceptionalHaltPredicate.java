@@ -23,7 +23,7 @@ public class InsufficientGasExceptionalHaltPredicate implements ExceptionalHaltP
 
   @Override
   public Optional<ExceptionalHaltReason> exceptionalHaltCondition(
-          final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
+      final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
     // Should not execute, as the cost function could depend on the stack items.
     if (prevReasons.contains(ExceptionalHaltReason.INSUFFICIENT_STACK_ITEMS)) {
       return Optional.empty();

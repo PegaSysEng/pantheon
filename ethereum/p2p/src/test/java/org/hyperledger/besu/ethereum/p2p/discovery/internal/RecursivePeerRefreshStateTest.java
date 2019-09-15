@@ -23,11 +23,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.p2p.discovery.DiscoveryPeer;
 import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryStatus;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.RecursivePeerRefreshState.BondingAgent;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.RecursivePeerRefreshState.FindNeighbourDispatcher;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Collections;

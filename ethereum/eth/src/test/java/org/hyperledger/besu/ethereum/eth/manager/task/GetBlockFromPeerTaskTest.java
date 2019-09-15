@@ -14,14 +14,14 @@ package org.hyperledger.besu.ethereum.eth.manager.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
-import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
-import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
-import org.hyperledger.besu.ethereum.eth.manager.exceptions.EthTaskException;
 import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockBody;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManagerTestUtil;
+import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.ethtaskutils.AbstractMessageTaskTest;
+import org.hyperledger.besu.ethereum.eth.manager.exceptions.EthTaskException;
 import org.hyperledger.besu.util.ExceptionUtils;
 
 import java.util.concurrent.CompletableFuture;
@@ -109,7 +109,8 @@ public class GetBlockFromPeerTaskTest
     // Check wrapped failure
     final Throwable error = ExceptionUtils.rootCause(failure.get());
     assertThat(error).isInstanceOf(EthTaskException.class);
-    assertThat(((EthTaskException) error).reason()).isEqualTo(EthTaskException.FailureReason.INCOMPLETE_RESULTS);
+    assertThat(((EthTaskException) error).reason())
+        .isEqualTo(EthTaskException.FailureReason.INCOMPLETE_RESULTS);
 
     assertThat(task.run().isCompletedExceptionally()).isTrue();
     task.cancel();

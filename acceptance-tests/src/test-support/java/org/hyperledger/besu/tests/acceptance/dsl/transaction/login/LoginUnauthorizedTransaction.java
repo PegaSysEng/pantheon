@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.login;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
+
+import org.assertj.core.api.Assertions;
 
 public class LoginUnauthorizedTransaction implements Transaction<Void> {
 

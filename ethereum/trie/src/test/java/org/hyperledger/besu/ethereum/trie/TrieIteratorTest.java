@@ -12,6 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
+import static org.hyperledger.besu.ethereum.trie.CompactEncoding.bytesToPath;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
@@ -20,7 +21,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.trie.CompactEncoding.bytesToPath;
 
 import org.hyperledger.besu.crypto.Hash;
 import org.hyperledger.besu.ethereum.trie.TrieIterator.LeafHandler;

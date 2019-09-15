@@ -56,14 +56,14 @@ Calculated : ${currentHash}
 tasks.register('checkAPIChanges', FileStateChecker) {
   description = "Checks that the API for the Plugin-API project does not change without deliberate thought"
   files = sourceSets.main.allJava.files
-  knownHash = 'FzYuZLAwab2uzCEqdVvkpUL5lih3M4MUKT+qXgGmB7I='
+  knownHash = '7TqhyrZo+Sp1eX2zcZaHgYyBoB1nacmutVKchKXU974='
 }
 check.dependsOn('checkAPIChanges')
 
 publishing {
   publications {
     mavenJava(MavenPublication) {
-      groupId 'tech.pegasys.besu'
+      groupId 'org.hyperledger.besu'
       pom {
         name = 'Besu Plugins Library'
         description = 'Core Plugins Libraries for Besu'

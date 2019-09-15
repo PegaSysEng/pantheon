@@ -14,10 +14,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.condition.ibft2;
 
 import static org.hyperledger.besu.tests.acceptance.dsl.transaction.clique.CliqueTransactions.LATEST;
 
-import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
-import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
 import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
+import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.ibft2.Ibft2Transactions;
 
 import java.util.Arrays;
@@ -39,8 +39,7 @@ public class Ibft2Conditions {
   }
 
   public List<BesuNode> validators(final BesuNode[] nodes) {
-    final Comparator<BesuNode> compareByAddress =
-        Comparator.comparing(BesuNode::getAddress);
+    final Comparator<BesuNode> compareByAddress = Comparator.comparing(BesuNode::getAddress);
     List<BesuNode> besuNodes = Arrays.asList(nodes);
     besuNodes.sort(compareByAddress);
     return besuNodes;
@@ -88,8 +87,7 @@ public class Ibft2Conditions {
       final Map<Address, Boolean> proposalsAsAddress =
           this.proposals.entrySet().stream()
               .collect(Collectors.toMap(p -> p.getKey().getAddress(), Entry::getValue));
-      return new ExpectProposals(
-          ibft, proposalsAsAddress);
+      return new ExpectProposals(ibft, proposalsAsAddress);
     }
   }
 }

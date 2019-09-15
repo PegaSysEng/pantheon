@@ -14,6 +14,9 @@ package org.hyperledger.besu.ethereum.eth.peervalidation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.hyperledger.besu.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
+import org.hyperledger.besu.ethereum.core.BlockDataGenerator.BlockOptions;
 import org.hyperledger.besu.ethereum.eth.manager.DeterministicEthScheduler;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
@@ -22,9 +25,6 @@ import org.hyperledger.besu.ethereum.eth.manager.RespondingEthPeer;
 import org.hyperledger.besu.ethereum.eth.messages.BlockHeadersMessage;
 import org.hyperledger.besu.ethereum.eth.messages.EthPV62;
 import org.hyperledger.besu.ethereum.eth.messages.GetBlockHeadersMessage;
-import org.hyperledger.besu.ethereum.core.Block;
-import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
-import org.hyperledger.besu.ethereum.core.BlockDataGenerator.BlockOptions;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockHeaderValidator;
 import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSchedule;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
@@ -108,7 +108,8 @@ public class DaoForkPeerValidatorTest {
 
   @Test
   public void validatePeer_unresponsivePeer() {
-    EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create(DeterministicEthScheduler.TimeoutPolicy.ALWAYS);
+    EthProtocolManager ethProtocolManager =
+        EthProtocolManagerTestUtil.create(DeterministicEthScheduler.TimeoutPolicy.ALWAYS);
     long daoBlockNumber = 500;
 
     PeerValidator validator =
@@ -175,7 +176,8 @@ public class DaoForkPeerValidatorTest {
   @Test
   public void canBeValidated() {
     BlockDataGenerator gen = new BlockDataGenerator(1);
-    EthProtocolManager ethProtocolManager = EthProtocolManagerTestUtil.create(DeterministicEthScheduler.TimeoutPolicy.ALWAYS);
+    EthProtocolManager ethProtocolManager =
+        EthProtocolManagerTestUtil.create(DeterministicEthScheduler.TimeoutPolicy.ALWAYS);
     long daoBlockNumber = 500;
     long buffer = 10;
 

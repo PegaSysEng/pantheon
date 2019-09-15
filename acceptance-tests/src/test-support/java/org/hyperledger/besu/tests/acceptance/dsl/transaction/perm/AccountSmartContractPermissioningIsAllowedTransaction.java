@@ -15,9 +15,9 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.hyperledger.besu.crypto.Hash;
+import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
 
@@ -28,9 +28,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 public class AccountSmartContractPermissioningIsAllowedTransaction implements Transaction<Boolean> {
 
   private static final BytesValue IS_ACCOUNT_ALLOWED_SIGNATURE =
-      Hash.keccak256(
-              BytesValue.of("whitelistContains(address)".getBytes(UTF_8)))
-          .slice(0, 4);
+      Hash.keccak256(BytesValue.of("whitelistContains(address)".getBytes(UTF_8))).slice(0, 4);
 
   private final Address contractAddress;
   private final Address account;

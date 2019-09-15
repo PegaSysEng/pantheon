@@ -18,8 +18,8 @@ import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.core.Wei;
-import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
@@ -55,7 +55,7 @@ public abstract class AbstractMinerExecutor<
   }
 
   public abstract M startAsyncMining(
-          final Subscribers<MinedBlockObserver> observers, final BlockHeader parentHeader);
+      final Subscribers<MinedBlockObserver> observers, final BlockHeader parentHeader);
 
   public abstract M createMiner(final BlockHeader parentHeader);
 

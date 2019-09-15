@@ -20,9 +20,6 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.orion.testutil.OrionKeyConfiguration;
-import org.hyperledger.orion.testutil.OrionTestHarness;
-import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
 import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.enclave.types.SendRequest;
 import org.hyperledger.besu.enclave.types.SendRequestLegacy;
@@ -44,6 +41,9 @@ import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.util.bytes.Bytes32;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.bytes.BytesValues;
+import org.hyperledger.orion.testutil.OrionKeyConfiguration;
+import org.hyperledger.orion.testutil.OrionTestHarness;
+import org.hyperledger.orion.testutil.OrionTestHarnessFactory;
 
 import java.io.IOException;
 import java.util.Base64;

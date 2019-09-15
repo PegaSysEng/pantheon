@@ -16,9 +16,9 @@ import static io.netty.buffer.ByteBufUtil.hexDump;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static org.bouncycastle.pqc.math.linearalgebra.ByteUtils.xor;
 
+import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.HandshakeSecrets;
 import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.Handshaker;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-import org.hyperledger.besu.ethereum.p2p.rlpx.handshake.HandshakeSecrets;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.RawMessage;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.util.bytes.BytesValue;

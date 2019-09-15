@@ -192,7 +192,9 @@ public class RecursivePeerRefreshState {
     for (final DiscoveryPeer receivedDiscoPeer : peers) {
       if (satisfiesMapAdditionCriteria(receivedDiscoPeer)) {
         final MetadataPeer receivedMetadataPeer =
-            new MetadataPeer(receivedDiscoPeer, PeerDistanceCalculator.distance(target, receivedDiscoPeer.getId()));
+            new MetadataPeer(
+                receivedDiscoPeer,
+                PeerDistanceCalculator.distance(target, receivedDiscoPeer.getId()));
         oneTrueMap.put(receivedDiscoPeer.getId(), receivedMetadataPeer);
       }
     }

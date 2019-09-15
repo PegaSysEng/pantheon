@@ -14,7 +14,6 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.websocket.methods;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.WebSocketRequestHandler;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.Subscription;
@@ -33,6 +32,7 @@ import io.vertx.core.json.Json;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +69,8 @@ public class EthSubscribeIntegrationTest {
             msg -> {
               final List<SyncingSubscription> syncingSubscriptions = getSubscriptions();
               assertThat(syncingSubscriptions).hasSize(1);
-              Assertions.assertThat(syncingSubscriptions.get(0).getConnectionId()).isEqualTo(CONNECTION_ID_1);
+              Assertions.assertThat(syncingSubscriptions.get(0).getConnectionId())
+                  .isEqualTo(CONNECTION_ID_1);
               async.complete();
             })
         .completionHandler(
@@ -94,7 +95,8 @@ public class EthSubscribeIntegrationTest {
             msg -> {
               final List<SyncingSubscription> subscriptions = getSubscriptions();
               assertThat(subscriptions).hasSize(1);
-              Assertions.assertThat(subscriptions.get(0).getConnectionId()).isEqualTo(CONNECTION_ID_1);
+              Assertions.assertThat(subscriptions.get(0).getConnectionId())
+                  .isEqualTo(CONNECTION_ID_1);
               async.countDown();
 
               vertx

@@ -24,7 +24,7 @@ public class StackOverflowExceptionalHaltPredicate implements ExceptionalHaltPre
 
   @Override
   public Optional<ExceptionalHaltReason> exceptionalHaltCondition(
-          final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
+      final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
     final Operation op = frame.getCurrentOperation();
     final boolean condition = frame.stackSize() + op.getStackSizeChange() > frame.getMaxStackSize();
     return condition ? Optional.of(ExceptionalHaltReason.TOO_MANY_STACK_ITEMS) : Optional.empty();

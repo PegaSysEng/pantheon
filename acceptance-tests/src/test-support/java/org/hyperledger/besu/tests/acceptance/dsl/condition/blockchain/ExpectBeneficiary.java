@@ -13,12 +13,11 @@
 package org.hyperledger.besu.tests.acceptance.dsl.condition.blockchain;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.hyperledger.besu.tests.acceptance.dsl.WaitUtils.waitFor;
 
 import org.hyperledger.besu.tests.acceptance.dsl.WaitUtils;
 import org.hyperledger.besu.tests.acceptance.dsl.condition.Condition;
-import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.BesuNode;
+import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.eth.EthTransactions;
 
 public class ExpectBeneficiary implements Condition {
@@ -32,6 +31,7 @@ public class ExpectBeneficiary implements Condition {
 
   @Override
   public void verify(final Node node) {
-    WaitUtils.waitFor(() -> assertThat(node.execute(eth.block()).getMiner()).isEqualTo(beneficiary));
+    WaitUtils.waitFor(
+        () -> assertThat(node.execute(eth.block()).getMiner()).isEqualTo(beneficiary));
   }
 }

@@ -139,8 +139,7 @@ public class BesuNodeConfigurationBuilder {
     return this;
   }
 
-  public BesuNodeConfigurationBuilder webSocketAuthenticationEnabled()
-      throws URISyntaxException {
+  public BesuNodeConfigurationBuilder webSocketAuthenticationEnabled() throws URISyntaxException {
     final String authTomlPath =
         Paths.get(ClassLoader.getSystemResource("authentication/auth.toml").toURI())
             .toAbsolutePath()

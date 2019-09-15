@@ -292,7 +292,8 @@ public class PrivateTransactionProcessor {
     } else {
       return Result.failed(
           0,
-          ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.PRIVATE_TRANSACTION_FAILED),
+          ValidationResult.invalid(
+              TransactionValidator.TransactionInvalidReason.PRIVATE_TRANSACTION_FAILED),
           initialFrame.getRevertReason());
     }
   }
@@ -323,7 +324,7 @@ public class PrivateTransactionProcessor {
 
   @SuppressWarnings("unused")
   private static Gas refunded(
-          final Transaction transaction, final Gas gasRemaining, final Gas gasRefund) {
+      final Transaction transaction, final Gas gasRemaining, final Gas gasRefund) {
     // Integer truncation takes care of the the floor calculation needed after the divide.
     final Gas maxRefundAllowance =
         Gas.of(transaction.getGasLimit()).minus(gasRemaining).dividedBy(2);

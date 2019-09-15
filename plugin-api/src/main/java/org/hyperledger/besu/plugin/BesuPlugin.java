@@ -22,9 +22,9 @@ package org.hyperledger.besu.plugin;
 public interface BesuPlugin {
 
   /**
-   * Called when the plugin is first registered with Besu. Plugins are registered very early in
-   * the Besu life-cycle and should use this callback to register any command line options
-   * required via the PicoCLIOptions service.
+   * Called when the plugin is first registered with Besu. Plugins are registered very early in the
+   * Besu life-cycle and should use this callback to register any command line options required via
+   * the PicoCLIOptions service.
    *
    * <p>The <code>context</code> parameter should be stored in a field in the plugin. This is the
    * only time it will be provided to the plugin and is how the plugin will interact with Besu.
@@ -43,8 +43,8 @@ public interface BesuPlugin {
   void start();
 
   /**
-   * Called when the plugin is being stopped. This method will be called as part of Besu
-   * shutting down but may also be called at other times to disable the plugin.
+   * Called when the plugin is being stopped. This method will be called as part of Besu shutting
+   * down but may also be called at other times to disable the plugin.
    *
    * <p>The plugin should remove any registered listeners and stop any background threads it
    * started.

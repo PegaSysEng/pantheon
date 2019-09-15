@@ -20,9 +20,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.p2p.peers.PeerTestHelper.createPeer;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.p2p.config.DiscoveryConfiguration;
 import org.hyperledger.besu.ethereum.p2p.config.NetworkingConfiguration;
@@ -54,6 +52,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,10 +65,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 public final class DefaultP2PNetworkTest {
 
   final MaintainedPeers maintainedPeers = new MaintainedPeers();
-  @Mock
-  PeerDiscoveryAgent discoveryAgent;
-  @Mock
-  RlpxAgent rlpxAgent;
+  @Mock PeerDiscoveryAgent discoveryAgent;
+  @Mock RlpxAgent rlpxAgent;
   @Mock UpnpNatManager natManager;
 
   private final ArgumentCaptor<PeerBondedObserver> discoverySubscriberCaptor =
@@ -234,7 +231,8 @@ public final class DefaultP2PNetworkTest {
     final DefaultP2PNetwork network = network();
     network.start();
     final DiscoveryPeer peer = DiscoveryPeer.fromEnode(PeerTestHelper.enode());
-    final PeerDiscoveryEvent.PeerBondedEvent peerBondedEvent = new PeerDiscoveryEvent.PeerBondedEvent(peer, System.currentTimeMillis());
+    final PeerDiscoveryEvent.PeerBondedEvent peerBondedEvent =
+        new PeerDiscoveryEvent.PeerBondedEvent(peer, System.currentTimeMillis());
 
     discoverySubscriberCaptor.getValue().onPeerBonded(peerBondedEvent);
     verify(rlpxAgent, times(1)).connect(peer);
@@ -247,7 +245,8 @@ public final class DefaultP2PNetworkTest {
     final DiscoveryPeer peer =
         DiscoveryPeer.fromIdAndEndpoint(
             Peer.randomId(), new Endpoint("127.0.0.1", 999, OptionalInt.empty()));
-    final PeerDiscoveryEvent.PeerBondedEvent peerBondedEvent = new PeerDiscoveryEvent.PeerBondedEvent(peer, System.currentTimeMillis());
+    final PeerDiscoveryEvent.PeerBondedEvent peerBondedEvent =
+        new PeerDiscoveryEvent.PeerBondedEvent(peer, System.currentTimeMillis());
 
     discoverySubscriberCaptor.getValue().onPeerBonded(peerBondedEvent);
     verify(rlpxAgent, times(1)).connect(peer);

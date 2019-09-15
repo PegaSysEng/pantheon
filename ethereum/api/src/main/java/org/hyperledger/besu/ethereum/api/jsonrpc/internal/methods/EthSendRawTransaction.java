@@ -85,7 +85,8 @@ public class EthSendRawTransaction implements JsonRpcMethod {
             sendEmptyHashOnInvalidBlock
                 ? new JsonRpcSuccessResponse(request.getId(), Hash.EMPTY.toString())
                 : new JsonRpcErrorResponse(
-                    request.getId(), JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
+                    request.getId(),
+                    JsonRpcErrorConverter.convertTransactionInvalidReason(errorReason)));
   }
 
   private Transaction decodeRawTransaction(final String hash)

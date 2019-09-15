@@ -24,11 +24,11 @@ import org.hyperledger.besu.ethereum.core.MutableWorldState;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.core.ProcessableBlockHeader;
 import org.hyperledger.besu.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
 import org.hyperledger.besu.ethereum.mainnet.EthHashSolver;
 import org.hyperledger.besu.ethereum.mainnet.EthHasher;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
-import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;
 import org.hyperledger.besu.ethereum.mainnet.ValidationTestUtils;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
@@ -71,7 +71,8 @@ public class EthHashBlockCreatorTest {
                     .createProtocolSchedule())
             .build();
 
-    final EthHashSolver solver = new EthHashSolver(Lists.newArrayList(BLOCK_1_NONCE), new EthHasher.Light());
+    final EthHashSolver solver =
+        new EthHashSolver(Lists.newArrayList(BLOCK_1_NONCE), new EthHasher.Light());
 
     final PendingTransactions pendingTransactions =
         new PendingTransactions(
@@ -118,7 +119,8 @@ public class EthHashBlockCreatorTest {
                     .createProtocolSchedule())
             .build();
 
-    final EthHashSolver solver = new EthHashSolver(Lists.newArrayList(BLOCK_1_NONCE), new EthHasher.Light());
+    final EthHashSolver solver =
+        new EthHashSolver(Lists.newArrayList(BLOCK_1_NONCE), new EthHasher.Light());
 
     final PendingTransactions pendingTransactions =
         new PendingTransactions(
@@ -160,7 +162,8 @@ public class EthHashBlockCreatorTest {
                     .createProtocolSchedule())
             .build();
 
-    final EthHashSolver solver = new EthHashSolver(Lists.newArrayList(BLOCK_1_NONCE), new EthHasher.Light());
+    final EthHashSolver solver =
+        new EthHashSolver(Lists.newArrayList(BLOCK_1_NONCE), new EthHasher.Light());
 
     final PendingTransactions pendingTransactions =
         new PendingTransactions(
@@ -218,7 +221,8 @@ public class EthHashBlockCreatorTest {
                     .createProtocolSchedule())
             .build();
 
-    final EthHashSolver solver = new EthHashSolver(Lists.newArrayList(BLOCK_1_NONCE), new EthHasher.Light());
+    final EthHashSolver solver =
+        new EthHashSolver(Lists.newArrayList(BLOCK_1_NONCE), new EthHasher.Light());
 
     final PendingTransactions pendingTransactions =
         new PendingTransactions(

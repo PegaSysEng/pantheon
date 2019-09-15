@@ -34,7 +34,7 @@ public abstract class RlpxConnection {
   }
 
   public static RlpxConnection outboundConnection(
-          final Peer peer, final CompletableFuture<PeerConnection> future) {
+      final Peer peer, final CompletableFuture<PeerConnection> future) {
     return new LocallyInitiatedRlpxConnection(peer, future);
   }
 

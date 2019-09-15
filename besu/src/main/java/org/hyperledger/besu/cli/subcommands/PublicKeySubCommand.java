@@ -16,8 +16,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.COMMAND_NAME;
 
-import org.hyperledger.besu.cli.DefaultCommandValues;
 import org.hyperledger.besu.cli.BesuCommand;
+import org.hyperledger.besu.cli.DefaultCommandValues;
 import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.AddressSubCommand;
 import org.hyperledger.besu.cli.subcommands.PublicKeySubCommand.ExportSubCommand;
 import org.hyperledger.besu.crypto.SECP256K1;

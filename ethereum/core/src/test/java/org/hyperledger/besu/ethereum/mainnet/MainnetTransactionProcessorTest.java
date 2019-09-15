@@ -15,7 +15,6 @@ package org.hyperledger.besu.ethereum.mainnet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.hyperledger.besu.ethereum.mainnet.ValidationResult.invalid;
 
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Account;
@@ -92,7 +91,9 @@ public class MainnetTransactionProcessorTest {
     when(transactionValidator.validate(any())).thenReturn(ValidationResult.valid());
     // returning invalid transaction to halt method execution
     when(transactionValidator.validateForSender(any(), any(), txValidationParamCaptor.capture()))
-        .thenReturn(ValidationResult.invalid(TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE));
+        .thenReturn(
+            ValidationResult.invalid(
+                TransactionValidator.TransactionInvalidReason.INCORRECT_NONCE));
     return txValidationParamCaptor;
   }
 }

@@ -16,8 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.hyperledger.besu.chainimport.RlpBlockImporter;
-import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.config.GenesisConfigFile;
+import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Block;
@@ -65,8 +65,8 @@ public final class RlpBlockExporterTest {
     protocolSchedule = controller.getProtocolSchedule();
   }
 
-  private static Blockchain importBlocks(
-      final BesuController<?> controller, final Path blocksFile) throws IOException {
+  private static Blockchain importBlocks(final BesuController<?> controller, final Path blocksFile)
+      throws IOException {
     final RlpBlockImporter blockImporter = new RlpBlockImporter();
 
     blockImporter.importBlockchain(blocksFile, controller);

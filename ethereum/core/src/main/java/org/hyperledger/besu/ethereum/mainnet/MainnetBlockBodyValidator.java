@@ -107,7 +107,7 @@ public class MainnetBlockBodyValidator<C> implements BlockBodyValidator<C> {
   }
 
   private static boolean validateLogsBloom(
-          final LogsBloomFilter expected, final LogsBloomFilter actual) {
+      final LogsBloomFilter expected, final LogsBloomFilter actual) {
     if (!expected.equals(actual)) {
       LOG.warn(
           "Invalid block: logs bloom filter mismatch (expected={}, actual={})", expected, actual);

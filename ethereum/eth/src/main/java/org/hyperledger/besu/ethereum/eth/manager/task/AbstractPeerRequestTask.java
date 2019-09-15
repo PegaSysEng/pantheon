@@ -37,7 +37,7 @@ public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
   private volatile PendingPeerRequest responseStream;
 
   protected AbstractPeerRequestTask(
-          final EthContext ethContext, final int requestCode, final MetricsSystem metricsSystem) {
+      final EthContext ethContext, final int requestCode, final MetricsSystem metricsSystem) {
     super(ethContext, metricsSystem);
     this.requestCode = requestCode;
   }
@@ -64,7 +64,8 @@ public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
 
     promise.whenComplete(
         (r, t) -> {
-          final Optional<RequestManager.ResponseStream> responseStream = this.responseStream.abort();
+          final Optional<RequestManager.ResponseStream> responseStream =
+              this.responseStream.abort();
           if (t != null) {
             t = ExceptionUtils.rootCause(t);
             if (t instanceof TimeoutException && responseStream.isPresent()) {
@@ -79,7 +80,7 @@ public abstract class AbstractPeerRequestTask<R> extends AbstractPeerTask<R> {
   }
 
   public PendingPeerRequest sendRequestToPeer(
-          final PeerRequest request, final long minimumBlockNumber) {
+      final PeerRequest request, final long minimumBlockNumber) {
     return ethContext.getEthPeers().executePeerRequest(request, minimumBlockNumber, assignedPeer);
   }
 

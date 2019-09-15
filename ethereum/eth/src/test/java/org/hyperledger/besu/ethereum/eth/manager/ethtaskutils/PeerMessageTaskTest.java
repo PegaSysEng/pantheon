@@ -34,7 +34,8 @@ import org.junit.Test;
  *
  * @param <T> The type of data being retrieved.
  */
-public abstract class PeerMessageTaskTest<T> extends AbstractMessageTaskTest<T, AbstractPeerTask.PeerTaskResult<T>> {
+public abstract class PeerMessageTaskTest<T>
+    extends AbstractMessageTaskTest<T, AbstractPeerTask.PeerTaskResult<T>> {
   @Test
   public void completesWhenPeerReturnsPartialResult() {
     // Setup a partially responsive peer
@@ -132,7 +133,9 @@ public abstract class PeerMessageTaskTest<T> extends AbstractMessageTaskTest<T, 
 
   @Override
   protected void assertResultMatchesExpectation(
-          final T requestedData, final AbstractPeerTask.PeerTaskResult<T> response, final EthPeer respondingPeer) {
+      final T requestedData,
+      final AbstractPeerTask.PeerTaskResult<T> response,
+      final EthPeer respondingPeer) {
     assertThat(response.getResult()).isEqualTo(requestedData);
     assertThat(response.getPeer()).isEqualTo(respondingPeer);
   }

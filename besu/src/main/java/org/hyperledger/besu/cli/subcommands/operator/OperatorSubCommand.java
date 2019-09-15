@@ -16,8 +16,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hyperledger.besu.cli.subcommands.operator.OperatorSubCommand.COMMAND_NAME;
 
-import org.hyperledger.besu.cli.DefaultCommandValues;
 import org.hyperledger.besu.cli.BesuCommand;
+import org.hyperledger.besu.cli.DefaultCommandValues;
 import org.hyperledger.besu.config.JsonGenesisConfigOptions;
 import org.hyperledger.besu.config.JsonUtil;
 import org.hyperledger.besu.consensus.ibft.IbftExtraData;

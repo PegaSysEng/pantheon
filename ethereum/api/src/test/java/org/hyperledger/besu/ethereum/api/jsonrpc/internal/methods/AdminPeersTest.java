@@ -15,7 +15,6 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import org.assertj.core.api.Assertions;
 import org.hyperledger.besu.ethereum.api.jsonrpc.MockPeerConnection;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
@@ -36,6 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -95,7 +95,8 @@ public class AdminPeersTest {
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.P2P_DISABLED);
 
-    Assertions.assertThat(adminPeers.response(request)).isEqualToComparingFieldByField(expectedResponse);
+    Assertions.assertThat(adminPeers.response(request))
+        .isEqualToComparingFieldByField(expectedResponse);
   }
 
   private Collection<PeerConnection> peerList() {

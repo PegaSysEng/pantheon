@@ -14,10 +14,10 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.clique;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
-import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
+import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
 
 import java.io.IOException;
 import java.util.List;
@@ -32,7 +32,8 @@ public class CliqueGetSignersAtHash implements Transaction<List<Address>> {
   @Override
   public List<Address> execute(final NodeRequests node) {
     try {
-      final CliqueRequestFactory.SignersBlockResponse result = node.clique().cliqueGetSignersAtHash(hash).send();
+      final CliqueRequestFactory.SignersBlockResponse result =
+          node.clique().cliqueGetSignersAtHash(hash).send();
       assertThat(result).isNotNull();
       assertThat(result.hasError()).isFalse();
       return result.getResult();

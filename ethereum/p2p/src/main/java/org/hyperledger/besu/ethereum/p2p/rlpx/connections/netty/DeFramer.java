@@ -178,7 +178,9 @@ final class DeFramer extends ByteToMessageDecoder {
             message.getData().toString());
         ctx.writeAndFlush(
                 new OutboundMessage(
-                    null, DisconnectMessage.create(DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL)))
+                    null,
+                    DisconnectMessage.create(
+                        DisconnectMessage.DisconnectReason.BREACH_OF_PROTOCOL)))
             .addListener((f) -> ctx.close());
         connectFuture.completeExceptionally(
             new BreachOfProtocolException("Message received before HELLO's exchanged"));
@@ -219,7 +221,9 @@ final class DeFramer extends ByteToMessageDecoder {
       LOG.error("Exception while processing incoming message", throwable);
     }
     if (connectFuture.isDone() && !connectFuture.isCompletedExceptionally()) {
-      connectFuture.get().terminateConnection(DisconnectMessage.DisconnectReason.TCP_SUBSYSTEM_ERROR, false);
+      connectFuture
+          .get()
+          .terminateConnection(DisconnectMessage.DisconnectReason.TCP_SUBSYSTEM_ERROR, false);
     } else {
       connectFuture.completeExceptionally(throwable);
       ctx.close();

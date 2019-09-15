@@ -14,7 +14,6 @@ package org.hyperledger.besu.ethereum.mainnet;
 
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.mainnet.precompiles.AltBN128AddPrecompiledContract;
 import org.hyperledger.besu.ethereum.mainnet.precompiles.AltBN128MulPrecompiledContract;
 import org.hyperledger.besu.ethereum.mainnet.precompiles.AltBN128PairingPrecompiledContract;
@@ -25,6 +24,7 @@ import org.hyperledger.besu.ethereum.mainnet.precompiles.IDPrecompiledContract;
 import org.hyperledger.besu.ethereum.mainnet.precompiles.RIPEMD160PrecompiledContract;
 import org.hyperledger.besu.ethereum.mainnet.precompiles.SHA256PrecompiledContract;
 import org.hyperledger.besu.ethereum.mainnet.precompiles.privacy.PrivacyPrecompiledContract;
+import org.hyperledger.besu.ethereum.vm.GasCalculator;
 
 /** Provides the various precompiled contracts used on mainnet hard forks. */
 public abstract class MainnetPrecompiledContractRegistries {

@@ -25,7 +25,7 @@ public class InvalidOperationExceptionalHaltPredicate implements ExceptionalHalt
 
   @Override
   public Optional<ExceptionalHaltReason> exceptionalHaltCondition(
-          final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
+      final MessageFrame frame, final EnumSet<ExceptionalHaltReason> prevReasons, final EVM evm) {
     return frame.getCurrentOperation().getOpcode() == INVALID_OPCODE
         ? Optional.of(ExceptionalHaltReason.INVALID_OPERATION)
         : Optional.empty();

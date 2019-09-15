@@ -26,7 +26,7 @@ public class ProposalBlockConsistencyValidator {
   private static final Logger LOG = LogManager.getLogger();
 
   public boolean validateProposalMatchesBlock(
-          final SignedData<ProposalPayload> signedPayload, final Block proposedBlock) {
+      final SignedData<ProposalPayload> signedPayload, final Block proposedBlock) {
 
     if (!signedPayload.getPayload().getDigest().equals(proposedBlock.getHash())) {
       LOG.info("Invalid Proposal, embedded digest does not match block's hash.");

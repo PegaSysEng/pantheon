@@ -38,7 +38,7 @@ public class MainnetBlockProcessor implements BlockProcessor {
   public interface TransactionReceiptFactory {
 
     TransactionReceipt create(
-            TransactionProcessor.Result result, WorldState worldState, long gasUsed);
+        TransactionProcessor.Result result, WorldState worldState, long gasUsed);
   }
 
   private static final Logger LOG = LogManager.getLogger();
