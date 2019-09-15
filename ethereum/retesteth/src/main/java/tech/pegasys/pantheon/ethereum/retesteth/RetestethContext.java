@@ -12,10 +12,10 @@
  */
 package tech.pegasys.pantheon.ethereum.retesteth;
 
-import static tech.pegasys.pantheon.config.JsonUtil.normalizeKeys;
+import static org.hyperledger.besu.config.JsonUtil.normalizeKeys;
 
-import tech.pegasys.pantheon.config.JsonGenesisConfigOptions;
-import tech.pegasys.pantheon.config.JsonUtil;
+import org.hyperledger.besu.config.JsonGenesisConfigOptions;
+import org.hyperledger.besu.config.JsonUtil;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.processor.BlockReplay;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;

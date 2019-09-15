@@ -13,13 +13,13 @@
 package tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies;
 
 import static com.google.common.base.Preconditions.checkState;
-import static tech.pegasys.pantheon.crypto.Hash.keccak256;
+import static org.hyperledger.besu.crypto.Hash.keccak256;
 import static tech.pegasys.pantheon.util.bytes.Bytes32s.xor;
 import static tech.pegasys.pantheon.util.bytes.BytesValues.concatenate;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SECP256K1.PublicKey;
-import tech.pegasys.pantheon.crypto.SecureRandomProvider;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
+import org.hyperledger.besu.crypto.SecureRandomProvider;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.HandshakeException;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.HandshakeSecrets;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.Handshaker;

@@ -37,7 +37,7 @@ import static tech.pegasys.pantheon.ethereum.p2p.config.DiscoveryConfiguration.M
 
 import tech.pegasys.pantheon.PantheonInfo;
 import tech.pegasys.pantheon.cli.config.EthNetworkConfig;
-import tech.pegasys.pantheon.config.GenesisConfigFile;
+import org.hyperledger.besu.config.GenesisConfigFile;
 import tech.pegasys.pantheon.ethereum.api.graphql.GraphQLConfiguration;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.RpcApi;

@@ -12,20 +12,20 @@
  */
 package tech.pegasys.pantheon.controller;
 
-import tech.pegasys.pantheon.config.CliqueConfigOptions;
-import tech.pegasys.pantheon.consensus.clique.CliqueBlockInterface;
-import tech.pegasys.pantheon.consensus.clique.CliqueContext;
-import tech.pegasys.pantheon.consensus.clique.CliqueMiningTracker;
-import tech.pegasys.pantheon.consensus.clique.CliqueProtocolSchedule;
-import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueBlockScheduler;
-import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueMinerExecutor;
-import tech.pegasys.pantheon.consensus.clique.blockcreation.CliqueMiningCoordinator;
-import tech.pegasys.pantheon.consensus.clique.jsonrpc.CliqueJsonRpcMethodsFactory;
-import tech.pegasys.pantheon.consensus.common.BlockInterface;
-import tech.pegasys.pantheon.consensus.common.EpochManager;
-import tech.pegasys.pantheon.consensus.common.VoteProposer;
-import tech.pegasys.pantheon.consensus.common.VoteTallyCache;
-import tech.pegasys.pantheon.consensus.common.VoteTallyUpdater;
+import org.hyperledger.besu.config.CliqueConfigOptions;
+import org.hyperledger.besu.consensus.clique.CliqueBlockInterface;
+import org.hyperledger.besu.consensus.clique.CliqueContext;
+import org.hyperledger.besu.consensus.clique.CliqueMiningTracker;
+import org.hyperledger.besu.consensus.clique.CliqueProtocolSchedule;
+import org.hyperledger.besu.consensus.clique.blockcreation.CliqueBlockScheduler;
+import org.hyperledger.besu.consensus.clique.blockcreation.CliqueMinerExecutor;
+import org.hyperledger.besu.consensus.clique.blockcreation.CliqueMiningCoordinator;
+import org.hyperledger.besu.consensus.clique.jsonrpc.CliqueJsonRpcMethodsFactory;
+import org.hyperledger.besu.consensus.common.BlockInterface;
+import org.hyperledger.besu.consensus.common.EpochManager;
+import org.hyperledger.besu.consensus.common.VoteProposer;
+import org.hyperledger.besu.consensus.common.VoteTallyCache;
+import org.hyperledger.besu.consensus.common.VoteTallyUpdater;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.methods.JsonRpcMethodFactory;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;

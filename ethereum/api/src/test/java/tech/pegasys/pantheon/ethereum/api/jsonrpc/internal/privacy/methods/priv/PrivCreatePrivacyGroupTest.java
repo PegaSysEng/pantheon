@@ -18,10 +18,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.enclave.Enclave;
-import tech.pegasys.pantheon.enclave.EnclaveException;
-import tech.pegasys.pantheon.enclave.types.CreatePrivacyGroupRequest;
-import tech.pegasys.pantheon.enclave.types.PrivacyGroup;
+import org.hyperledger.besu.enclave.Enclave;
+import org.hyperledger.besu.enclave.EnclaveException;
+import org.hyperledger.besu.enclave.types.CreatePrivacyGroupRequest;
+import org.hyperledger.besu.enclave.types.PrivacyGroup;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;

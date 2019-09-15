@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
+import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.authentication.AuthenticationUtils;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.health.HealthService;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.filter.FilterManager;

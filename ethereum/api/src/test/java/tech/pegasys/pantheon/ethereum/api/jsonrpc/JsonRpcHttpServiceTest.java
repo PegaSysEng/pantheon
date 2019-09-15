@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.config.StubGenesisConfigOptions;
+import org.hyperledger.besu.config.StubGenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.api.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.health.HealthService;

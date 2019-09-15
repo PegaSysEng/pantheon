@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.controller;
 
-import tech.pegasys.pantheon.crypto.InvalidSEC256K1PrivateKeyStoreException;
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.InvalidSEC256K1PrivateKeyStoreException;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.util.bytes.Bytes32;
 
 import java.io.File;

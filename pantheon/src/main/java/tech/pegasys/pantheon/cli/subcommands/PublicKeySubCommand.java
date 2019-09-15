@@ -20,8 +20,8 @@ import static tech.pegasys.pantheon.cli.subcommands.PublicKeySubCommand.COMMAND_
 import tech.pegasys.pantheon.cli.PantheonCommand;
 import tech.pegasys.pantheon.cli.subcommands.PublicKeySubCommand.AddressSubCommand;
 import tech.pegasys.pantheon.cli.subcommands.PublicKeySubCommand.ExportSubCommand;
-import tech.pegasys.pantheon.crypto.SECP256K1;
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Util;
 

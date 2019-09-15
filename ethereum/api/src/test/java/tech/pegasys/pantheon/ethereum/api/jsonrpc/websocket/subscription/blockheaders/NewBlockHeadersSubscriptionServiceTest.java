@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.api.TransactionWithMetadata;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;

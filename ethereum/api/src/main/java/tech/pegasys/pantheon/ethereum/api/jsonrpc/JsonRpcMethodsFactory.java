@@ -12,8 +12,8 @@
  */
 package tech.pegasys.pantheon.ethereum.api.jsonrpc;
 
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
-import tech.pegasys.pantheon.enclave.Enclave;
+import org.hyperledger.besu.config.GenesisConfigOptions;
+import org.hyperledger.besu.enclave.Enclave;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.methods.AdminAddPeer;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.methods.AdminChangeLogLevel;

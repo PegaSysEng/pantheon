@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.methods;
 
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
+import org.hyperledger.besu.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.RpcMethod;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;

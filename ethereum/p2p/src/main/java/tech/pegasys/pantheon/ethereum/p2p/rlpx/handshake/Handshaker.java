@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake;
 
-import tech.pegasys.pantheon.crypto.SECP256K1;
+import org.hyperledger.besu.crypto.SECP256K1;
 import tech.pegasys.pantheon.ethereum.p2p.rlpx.handshake.ecies.ECIESHandshaker;
 
 import java.util.Optional;

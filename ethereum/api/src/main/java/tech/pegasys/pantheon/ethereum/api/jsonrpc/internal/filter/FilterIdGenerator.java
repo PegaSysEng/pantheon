@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.filter;
 
-import tech.pegasys.pantheon.crypto.SecureRandomProvider;
+import org.hyperledger.besu.crypto.SecureRandomProvider;
 import tech.pegasys.pantheon.ethereum.api.jsonrpc.internal.results.Quantity;
 
 import java.security.SecureRandom;
