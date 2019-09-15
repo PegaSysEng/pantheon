@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.cli.options;
 
-import tech.pegasys.pantheon.ethereum.eth.sync.SynchronizerConfiguration;
+import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.Arrays;

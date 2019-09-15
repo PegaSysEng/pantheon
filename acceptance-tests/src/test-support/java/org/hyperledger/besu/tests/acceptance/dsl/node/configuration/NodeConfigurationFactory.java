@@ -18,10 +18,10 @@ import static org.hyperledger.besu.consensus.clique.jsonrpc.CliqueRpcApis.CLIQUE
 import static org.hyperledger.besu.consensus.ibft.jsonrpc.IbftRpcApis.IBFT;
 
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.RpcApi;
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.RpcApis;
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.websocket.WebSocketConfiguration;
+import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApis;
+import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationProvider;
 
 import java.util.ArrayList;

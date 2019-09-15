@@ -14,7 +14,7 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.account;
 
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 import java.util.ArrayList;
 import java.util.List;

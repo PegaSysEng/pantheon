@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.cli.util;
 
-import tech.pegasys.pantheon.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.core.Wei;
 
 import java.io.File;
 import java.io.IOException;

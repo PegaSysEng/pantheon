@@ -22,8 +22,8 @@ import tech.pegasys.pantheon.cli.subcommands.PublicKeySubCommand.AddressSubComma
 import tech.pegasys.pantheon.cli.subcommands.PublicKeySubCommand.ExportSubCommand;
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Util;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Util;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -13,7 +13,7 @@
 package tech.pegasys.pantheon.cli.subcommands.rlp;
 
 import org.hyperledger.besu.consensus.ibft.IbftExtraData;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;

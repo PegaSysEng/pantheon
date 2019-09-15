@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.services;
 
-import tech.pegasys.pantheon.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
+import org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
 import tech.pegasys.pantheon.plugin.services.StorageService;
 import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorageFactory;
 import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;

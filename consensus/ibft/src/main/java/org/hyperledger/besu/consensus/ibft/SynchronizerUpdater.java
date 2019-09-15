@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.consensus.ibft;
 
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 
 public interface SynchronizerUpdater {
 

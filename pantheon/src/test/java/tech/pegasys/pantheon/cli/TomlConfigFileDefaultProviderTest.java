@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import tech.pegasys.pantheon.cli.util.TomlConfigFileDefaultProvider;
-import tech.pegasys.pantheon.ethereum.core.Wei;
+import org.hyperledger.besu.ethereum.core.Wei;
 
 import java.io.BufferedWriter;
 import java.io.File;

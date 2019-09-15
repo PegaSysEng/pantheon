@@ -14,7 +14,7 @@ package org.hyperledger.besu.consensus.ibft;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 import org.junit.Test;
 

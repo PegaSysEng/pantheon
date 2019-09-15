@@ -15,8 +15,8 @@ package org.hyperledger.besu.tests.acceptance.dsl.transaction.clique;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 import java.util.Arrays;
 import java.util.List;

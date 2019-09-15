@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.cli.custom;
 
-import tech.pegasys.pantheon.ethereum.permissioning.TomlConfigFileParser;
+import org.hyperledger.besu.ethereum.permissioning.TomlConfigFileParser;
 
 import java.io.File;
 import java.io.IOException;

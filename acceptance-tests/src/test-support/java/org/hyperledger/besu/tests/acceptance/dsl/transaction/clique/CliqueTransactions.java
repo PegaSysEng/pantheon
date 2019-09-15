@@ -13,7 +13,7 @@
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.clique;
 
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 public class CliqueTransactions {
   public static final String LATEST = "latest";

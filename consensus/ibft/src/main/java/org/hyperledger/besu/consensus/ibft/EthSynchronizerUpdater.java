@@ -14,9 +14,9 @@ package org.hyperledger.besu.consensus.ibft;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeer;
-import tech.pegasys.pantheon.ethereum.eth.manager.EthPeers;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 
 import org.apache.logging.log4j.Logger;
 

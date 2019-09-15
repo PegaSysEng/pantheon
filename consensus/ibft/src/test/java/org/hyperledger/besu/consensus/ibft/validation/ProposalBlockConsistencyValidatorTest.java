@@ -21,7 +21,7 @@ import org.hyperledger.besu.consensus.ibft.IbftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.ibft.IbftBlockInterface;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
-import tech.pegasys.pantheon.ethereum.core.Block;
+import org.hyperledger.besu.ethereum.core.Block;
 
 import java.util.Collections;
 import java.util.Optional;

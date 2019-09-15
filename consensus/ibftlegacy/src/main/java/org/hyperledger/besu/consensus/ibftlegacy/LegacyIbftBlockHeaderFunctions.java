@@ -12,9 +12,9 @@
  */
 package org.hyperledger.besu.consensus.ibftlegacy;
 
-import tech.pegasys.pantheon.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.ethereum.core.BlockHeaderFunctions;
-import tech.pegasys.pantheon.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
+import org.hyperledger.besu.ethereum.core.Hash;
 
 public class LegacyIbftBlockHeaderFunctions implements BlockHeaderFunctions {
 

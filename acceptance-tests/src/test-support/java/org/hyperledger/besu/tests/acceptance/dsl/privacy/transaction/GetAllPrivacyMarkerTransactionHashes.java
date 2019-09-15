@@ -14,7 +14,7 @@ package org.hyperledger.besu.tests.acceptance.dsl.privacy.transaction;
 
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 import java.io.IOException;
 import java.math.BigInteger;

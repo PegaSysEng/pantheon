@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.cli.options;
 
-import tech.pegasys.pantheon.ethereum.eth.EthProtocolConfiguration;
+import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
 import tech.pegasys.pantheon.util.number.PositiveNumber;
 
 import java.util.Arrays;

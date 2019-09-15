@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.consensus.clique.jsonrpc;
 
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
 
 import java.util.Optional;
 

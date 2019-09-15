@@ -15,7 +15,7 @@ package org.hyperledger.besu.consensus.common;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hyperledger.besu.consensus.common.VoteType.ADD;
 
-import tech.pegasys.pantheon.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.core.Address;
 
 import java.util.Objects;
 

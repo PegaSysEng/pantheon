@@ -12,9 +12,9 @@
  */
 package tech.pegasys.pantheon.services;
 
-import tech.pegasys.pantheon.ethereum.eth.sync.BlockBroadcaster;
-import tech.pegasys.pantheon.ethereum.eth.sync.state.SyncState;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.eth.sync.BlockBroadcaster;
+import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
+import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.plugin.services.PantheonEvents;
 
 public class PantheonEventsImpl implements PantheonEvents {

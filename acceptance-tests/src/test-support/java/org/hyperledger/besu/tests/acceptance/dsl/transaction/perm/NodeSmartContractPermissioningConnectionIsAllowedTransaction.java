@@ -13,16 +13,16 @@
 package org.hyperledger.besu.tests.acceptance.dsl.transaction.perm;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static tech.pegasys.pantheon.ethereum.permissioning.NodeSmartContractPermissioningController.checkTransactionResult;
+import static org.hyperledger.besu.ethereum.permissioning.NodeSmartContractPermissioningController.checkTransactionResult;
 
 import org.hyperledger.besu.crypto.Hash;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.NodeRequests;
 import org.hyperledger.besu.tests.acceptance.dsl.transaction.Transaction;
-import tech.pegasys.pantheon.ethereum.core.Address;
-import tech.pegasys.pantheon.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeSmartContractPermissioningController;
+import org.hyperledger.besu.ethereum.core.Address;
+import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.permissioning.NodeSmartContractPermissioningController;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 
 import java.io.IOException;

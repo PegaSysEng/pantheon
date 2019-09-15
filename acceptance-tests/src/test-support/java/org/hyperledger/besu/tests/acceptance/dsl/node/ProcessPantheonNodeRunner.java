@@ -16,9 +16,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.hyperledger.besu.tests.acceptance.dsl.StaticNodesUtils;
 import tech.pegasys.pantheon.cli.options.NetworkingOptions;
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.RpcApi;
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.RpcApis;
-import tech.pegasys.pantheon.ethereum.permissioning.PermissioningConfiguration;
+import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApis;
+import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
 

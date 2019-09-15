@@ -14,8 +14,8 @@ package org.hyperledger.besu.consensus.ibft;
 
 import static java.util.Collections.newSetFromMap;
 
-import tech.pegasys.pantheon.ethereum.core.Hash;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.wire.MessageData;
+import org.hyperledger.besu.ethereum.core.Hash;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 
 import java.util.Set;
 

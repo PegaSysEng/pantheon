@@ -15,7 +15,7 @@ package org.hyperledger.besu.consensus.ibft.support;
 import static java.util.function.Function.identity;
 
 import org.hyperledger.besu.consensus.ibft.SynchronizerUpdater;
-import tech.pegasys.pantheon.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 
 import java.util.Collection;
 import java.util.HashMap;

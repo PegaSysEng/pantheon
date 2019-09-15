@@ -18,9 +18,9 @@ import static java.util.stream.Collectors.toList;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
 import org.hyperledger.besu.tests.acceptance.dsl.node.PantheonNode;
 import org.hyperledger.besu.tests.acceptance.dsl.node.RunnableNode;
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.JsonRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.RpcApi;
-import tech.pegasys.pantheon.ethereum.api.jsonrpc.websocket.WebSocketConfiguration;
+import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcConfiguration;
+import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
+import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.tests.acceptance.dsl.node.configuration.genesis.GenesisConfigurationFactory;
 
 import java.io.IOException;
