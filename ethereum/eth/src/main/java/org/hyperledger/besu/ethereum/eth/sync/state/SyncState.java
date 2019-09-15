@@ -19,8 +19,8 @@ import org.hyperledger.besu.ethereum.chain.ChainHead;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.SyncStatus;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.plugin.services.PantheonEvents.SyncStatusListener;
-import tech.pegasys.pantheon.util.Subscribers;
+import org.hyperledger.besu.plugin.services.PantheonEvents.SyncStatusListener;
+import org.hyperledger.besu.util.Subscribers;
 
 import java.util.Optional;
 

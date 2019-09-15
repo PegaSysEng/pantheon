@@ -19,7 +19,7 @@ import org.hyperledger.besu.ethereum.eth.sync.TrailingPeerRequirements;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
 
 public class FullSyncDownloader<C> {
 

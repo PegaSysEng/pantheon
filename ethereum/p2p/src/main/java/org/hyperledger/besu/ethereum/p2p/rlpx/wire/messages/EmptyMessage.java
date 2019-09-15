@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages;
 
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 /** A message without a body. */
 abstract class EmptyMessage implements MessageData {

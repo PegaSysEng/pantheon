@@ -23,8 +23,8 @@ import org.hyperledger.besu.ethereum.p2p.discovery.internal.PacketData;
 import org.hyperledger.besu.ethereum.p2p.discovery.internal.PacketType;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
 
 import java.util.List;
 import java.util.Random;

@@ -22,7 +22,7 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcRespon
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.SyncingResult;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
-import tech.pegasys.pantheon.plugin.data.SyncStatus;
+import org.hyperledger.besu.plugin.data.SyncStatus;
 
 import java.util.Optional;
 

@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.api.graphql;
 
 import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Optional;
 

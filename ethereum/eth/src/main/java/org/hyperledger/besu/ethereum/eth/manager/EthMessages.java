@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
-import tech.pegasys.pantheon.util.Subscribers;
+import org.hyperledger.besu.util.Subscribers;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

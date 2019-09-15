@@ -17,11 +17,11 @@ import static org.hyperledger.besu.crypto.SECP256K1.calculateKeyAgreement;
 
 import org.hyperledger.besu.crypto.Hash;
 import org.hyperledger.besu.crypto.SECP256K1;
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.Bytes32s;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.MutableBytes32;
-import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.Bytes32s;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytes32;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
 
 /**
  * The initiator's handshake message.

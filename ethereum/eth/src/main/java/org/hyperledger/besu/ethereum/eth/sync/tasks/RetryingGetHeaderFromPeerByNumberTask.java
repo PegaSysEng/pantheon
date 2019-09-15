@@ -19,7 +19,7 @@ import org.hyperledger.besu.ethereum.eth.manager.task.AbstractGetHeadersFromPeer
 import org.hyperledger.besu.ethereum.eth.manager.task.AbstractRetryingPeerTask;
 import org.hyperledger.besu.ethereum.eth.manager.task.GetHeadersFromPeerByNumberTask;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
 
 import java.util.Collection;
 import java.util.List;

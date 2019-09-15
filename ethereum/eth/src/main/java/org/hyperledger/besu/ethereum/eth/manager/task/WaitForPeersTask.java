@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.eth.manager.task;
 
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeers;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

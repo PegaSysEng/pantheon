@@ -13,12 +13,12 @@
 package org.hyperledger.besu.ethereum.eth.manager;
 
 import static org.hyperledger.besu.ethereum.eth.manager.MonitoredExecutors.newFixedThreadPool;
-import static tech.pegasys.pantheon.util.FutureUtils.propagateResult;
+import static org.hyperledger.besu.util.FutureUtils.propagateResult;
 
 import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.services.pipeline.Pipeline;
-import tech.pegasys.pantheon.util.ExceptionUtils;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.services.pipeline.Pipeline;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 import java.time.Duration;
 import java.util.Collection;

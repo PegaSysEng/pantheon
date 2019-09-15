@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.rlp;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
 
 /**
  * Helper static methods to facilitate RLP encoding <b>within this package</b>. Neither this class

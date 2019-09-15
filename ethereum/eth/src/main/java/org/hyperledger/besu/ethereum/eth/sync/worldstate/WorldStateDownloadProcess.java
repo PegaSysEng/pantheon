@@ -13,20 +13,20 @@
 package org.hyperledger.besu.ethereum.eth.sync.worldstate;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static tech.pegasys.pantheon.services.pipeline.PipelineBuilder.createPipelineFrom;
+import static org.hyperledger.besu.services.pipeline.PipelineBuilder.createPipelineFrom;
 
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
-import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
-import tech.pegasys.pantheon.services.pipeline.Pipe;
-import tech.pegasys.pantheon.services.pipeline.Pipeline;
-import tech.pegasys.pantheon.services.pipeline.PipelineBuilder;
-import tech.pegasys.pantheon.services.pipeline.WritePipe;
-import tech.pegasys.pantheon.services.tasks.Task;
-import tech.pegasys.pantheon.util.ExceptionUtils;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.services.pipeline.Pipe;
+import org.hyperledger.besu.services.pipeline.Pipeline;
+import org.hyperledger.besu.services.pipeline.PipelineBuilder;
+import org.hyperledger.besu.services.pipeline.WritePipe;
+import org.hyperledger.besu.services.tasks.Task;
+import org.hyperledger.besu.util.ExceptionUtils;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;

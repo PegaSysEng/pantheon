@@ -14,11 +14,11 @@ package org.hyperledger.besu.ethereum.rlp;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.MutableBytes32;
-import tech.pegasys.pantheon.util.uint.UInt256;
-import tech.pegasys.pantheon.util.uint.UInt256Value;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytes32;
+import org.hyperledger.besu.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256Value;
 
 import java.math.BigInteger;
 import java.net.InetAddress;

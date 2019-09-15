@@ -17,7 +17,7 @@ import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
 import tech.pegasys.pantheon.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.p2p.discovery.internal;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.hyperledger.besu.crypto.Hash.keccak256;
-import static tech.pegasys.pantheon.util.Preconditions.checkGuard;
-import static tech.pegasys.pantheon.util.bytes.BytesValues.asUnsignedBigInteger;
+import static org.hyperledger.besu.util.Preconditions.checkGuard;
+import static org.hyperledger.besu.util.bytes.BytesValues.asUnsignedBigInteger;
 
 import org.hyperledger.besu.crypto.SECP256K1;
 import org.hyperledger.besu.crypto.SECP256K1.PublicKey;
@@ -24,9 +24,9 @@ import org.hyperledger.besu.ethereum.p2p.discovery.PeerDiscoveryPacketDecodingEx
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPException;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.bytes.MutableBytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256Bytes;
+import org.hyperledger.besu.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.MutableBytesValue;
+import org.hyperledger.besu.util.uint.UInt256Bytes;
 
 import java.math.BigInteger;
 import java.util.Arrays;

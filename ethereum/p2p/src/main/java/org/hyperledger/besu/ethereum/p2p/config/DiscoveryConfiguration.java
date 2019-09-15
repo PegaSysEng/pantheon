@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.p2p.config;
 import static java.util.stream.Collectors.toList;
 
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.util.NetworkUtility;
+import org.hyperledger.besu.util.NetworkUtility;
 
 import java.util.ArrayList;
 import java.util.Collections;

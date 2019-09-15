@@ -17,7 +17,7 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.Subscrip
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.request.SubscriptionType;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
-import tech.pegasys.pantheon.plugin.data.SyncStatus;
+import org.hyperledger.besu.plugin.data.SyncStatus;
 
 public class SyncingSubscriptionService {
 

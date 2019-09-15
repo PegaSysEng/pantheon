@@ -15,10 +15,10 @@ package org.hyperledger.besu.crypto;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.crypto.Hash.keccak256;
-import static tech.pegasys.pantheon.util.bytes.BytesValue.fromHexString;
+import static org.hyperledger.besu.util.bytes.BytesValue.fromHexString;
 
-import tech.pegasys.pantheon.util.bytes.Bytes32;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.Bytes32;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.io.File;
 import java.math.BigInteger;

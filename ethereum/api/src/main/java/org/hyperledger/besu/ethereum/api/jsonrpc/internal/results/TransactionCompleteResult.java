@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.results;
 
 import tech.pegasys.pantheon.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

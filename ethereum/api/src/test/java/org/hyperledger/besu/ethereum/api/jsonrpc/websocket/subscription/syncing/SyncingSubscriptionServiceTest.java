@@ -24,7 +24,7 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.request.
 import org.mockito.ArgumentMatchers;
 import org.hyperledger.besu.ethereum.core.SyncStatus;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
-import tech.pegasys.pantheon.plugin.services.PantheonEvents.SyncStatusListener;
+import org.hyperledger.besu.plugin.services.PantheonEvents.SyncStatusListener;
 
 import java.util.Collections;
 import java.util.List;

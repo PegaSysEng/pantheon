@@ -13,13 +13,13 @@
 package org.hyperledger.besu.ethereum.p2p.discovery;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static tech.pegasys.pantheon.util.Preconditions.checkGuard;
+import static org.hyperledger.besu.util.Preconditions.checkGuard;
 
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-import tech.pegasys.pantheon.util.NetworkUtility;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.NetworkUtility;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.net.InetAddress;
 import java.util.Objects;

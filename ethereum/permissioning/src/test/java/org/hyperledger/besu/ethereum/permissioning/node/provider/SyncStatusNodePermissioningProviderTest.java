@@ -22,10 +22,10 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.ethereum.core.SyncStatus;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.plugin.services.PantheonEvents.SyncStatusListener;
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.PantheonEvents.SyncStatusListener;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
 
 import java.util.ArrayList;
 import java.util.Collection;

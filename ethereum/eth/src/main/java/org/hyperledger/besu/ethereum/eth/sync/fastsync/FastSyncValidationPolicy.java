@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.eth.sync.fastsync;
 
 import org.hyperledger.besu.ethereum.eth.sync.ValidationPolicy;
 import org.hyperledger.besu.ethereum.mainnet.HeaderValidationMode;
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
-import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
 
 public class FastSyncValidationPolicy implements ValidationPolicy {
   private final float targetFullValidationRate;

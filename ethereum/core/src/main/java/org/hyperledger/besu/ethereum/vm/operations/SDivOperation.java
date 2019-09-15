@@ -16,7 +16,7 @@ import org.hyperledger.besu.ethereum.core.Gas;
 import org.hyperledger.besu.ethereum.vm.AbstractOperation;
 import org.hyperledger.besu.ethereum.vm.GasCalculator;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
-import tech.pegasys.pantheon.util.uint.Int256;
+import org.hyperledger.besu.util.uint.Int256;
 
 public class SDivOperation extends AbstractOperation {
 

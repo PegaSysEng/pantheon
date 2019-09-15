@@ -13,7 +13,7 @@
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.privacy;
 
 import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

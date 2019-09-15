@@ -22,7 +22,7 @@ import org.hyperledger.besu.ethereum.api.graphql.internal.response.GraphQLJsonRe
 import org.hyperledger.besu.ethereum.api.graphql.internal.response.GraphQLResponse;
 import org.hyperledger.besu.ethereum.api.graphql.internal.response.GraphQLResponseType;
 import org.hyperledger.besu.ethereum.api.graphql.internal.response.GraphQLSuccessResponse;
-import tech.pegasys.pantheon.util.NetworkUtility;
+import org.hyperledger.besu.util.NetworkUtility;
 
 import java.net.InetSocketAddress;
 import java.net.SocketException;

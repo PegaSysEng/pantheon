@@ -23,7 +23,7 @@ import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.messages.TransactionsMessage;
 import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import tech.pegasys.pantheon.plugin.services.metrics.Counter;
+import org.hyperledger.besu.plugin.services.metrics.Counter;
 
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;

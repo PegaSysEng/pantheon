@@ -12,14 +12,14 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager.task;
 
-import static tech.pegasys.pantheon.util.FutureUtils.completedExceptionally;
+import static org.hyperledger.besu.util.FutureUtils.completedExceptionally;
 
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
-import tech.pegasys.pantheon.metrics.PantheonMetricCategory;
-import tech.pegasys.pantheon.metrics.noop.NoOpMetricsSystem;
-import tech.pegasys.pantheon.plugin.services.MetricsSystem;
-import tech.pegasys.pantheon.plugin.services.metrics.LabelledMetric;
-import tech.pegasys.pantheon.plugin.services.metrics.OperationTimer;
+import org.hyperledger.besu.metrics.PantheonMetricCategory;
+import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
+import org.hyperledger.besu.plugin.services.MetricsSystem;
+import org.hyperledger.besu.plugin.services.metrics.LabelledMetric;
+import org.hyperledger.besu.plugin.services.metrics.OperationTimer;
 
 import java.util.Collection;
 import java.util.concurrent.CancellationException;

@@ -18,7 +18,7 @@ import org.hyperledger.besu.ethereum.privacy.PrivateStateStorage;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStatePreimageStorage;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateStorage;
-import tech.pegasys.pantheon.plugin.services.storage.KeyValueStorage;
+import org.hyperledger.besu.plugin.services.storage.KeyValueStorage;
 
 import java.io.Closeable;
 

@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.p2p.rlpx.connections;
 
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.DisconnectReason;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;

@@ -15,12 +15,12 @@ package org.hyperledger.besu.tests.acceptance.dsl.node;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.hyperledger.besu.tests.acceptance.dsl.StaticNodesUtils;
-import tech.pegasys.pantheon.cli.options.NetworkingOptions;
+import org.hyperledger.besu.cli.options.NetworkingOptions;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApis;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
-import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
-import tech.pegasys.pantheon.plugin.services.metrics.MetricCategory;
+import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
+import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
 
 import java.io.BufferedReader;
 import java.io.File;

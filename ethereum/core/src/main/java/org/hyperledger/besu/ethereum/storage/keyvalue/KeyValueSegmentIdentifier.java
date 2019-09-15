@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.storage.keyvalue;
 
-import tech.pegasys.pantheon.plugin.services.storage.SegmentIdentifier;
+import org.hyperledger.besu.plugin.services.storage.SegmentIdentifier;
 
 public enum KeyValueSegmentIdentifier implements SegmentIdentifier {
   BLOCKCHAIN((byte) 1),

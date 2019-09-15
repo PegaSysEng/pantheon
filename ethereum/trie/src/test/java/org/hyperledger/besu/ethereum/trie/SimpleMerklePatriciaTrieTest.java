@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.trie;
 
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.nio.charset.Charset;
 

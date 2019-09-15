@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.core;
 
-import tech.pegasys.pantheon.plugin.data.SyncStatus;
-import tech.pegasys.pantheon.plugin.services.PantheonEvents;
+import org.hyperledger.besu.plugin.data.SyncStatus;
+import org.hyperledger.besu.plugin.services.PantheonEvents;
 
 import java.util.Optional;
 

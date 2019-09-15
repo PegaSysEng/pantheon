@@ -34,8 +34,8 @@ import org.hyperledger.besu.ethereum.core.BlockBody;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.plugin.services.PantheonEvents.SyncStatusListener;
-import tech.pegasys.pantheon.util.uint.UInt256;
+import org.hyperledger.besu.plugin.services.PantheonEvents.SyncStatusListener;
+import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.Collections;
 import java.util.Optional;

@@ -12,11 +12,11 @@
  */
 package org.hyperledger.besu.ethereum.p2p.rlpx.wire;
 
-import static tech.pegasys.pantheon.util.bytes.BytesValue.wrap;
+import static org.hyperledger.besu.util.bytes.BytesValue.wrap;
 
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 import org.hyperledger.besu.ethereum.rlp.RLPOutput;
-import tech.pegasys.pantheon.util.bytes.BytesValues;
+import org.hyperledger.besu.util.bytes.BytesValues;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;

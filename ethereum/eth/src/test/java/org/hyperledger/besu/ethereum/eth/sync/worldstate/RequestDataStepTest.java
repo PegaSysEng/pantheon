@@ -26,8 +26,8 @@ import org.hyperledger.besu.ethereum.eth.manager.task.EthTask;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.Hash;
-import tech.pegasys.pantheon.services.tasks.Task;
-import tech.pegasys.pantheon.util.bytes.BytesValue;
+import org.hyperledger.besu.services.tasks.Task;
+import org.hyperledger.besu.util.bytes.BytesValue;
 
 import java.util.List;
 import java.util.Map;
