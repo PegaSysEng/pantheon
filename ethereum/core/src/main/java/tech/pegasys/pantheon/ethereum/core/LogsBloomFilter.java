@@ -82,12 +82,15 @@ public class LogsBloomFilter implements UnformattedData {
    */
   public static LogsBloomFilter readFrom(final RLPInput input) {
     final BytesValue bytes = input.readBytesValue();
-    if (bytes.size() != BYTE_SIZE) {
+    if (bytes == null || bytes.size() == 0) {
+      return null;
+    } else if (bytes.size() != BYTE_SIZE) {
       throw new RLPException(
           String.format(
               "LogsBloomFilter unexpected size of %s (needs %s)", bytes.size(), BYTE_SIZE));
+    } else {
+      return new LogsBloomFilter(bytes);
     }
-    return new LogsBloomFilter(bytes);
   }
 
   /**
