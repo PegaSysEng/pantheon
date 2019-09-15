@@ -14,7 +14,7 @@ package org.hyperledger.besu.ethereum.core;
 
 import java.util.Objects;
 
-public final class SyncStatus implements tech.pegasys.pantheon.plugin.data.SyncStatus {
+public final class SyncStatus implements org.hyperledger.besu.plugin.data.SyncStatus {
 
   private final long startingBlock;
   private final long currentBlock;

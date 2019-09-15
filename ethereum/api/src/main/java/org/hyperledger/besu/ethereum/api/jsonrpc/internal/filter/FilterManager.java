@@ -14,8 +14,8 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.filter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import tech.pegasys.pantheon.ethereum.api.LogWithMetadata;
-import tech.pegasys.pantheon.ethereum.api.LogsQuery;
+import org.hyperledger.besu.ethereum.api.LogWithMetadata;
+import org.hyperledger.besu.ethereum.api.LogsQuery;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;

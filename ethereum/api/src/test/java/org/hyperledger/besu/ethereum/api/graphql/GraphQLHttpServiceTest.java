@@ -15,8 +15,8 @@ package org.hyperledger.besu.ethereum.api.graphql;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.api.graphql.internal.BlockchainQuery;
-import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
-import tech.pegasys.pantheon.ethereum.api.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.blockcreation.EthHashMiningCoordinator;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.Synchronizer;

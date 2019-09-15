@@ -22,7 +22,7 @@ import org.hyperledger.besu.util.bytes.DelegatingBytes32;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 /** A 32-bytes hash value as used in Ethereum blocks, that is the result of the KEC algorithm. */
-public class Hash extends DelegatingBytes32 implements tech.pegasys.pantheon.plugin.data.Hash {
+public class Hash extends DelegatingBytes32 implements org.hyperledger.besu.plugin.data.Hash {
 
   public static final Hash ZERO = new Hash(Bytes32.ZERO);
 

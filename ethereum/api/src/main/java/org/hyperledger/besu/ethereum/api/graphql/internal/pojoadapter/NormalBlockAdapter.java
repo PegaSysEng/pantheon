@@ -13,8 +13,8 @@
 package org.hyperledger.besu.ethereum.api.graphql.internal.pojoadapter;
 
 import org.hyperledger.besu.ethereum.api.graphql.internal.BlockchainQuery;
-import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
-import tech.pegasys.pantheon.ethereum.api.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.util.uint.UInt256;

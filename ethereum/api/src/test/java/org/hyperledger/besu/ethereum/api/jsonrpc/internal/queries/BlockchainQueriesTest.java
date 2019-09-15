@@ -17,10 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryBlockchain;
 import static org.hyperledger.besu.ethereum.core.InMemoryStorageProvider.createInMemoryWorldStateArchive;
 
-import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
-import tech.pegasys.pantheon.ethereum.api.LogWithMetadata;
-import tech.pegasys.pantheon.ethereum.api.LogsQuery;
-import tech.pegasys.pantheon.ethereum.api.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.api.LogWithMetadata;
+import org.hyperledger.besu.ethereum.api.LogsQuery;
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.Address;

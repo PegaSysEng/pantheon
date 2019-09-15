@@ -12,10 +12,10 @@
  */
 package org.hyperledger.besu.ethereum.api.graphql.internal;
 
-import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
-import tech.pegasys.pantheon.ethereum.api.LogWithMetadata;
-import tech.pegasys.pantheon.ethereum.api.LogsQuery;
-import tech.pegasys.pantheon.ethereum.api.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.api.LogWithMetadata;
+import org.hyperledger.besu.ethereum.api.LogsQuery;
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.chain.TransactionLocation;
 import org.hyperledger.besu.ethereum.core.Block;

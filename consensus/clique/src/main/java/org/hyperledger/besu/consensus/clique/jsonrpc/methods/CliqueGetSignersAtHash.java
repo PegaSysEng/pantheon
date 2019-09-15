@@ -13,7 +13,7 @@
 package org.hyperledger.besu.consensus.clique.jsonrpc.methods;
 
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
-import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;

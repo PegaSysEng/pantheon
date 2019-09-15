@@ -20,7 +20,7 @@ import org.hyperledger.besu.cli.config.EthNetworkConfig;
 import org.hyperledger.besu.controller.KeyPairUtil;
 import org.hyperledger.besu.controller.PantheonController;
 import org.hyperledger.besu.controller.PantheonControllerBuilder;
-import tech.pegasys.pantheon.ethereum.api.graphql.GraphQLConfiguration;
+import org.hyperledger.besu.ethereum.api.graphql.GraphQLConfiguration;
 import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
 import org.hyperledger.besu.ethereum.eth.sync.SynchronizerConfiguration;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolConfiguration;

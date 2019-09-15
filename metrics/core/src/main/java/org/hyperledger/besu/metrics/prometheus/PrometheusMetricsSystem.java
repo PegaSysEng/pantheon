@@ -52,7 +52,7 @@ public class PrometheusMetricsSystem implements ObservableMetricsSystem {
 
   private final Map<MetricCategory, Collection<Collector>> collectors = new ConcurrentHashMap<>();
   private final CollectorRegistry registry = new CollectorRegistry(true);
-  private final Map<String, LabelledMetric<tech.pegasys.pantheon.plugin.services.metrics.Counter>>
+  private final Map<String, LabelledMetric<org.hyperledger.besu.plugin.services.metrics.Counter>>
       cachedCounters = new ConcurrentHashMap<>();
   private final Map<String, LabelledMetric<OperationTimer>> cachedTimers =
       new ConcurrentHashMap<>();
@@ -92,7 +92,7 @@ public class PrometheusMetricsSystem implements ObservableMetricsSystem {
   }
 
   @Override
-  public LabelledMetric<tech.pegasys.pantheon.plugin.services.metrics.Counter>
+  public LabelledMetric<org.hyperledger.besu.plugin.services.metrics.Counter>
       createLabelledCounter(
           final MetricCategory category,
           final String name,

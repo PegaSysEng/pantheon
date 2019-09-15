@@ -27,7 +27,7 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.TransactionRec
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.LogResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.mockito.ArgumentMatchers;
-import tech.pegasys.pantheon.ethereum.api.LogWithMetadata;
+import org.hyperledger.besu.ethereum.api.LogWithMetadata;
 import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;

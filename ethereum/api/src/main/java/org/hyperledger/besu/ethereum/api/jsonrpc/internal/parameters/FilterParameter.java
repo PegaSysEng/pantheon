@@ -12,7 +12,7 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters;
 
-import tech.pegasys.pantheon.ethereum.api.TopicsParameter;
+import org.hyperledger.besu.ethereum.api.TopicsParameter;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
 

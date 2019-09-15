@@ -15,7 +15,7 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
-import tech.pegasys.pantheon.ethereum.api.TopicsParameter;
+import org.hyperledger.besu.ethereum.api.TopicsParameter;
 
 import java.util.Arrays;
 import java.util.Collections;

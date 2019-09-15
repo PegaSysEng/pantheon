@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.filter;
 
-import tech.pegasys.pantheon.ethereum.api.LogWithMetadata;
-import tech.pegasys.pantheon.ethereum.api.LogsQuery;
+import org.hyperledger.besu.ethereum.api.LogWithMetadata;
+import org.hyperledger.besu.ethereum.api.LogsQuery;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
 
 import java.util.ArrayList;

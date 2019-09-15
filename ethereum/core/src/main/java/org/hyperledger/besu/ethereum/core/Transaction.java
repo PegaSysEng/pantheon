@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /** An operation submitted by an external actor to be applied to the system. */
-public class Transaction implements tech.pegasys.pantheon.plugin.data.Transaction {
+public class Transaction implements org.hyperledger.besu.plugin.data.Transaction {
 
   // Used for transactions that are not tied to a specific chain
   // (e.g. does not have a chain id associated with it).

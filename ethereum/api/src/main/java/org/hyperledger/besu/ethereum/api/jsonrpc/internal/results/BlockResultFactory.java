@@ -12,8 +12,8 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.results;
 
-import tech.pegasys.pantheon.ethereum.api.BlockWithMetadata;
-import tech.pegasys.pantheon.ethereum.api.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.core.Hash;
 
 import java.util.List;
