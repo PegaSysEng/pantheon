@@ -42,8 +42,3 @@ Instructions for how to get started with developing on the Besu codebase. Please
 ## Release Notes
 
 [Release Notes](CHANGELOG.md)
-
-
-
-find . -type f -name "*.md" -print0 | xargs -0 -l sed -i -e 's/Besu/Besu/g'
-find . -type f -name "*.md" -print0 | xargs -0 -l sed -i -e 's/besu/besu/g'
