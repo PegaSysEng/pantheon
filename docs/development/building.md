@@ -7,7 +7,7 @@
 ## Quick start
 
 ```sh
-git clone --recursive https://github.com/PegasysEng/besu
+git clone --recursive https://github.com/hyperledger/besu
 cd besu
 ./gradlew build  
 ./gradlew integrationTest
@@ -16,11 +16,11 @@ cd besu
 ## Checkout source code
 
 ```
-git clone --recursive git@github.com:PegasysEng/besu.git
+git clone --recursive git@github.com:hyperledger/besu.git
 ```
 OR
 ```
-git clone --recursive https://github.com/PegasysEng/besu
+git clone --recursive https://github.com/hyperledger/besu
 ```
 
 ## See what tasks are available

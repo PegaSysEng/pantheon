@@ -184,8 +184,8 @@ try {
                         stage(stage_name + 'Calculate variables') {
                             def gradleProperties = readProperties file: 'gradle.properties'
                             version = gradleProperties.version
-                            def imageRepos = 'pegasyseng'
-                            image = "${imageRepos}/pantheon:${version}"
+                            def imageRepos = 'hyperledger'
+                            image = "${imageRepos}/besu:${version}"
                         }
 
                         try {

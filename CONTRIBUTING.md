@@ -34,7 +34,7 @@ By participating, you are expected to uphold this code. Please report unacceptab
 > **Note:** Please don't file an issue to ask a question.  You'll get faster results by using the resources below.
 
 * [Besu documentation]
-* [Gitter]
+* [Rocketchat]
 
 ## How To Contribute
 ### Reporting Bugs
@@ -138,7 +138,7 @@ Start by looking through the 'good first issue' and 'help wanted' labeled issues
 and a test or two.
 * [Help wanted issues][search-label-help-wanted] - issues which are a bit more involved than `good first issue` issues.
 
-When you've identified an issue you'd like to work on, ping us on [Gitter] and we'll assign it to you. 
+When you've identified an issue you'd like to work on, ping us on [Rocketchat] and we'll assign it to you. 
 
 ### Contribution Workflow
 The codebase and documentation are maintained using the same "*contributor workflow*" where everyone 
@@ -240,8 +240,8 @@ These are not strictly enforced during the build, but should be adhered to and c
 | [`needs engineering approval`][search-label-needs-engineering-approval] | Pull requests which need to be approved from a technical person, mainly documentation PRs. |
 
 [private@pegasys.tech]: mailto:private@pegasys.tech
-[Gitter]: https://gitter.im/PegaSysEng/besu
-[Besu documentation]: https://docs.besu.pegasys.tech/
+[Rocketchat]: https://chat.hyperledger.org/channel/besu
+[Besu documentation]: https://besu.hyperledger.org/
 [CLA.md]: /CLA.md
 [Code Reviews]: /docs/community/code-reviews.md
 [MkDocs]: https://www.mkdocs.org/
