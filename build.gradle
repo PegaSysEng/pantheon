@@ -577,25 +577,24 @@ def calculateVersion() {
 }
 
 def getCheckedOutGitCommitHash() {
+  getGitHeadHash().take 8
+}
+
+def getGitHeadHash() {
+  getGitRefHash('^HEAD$')
+}
+
+def getGitRefHash(String ref) {
   def gitFolder = "$projectDir/.git/"
-  if (!file(gitFolder).isDirectory()) {
-    // We are in a submodule.  The file's contents are `gitdir: <gitFolder>\n`.
-    // Read the file, cut off the front, and trim the whitespace.
-    gitFolder = file(gitFolder).text.substring(8).trim() + "/"
+  def cmd = "git --git-dir $gitFolder show-ref --head --hash $ref"
+  def proc = cmd.execute()
+  def errors = ""
+  proc.err.eachLine { line -> errors += "$line\n" }
+  proc.waitFor()
+  if (proc.exitValue() != 0) {
+    throw new GradleException("Unable to retrieve git ref hash for \"$ref\":\n$errors")
   }
-  def takeFromHash = 8
-  /*
-   * '.git/HEAD' contains either
-   *      in case of detached head: the currently checked out commit hash
-   *      otherwise: a reference to a file containing the current commit hash
-   */
-  def head = new File(gitFolder + "HEAD").text.split(":") // .git/HEAD
-  def isCommit = head.length == 1 // e5a7c79edabbf7dd39888442df081b1c9d8e88fd
-
-  if (isCommit) return head[0].trim().take(takeFromHash) // e5a7c79edabb
-
-  def refHead = new File(gitFolder + head[1].trim()) // .git/refs/heads/master
-  refHead.text.trim().take takeFromHash
+  proc.in.readLines().get(0).trim()
 }
 
 tasks.register("verifyDistributions") {
